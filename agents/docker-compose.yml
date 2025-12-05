@@ -1,0 +1,167 @@
+version: '3.8'
+
+services:
+  # Redis - Message Bus
+  redis:
+    image: redis:7-alpine
+    container_name: talent-ai-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Genkit Service
+  genkit-service:
+    build:
+      context: ./genkit-service
+      dockerfile: Dockerfile
+    container_name: talent-ai-genkit
+    ports:
+      - "3400:3400"
+    environment:
+      - GOOGLE_GENAI_API_KEY=${GOOGLE_GENAI_API_KEY}
+      - NODE_ENV=development
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3400/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Scout Coordinator Agent
+  scout-coordinator:
+    build:
+      context: ./scout-coordinator-agent
+      dockerfile: Dockerfile
+    container_name: talent-ai-scout
+    ports:
+      - "8090:8090"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - GENKIT_SERVICE_URL=http://genkit-service:3400
+      - CONVERSATION_SERVICE_URL=http://conversation-service:8003
+      - VOICE_SERVICE_URL=http://voice-service:8002
+      - AVATAR_SERVICE_URL=http://avatar-service:8001
+      - INTERVIEW_SERVICE_URL=http://interview-service:8004
+    depends_on:
+      - redis
+      - genkit-service
+    restart: unless-stopped
+
+  # Proactive Scanning Agent
+  proactive-scanning:
+    build:
+      context: ./proactive-scanning-agent
+      dockerfile: Dockerfile
+    container_name: talent-ai-scanning
+    ports:
+      - "8091:8091"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - LINKEDIN_API_KEY=${LINKEDIN_API_KEY}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  # Boolean Mastery Agent
+  boolean-mastery:
+    build:
+      context: ./boolean-mastery-agent
+      dockerfile: Dockerfile
+    container_name: talent-ai-boolean
+    ports:
+      - "8092:8092"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - GENKIT_SERVICE_URL=http://genkit-service:3400
+    depends_on:
+      - redis
+      - genkit-service
+    restart: unless-stopped
+
+  # Personalized Engagement Agent
+  personalized-engagement:
+    build:
+      context: ./personalized-engagement-agent
+      dockerfile: Dockerfile
+    container_name: talent-ai-engagement
+    ports:
+      - "8093:8093"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - GENKIT_SERVICE_URL=http://genkit-service:3400
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+    depends_on:
+      - redis
+      - genkit-service
+    restart: unless-stopped
+
+  # Market Intelligence Agent
+  market-intelligence:
+    build:
+      context: ./market-intelligence-agent
+      dockerfile: Dockerfile
+    container_name: talent-ai-market
+    ports:
+      - "8094:8094"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - GLASSDOOR_API_KEY=${GLASSDOOR_API_KEY}
+      - LINKEDIN_API_KEY=${LINKEDIN_API_KEY}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  # Tool Leverage Agent
+  tool-leverage:
+    build:
+      context: ./tool-leverage-agent
+      dockerfile: Dockerfile
+    container_name: talent-ai-tools
+    ports:
+      - "8095:8095"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - CONTACTOUT_API_KEY=${CONTACTOUT_API_KEY}
+      - SALESQL_API_KEY=${SALESQL_API_KEY}
+      - ATS_API_URL=${ATS_API_URL}
+      - CRM_API_URL=${CRM_API_URL}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  # Quality-Focused Agent
+  quality-focused:
+    build:
+      context: ./quality-focused-agent
+      dockerfile: Dockerfile
+    container_name: talent-ai-quality
+    ports:
+      - "8096:8096"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - GENKIT_SERVICE_URL=http://genkit-service:3400
+    depends_on:
+      - redis
+      - genkit-service
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    name: talent-ai-network
+    driver: bridge

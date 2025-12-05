@@ -1,0 +1,6918 @@
+[
+  {
+    "index": 0,
+    "name": "browInnerUp",
+    "analysis": {
+      "totalDisplacement": 41369761.058299914,
+      "avgDisplacement": 15356.258744728995,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26830709,
+      "horizontalDisplacement": 15067905,
+      "depthDisplacement": 26146315,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31751697.721741624,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 1,
+    "name": "browDown_L",
+    "analysis": {
+      "totalDisplacement": 41345240.50285039,
+      "avgDisplacement": 15347.156831050628,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26809872,
+      "horizontalDisplacement": 15080185,
+      "depthDisplacement": 26109922,
+      "mouthRegionDisplacement": 1544216.7965029404,
+      "jawRegionDisplacement": 419823.7733064287,
+      "upperFaceDisplacement": 31728144.881395638,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.2",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 2,
+    "name": "browDown_R",
+    "analysis": {
+      "totalDisplacement": 41334774.676964164,
+      "avgDisplacement": 15343.27196620793,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26811154,
+      "horizontalDisplacement": 15056565,
+      "depthDisplacement": 26110952,
+      "mouthRegionDisplacement": 1544097.5927017275,
+      "jawRegionDisplacement": 419821.13363688893,
+      "upperFaceDisplacement": 31717800.898980167,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 3,
+    "name": "browOuterUp_L",
+    "analysis": {
+      "totalDisplacement": 41370697.76486724,
+      "avgDisplacement": 15356.606445756213,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26833791,
+      "horizontalDisplacement": 15066323,
+      "depthDisplacement": 26145581,
+      "mouthRegionDisplacement": 1545273.7837087642,
+      "jawRegionDisplacement": 419906.21855106245,
+      "upperFaceDisplacement": 31752462.710962016,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 4,
+    "name": "browOuterUp_R",
+    "analysis": {
+      "totalDisplacement": 41373744.52596717,
+      "avgDisplacement": 15357.737389000435,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26833787,
+      "horizontalDisplacement": 15069487,
+      "depthDisplacement": 26145581,
+      "mouthRegionDisplacement": 1545342.6838188237,
+      "jawRegionDisplacement": 419904.53910534555,
+      "upperFaceDisplacement": 31755442.251397606,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 5,
+    "name": "eyeLookUp_L",
+    "analysis": {
+      "totalDisplacement": 41362525.51687384,
+      "avgDisplacement": 15353.572946129858,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26828870,
+      "horizontalDisplacement": 15067521,
+      "depthDisplacement": 26133475,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31744462.18031553,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 6,
+    "name": "eyeLookUp_R",
+    "analysis": {
+      "totalDisplacement": 41363142.436877586,
+      "avgDisplacement": 15353.801943904078,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26828870,
+      "horizontalDisplacement": 15068289,
+      "depthDisplacement": 26133475,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31745079.100319296,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 7,
+    "name": "eyeLookDown_L",
+    "analysis": {
+      "totalDisplacement": 41355647.57949759,
+      "avgDisplacement": 15351.019888454934,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26829930,
+      "horizontalDisplacement": 15067519,
+      "depthDisplacement": 26118373,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31737584.2429393,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.2",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 8,
+    "name": "eyeLookDown_R",
+    "analysis": {
+      "totalDisplacement": 41355683.141535096,
+      "avgDisplacement": 15351.03308891429,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26829930,
+      "horizontalDisplacement": 15068291,
+      "depthDisplacement": 26118373,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31737619.80497679,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.2",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 9,
+    "name": "eyeLookIn_L",
+    "analysis": {
+      "totalDisplacement": 41362518.701537386,
+      "avgDisplacement": 15353.570416309349,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26824746,
+      "horizontalDisplacement": 15078783,
+      "depthDisplacement": 26128406,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31744455.364979077,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.2",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 10,
+    "name": "eyeLookIn_R",
+    "analysis": {
+      "totalDisplacement": 41354313.725815594,
+      "avgDisplacement": 15350.524768305715,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26824746,
+      "horizontalDisplacement": 15057027,
+      "depthDisplacement": 26128406,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31736250.38925729,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 11,
+    "name": "eyeLookOut_L",
+    "analysis": {
+      "totalDisplacement": 41357599.22632073,
+      "avgDisplacement": 15351.744330482825,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26831012,
+      "horizontalDisplacement": 15059977,
+      "depthDisplacement": 26127631,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31739535.889762428,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 12,
+    "name": "eyeLookOut_R",
+    "analysis": {
+      "totalDisplacement": 41363654.64216212,
+      "avgDisplacement": 15353.992072072057,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26831012,
+      "horizontalDisplacement": 15075833,
+      "depthDisplacement": 26127631,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31745591.305603825,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.2",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 13,
+    "name": "eyeBlink_L",
+    "analysis": {
+      "totalDisplacement": 41353924.322912715,
+      "avgDisplacement": 15350.380223798335,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26823091,
+      "horizontalDisplacement": 15078528,
+      "depthDisplacement": 26113536,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31735860.98635441,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.2",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 14,
+    "name": "eyeBlink_R",
+    "analysis": {
+      "totalDisplacement": 41345071.79460106,
+      "avgDisplacement": 15347.09420735006,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26823091,
+      "horizontalDisplacement": 15057282,
+      "depthDisplacement": 26113536,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31727008.458042767,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 15,
+    "name": "eyeSquint_L",
+    "analysis": {
+      "totalDisplacement": 41367241.15428657,
+      "avgDisplacement": 15355.32336833206,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26824867,
+      "horizontalDisplacement": 15077904,
+      "depthDisplacement": 26138041,
+      "mouthRegionDisplacement": 1545117.5562212076,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31749164.87374157,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.2",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 16,
+    "name": "eyeSquint_R",
+    "analysis": {
+      "totalDisplacement": 41360312.09932995,
+      "avgDisplacement": 15352.751336054176,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26824867,
+      "horizontalDisplacement": 15057906,
+      "depthDisplacement": 26138041,
+      "mouthRegionDisplacement": 1545098.621762841,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31742254.7532433,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 17,
+    "name": "eyeWide_L",
+    "analysis": {
+      "totalDisplacement": 41362006.37877705,
+      "avgDisplacement": 15353.38024453491,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26829956,
+      "horizontalDisplacement": 15067487,
+      "depthDisplacement": 26130991,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31743943.042218745,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 18,
+    "name": "eyeWide_R",
+    "analysis": {
+      "totalDisplacement": 41362603.50431994,
+      "avgDisplacement": 15353.601894699312,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26829956,
+      "horizontalDisplacement": 15068323,
+      "depthDisplacement": 26130991,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31744540.167761646,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 19,
+    "name": "cheekPuff",
+    "analysis": {
+      "totalDisplacement": 41262514.91796211,
+      "avgDisplacement": 15316.449486994103,
+      "maxDisplacement": 19392.957510395365,
+      "verticalDisplacement": 26666338,
+      "horizontalDisplacement": 15067905,
+      "depthDisplacement": 26143514,
+      "mouthRegionDisplacement": 1544270.6030519619,
+      "jawRegionDisplacement": 419843.05047922925,
+      "upperFaceDisplacement": 31645380.082700375,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6134,
+          "dy": -12106,
+          "dz": -13853,
+          "magnitude": 19392.957510395365
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6563,
+          "dy": -11956,
+          "dz": -13778,
+          "magnitude": 19386.907669868342
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6122,
+          "dy": -11850,
+          "dz": -14040,
+          "magnitude": 19365.51016627241
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6536,
+          "dy": -11721,
+          "dz": -13959,
+          "magnitude": 19363.75010167194
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6116,
+          "dy": -12278,
+          "dz": -13578,
+          "magnitude": 19300.69490976944
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12167,
+          "dz": -13886,
+          "magnitude": 19290.89251434469
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6531,
+          "dy": -12108,
+          "dz": -13505,
+          "magnitude": 19278.035428953855
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6486,
+          "dy": -11462,
+          "dz": -14075,
+          "magnitude": 19275.66509877156
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6096,
+          "dy": -11588,
+          "dz": -14141,
+          "magnitude": 19272.02223431677
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11885,
+          "dz": -14072,
+          "magnitude": 19249.83267459746
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.3",
+        "horizontal": "22.2",
+        "depth": "38.5"
+      }
+    }
+  },
+  {
+    "index": 20,
+    "name": "cheekSquint_L",
+    "analysis": {
+      "totalDisplacement": 41371738.81547228,
+      "avgDisplacement": 15356.992878794463,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26820118,
+      "horizontalDisplacement": 15066750,
+      "depthDisplacement": 26156353,
+      "mouthRegionDisplacement": 1545168.520656404,
+      "jawRegionDisplacement": 419994.377244306,
+      "upperFaceDisplacement": 31753413.28294081,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 21,
+    "name": "cheekSquint_R",
+    "analysis": {
+      "totalDisplacement": 41373773.059121236,
+      "avgDisplacement": 15357.747980371654,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26820698,
+      "horizontalDisplacement": 15069060,
+      "depthDisplacement": 26156797,
+      "mouthRegionDisplacement": 1545442.2851543198,
+      "jawRegionDisplacement": 419871.52606504026,
+      "upperFaceDisplacement": 31755447.216565333,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 22,
+    "name": "noseSneer_L",
+    "analysis": {
+      "totalDisplacement": 41369630.54855405,
+      "avgDisplacement": 15356.21030013142,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26821977,
+      "horizontalDisplacement": 15071170,
+      "depthDisplacement": 26150258,
+      "mouthRegionDisplacement": 1545148.9081457271,
+      "jawRegionDisplacement": 419904.31388778955,
+      "upperFaceDisplacement": 31751522.274875153,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 23,
+    "name": "noseSneer_R",
+    "analysis": {
+      "totalDisplacement": 41367759.07732433,
+      "avgDisplacement": 15355.51561890287,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26821977,
+      "horizontalDisplacement": 15064640,
+      "depthDisplacement": 26150258,
+      "mouthRegionDisplacement": 1545138.9103912213,
+      "jawRegionDisplacement": 419904.4491849986,
+      "upperFaceDisplacement": 31749660.66610272,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 24,
+    "name": "jawOpen",
+    "analysis": {
+      "totalDisplacement": 41081287.7677323,
+      "avgDisplacement": 15249.178829893208,
+      "maxDisplacement": 19371.104098631033,
+      "verticalDisplacement": 27645013,
+      "horizontalDisplacement": 15067905,
+      "depthDisplacement": 24822903,
+      "mouthRegionDisplacement": 1546278.2203001946,
+      "jawRegionDisplacement": 419685.6245726842,
+      "upperFaceDisplacement": 31462270.2668915,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6461,
+          "dy": -13287,
+          "dz": -12528,
+          "magnitude": 19371.104098631033
+        },
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6059,
+          "dy": -13465,
+          "dz": -12498,
+          "magnitude": 19344.707544959165
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6418,
+          "dy": -12985,
+          "dz": -12722,
+          "magnitude": 19278.232102555463
+        },
+        {
+          "vertexIndex": 604,
+          "x": 6794,
+          "y": 11685,
+          "z": 13538,
+          "dx": -6799,
+          "dy": -13016,
+          "dz": -12487,
+          "magnitude": 19276.094677086436
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6430,
+          "dy": -13466,
+          "dz": -12199,
+          "magnitude": 19274.170721460367
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6046,
+          "dy": -13660,
+          "dz": -12162,
+          "magnitude": 19263.020531578113
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6035,
+          "dy": -13137,
+          "dz": -12708,
+          "magnitude": 19248.25337530655
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -13526,
+          "dz": -12475,
+          "magnitude": 19231.743290716004
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6749,
+          "dy": -12769,
+          "dz": -12682,
+          "magnitude": 19220.548535356633
+        },
+        {
+          "vertexIndex": 605,
+          "x": 6741,
+          "y": 11837,
+          "z": 13283,
+          "dx": -6762,
+          "dy": -13163,
+          "dz": -12205,
+          "magnitude": 19182.055103663944
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.3",
+        "upper": "94.1"
+      },
+      "axisDistribution": {
+        "vertical": "40.9",
+        "horizontal": "22.3",
+        "depth": "36.8"
+      }
+    }
+  },
+  {
+    "index": 25,
+    "name": "jawForward",
+    "analysis": {
+      "totalDisplacement": 41088312.713143826,
+      "avgDisplacement": 15251.786456252348,
+      "maxDisplacement": 19007.66355973295,
+      "verticalDisplacement": 26435014,
+      "horizontalDisplacement": 15067905,
+      "depthDisplacement": 26101528,
+      "mouthRegionDisplacement": 1540630.7004176667,
+      "jawRegionDisplacement": 419377.63594527706,
+      "upperFaceDisplacement": 31475742.38728714,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6052,
+          "dy": -11601,
+          "dz": -13787,
+          "magnitude": 19007.66355973295
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6437,
+          "dy": -11472,
+          "dz": -13712,
+          "magnitude": 19001.59722233897
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6420,
+          "dy": -11202,
+          "dz": -13883,
+          "magnitude": 18958.873727096765
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6040,
+          "dy": -11815,
+          "dz": -13530,
+          "magnitude": 18950.90301278543
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6041,
+          "dy": -11305,
+          "dz": -13951,
+          "magnitude": 18945.37165114477
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6409,
+          "dy": -11667,
+          "dz": -13451,
+          "magnitude": 18924.153111830394
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -11644,
+          "dz": -13801,
+          "magnitude": 18903.2268673896
+        },
+        {
+          "vertexIndex": 604,
+          "x": 6794,
+          "y": 11685,
+          "z": 13538,
+          "dx": -6747,
+          "dy": -11284,
+          "dz": -13554,
+          "magnitude": 18882.83826653186
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6735,
+          "dy": -11041,
+          "dz": -13737,
+          "magnitude": 18867.14273545414
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6379,
+          "dy": -10926,
+          "dz": -13993,
+          "magnitude": 18864.600870413346
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.3",
+        "upper": "94.1"
+      },
+      "axisDistribution": {
+        "vertical": "39.1",
+        "horizontal": "22.3",
+        "depth": "38.6"
+      }
+    }
+  },
+  {
+    "index": 26,
+    "name": "jawLeft",
+    "analysis": {
+      "totalDisplacement": 41268532.83621381,
+      "avgDisplacement": 15318.683309656204,
+      "maxDisplacement": 19080.387705704514,
+      "verticalDisplacement": 26806680,
+      "horizontalDisplacement": 14762219,
+      "depthDisplacement": 26156683,
+      "mouthRegionDisplacement": 1543390.9892576318,
+      "jawRegionDisplacement": 419622.234966229,
+      "upperFaceDisplacement": 31652614.68556307,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6019,
+          "dy": -11725,
+          "dz": -13797,
+          "magnitude": 19080.387705704514
+        },
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -5615,
+          "dy": -11840,
+          "dz": -13863,
+          "magnitude": 19076.07386230196
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -5608,
+          "dy": -12076,
+          "dz": -13627,
+          "magnitude": 19051.891480900264
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -5996,
+          "dy": -11950,
+          "dz": -13553,
+          "magnitude": 19037.813030912977
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -5998,
+          "dy": -11448,
+          "dz": -13947,
+          "magnitude": 19014.508066210918
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -5605,
+          "dy": -11540,
+          "dz": -14012,
+          "magnitude": 18997.99381513743
+        },
+        {
+          "vertexIndex": 604,
+          "x": 6794,
+          "y": 11685,
+          "z": 13538,
+          "dx": -6345,
+          "dy": -11551,
+          "dz": -13646,
+          "magnitude": 18970.97630592585
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5152,
+          "dy": -11862,
+          "dz": -13872,
+          "magnitude": 18965.298099423588
+        },
+        {
+          "vertexIndex": 601,
+          "x": 5593,
+          "y": 12291,
+          "z": 13499,
+          "dx": -5156,
+          "dy": -12114,
+          "dz": -13636,
+          "magnitude": 18954.51998864651
+        },
+        {
+          "vertexIndex": 605,
+          "x": 6741,
+          "y": 11837,
+          "z": 13283,
+          "dx": -6319,
+          "dy": -11771,
+          "dz": -13437,
+          "magnitude": 18948.328976455945
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.6",
+        "horizontal": "21.8",
+        "depth": "38.6"
+      }
+    }
+  },
+  {
+    "index": 27,
+    "name": "jawRight",
+    "analysis": {
+      "totalDisplacement": 41467041.97887629,
+      "avgDisplacement": 15392.368960236188,
+      "maxDisplacement": 19291.498568022133,
+      "verticalDisplacement": 26806734,
+      "horizontalDisplacement": 15372454,
+      "depthDisplacement": 26156514,
+      "mouthRegionDisplacement": 1546043.4910183838,
+      "jawRegionDisplacement": 420127.826754227,
+      "upperFaceDisplacement": 31847744.1495526,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6480,
+          "dy": -11781,
+          "dz": -13834,
+          "magnitude": 19291.498568022133
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6463,
+          "dy": -12026,
+          "dz": -13610,
+          "magnitude": 19277.63328316005
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6850,
+          "dy": -11623,
+          "dz": -13753,
+          "magnitude": 19265.55574075142
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6823,
+          "dy": -11854,
+          "dz": -13518,
+          "magnitude": 19230.36580515306
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -6034,
+          "dy": -11862,
+          "dz": -13872,
+          "magnitude": 19223.64648031169
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6470,
+          "dy": -11485,
+          "dz": -13980,
+          "magnitude": 19214.747591368458
+        },
+        {
+          "vertexIndex": 601,
+          "x": 5593,
+          "y": 12291,
+          "z": 13499,
+          "dx": -6030,
+          "dy": -12114,
+          "dz": -13636,
+          "magnitude": 19210.684318888798
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6834,
+          "dy": -11355,
+          "dz": -13903,
+          "magnitude": 19207.628432474427
+        },
+        {
+          "vertexIndex": 604,
+          "x": 6794,
+          "y": 11685,
+          "z": 13538,
+          "dx": -7143,
+          "dy": -11425,
+          "dz": -13597,
+          "magnitude": 19142.40013686894
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -6034,
+          "dy": -11541,
+          "dz": -14019,
+          "magnitude": 19134.68573036934
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.2",
+        "horizontal": "22.5",
+        "depth": "38.3"
+      }
+    }
+  },
+  {
+    "index": 28,
+    "name": "mouthFunnel",
+    "analysis": {
+      "totalDisplacement": 41257780.099561475,
+      "avgDisplacement": 15314.691944900325,
+      "maxDisplacement": 19277.747326905184,
+      "verticalDisplacement": 26638918,
+      "horizontalDisplacement": 15067905,
+      "depthDisplacement": 26148831,
+      "mouthRegionDisplacement": 1544858.8622326353,
+      "jawRegionDisplacement": 419853.17909704545,
+      "upperFaceDisplacement": 31640045.08279723,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6489,
+          "dy": -11711,
+          "dz": -13870,
+          "magnitude": 19277.747326905184
+        },
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6064,
+          "dy": -11885,
+          "dz": -13912,
+          "magnitude": 19276.12681531225
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6451,
+          "dy": -11437,
+          "dz": -14077,
+          "magnitude": 19250.51425287127
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6039,
+          "dy": -11592,
+          "dz": -14126,
+          "magnitude": 19245.463387510314
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -11953,
+          "dz": -13911,
+          "magnitude": 19174.769333684304
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6057,
+          "dy": -12087,
+          "dz": -13591,
+          "magnitude": 19170.239930684227
+        },
+        {
+          "vertexIndex": 604,
+          "x": 6794,
+          "y": 11685,
+          "z": 13538,
+          "dx": -6828,
+          "dy": -11459,
+          "dz": -13758,
+          "magnitude": 19162.79804725813
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6794,
+          "dy": -11223,
+          "dz": -13966,
+          "magnitude": 19161.50622993923
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6465,
+          "dy": -11901,
+          "dz": -13554,
+          "magnitude": 19160.92226381601
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11636,
+          "dz": -14136,
+          "magnitude": 19144.310930404365
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.3",
+        "horizontal": "22.2",
+        "depth": "38.5"
+      }
+    }
+  },
+  {
+    "index": 29,
+    "name": "mouthPucker",
+    "analysis": {
+      "totalDisplacement": 41262048.62302315,
+      "avgDisplacement": 15316.276400528268,
+      "maxDisplacement": 19306.27175298224,
+      "verticalDisplacement": 26664079,
+      "horizontalDisplacement": 15067905,
+      "depthDisplacement": 26139347,
+      "mouthRegionDisplacement": 1544726.6469302946,
+      "jawRegionDisplacement": 419894.68047057313,
+      "upperFaceDisplacement": 31644372.2439769,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6427,
+          "dy": -11806,
+          "dz": -13858,
+          "magnitude": 19306.27175298224
+        },
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6004,
+          "dy": -11961,
+          "dz": -13895,
+          "magnitude": 19292.085475655553
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6052,
+          "dy": -12166,
+          "dz": -13644,
+          "magnitude": 19256.089841917543
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6377,
+          "dy": -11571,
+          "dz": -13991,
+          "magnitude": 19243.23909844702
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6465,
+          "dy": -11981,
+          "dz": -13592,
+          "magnitude": 19237.54272249967
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -5982,
+          "dy": -11697,
+          "dz": -14044,
+          "magnitude": 19231.174405116293
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12009,
+          "dz": -13902,
+          "magnitude": 19203.211554320802
+        },
+        {
+          "vertexIndex": 601,
+          "x": 5593,
+          "y": 12291,
+          "z": 13499,
+          "dx": -5593,
+          "dy": -12243,
+          "dz": -13622,
+          "magnitude": 19150.23712646922
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6743,
+          "dy": -11378,
+          "dz": -13848,
+          "magnitude": 19149.25682631052
+        },
+        {
+          "vertexIndex": 604,
+          "x": 6794,
+          "y": 11685,
+          "z": 13538,
+          "dx": -6787,
+          "dy": -11564,
+          "dz": -13671,
+          "magnitude": 19149.03929705091
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.3",
+        "horizontal": "22.2",
+        "depth": "38.5"
+      }
+    }
+  },
+  {
+    "index": 30,
+    "name": "mouthLeft",
+    "analysis": {
+      "totalDisplacement": 41331827.27319993,
+      "avgDisplacement": 15342.177903934644,
+      "maxDisplacement": 19206.411533651986,
+      "verticalDisplacement": 26828769,
+      "horizontalDisplacement": 14868907,
+      "depthDisplacement": 26180810,
+      "mouthRegionDisplacement": 1544787.8574440437,
+      "jawRegionDisplacement": 419880.5848493997,
+      "upperFaceDisplacement": 31714093.448772144,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6352,
+          "dy": -11946,
+          "dz": -13632,
+          "magnitude": 19206.411533651986
+        },
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -5940,
+          "dy": -12070,
+          "dz": -13692,
+          "magnitude": 19194.774393047708
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6385,
+          "dy": -11667,
+          "dz": -13836,
+          "magnitude": 19191.717223844247
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -5982,
+          "dy": -11772,
+          "dz": -13899,
+          "magnitude": 19171.502523276573
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6719,
+          "dy": -11512,
+          "dz": -13714,
+          "magnitude": 19124.458188403667
+        },
+        {
+          "vertexIndex": 604,
+          "x": 6794,
+          "y": 11685,
+          "z": 13538,
+          "dx": -6683,
+          "dy": -11766,
+          "dz": -13506,
+          "magnitude": 19118.40163298177
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -5846,
+          "dy": -12290,
+          "dz": -13423,
+          "magnitude": 19115.353645695388
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6243,
+          "dy": -12152,
+          "dz": -13365,
+          "magnitude": 19112.021818740162
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6366,
+          "dy": -11370,
+          "dz": -13961,
+          "magnitude": 19097.444253093134
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5463,
+          "dy": -12106,
+          "dz": -13708,
+          "magnitude": 19086.87687915443
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.5",
+        "horizontal": "21.9",
+        "depth": "38.6"
+      }
+    }
+  },
+  {
+    "index": 31,
+    "name": "mouthRight",
+    "analysis": {
+      "totalDisplacement": 41463102.23032528,
+      "avgDisplacement": 15390.906544292977,
+      "maxDisplacement": 19247.03629133587,
+      "verticalDisplacement": 26828725,
+      "horizontalDisplacement": 15266903,
+      "depthDisplacement": 26180814,
+      "mouthRegionDisplacement": 1545647.2375848657,
+      "jawRegionDisplacement": 419927.07706049975,
+      "upperFaceDisplacement": 31844472.653024312,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6186,
+          "dy": -12033,
+          "dz": -13689,
+          "magnitude": 19247.03629133587
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6576,
+          "dy": -11858,
+          "dz": -13624,
+          "magnitude": 19221.584638109314
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6249,
+          "dy": -12234,
+          "dz": -13416,
+          "magnitude": 19201.817960807773
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6127,
+          "dy": -11747,
+          "dz": -13898,
+          "magnitude": 19201.211992996694
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6516,
+          "dy": -11603,
+          "dz": -13833,
+          "magnitude": 19194.78455205997
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5723,
+          "dy": -12106,
+          "dz": -13708,
+          "magnitude": 19162.912852695437
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6619,
+          "dy": -12032,
+          "dz": -13355,
+          "magnitude": 19155.579082867738
+        },
+        {
+          "vertexIndex": 601,
+          "x": 5593,
+          "y": 12291,
+          "z": 13499,
+          "dx": -5797,
+          "dy": -12330,
+          "dz": -13432,
+          "magnitude": 19132.504619103063
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5668,
+          "dy": -11796,
+          "dz": -13923,
+          "magnitude": 19108.159749175218
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6447,
+          "dy": -11321,
+          "dz": -13964,
+          "magnitude": 19097.700018588625
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.3",
+        "horizontal": "22.4",
+        "depth": "38.3"
+      }
+    }
+  },
+  {
+    "index": 32,
+    "name": "mouthRollUpper",
+    "analysis": {
+      "totalDisplacement": 41351510.41605812,
+      "avgDisplacement": 15349.484193043105,
+      "maxDisplacement": 19270.747805936335,
+      "verticalDisplacement": 26835760,
+      "horizontalDisplacement": 15067905,
+      "depthDisplacement": 26104653,
+      "mouthRegionDisplacement": 1545191.789034903,
+      "jawRegionDisplacement": 419905.69648821524,
+      "upperFaceDisplacement": 31733357.878889613,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6072,
+          "dy": -12024,
+          "dz": -13781,
+          "magnitude": 19270.747805936335
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6480,
+          "dy": -11868,
+          "dz": -13705,
+          "magnitude": 19252.710172856183
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6064,
+          "dy": -11754,
+          "dz": -13979,
+          "magnitude": 19244.247270288335
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6465,
+          "dy": -11624,
+          "dz": -13899,
+          "magnitude": 19237.874154905992
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6054,
+          "dy": -12204,
+          "dz": -13502,
+          "magnitude": 19180.524914610654
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12081,
+          "dz": -13806,
+          "magnitude": 19179.099196781895
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6419,
+          "dy": -11355,
+          "dz": -14022,
+          "magnitude": 19150.876481247535
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6442,
+          "dy": -12034,
+          "dz": -13431,
+          "magnitude": 19149.628743137553
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6039,
+          "dy": -11481,
+          "dz": -14085,
+          "magnitude": 19148.6319876904
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11793,
+          "dz": -14009,
+          "magnitude": 19147.0253303222
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.5",
+        "horizontal": "22.2",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 33,
+    "name": "mouthRollLower",
+    "analysis": {
+      "totalDisplacement": 41392339.52180331,
+      "avgDisplacement": 15364.639763104422,
+      "maxDisplacement": 19369.049589486833,
+      "verticalDisplacement": 26817415,
+      "horizontalDisplacement": 15067905,
+      "depthDisplacement": 26184232,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31774276.185245004,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6131,
+          "dy": -12060,
+          "dz": -13861,
+          "magnitude": 19369.049589486833
+        },
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6108,
+          "dy": -11850,
+          "dz": -14023,
+          "magnitude": 19348.76463756795
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6542,
+          "dy": -11694,
+          "dz": -13932,
+          "magnitude": 19329.977340907568
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6564,
+          "dy": -11852,
+          "dz": -13742,
+          "magnitude": 19297.63104632276
+        },
+        {
+          "vertexIndex": 601,
+          "x": 5593,
+          "y": 12291,
+          "z": 13499,
+          "dx": -5593,
+          "dy": -12154,
+          "dz": -13905,
+          "magnitude": 19296.38282165857
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -11899,
+          "dz": -14085,
+          "magnitude": 19267.98056361901
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6068,
+          "dy": -11637,
+          "dz": -14094,
+          "magnitude": 19258.27689592192
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6478,
+          "dy": -11519,
+          "dz": -14007,
+          "magnitude": 19257.411404443745
+        },
+        {
+          "vertexIndex": 575,
+          "x": 5995,
+          "y": 12284,
+          "z": 13142,
+          "dx": -6091,
+          "dy": -12158,
+          "dz": -13573,
+          "magnitude": 19213.10943080271
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6415,
+          "dy": -11326,
+          "dz": -14069,
+          "magnitude": 19166.82712396603
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.5"
+      }
+    }
+  },
+  {
+    "index": 34,
+    "name": "mouthShrugUpper",
+    "analysis": {
+      "totalDisplacement": 41374728.0020696,
+      "avgDisplacement": 15358.102450656866,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26832230,
+      "horizontalDisplacement": 15067905,
+      "depthDisplacement": 26146610,
+      "mouthRegionDisplacement": 1545220.9455956076,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31756548.332150176,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 35,
+    "name": "mouthShrugLower",
+    "analysis": {
+      "totalDisplacement": 41383716.244856805,
+      "avgDisplacement": 15361.438843673646,
+      "maxDisplacement": 19417.324686990225,
+      "verticalDisplacement": 26806487,
+      "horizontalDisplacement": 15067905,
+      "depthDisplacement": 26183376,
+      "mouthRegionDisplacement": 1545706.548928768,
+      "jawRegionDisplacement": 419978.6313154182,
+      "upperFaceDisplacement": 31764925.948974375,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6135,
+          "dy": -12048,
+          "dz": -13937,
+          "magnitude": 19417.324686990225
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6544,
+          "dy": -11887,
+          "dz": -13853,
+          "magnitude": 19391.50107650256
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6147,
+          "dy": -12223,
+          "dz": -13724,
+          "magnitude": 19378.73871024634
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6535,
+          "dy": -12044,
+          "dz": -13626,
+          "magnitude": 19324.38969282083
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12114,
+          "dz": -13975,
+          "magnitude": 19321.78226768949
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6094,
+          "dy": -11760,
+          "dz": -14065,
+          "magnitude": 19319.903234747322
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6493,
+          "dy": -11629,
+          "dz": -13984,
+          "magnitude": 19311.782569198527
+        },
+        {
+          "vertexIndex": 601,
+          "x": 5593,
+          "y": 12291,
+          "z": 13499,
+          "dx": -5593,
+          "dy": -12296,
+          "dz": -13767,
+          "magnitude": 19287.393654923933
+        },
+        {
+          "vertexIndex": 604,
+          "x": 6794,
+          "y": 11685,
+          "z": 13538,
+          "dx": -6867,
+          "dy": -11674,
+          "dz": -13688,
+          "magnitude": 19256.149900745993
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11807,
+          "dz": -14100,
+          "magnitude": 19222.302099384455
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.5"
+      }
+    }
+  },
+  {
+    "index": 36,
+    "name": "mouthClose",
+    "analysis": {
+      "totalDisplacement": 41353170.17374189,
+      "avgDisplacement": 15350.100287209314,
+      "maxDisplacement": 19360.482690263692,
+      "verticalDisplacement": 26752210,
+      "horizontalDisplacement": 15067905,
+      "depthDisplacement": 26184827,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31735106.8371836,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6108,
+          "dy": -11949,
+          "dz": -13955,
+          "magnitude": 19360.482690263692
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6540,
+          "dy": -11796,
+          "dz": -13832,
+          "magnitude": 19319.45754932058
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6086,
+          "dy": -11698,
+          "dz": -14093,
+          "magnitude": 19300.1359839769
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6100,
+          "dy": -12076,
+          "dz": -13762,
+          "magnitude": 19298.50823250336
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6496,
+          "dy": -11584,
+          "dz": -13979,
+          "magnitude": 19282.10343816255
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12001,
+          "dz": -13977,
+          "magnitude": 19252.5888908479
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6523,
+          "dy": -11882,
+          "dz": -13646,
+          "magnitude": 19233.9483466084
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11728,
+          "dz": -14134,
+          "magnitude": 19198.895515107113
+        },
+        {
+          "vertexIndex": 601,
+          "x": 5593,
+          "y": 12291,
+          "z": 13499,
+          "dx": -5593,
+          "dy": -12142,
+          "dz": -13779,
+          "magnitude": 19198.194029647686
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6807,
+          "dy": -11428,
+          "dz": -13813,
+          "magnitude": 19176.376143578327
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.3",
+        "horizontal": "22.2",
+        "depth": "38.5"
+      }
+    }
+  },
+  {
+    "index": 37,
+    "name": "mouthSmile_L",
+    "analysis": {
+      "totalDisplacement": 41418617.99613411,
+      "avgDisplacement": 15374.39420791912,
+      "maxDisplacement": 19308.85470451316,
+      "verticalDisplacement": 26881262,
+      "horizontalDisplacement": 15014129,
+      "depthDisplacement": 26195517,
+      "mouthRegionDisplacement": 1544797.5511854063,
+      "jawRegionDisplacement": 419813.1097653856,
+      "upperFaceDisplacement": 31800947.453564383,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6065,
+          "dy": -12037,
+          "dz": -13826,
+          "magnitude": 19308.85470451316
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6462,
+          "dy": -11881,
+          "dz": -13758,
+          "magnitude": 19292.438130003164
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11734,
+          "dz": -14008,
+          "magnitude": 19251.553210065937
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6043,
+          "dy": -12238,
+          "dz": -13567,
+          "magnitude": 19244.479260296965
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6455,
+          "dy": -11598,
+          "dz": -13929,
+          "magnitude": 19240.521562577247
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6416,
+          "dy": -12076,
+          "dz": -13513,
+          "magnitude": 19224.879739545835
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12099,
+          "dz": -13840,
+          "magnitude": 19214.917382075833
+        },
+        {
+          "vertexIndex": 604,
+          "x": 6794,
+          "y": 11685,
+          "z": 13538,
+          "dx": -6769,
+          "dy": -11673,
+          "dz": -13612,
+          "magnitude": 19166.763785261195
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11785,
+          "dz": -14035,
+          "magnitude": 19161.135117732458
+        },
+        {
+          "vertexIndex": 601,
+          "x": 5593,
+          "y": 12291,
+          "z": 13499,
+          "dx": -5593,
+          "dy": -12302,
+          "dz": -13566,
+          "magnitude": 19148.295198267653
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.5",
+        "horizontal": "22.1",
+        "depth": "38.5"
+      }
+    }
+  },
+  {
+    "index": 38,
+    "name": "mouthSmile_R",
+    "analysis": {
+      "totalDisplacement": 41455854.702129155,
+      "avgDisplacement": 15388.21629626175,
+      "maxDisplacement": 19298.59686609366,
+      "verticalDisplacement": 26881294,
+      "horizontalDisplacement": 15121681,
+      "depthDisplacement": 26195453,
+      "mouthRegionDisplacement": 1545417.0425548512,
+      "jawRegionDisplacement": 419901.51982569875,
+      "upperFaceDisplacement": 31837473.548240215,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6066,
+          "dy": -12043,
+          "dz": -13806,
+          "magnitude": 19298.59686609366
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6468,
+          "dy": -11893,
+          "dz": -13716,
+          "magnitude": 19271.92592866629
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11754,
+          "dz": -13999,
+          "magnitude": 19257.20639137463
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6456,
+          "dy": -11636,
+          "dz": -13912,
+          "magnitude": 19251.49801963473
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6045,
+          "dy": -12233,
+          "dz": -13533,
+          "magnitude": 19217.970834612068
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12099,
+          "dz": -13840,
+          "magnitude": 19214.917382075833
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6426,
+          "dy": -12064,
+          "dz": -13445,
+          "magnitude": 19172.93918521623
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11785,
+          "dz": -14035,
+          "magnitude": 19161.135117732458
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6413,
+          "dy": -11350,
+          "dz": -14031,
+          "magnitude": 19152.494093459474
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6785,
+          "dy": -11467,
+          "dz": -13758,
+          "magnitude": 19152.30738057428
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.2",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 39,
+    "name": "mouthFrown_L",
+    "analysis": {
+      "totalDisplacement": 41345116.15851011,
+      "avgDisplacement": 15347.110675022313,
+      "maxDisplacement": 19283.26406498651,
+      "verticalDisplacement": 26836472,
+      "horizontalDisplacement": 15058363,
+      "depthDisplacement": 26101308,
+      "mouthRegionDisplacement": 1544816.6134179719,
+      "jawRegionDisplacement": 419858.96814493445,
+      "upperFaceDisplacement": 31727450.561804805,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12050,
+          "dz": -13778,
+          "magnitude": 19283.26406498651
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11782,
+          "dz": -13987,
+          "magnitude": 19265.595604600447
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6470,
+          "dy": -11890,
+          "dz": -13705,
+          "magnitude": 19262.918392600848
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6455,
+          "dy": -11644,
+          "dz": -13909,
+          "magnitude": 19253.831878356057
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13801,
+          "magnitude": 19191.891490939604
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6046,
+          "dy": -12225,
+          "dz": -13489,
+          "magnitude": 19182.227764261377
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11506,
+          "dz": -14096,
+          "magnitude": 19170.143661433525
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6410,
+          "dy": -11371,
+          "dz": -14035,
+          "magnitude": 19166.87157571626
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6430,
+          "dy": -12056,
+          "dz": -13423,
+          "magnitude": 19153.823769681083
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.5",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 40,
+    "name": "mouthFrown_R",
+    "analysis": {
+      "totalDisplacement": 41350559.92344788,
+      "avgDisplacement": 15349.131374702256,
+      "maxDisplacement": 19282.549572087195,
+      "verticalDisplacement": 26836536,
+      "horizontalDisplacement": 15077447,
+      "depthDisplacement": 26101340,
+      "mouthRegionDisplacement": 1544711.1952865957,
+      "jawRegionDisplacement": 419849.5876557606,
+      "upperFaceDisplacement": 31732956.5546136,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12050,
+          "dz": -13777,
+          "magnitude": 19282.549572087195
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11782,
+          "dz": -13986,
+          "magnitude": 19264.869607656314
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11895,
+          "dz": -13699,
+          "magnitude": 19262.073278855525
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6456,
+          "dy": -11651,
+          "dz": -13905,
+          "magnitude": 19255.512509408833
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13801,
+          "magnitude": 19191.891490939604
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6047,
+          "dy": -12225,
+          "dz": -13487,
+          "magnitude": 19181.136645152186
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11506,
+          "dz": -14096,
+          "magnitude": 19170.143661433525
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11378,
+          "dz": -14033,
+          "magnitude": 19169.89551353893
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6786,
+          "dy": -11472,
+          "dz": -13755,
+          "magnitude": 19153.501115983992
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.5",
+        "horizontal": "22.2",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 41,
+    "name": "mouthDimple_L",
+    "analysis": {
+      "totalDisplacement": 41398200.04994125,
+      "avgDisplacement": 15366.815163304102,
+      "maxDisplacement": 19309.849740482186,
+      "verticalDisplacement": 26870419,
+      "horizontalDisplacement": 15038378,
+      "depthDisplacement": 26161659,
+      "mouthRegionDisplacement": 1545282.9404205647,
+      "jawRegionDisplacement": 419917.4277119335,
+      "upperFaceDisplacement": 31779934.958500028,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6068,
+          "dy": -12052,
+          "dz": -13813,
+          "magnitude": 19309.849740482186
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11902,
+          "dz": -13738,
+          "magnitude": 19294.146495763944
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6061,
+          "dy": -11783,
+          "dz": -14017,
+          "magnitude": 19288.626156364793
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6460,
+          "dy": -11655,
+          "dz": -13936,
+          "magnitude": 19281.66800357272
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12108,
+          "dz": -13831,
+          "magnitude": 19214.106120244054
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6045,
+          "dy": -12230,
+          "dz": -13527,
+          "magnitude": 19211.8362995316
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6421,
+          "dy": -12075,
+          "dz": -13474,
+          "magnitude": 19198.529683285644
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6415,
+          "dy": -11382,
+          "dz": -14062,
+          "magnitude": 19194.8428751058
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6036,
+          "dy": -11507,
+          "dz": -14126,
+          "magnitude": 19193.4421352711
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14043,
+          "magnitude": 19189.76763798874
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.5",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 42,
+    "name": "mouthDimple_R",
+    "analysis": {
+      "totalDisplacement": 41419128.888886034,
+      "avgDisplacement": 15374.58384888123,
+      "maxDisplacement": 19292.064327075004,
+      "verticalDisplacement": 26870419,
+      "horizontalDisplacement": 15097432,
+      "depthDisplacement": 26161647,
+      "mouthRegionDisplacement": 1545651.664729169,
+      "jawRegionDisplacement": 419929.2440637641,
+      "upperFaceDisplacement": 31800491.312654838,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6068,
+          "dy": -12051,
+          "dz": -13789,
+          "magnitude": 19292.064327075004
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6060,
+          "dy": -11782,
+          "dz": -13997,
+          "magnitude": 19273.171327002725
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13699,
+          "magnitude": 19263.926027681897
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6458,
+          "dy": -11654,
+          "dz": -13905,
+          "magnitude": 19257.99846816901
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12108,
+          "dz": -13831,
+          "magnitude": 19214.106120244054
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12226,
+          "dz": -13500,
+          "magnitude": 19191.231852072448
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14043,
+          "magnitude": 19189.76763798874
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6035,
+          "dy": -11506,
+          "dz": -14106,
+          "magnitude": 19177.81262292444
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11381,
+          "dz": -14033,
+          "magnitude": 19171.676269956155
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11475,
+          "dz": -13753,
+          "magnitude": 19154.216324350105
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.2",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 43,
+    "name": "mouthUpperUp_L",
+    "analysis": {
+      "totalDisplacement": 41390847.95990461,
+      "avgDisplacement": 15364.086102414482,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26837998,
+      "horizontalDisplacement": 15063534,
+      "depthDisplacement": 26171080,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31772784.623346303,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 44,
+    "name": "mouthUpperUp_R",
+    "analysis": {
+      "totalDisplacement": 41394639.42699727,
+      "avgDisplacement": 15365.49347698488,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26837998,
+      "horizontalDisplacement": 15072276,
+      "depthDisplacement": 26171080,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31776576.090438955,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 45,
+    "name": "mouthLowerDown_L",
+    "analysis": {
+      "totalDisplacement": 41345668.49411342,
+      "avgDisplacement": 15347.31569937395,
+      "maxDisplacement": 19228.801366699903,
+      "verticalDisplacement": 26833983,
+      "horizontalDisplacement": 15065302,
+      "depthDisplacement": 26102609,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31727605.157555122,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6063,
+          "dy": -12063,
+          "dz": -13692,
+          "magnitude": 19228.801366699903
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6054,
+          "dy": -11784,
+          "dz": -13918,
+          "magnitude": 19215.21001706721
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6457,
+          "dy": -11909,
+          "dz": -13608,
+          "magnitude": 19201.42687406329
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6442,
+          "dy": -11651,
+          "dz": -13834,
+          "magnitude": 19199.602105252077
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5596,
+          "dy": -12117,
+          "dz": -13741,
+          "magnitude": 19155.990864478925
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5596,
+          "dy": -11825,
+          "dz": -13971,
+          "magnitude": 19139.871525169652
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6029,
+          "dy": -11504,
+          "dz": -14048,
+          "magnitude": 19132.097663350978
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6043,
+          "dy": -12256,
+          "dz": -13384,
+          "magnitude": 19127.436864357962
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6397,
+          "dy": -11373,
+          "dz": -13984,
+          "magnitude": 19126.39521708155
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6762,
+          "dy": -11472,
+          "dz": -13699,
+          "magnitude": 19104.816905691612
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.5",
+        "horizontal": "22.2",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 46,
+    "name": "mouthLowerDown_R",
+    "analysis": {
+      "totalDisplacement": 41346993.386161685,
+      "avgDisplacement": 15347.807493007307,
+      "maxDisplacement": 19266.165212620803,
+      "verticalDisplacement": 26833983,
+      "horizontalDisplacement": 15070508,
+      "depthDisplacement": 26102609,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31728930.04960339,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6064,
+          "dy": -12055,
+          "dz": -13751,
+          "magnitude": 19266.165212620803
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13695,
+          "magnitude": 19261.081745322612
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6057,
+          "dy": -11783,
+          "dz": -13967,
+          "magnitude": 19251.063009610665
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6045,
+          "dy": -12234,
+          "dz": -13453,
+          "magnitude": 19162.35867527795
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6032,
+          "dy": -11506,
+          "dz": -14083,
+          "magnitude": 19159.95691540041
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5590,
+          "dy": -12117,
+          "dz": -13741,
+          "magnitude": 19154.23895642946
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6430,
+          "dy": -12059,
+          "dz": -13408,
+          "magnitude": 19145.204229780367
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.5",
+        "horizontal": "22.2",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 47,
+    "name": "mouthPress_L",
+    "analysis": {
+      "totalDisplacement": 41390246.9508887,
+      "avgDisplacement": 15363.86301072335,
+      "maxDisplacement": 19390.975065736122,
+      "verticalDisplacement": 26806218,
+      "horizontalDisplacement": 15045586,
+      "depthDisplacement": 26207485,
+      "mouthRegionDisplacement": 1545436.479258406,
+      "jawRegionDisplacement": 420007.5467716132,
+      "upperFaceDisplacement": 31771612.200345073,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6367,
+          "dy": -11660,
+          "dz": -14125,
+          "magnitude": 19390.975065736122
+        },
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -5997,
+          "dy": -11818,
+          "dz": -14110,
+          "magnitude": 19357.717659889557
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6332,
+          "dy": -11886,
+          "dz": -13864,
+          "magnitude": 19328.26210501089
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -5985,
+          "dy": -12059,
+          "dz": -13846,
+          "magnitude": 19311.950238129757
+        },
+        {
+          "vertexIndex": 604,
+          "x": 6794,
+          "y": 11685,
+          "z": 13538,
+          "dx": -6686,
+          "dy": -11469,
+          "dz": -13999,
+          "magnitude": 19292.811044531587
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6360,
+          "dy": -11352,
+          "dz": -14230,
+          "magnitude": 19282.385848229467
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -5993,
+          "dy": -11491,
+          "dz": -14244,
+          "magnitude": 19257.483376599343
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -11933,
+          "dz": -14025,
+          "magnitude": 19245.227018666214
+        },
+        {
+          "vertexIndex": 605,
+          "x": 6741,
+          "y": 11837,
+          "z": 13283,
+          "dx": -6638,
+          "dy": -11672,
+          "dz": -13786,
+          "magnitude": 19244.542706959808
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6678,
+          "dy": -11198,
+          "dz": -14118,
+          "magnitude": 19217.409086554828
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.1",
+        "depth": "38.5"
+      }
+    }
+  },
+  {
+    "index": 48,
+    "name": "mouthPress_R",
+    "analysis": {
+      "totalDisplacement": 41406152.617085174,
+      "avgDisplacement": 15369.7671184429,
+      "maxDisplacement": 19310.22363930568,
+      "verticalDisplacement": 26806266,
+      "horizontalDisplacement": 15090224,
+      "depthDisplacement": 26207385,
+      "mouthRegionDisplacement": 1545677.2014320367,
+      "jawRegionDisplacement": 419961.5993870742,
+      "upperFaceDisplacement": 31787455.422345325,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6042,
+          "dy": -11963,
+          "dz": -13902,
+          "magnitude": 19310.22363930568
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6455,
+          "dy": -11862,
+          "dz": -13753,
+          "magnitude": 19274.830167863995
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6030,
+          "dy": -11663,
+          "dz": -14084,
+          "magnitude": 19254.753309248084
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6438,
+          "dy": -11599,
+          "dz": -13949,
+          "magnitude": 19249.915480333933
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -11933,
+          "dz": -14025,
+          "magnitude": 19245.227018666214
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6029,
+          "dy": -12163,
+          "dz": -13620,
+          "magnitude": 19229.97165884547
+        },
+        {
+          "vertexIndex": 601,
+          "x": 5593,
+          "y": 12291,
+          "z": 13499,
+          "dx": -5596,
+          "dy": -12170,
+          "dz": -13741,
+          "magnitude": 19189.5595832734
+        },
+        {
+          "vertexIndex": 577,
+          "x": 6431,
+          "y": 12058,
+          "z": 13411,
+          "dx": -6418,
+          "dy": -12034,
+          "dz": -13473,
+          "magnitude": 19171.061759850443
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5591,
+          "dy": -11595,
+          "dz": -14187,
+          "magnitude": 19156.57263186711
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6776,
+          "dy": -11451,
+          "dz": -13775,
+          "magnitude": 19151.767594663423
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.2",
+        "depth": "38.5"
+      }
+    }
+  },
+  {
+    "index": 49,
+    "name": "mouthStretch_L",
+    "analysis": {
+      "totalDisplacement": 41372629.588358045,
+      "avgDisplacement": 15357.32352945733,
+      "maxDisplacement": 19324.088542541922,
+      "verticalDisplacement": 26909918,
+      "horizontalDisplacement": 15014612,
+      "depthDisplacement": 26095619,
+      "mouthRegionDisplacement": 1545255.9962213454,
+      "jawRegionDisplacement": 419902.7830205198,
+      "upperFaceDisplacement": 31754436.38845886,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6370,
+          "dy": -11773,
+          "dz": -13937,
+          "magnitude": 19324.088542541922
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6358,
+          "dy": -12026,
+          "dz": -13721,
+          "magnitude": 19321.352980575663
+        },
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6005,
+          "dy": -12132,
+          "dz": -13773,
+          "magnitude": 19311.67983371721
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6010,
+          "dy": -11855,
+          "dz": -13988,
+          "magnitude": 19295.73188557511
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6651,
+          "dy": -11650,
+          "dz": -13818,
+          "magnitude": 19258.645461194825
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6348,
+          "dy": -11475,
+          "dz": -14063,
+          "magnitude": 19228.64264580316
+        },
+        {
+          "vertexIndex": 604,
+          "x": 6794,
+          "y": 11685,
+          "z": 13538,
+          "dx": -6606,
+          "dy": -11872,
+          "dz": -13595,
+          "magnitude": 19219.980358991004
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5579,
+          "dy": -12152,
+          "dz": -13789,
+          "magnitude": 19207.625204589975
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -5966,
+          "dy": -12304,
+          "dz": -13477,
+          "magnitude": 19199.2474071251
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -5998,
+          "dy": -11563,
+          "dz": -14101,
+          "magnitude": 19196.801139773263
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.6",
+        "horizontal": "22.1",
+        "depth": "38.4"
+      }
+    }
+  },
+  {
+    "index": 50,
+    "name": "mouthStretch_R",
+    "analysis": {
+      "totalDisplacement": 41407755.32882947,
+      "avgDisplacement": 15370.36203742742,
+      "maxDisplacement": 19291.47112067921,
+      "verticalDisplacement": 26909898,
+      "horizontalDisplacement": 15121198,
+      "depthDisplacement": 26095663,
+      "mouthRegionDisplacement": 1545577.5970390309,
+      "jawRegionDisplacement": 419889.9376274303,
+      "upperFaceDisplacement": 31789234.35825927,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6057,
+          "dy": -12075,
+          "dz": -13772,
+          "magnitude": 19291.47112067921
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6049,
+          "dy": -11803,
+          "dz": -13985,
+          "magnitude": 19273.85366241012
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6462,
+          "dy": -11910,
+          "dz": -13696,
+          "magnitude": 19266.18696057941
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6450,
+          "dy": -11666,
+          "dz": -13905,
+          "magnitude": 19262.582407351307
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5607,
+          "dy": -12152,
+          "dz": -13789,
+          "magnitude": 19215.776695205426
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5601,
+          "dy": -11861,
+          "dz": -14012,
+          "magnitude": 19193.50582879532
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6052,
+          "dy": -12251,
+          "dz": -13478,
+          "magnitude": 19192.97238574578
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6027,
+          "dy": -11523,
+          "dz": -14097,
+          "magnitude": 19178.885968689632
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6407,
+          "dy": -11391,
+          "dz": -14033,
+          "magnitude": 19176.27750633579
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6785,
+          "dy": -11479,
+          "dz": -13754,
+          "magnitude": 19156.622405841797
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.5",
+        "horizontal": "22.2",
+        "depth": "38.3"
+      }
+    }
+  },
+  {
+    "index": 51,
+    "name": "tongueOut",
+    "analysis": {
+      "totalDisplacement": 41358892.718027204,
+      "avgDisplacement": 15352.224468458502,
+      "maxDisplacement": 19282.46006089472,
+      "verticalDisplacement": 26827418,
+      "horizontalDisplacement": 15067905,
+      "depthDisplacement": 26127990,
+      "mouthRegionDisplacement": 1545104.612234502,
+      "jawRegionDisplacement": 419903.67267840577,
+      "upperFaceDisplacement": 31740829.381468907,
+      "significantVertices": 2694,
+      "topDisplacements": [
+        {
+          "vertexIndex": 602,
+          "x": 6067,
+          "y": 12051,
+          "z": 13776,
+          "dx": -6067,
+          "dy": -12051,
+          "dz": -13776,
+          "magnitude": 19282.46006089472
+        },
+        {
+          "vertexIndex": 630,
+          "x": 6059,
+          "y": 11783,
+          "z": 13986,
+          "dx": -6059,
+          "dy": -11783,
+          "dz": -13986,
+          "magnitude": 19265.481203437404
+        },
+        {
+          "vertexIndex": 603,
+          "x": 6471,
+          "y": 11898,
+          "z": 13696,
+          "dx": -6471,
+          "dy": -11898,
+          "dz": -13696,
+          "magnitude": 19261.79277741301
+        },
+        {
+          "vertexIndex": 629,
+          "x": 6457,
+          "y": 11655,
+          "z": 13903,
+          "dx": -6457,
+          "dy": -11655,
+          "dz": -13903,
+          "magnitude": 19256.82432282125
+        },
+        {
+          "vertexIndex": 669,
+          "x": 5593,
+          "y": 12107,
+          "z": 13800,
+          "dx": -5593,
+          "dy": -12107,
+          "dz": -13800,
+          "magnitude": 19191.17239774579
+        },
+        {
+          "vertexIndex": 574,
+          "x": 6048,
+          "y": 12225,
+          "z": 13484,
+          "dx": -6048,
+          "dy": -12225,
+          "dz": -13484,
+          "magnitude": 19179.34266339699
+        },
+        {
+          "vertexIndex": 668,
+          "x": 5593,
+          "y": 11822,
+          "z": 14018,
+          "dx": -5593,
+          "dy": -11822,
+          "dz": -14018,
+          "magnitude": 19171.48030278309
+        },
+        {
+          "vertexIndex": 631,
+          "x": 6411,
+          "y": 11382,
+          "z": 14031,
+          "dx": -6411,
+          "dy": -11382,
+          "dz": -14031,
+          "magnitude": 19170.806086338675
+        },
+        {
+          "vertexIndex": 637,
+          "x": 6034,
+          "y": 11507,
+          "z": 14096,
+          "dx": -6034,
+          "dy": -11507,
+          "dz": -14096,
+          "magnitude": 19170.743882280625
+        },
+        {
+          "vertexIndex": 628,
+          "x": 6787,
+          "y": 11476,
+          "z": 13753,
+          "dx": -6787,
+          "dy": -11476,
+          "dz": -13753,
+          "magnitude": 19154.81542589226
+        }
+      ]
+    },
+    "classification": {
+      "category": "upper-face",
+      "suggestedPhoneme": null,
+      "confidence": 0.7,
+      "regionDistribution": {
+        "mouth": "4.6",
+        "jaw": "1.2",
+        "upper": "94.2"
+      },
+      "axisDistribution": {
+        "vertical": "39.4",
+        "horizontal": "22.2",
+        "depth": "38.4"
+      }
+    }
+  }
+]

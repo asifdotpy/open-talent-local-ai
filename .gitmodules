@@ -1,0 +1,13 @@
+[submodule "agents"]
+	path = agents
+	url = https://github.com/asifdotpy/talent-ai-agents.git
+[submodule "microservices"]
+	path = microservices
+	url = https://github.com/asifdotpy/talent-ai-microservices.git
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/asifdotpy/talent-ai-frontend.git
+[submodule "ai-orchestra-simulation"]
+	path = ai-orchestra-simulation
+	url = https://github.com/asifdotpy/talent-ai-orchestra.git
+

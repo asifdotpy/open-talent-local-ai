@@ -1,0 +1,131 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: talent-ai-postgres
+    environment:
+      POSTGRES_USER: talentai
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: talentai
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U talentai -d talentai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Avatar Renderer Service (Node.js)
+  avatar-renderer:
+    build:
+      context: ./ai-orchestra-simulation
+      dockerfile: Dockerfile
+    container_name: talent-ai-avatar-renderer
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    volumes:
+      - ./ai-orchestra-simulation/src:/app/src:ro
+      - ./ai-orchestra-simulation/assets:/app/assets:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Interview Service
+  interview-service:
+    build:
+      context: ./microservices/interview-service
+      dockerfile: Dockerfile
+    container_name: talent-ai-interview-service
+    ports:
+      - "8004:80"
+    environment:
+      - DATABASE_URL=postgresql://talentai:talentai123@postgres:5432/talentai
+      - VOICE_SERVICE_URL=http://voice-service:80
+      - CONVERSATION_SERVICE_URL=http://conversation-service:80
+      - AVATAR_SERVICE_URL=http://avatar-renderer:3001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      voice-service:
+        condition: service_healthy
+      conversation-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Voice Service
+  voice-service:
+    build:
+      context: ./microservices/voice-service
+      dockerfile: Dockerfile
+    container_name: talent-ai-voice-service
+    ports:
+      - "8002:80"
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - voice_models:/app/models
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Conversation Service
+  conversation-service:
+    build:
+      context: ./microservices/conversation-service
+      dockerfile: Dockerfile
+    container_name: talent-ai-conversation-service
+    ports:
+      - "8003:80"
+    environment:
+      - PYTHONPATH=/app
+      - OLLAMA_HOST=http://ollama:11434
+    depends_on:
+      - ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Ollama Service for AI Models
+  ollama:
+    image: ollama/ollama:latest
+    container_name: talent-ai-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    command: ["/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull granite4:350m-h && wait"]
+    healthcheck:
+      test: ["CMD", "ollama", "list", "|", "grep", "granite4:350m-h"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  voice_models:
+  ollama_data:

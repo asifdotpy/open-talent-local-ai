@@ -1,0 +1,603 @@
+################################################################################
+# TalentAI Platform - .gitignore
+# Open Source Project - Best Practices Compliant
+# Last Updated: November 17, 2025
+################################################################################
+
+#===============================================================================
+# PYTHON
+#===============================================================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask
+instance/
+.webassets-cache
+
+# Scrapy
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# IPython / Jupyter
+profile_default/
+ipython_config.py
+*.ipynb_checkpoints
+
+# Jupyter notebooks (except in notebooks/ directory)
+/*.ipynb
+**/exploratory_*.ipynb
+**/temp_*.ipynb
+
+# BUT KEEP notebooks in designated directory
+!notebooks/**/*.ipynb
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+#===============================================================================
+# NODE.JS / JAVASCRIPT
+#===============================================================================
+# Dependencies
+node_modules/
+jspm_packages/
+
+# Build outputs
+dist/
+dist-ssr/
+*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Testing
+coverage/
+.nyc_output/
+
+# Next.js
+.next/
+out/
+
+# Nuxt.js
+.nuxt/
+
+# Gatsby
+.cache/
+public/
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Rollup
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Serverless
+.serverless/
+
+# TypeScript
+*.tsbuildinfo
+
+# Optional npm cache
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Microbundle cache
+.rpt2_cache/
+
+# Optional REPL history
+.node_repl_history
+
+# Yarn
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+#===============================================================================
+# ENVIRONMENT & SECRETS
+#===============================================================================
+.env
+.env.*
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# BUT KEEP EXAMPLES
+!.env.example
+!.env.sample
+!.env.template
+
+# Secret keys and credentials
+*.pem
+*.key
+*.crt
+*.p12
+secrets/
+credentials/
+
+#===============================================================================
+# DOCKER
+#===============================================================================
+# Docker volumes
+volumes/
+data/
+
+# Docker override files
+docker-compose.override.yml
+
+#===============================================================================
+# DATABASES
+#===============================================================================
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+
+# PostgreSQL
+*.sql.gz
+*.dump
+
+# Redis
+dump.rdb
+
+#===============================================================================
+# IDEs & EDITORS
+#===============================================================================
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+*.code-workspace
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+#===============================================================================
+# OPERATING SYSTEMS
+#===============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+#===============================================================================
+# MEDIA & ASSETS (Generated/Temporary)
+#===============================================================================
+# Audio files
+*.wav
+*.mp3
+*.ogg
+*.flac
+*.aac
+
+# Video files
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+*.mkv
+
+# Image files (generated/temporary)
+*.psd
+*.sketch
+
+# BUT KEEP STATIC ASSETS in specific directories
+!assets/**/*.png
+!assets/**/*.jpg
+!assets/**/*.svg
+!frontend/**/assets/**/*
+!docs/**/*.png
+!docs/**/*.jpg
+!docs/**/*.svg
+
+#===============================================================================
+# BINARY DOWNLOADS & LARGE FILES
+#===============================================================================
+# Piper TTS binaries
+**/piper_linux_*.tar.gz
+**/piper_windows_*.tar.gz
+**/piper_macos_*.tar.gz
+**/piper_*.tar.gz
+
+# Whisper models (large)
+**/whisper_*.pt
+**/ggml-*.bin
+
+#===============================================================================
+# HUGGING FACE MODELS, DATASETS & CACHE
+#===============================================================================
+# Hugging Face model files (large binary files)
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.pkl
+*.h5
+*.pb
+*.onnx
+*.tflite
+
+# Hugging Face model directories and cache
+.huggingface/
+~/.cache/huggingface/
+.cache/huggingface/
+huggingface_cache/
+models/
+transformers_cache/
+
+# Specific Hugging Face model components (keep config files)
+models/*/
+!models/*/.gitkeep
+!models/*/README.md
+!models/*/config.json
+!models/*/generation_config.json
+!models/*/tokenizer_config.json
+!models/*/vocab.txt
+!models/*/merges.txt
+!models/*/vocab.json
+!models/*/tokenizer.json
+!models/*/special_tokens_map.json
+!models/*/added_tokens.json
+!models/*/chat_template.jinja
+!models/*/adapter_config.json
+!models/*/.gitattributes
+
+# Hugging Face datasets (downloaded datasets)
+~/.cache/huggingface/datasets/
+.cache/huggingface/datasets/
+datasets/
+data/
+*.arrow
+*.parquet
+
+# Hugging Face transformers cache
+~/.cache/huggingface/transformers/
+.cache/huggingface/transformers/
+
+# Diffusers cache (for image/video generation models)
+~/.cache/huggingface/diffusers/
+.cache/huggingface/diffusers/
+
+#===============================================================================
+# LLM MODELS & ADAPTERS (General)
+#===============================================================================
+# LLM model formats
+*.gguf
+*.ggml
+*.bin
+models/*.pt
+models/**/*.safetensors
+models/**/*.bin
+models/**/*.pt
+models/**/*.gguf
+models/**/tokenizer.json
+models/**/merges.txt
+models/**/vocab.json
+models/**/added_tokens.json
+models/**/special_tokens_map.json
+
+# Model directories (keep structure but ignore large files)
+models/*/
+!models/*/.gitkeep
+!models/*/README.md
+!models/*/adapter_config.json
+!models/*/chat_template.jinja
+!models/*/tokenizer_config.json
+!models/*/.gitattributes
+
+#===============================================================================
+# BUILD ARTIFACTS & CACHES
+#===============================================================================
+# General build artifacts
+*.o
+*.a
+*.lib
+*.exe
+*.dll
+*.dylib
+
+# Python build
+*.pyc
+__pycache__/
+
+# Caches
+.cache/
+.cache_*/
+*.cache
+.parcel-cache/
+
+# Genkit
+.genkit/
+
+# Playwright
+.playwright-mcp/
+
+# Git Guardian
+.cache_ggshield
+.ggshield
+
+#===============================================================================
+# TEST OUTPUTS
+#===============================================================================
+# Test videos
+test_*.webm
+test_*.mp4
+final_test.webm
+*.test.webm
+*.test.mp4
+
+# Performance reports
+*-report.json
+*-results.json
+*-stats.json
+*profile*.json
+benchmark_*.json
+
+# Screenshots
+screenshots/
+test-results/
+
+#===============================================================================
+# TEMPORARY FILES
+#===============================================================================
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+nohup.out
+temp/
+tmp/
+
+#===============================================================================
+# DEVELOPMENT-ONLY MARKDOWN FILES
+#===============================================================================
+# Session reports and progress tracking (keep in docs/progress/)
+# Session reports and summaries (generated docs)
+SESSION_*.md
+CURRENT_STATE_*.md
+DELIVERABLES_*.md
+MVP_DEPLOYMENT_*.md
+
+# Editor swap files
+/RESUME_HERE.md
+
+# Analysis and status reports (development artifacts)
+/AVATAR_SYSTEM_STATUS_REPORT*.md
+/MICROSERVICES_TESTING_COMPLETION_SUMMARY.md
+
+# Personal notes and messages
+message.md
+welcome_*.md
+whatsapp_message.md
+personal
+
+# Jupyter notebooks (development exploration)
+/*.ipynb
+/AVATAR_*.ipynb
+
+# Zone.Identifier files (Windows WSL)
+*.md:Zone.Identifier
+*:Zone.Identifier
+
+# BUT KEEP ESSENTIAL PROJECT DOCUMENTATION
+# These are explicitly ALLOWED:
+# - README.md (root and subdirectories)
+# - CONTRIBUTING.md (root and subdirectories)
+# - LICENSE.md / LICENSE
+# - SECURITY.md
+# - AGENTS.md (architecture documentation)
+# - GEMINI.md (AI assistant context)
+# - docs/** (all documentation)
+# - specs/** (specifications)
+
+#===============================================================================
+# BUSINESS & LEGAL (Not part of codebase)
+#===============================================================================
+business-setup/
+research/
+legal/
+contracts/
+financial/
+
+#===============================================================================
+# SCRIPTS & UTILITIES (Temporary)
+#===============================================================================
+pre_pull_check.sh
+MERGE_PLAN.md
+
+#===============================================================================
+# AI ORCHESTRA SIMULATION (Development artifacts)
+#===============================================================================
+# Keep the directory structure but ignore development markdown
+ai-orchestra-simulation/CHECKPOINT_*.md
+ai-orchestra-simulation/ACTUAL_STATE_*.md
+ai-orchestra-simulation/YOUR_SITUATION_*.md
+ai-orchestra-simulation/*_REPORT.md
+
+#===============================================================================
+# PROJECT-SPECIFIC EXCLUSIONS
+#===============================================================================
+# Infrastructure data
+infrastructure/docker-compose/volumes/
+infrastructure/docker-compose/backups/
+
+# Agent logs
+agents/**/*.log
+agents/**/nohup.out
+
+# Microservices logs
+microservices/**/*.log
+microservices/**/nohup.out
+
+# Frontend build outputs
+frontend/**/dist/
+frontend/**/build/
+frontend/**/.next/
+
+#===============================================================================
+# END OF .gitignore
+#===============================================================================

@@ -1,0 +1,741 @@
+{
+  "test_info": {
+    "test_type": "Basic Load Test",
+    "server_url": "http://localhost:3001",
+    "concurrent_users": 10,
+    "test_duration_seconds": 326.38869738578796,
+    "timestamp": "2025-11-13T15:20:33.307467"
+  },
+  "summary": {
+    "total_requests": 90,
+    "successful_requests": 0,
+    "error_requests": 90,
+    "success_rate": "0%",
+    "error": "No successful requests"
+  },
+  "errors": [
+    {
+      "user_id": 1,
+      "request_id": 0,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 33.6998233795166,
+      "timestamp": "2025-11-13T15:15:41.816171"
+    },
+    {
+      "user_id": 0,
+      "request_id": 0,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 33.782381534576416,
+      "timestamp": "2025-11-13T15:15:41.816355"
+    },
+    {
+      "user_id": 2,
+      "request_id": 0,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 33.50798153877258,
+      "timestamp": "2025-11-13T15:15:41.816563"
+    },
+    {
+      "user_id": 4,
+      "request_id": 0,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 33.20569443702698,
+      "timestamp": "2025-11-13T15:15:41.816708"
+    },
+    {
+      "user_id": 5,
+      "request_id": 0,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 33.15416884422302,
+      "timestamp": "2025-11-13T15:15:41.816876"
+    },
+    {
+      "user_id": 3,
+      "request_id": 0,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 33.28617334365845,
+      "timestamp": "2025-11-13T15:15:41.817086"
+    },
+    {
+      "user_id": 7,
+      "request_id": 0,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 33.05776572227478,
+      "timestamp": "2025-11-13T15:15:41.817286"
+    },
+    {
+      "user_id": 9,
+      "request_id": 0,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.95911765098572,
+      "timestamp": "2025-11-13T15:15:41.817468"
+    },
+    {
+      "user_id": 6,
+      "request_id": 0,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 33.106584787368774,
+      "timestamp": "2025-11-13T15:15:41.817715"
+    },
+    {
+      "user_id": 8,
+      "request_id": 0,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 33.0164361000061,
+      "timestamp": "2025-11-13T15:15:41.826103"
+    },
+    {
+      "user_id": 0,
+      "request_id": 1,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.953683614730835,
+      "timestamp": "2025-11-13T15:16:14.871113"
+    },
+    {
+      "user_id": 1,
+      "request_id": 1,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.958696603775024,
+      "timestamp": "2025-11-13T15:16:14.888960"
+    },
+    {
+      "user_id": 3,
+      "request_id": 1,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.970457315444946,
+      "timestamp": "2025-11-13T15:16:14.921256"
+    },
+    {
+      "user_id": 2,
+      "request_id": 1,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.97803831100464,
+      "timestamp": "2025-11-13T15:16:14.921436"
+    },
+    {
+      "user_id": 4,
+      "request_id": 1,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.98038601875305,
+      "timestamp": "2025-11-13T15:16:14.943156"
+    },
+    {
+      "user_id": 6,
+      "request_id": 1,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.964362382888794,
+      "timestamp": "2025-11-13T15:16:14.943431"
+    },
+    {
+      "user_id": 5,
+      "request_id": 1,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.97309160232544,
+      "timestamp": "2025-11-13T15:16:14.943661"
+    },
+    {
+      "user_id": 8,
+      "request_id": 1,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.94295310974121,
+      "timestamp": "2025-11-13T15:16:14.951607"
+    },
+    {
+      "user_id": 7,
+      "request_id": 1,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.96092176437378,
+      "timestamp": "2025-11-13T15:16:14.952070"
+    },
+    {
+      "user_id": 9,
+      "request_id": 1,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.94332838058472,
+      "timestamp": "2025-11-13T15:16:14.952489"
+    },
+    {
+      "user_id": 0,
+      "request_id": 2,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.936431884765625,
+      "timestamp": "2025-11-13T15:16:47.908168"
+    },
+    {
+      "user_id": 1,
+      "request_id": 2,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.937764406204224,
+      "timestamp": "2025-11-13T15:16:47.942194"
+    },
+    {
+      "user_id": 2,
+      "request_id": 2,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.935548067092896,
+      "timestamp": "2025-11-13T15:16:47.980077"
+    },
+    {
+      "user_id": 3,
+      "request_id": 2,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.94096755981445,
+      "timestamp": "2025-11-13T15:16:47.996076"
+    },
+    {
+      "user_id": 4,
+      "request_id": 2,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93499159812927,
+      "timestamp": "2025-11-13T15:16:48.018946"
+    },
+    {
+      "user_id": 5,
+      "request_id": 2,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.938597440719604,
+      "timestamp": "2025-11-13T15:16:48.033188"
+    },
+    {
+      "user_id": 6,
+      "request_id": 2,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.936381578445435,
+      "timestamp": "2025-11-13T15:16:48.040970"
+    },
+    {
+      "user_id": 7,
+      "request_id": 2,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93519568443298,
+      "timestamp": "2025-11-13T15:16:48.057906"
+    },
+    {
+      "user_id": 8,
+      "request_id": 2,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.936739444732666,
+      "timestamp": "2025-11-13T15:16:48.068684"
+    },
+    {
+      "user_id": 9,
+      "request_id": 2,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93634104728699,
+      "timestamp": "2025-11-13T15:16:48.088838"
+    },
+    {
+      "user_id": 0,
+      "request_id": 3,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.95333528518677,
+      "timestamp": "2025-11-13T15:17:20.963694"
+    },
+    {
+      "user_id": 1,
+      "request_id": 3,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.94581389427185,
+      "timestamp": "2025-11-13T15:17:20.999101"
+    },
+    {
+      "user_id": 2,
+      "request_id": 3,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.94653654098511,
+      "timestamp": "2025-11-13T15:17:21.047671"
+    },
+    {
+      "user_id": 3,
+      "request_id": 3,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.96199321746826,
+      "timestamp": "2025-11-13T15:17:21.091744"
+    },
+    {
+      "user_id": 4,
+      "request_id": 3,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.94871664047241,
+      "timestamp": "2025-11-13T15:17:21.108395"
+    },
+    {
+      "user_id": 5,
+      "request_id": 3,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.944579124450684,
+      "timestamp": "2025-11-13T15:17:21.128635"
+    },
+    {
+      "user_id": 6,
+      "request_id": 3,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.956087827682495,
+      "timestamp": "2025-11-13T15:17:21.157849"
+    },
+    {
+      "user_id": 7,
+      "request_id": 3,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.943862438201904,
+      "timestamp": "2025-11-13T15:17:21.172282"
+    },
+    {
+      "user_id": 8,
+      "request_id": 3,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.95284986495972,
+      "timestamp": "2025-11-13T15:17:21.203635"
+    },
+    {
+      "user_id": 9,
+      "request_id": 3,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.9494194984436,
+      "timestamp": "2025-11-13T15:17:21.232842"
+    },
+    {
+      "user_id": 0,
+      "request_id": 4,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.957091331481934,
+      "timestamp": "2025-11-13T15:17:54.028184"
+    },
+    {
+      "user_id": 1,
+      "request_id": 4,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93441033363342,
+      "timestamp": "2025-11-13T15:17:54.044036"
+    },
+    {
+      "user_id": 2,
+      "request_id": 4,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93616032600403,
+      "timestamp": "2025-11-13T15:17:54.104271"
+    },
+    {
+      "user_id": 3,
+      "request_id": 4,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.937384605407715,
+      "timestamp": "2025-11-13T15:17:54.160275"
+    },
+    {
+      "user_id": 4,
+      "request_id": 4,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93540334701538,
+      "timestamp": "2025-11-13T15:17:54.190600"
+    },
+    {
+      "user_id": 5,
+      "request_id": 4,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.945494413375854,
+      "timestamp": "2025-11-13T15:17:54.225694"
+    },
+    {
+      "user_id": 6,
+      "request_id": 4,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93840575218201,
+      "timestamp": "2025-11-13T15:17:54.261501"
+    },
+    {
+      "user_id": 7,
+      "request_id": 4,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93838977813721,
+      "timestamp": "2025-11-13T15:17:54.281364"
+    },
+    {
+      "user_id": 8,
+      "request_id": 4,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.935901165008545,
+      "timestamp": "2025-11-13T15:17:54.320414"
+    },
+    {
+      "user_id": 9,
+      "request_id": 4,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.934362173080444,
+      "timestamp": "2025-11-13T15:17:54.359764"
+    },
+    {
+      "user_id": 0,
+      "request_id": 5,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.9456946849823,
+      "timestamp": "2025-11-13T15:18:27.077765"
+    },
+    {
+      "user_id": 1,
+      "request_id": 5,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.937872886657715,
+      "timestamp": "2025-11-13T15:18:27.092443"
+    },
+    {
+      "user_id": 2,
+      "request_id": 5,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.94483137130737,
+      "timestamp": "2025-11-13T15:18:27.170589"
+    },
+    {
+      "user_id": 3,
+      "request_id": 5,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.94223070144653,
+      "timestamp": "2025-11-13T15:18:27.235948"
+    },
+    {
+      "user_id": 4,
+      "request_id": 5,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93621635437012,
+      "timestamp": "2025-11-13T15:18:27.267914"
+    },
+    {
+      "user_id": 5,
+      "request_id": 5,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.951221227645874,
+      "timestamp": "2025-11-13T15:18:27.330886"
+    },
+    {
+      "user_id": 6,
+      "request_id": 5,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93950176239014,
+      "timestamp": "2025-11-13T15:18:27.363435"
+    },
+    {
+      "user_id": 7,
+      "request_id": 5,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93862318992615,
+      "timestamp": "2025-11-13T15:18:27.394293"
+    },
+    {
+      "user_id": 8,
+      "request_id": 5,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.94470405578613,
+      "timestamp": "2025-11-13T15:18:27.445924"
+    },
+    {
+      "user_id": 9,
+      "request_id": 5,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93927359580994,
+      "timestamp": "2025-11-13T15:18:27.491819"
+    },
+    {
+      "user_id": 0,
+      "request_id": 6,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93990635871887,
+      "timestamp": "2025-11-13T15:19:00.118774"
+    },
+    {
+      "user_id": 1,
+      "request_id": 6,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93658709526062,
+      "timestamp": "2025-11-13T15:19:00.139606"
+    },
+    {
+      "user_id": 2,
+      "request_id": 6,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.971686124801636,
+      "timestamp": "2025-11-13T15:19:00.265901"
+    },
+    {
+      "user_id": 3,
+      "request_id": 6,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93742299079895,
+      "timestamp": "2025-11-13T15:19:00.311811"
+    },
+    {
+      "user_id": 4,
+      "request_id": 6,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.94343900680542,
+      "timestamp": "2025-11-13T15:19:00.352036"
+    },
+    {
+      "user_id": 5,
+      "request_id": 6,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.95532250404358,
+      "timestamp": "2025-11-13T15:19:00.437943"
+    },
+    {
+      "user_id": 6,
+      "request_id": 6,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93778419494629,
+      "timestamp": "2025-11-13T15:19:00.469465"
+    },
+    {
+      "user_id": 7,
+      "request_id": 6,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93970465660095,
+      "timestamp": "2025-11-13T15:19:00.504370"
+    },
+    {
+      "user_id": 8,
+      "request_id": 6,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.946199893951416,
+      "timestamp": "2025-11-13T15:19:00.577200"
+    },
+    {
+      "user_id": 9,
+      "request_id": 6,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.96421790122986,
+      "timestamp": "2025-11-13T15:19:00.647185"
+    },
+    {
+      "user_id": 0,
+      "request_id": 7,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.938984870910645,
+      "timestamp": "2025-11-13T15:19:33.162449"
+    },
+    {
+      "user_id": 1,
+      "request_id": 7,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93906927108765,
+      "timestamp": "2025-11-13T15:19:33.189639"
+    },
+    {
+      "user_id": 2,
+      "request_id": 7,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.9480504989624,
+      "timestamp": "2025-11-13T15:19:33.334383"
+    },
+    {
+      "user_id": 3,
+      "request_id": 7,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.93797183036804,
+      "timestamp": "2025-11-13T15:19:33.380199"
+    },
+    {
+      "user_id": 4,
+      "request_id": 7,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.95331597328186,
+      "timestamp": "2025-11-13T15:19:33.448809"
+    },
+    {
+      "user_id": 5,
+      "request_id": 7,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.94440460205078,
+      "timestamp": "2025-11-13T15:19:33.532891"
+    },
+    {
+      "user_id": 6,
+      "request_id": 7,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.94063210487366,
+      "timestamp": "2025-11-13T15:19:33.570872"
+    },
+    {
+      "user_id": 7,
+      "request_id": 7,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.94609570503235,
+      "timestamp": "2025-11-13T15:19:33.625543"
+    },
+    {
+      "user_id": 8,
+      "request_id": 7,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.945218563079834,
+      "timestamp": "2025-11-13T15:19:33.704827"
+    },
+    {
+      "user_id": 9,
+      "request_id": 7,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 32.951194286346436,
+      "timestamp": "2025-11-13T15:19:33.790370"
+    },
+    {
+      "user_id": 0,
+      "request_id": 8,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 30.008378982543945,
+      "timestamp": "2025-11-13T15:20:03.272495"
+    },
+    {
+      "user_id": 1,
+      "request_id": 8,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 30.004802703857422,
+      "timestamp": "2025-11-13T15:20:03.305326"
+    },
+    {
+      "user_id": 2,
+      "request_id": 8,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 30.007392168045044,
+      "timestamp": "2025-11-13T15:20:03.462444"
+    },
+    {
+      "user_id": 3,
+      "request_id": 8,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 30.004615783691406,
+      "timestamp": "2025-11-13T15:20:03.518467"
+    },
+    {
+      "user_id": 4,
+      "request_id": 8,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 30.009251594543457,
+      "timestamp": "2025-11-13T15:20:03.603089"
+    },
+    {
+      "user_id": 5,
+      "request_id": 8,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 30.010582208633423,
+      "timestamp": "2025-11-13T15:20:03.694428"
+    },
+    {
+      "user_id": 6,
+      "request_id": 8,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 30.006882429122925,
+      "timestamp": "2025-11-13T15:20:03.746619"
+    },
+    {
+      "user_id": 7,
+      "request_id": 8,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 30.009784698486328,
+      "timestamp": "2025-11-13T15:20:03.806379"
+    },
+    {
+      "user_id": 8,
+      "request_id": 8,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 30.00494623184204,
+      "timestamp": "2025-11-13T15:20:03.890493"
+    },
+    {
+      "user_id": 9,
+      "request_id": 8,
+      "status": "exception",
+      "error_message": "",
+      "response_time": 30.00837779045105,
+      "timestamp": "2025-11-13T15:20:03.991536"
+    }
+  ],
+  "recommendations": [
+    "Server appears to be down or unreachable"
+  ]
+}

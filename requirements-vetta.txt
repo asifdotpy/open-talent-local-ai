@@ -1,0 +1,27 @@
+# Vetta AI v4 Requirements
+# Install with: pip install -r requirements-vetta.txt
+
+# Core ML dependencies
+torch>=2.0.0
+transformers>=4.35.0
+accelerate>=0.25.0
+bitsandbytes>=0.41.0
+
+# Unsloth for efficient LoRA inference
+unsloth>=2024.12
+
+# HuggingFace Hub
+huggingface-hub>=0.20.0
+
+# Optional: FastAPI integration
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.5.0
+
+# Optional: Django integration
+django>=4.2.0
+djangorestframework>=3.14.0
+
+# Optional: Async task processing
+celery>=5.3.0
+redis>=5.0.0

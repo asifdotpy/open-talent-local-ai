@@ -1,0 +1,50 @@
+# ╔═══════════════════════════════════════════════════════════════════════════╗
+# ║  TalentAI vLLM Configuration - Production Ready                        ║
+# ╚═══════════════════════════════════════════════════════════════════════════╝
+
+# Base Model Configuration
+model: "asifdotpy/vetta-granite-2b-packaged-v3"
+tokenizer: "asifdotpy/vetta-granite-2b-packaged-v3"
+tokenizer_mode: "auto"
+trust_remote_code: true
+
+# Performance Optimization
+tensor_parallel_size: 1
+max_model_len: 2048
+max_num_seqs: 256
+max_num_batched_tokens: 4096
+gpu_memory_utilization: 0.9
+
+# LoRA Adapters for Multiple Personas
+lora_modules:
+  - name: "technical"
+    path: "asifdotpy/vetta-granite-2b-lora-v3"
+    base_model_name: "ibm-granite/granite-3.0-2b-instruct"
+
+  - name: "behavioral"
+    path: "asifdotpy/vetta-granite-2b-lora-v3"
+    base_model_name: "ibm-granite/granite-3.0-2b-instruct"
+
+  - name: "hr"
+    path: "asifdotpy/vetta-granite-2b-lora-v3"
+    base_model_name: "ibm-granite/granite-3.0-2b-instruct"
+
+# Server Configuration
+host: "0.0.0.0"
+port: 8000
+
+# API Configuration
+enable_lora: true
+max_loras: 3
+max_lora_rank: 16
+lora_extra_vocab_size: 256
+
+# Logging
+log_level: "INFO"
+
+# Advanced Performance Settings
+block_size: 16
+swap_space: 4
+cpu_offload_gb: 0
+enable_prefix_caching: true
+disable_log_stats: false

@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  vllm-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: talentai-vllm-server
+    ports:
+      - "8000:8000"
+    volumes:
+      - vllm-models:/models
+      - ./vllm-config.yaml:/app/vllm-config.yaml:ro
+      - ./start-vllm.sh:/app/start-vllm.sh:ro
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
+      - VLLM_LOGGING_LEVEL=INFO
+      - HF_TOKEN=${HF_TOKEN}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+volumes:
+  vllm-models:
+    driver: local

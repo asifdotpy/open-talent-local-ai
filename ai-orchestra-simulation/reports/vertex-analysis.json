@@ -1,0 +1,341 @@
+{
+  "timestamp": "2025-11-12T16:16:17.189Z",
+  "summary": {
+    "totalMeshes": 4,
+    "totalPrimitives": 4,
+    "totalVertices": 4368,
+    "hasMorphTargets": true,
+    "totalMorphTargets": 52
+  },
+  "boundingBox": {
+    "min": {
+      "x": 712,
+      "y": 1480,
+      "z": 2196
+    },
+    "max": {
+      "x": 10474,
+      "y": 13569,
+      "z": 14187
+    },
+    "size": {
+      "x": 9762,
+      "y": 12089,
+      "z": 11991
+    },
+    "center": {
+      "x": 5593,
+      "y": 7524.5,
+      "z": 8191.5
+    }
+  },
+  "geometryDetails": [
+    {
+      "meshIndex": 0,
+      "meshName": "unnamed",
+      "primitiveIndex": 0,
+      "vertexCount": 530,
+      "hasNormals": true,
+      "hasUVs": true,
+      "morphTargetCount": 0
+    },
+    {
+      "meshIndex": 1,
+      "meshName": "unnamed",
+      "primitiveIndex": 0,
+      "vertexCount": 530,
+      "hasNormals": true,
+      "hasUVs": true,
+      "morphTargetCount": 0
+    },
+    {
+      "meshIndex": 2,
+      "meshName": "unnamed",
+      "primitiveIndex": 0,
+      "vertexCount": 2694,
+      "hasNormals": true,
+      "hasUVs": true,
+      "morphTargetCount": 52
+    },
+    {
+      "meshIndex": 3,
+      "meshName": "unnamed",
+      "primitiveIndex": 0,
+      "vertexCount": 614,
+      "hasNormals": true,
+      "hasUVs": true,
+      "morphTargetCount": 0
+    }
+  ],
+  "morphTargets": {
+    "mesh_2_prim_0": {
+      "meshName": "unnamed",
+      "primitiveIndex": 0,
+      "count": 52,
+      "names": [],
+      "hasRequiredTargets": false,
+      "foundTargets": [],
+      "missingTargets": [
+        "jawOpen",
+        "mouthFunnel",
+        "mouthClose",
+        "mouthSmile"
+      ]
+    }
+  },
+  "vertexRegions": {
+    "mouth": 528,
+    "jaw": 289,
+    "eyes": 2664,
+    "nose": 0,
+    "other": 887
+  },
+  "vertexSamples": {
+    "mouth": [
+      {
+        "index": 385,
+        "x": 5593,
+        "y": 8699,
+        "z": 8479,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 386,
+        "x": 5380,
+        "y": 8699,
+        "z": 8507,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 387,
+        "x": 5182,
+        "y": 8699,
+        "z": 8589,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 388,
+        "x": 5012,
+        "y": 8699,
+        "z": 8719,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 389,
+        "x": 4881,
+        "y": 8699,
+        "z": 8890,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 390,
+        "x": 4799,
+        "y": 8699,
+        "z": 9088,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 391,
+        "x": 4771,
+        "y": 8699,
+        "z": 9301,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 392,
+        "x": 4799,
+        "y": 8699,
+        "z": 9514,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 393,
+        "x": 4881,
+        "y": 8699,
+        "z": 9712,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 394,
+        "x": 5012,
+        "y": 8699,
+        "z": 9882,
+        "mesh": 0,
+        "primitive": 0
+      }
+    ],
+    "jaw": [
+      {
+        "index": 367,
+        "x": 5593,
+        "y": 8869,
+        "z": 10215,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 368,
+        "x": 5357,
+        "y": 8869,
+        "z": 10184,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 369,
+        "x": 5136,
+        "y": 8869,
+        "z": 10092,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 370,
+        "x": 4947,
+        "y": 8869,
+        "z": 9947,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 371,
+        "x": 4802,
+        "y": 8869,
+        "z": 9758,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 372,
+        "x": 4711,
+        "y": 8869,
+        "z": 9537,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 373,
+        "x": 4679,
+        "y": 8869,
+        "z": 9301,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 374,
+        "x": 4711,
+        "y": 8869,
+        "z": 9064,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 375,
+        "x": 4802,
+        "y": 8869,
+        "z": 8844,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 376,
+        "x": 4947,
+        "y": 8869,
+        "z": 8655,
+        "mesh": 0,
+        "primitive": 0
+      }
+    ],
+    "eyes": [
+      {
+        "index": 0,
+        "x": 5593,
+        "y": 10070,
+        "z": 8751,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 1,
+        "x": 5593,
+        "y": 9947,
+        "z": 8602,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 2,
+        "x": 5412,
+        "y": 9947,
+        "z": 8625,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 3,
+        "x": 5380,
+        "y": 9797,
+        "z": 8507,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 4,
+        "x": 5182,
+        "y": 9797,
+        "z": 8589,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 5,
+        "x": 5243,
+        "y": 9947,
+        "z": 8695,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 6,
+        "x": 5451,
+        "y": 10070,
+        "z": 8770,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 7,
+        "x": 5472,
+        "y": 10121,
+        "z": 8848,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 8,
+        "x": 5593,
+        "y": 10121,
+        "z": 8832,
+        "mesh": 0,
+        "primitive": 0
+      },
+      {
+        "index": 9,
+        "x": 5735,
+        "y": 10070,
+        "z": 8770,
+        "mesh": 0,
+        "primitive": 0
+      }
+    ]
+  }
+}

@@ -1,0 +1,72 @@
+name: Release Pipeline
+
+on:
+  push:
+    tags: ['*']
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        submodule: [agents, microservices, frontend, infrastructure, ai-orchestra-simulation]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Setup Node.js
+        if: matrix.submodule == 'frontend' || matrix.submodule == 'agents'
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Setup Python
+        if: matrix.submodule == 'microservices' || matrix.submodule == 'agents' || matrix.submodule == 'ai-orchestra-simulation'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Run Tests
+        run: |
+          cd ${{ matrix.submodule }}
+          if [[ -f "package.json" ]]; then
+            npm ci
+            npm test
+          elif [[ -f "requirements.txt" ]]; then
+            pip install -r requirements.txt
+            python -m pytest tests/
+          fi
+
+      - name: Security Scan
+        run: |
+          cd ${{ matrix.submodule }}
+          if [[ -f "package.json" ]]; then
+            npm audit --audit-level high
+          elif [[ -f "requirements.txt" ]]; then
+            safety check
+          fi
+
+      - name: Build Artifacts
+        run: |
+          cd ${{ matrix.submodule }}
+          if [[ -f "package.json" ]]; then
+            npm run build
+          elif [[ -f "Dockerfile" ]]; then
+            docker build -t talent-ai/${{ matrix.submodule }}:$GITHUB_REF_NAME .
+          fi
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ matrix.submodule }} ${{ github.ref }}
+          body: |
+            Release ${{ matrix.submodule }} ${{ github.ref }}
+
+            ## Changes
+            - Automated release from CI/CD pipeline

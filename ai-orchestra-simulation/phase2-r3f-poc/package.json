@@ -1,0 +1,30 @@
+{
+  "name": "face-r3f-poc",
+  "version": "1.0.0",
+  "description": "Phase 2: Standalone React Three Fiber proof-of-concept for face.glb lip-sync",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.88.13",
+    "@react-three/fiber": "^8.15.11",
+    "next": "14.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "three": "^0.158.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@types/three": "^0.158.0",
+    "eslint": "^8.55.0",
+    "eslint-config-next": "14.0.4",
+    "file-loader": "^6.2.0",
+    "typescript": "^5.3.3"
+  }
+}

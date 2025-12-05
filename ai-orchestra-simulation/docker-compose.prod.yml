@@ -1,0 +1,179 @@
+version: '3.8'
+
+services:
+  # R3F Frontend - Port 3000
+  r3f-frontend:
+    build:
+      context: poc-webgl
+      dockerfile: Dockerfile
+    container_name: talent-r3f-frontend
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - avatar-renderer
+      - voice-service
+      - interview-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - talent-ai-network
+
+  # Avatar Renderer (Backend) - Port 3001
+  avatar-renderer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: talent-avatar-renderer
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./assets:/app/assets:ro
+      - avatar_logs:/app/logs
+    depends_on:
+      - voice-service
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - talent-ai-network
+
+  # Voice Service - Port 8002
+  voice-service:
+    build:
+      context: ../microservices/voice-service
+      dockerfile: Dockerfile
+    container_name: talent-voice-service
+    ports:
+      - "8002:8002"
+      - "8006:8006"  # WebRTC port
+    env_file:
+      - ../microservices/voice-service/.env
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - voice_models:/app/models
+      - voice_vendor:/app/vendor
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - talent-ai-network
+
+  # Conversation Service - Port 8003
+  conversation-service:
+    build:
+      context: ../microservices/conversation-service
+      dockerfile: Dockerfile
+    container_name: talent-conversation-service
+    ports:
+      - "8003:80"
+    env_file:
+      - ../microservices/conversation-service/.env
+    environment:
+      - PYTHONPATH=/app
+    depends_on:
+      - ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - talent-ai-network
+
+  # Interview Service - Port 8004
+  interview-service:
+    build:
+      context: ../microservices/interview-service
+      dockerfile: Dockerfile
+    container_name: talent-interview-service
+    ports:
+      - "8004:80"
+    env_file:
+      - ../microservices/interview-service/.env
+    environment:
+      - PYTHONPATH=/app
+    depends_on:
+      - conversation-service
+      - voice-service
+      - avatar-renderer
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - talent-ai-network
+
+  # Ollama Service for AI Models
+  ollama:
+    image: ollama/ollama:latest
+    container_name: talent-ollama
+    ports:
+      - "11435:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    command: ["/bin/sh", "-c", "ollama serve & sleep 5 && ollama pull granite4:350m-h && wait"]
+    healthcheck:
+      test: ["CMD", "ollama", "list", "|", "grep", "granite4:350m-h"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - talent-ai-network
+
+  # Development service for R3F frontend with hot reload
+  r3f-frontend-dev:
+    build:
+      context: poc-webgl
+      dockerfile: Dockerfile.dev
+    container_name: talent-r3f-frontend-dev
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./poc-webgl:/app
+      - /app/node_modules
+    profiles:
+      - dev
+    networks:
+      - talent-ai-network
+
+networks:
+  talent-ai-network:
+    driver: bridge
+    name: talent-ai-network
+
+volumes:
+  voice_models:
+    driver: local
+  voice_vendor:
+    driver: local
+  ollama_data:
+    driver: local
+  avatar_logs:
+    driver: local

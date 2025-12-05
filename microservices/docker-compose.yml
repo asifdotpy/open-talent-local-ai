@@ -1,0 +1,198 @@
+version: '3.8'
+
+services:
+  # Conversation Service - Port 8003
+  conversation-service:
+    build:
+      context: conversation-service
+      dockerfile: Dockerfile
+    container_name: talent-conversation-service
+    ports:
+      - "8003:80"
+    env_file:
+      - conversation-service/.env
+    environment:
+      - PYTHONPATH=/app
+    depends_on:
+      - ollama
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Voice Service - Port 8002
+  voice-service:
+    build:
+      context: voice-service
+      dockerfile: Dockerfile
+    container_name: talent-voice-service
+    ports:
+      - "8002:8002"
+      - "8006:8006"  # WebRTC port
+    env_file:
+      - voice-service/.env
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - voice_models:/app/models
+      - voice_vendor:/app/vendor
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8002/health').raise_for_status()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Avatar Service - Port 8001
+  avatar-service:
+    build:
+      context: avatar-service
+      dockerfile: Dockerfile
+    container_name: talent-avatar-service
+    ports:
+      - "8001:80"
+    env_file:
+      - avatar-service/.env
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - avatar_models:/app/models
+      - avatar_assets:/app/app/assets
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Interview Service - Port 8004
+  interview-service:
+    build:
+      context: interview-service
+      dockerfile: Dockerfile
+    container_name: talent-interview-service
+    ports:
+      - "8004:80"
+    env_file:
+      - interview-service/.env
+    environment:
+      - PYTHONPATH=/app
+    depends_on:
+      - conversation-service
+      - voice-service
+      - avatar-service
+      - analytics-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Scout Service - Port 8005
+  scout-service:
+    build:
+      context: scout-service
+      dockerfile: Dockerfile
+    container_name: talent-scout-service
+    ports:
+      - "8005:8000"
+    env_file:
+      - scout-service/.env
+    environment:
+      - PYTHONPATH=/app
+    depends_on:
+      - conversation-service
+      - voice-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Analytics Service - Port 8007
+  analytics-service:
+    build:
+      context: analytics-service
+      dockerfile: Dockerfile
+    container_name: talent-analytics-service
+    ports:
+      - "8007:80"
+    env_file:
+      - analytics-service/.env
+    environment:
+      - PYTHONPATH=/app
+      - PORT=80
+    depends_on:
+      - conversation-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Candidate Service - Port 8008
+  candidate-service:
+    build:
+      context: candidate-service
+      dockerfile: Dockerfile
+    container_name: talent-candidate-service
+    ports:
+      - "8008:8000"
+    env_file:
+      - candidate-service/.env
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - candidate_data:/app/data
+    depends_on:
+      - conversation-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+    # Ollama Model Pull Init Container
+  ollama-pull:
+    image: ollama/ollama:latest
+    container_name: talent-ollama-pull
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["ollama serve & sleep 5 && ollama pull granite4:350m-h"]
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+
+  # Ollama Service for AI Models
+  ollama:
+    image: ollama/ollama:latest
+    container_name: talent-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    depends_on:
+      ollama-pull:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "ollama", "list", "|", "grep", "granite4:350m-h"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  voice_models:
+  voice_vendor:
+  ollama_data:
+  candidate_data:
+  avatar_models:
+  avatar_assets:

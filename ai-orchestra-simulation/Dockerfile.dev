@@ -1,0 +1,40 @@
+# Development Dockerfile with hot reload and debugging
+FROM node:18-alpine
+
+# Install system dependencies for canvas and development tools
+RUN apk add --no-cache \
+    cairo-dev \
+    jpeg-dev \
+    giflib-dev \
+    librsvg-dev \
+    pango-dev \
+    pixman-dev \
+    python3 \
+    git \
+    curl \
+    vim
+
+# Create app user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S avatar -u 1001
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies (including dev dependencies)
+RUN npm ci
+
+# Copy application code
+COPY . .
+
+# Change ownership
+RUN chown -R avatar:nodejs /app
+USER avatar
+
+# Expose port
+EXPOSE 3001
+
+# Default command for development
+CMD ["npm", "run", "dev"]

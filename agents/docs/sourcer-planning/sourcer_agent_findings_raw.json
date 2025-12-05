@@ -1,0 +1,32 @@
+{
+  "timestamp": "2025-11-03T08:54:12.937076Z",
+  "documents": [
+    {
+      "labels": [
+        "Agent"
+      ],
+      "properties": {
+        "name": "Sourcer",
+        "description": "AI Talent Sourcer responsible for finding and enriching candidate profiles."
+      }
+    },
+    {
+      "labels": [
+        "Responsibility"
+      ],
+      "properties": {
+        "name": "Candidate Sourcing",
+        "description": "Scanning platforms and databases to find candidates."
+      }
+    },
+    {
+      "labels": [
+        "API"
+      ],
+      "properties": {
+        "name": "Sourcer Microservice API"
+      }
+    }
+  ],
+  "relationships": []
+}

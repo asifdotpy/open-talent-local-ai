@@ -1,0 +1,66 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout with submodules
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run basic integration tests
+        run: |
+          echo "Running basic integration tests..."
+
+          # Test that we can import our modules
+          python -c "import sys; sys.path.append('tests'); from shared.test_utils import TestHelper; print('✅ Module imports work')"
+
+          # Test that our API contracts are valid
+          python -c "import sys; sys.path.append('tests'); from shared.contracts.api_contracts import CANDIDATE_API_CONTRACTS; print(f'✅ Found {len(CANDIDATE_API_CONTRACTS)} candidate API contracts')"
+
+          # Test basic functionality
+          python -c "
+          from tests.shared.test_utils import create_mock_service_response
+          response = create_mock_service_response({'test': 'data'})
+          assert response['status'] == 'success'
+          assert 'timestamp' in response
+          print('✅ Basic functionality tests pass')
+          "
+
+      - name: Test workspace configuration
+        run: |
+          # Verify workspace file exists and is valid JSON
+          if [ -f "talent-ai-platform.code-workspace" ]; then
+            python -c "import json; json.load(open('talent-ai-platform.code-workspace')); print('✅ Workspace file is valid JSON')"
+          else
+            echo "❌ Workspace file not found"
+            exit 1
+          fi
+
+      - name: Test specifications structure
+        run: |
+          # Verify specs directory structure
+          if [ -d "specs" ] && [ -f "specs/README.md" ]; then
+            echo "✅ Specifications directory structure exists"
+          else
+            echo "❌ Specifications directory structure missing"
+            exit 1
+          fi

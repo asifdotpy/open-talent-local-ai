@@ -1,0 +1,13 @@
+{
+  "name": "face-model-validator",
+  "version": "1.0.0",
+  "description": "Phase 1: Face model validation for 3D avatar integration (Node.js compatible)",
+  "type": "module",
+  "scripts": {
+    "validate": "node validate-face-model.js",
+    "test": "npm run validate"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

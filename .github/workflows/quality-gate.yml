@@ -1,0 +1,39 @@
+name: Quality Gate
+
+on: [pull_request]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run code quality checks
+        run: |
+          # Basic code quality checks
+          echo "Running basic code quality checks..."
+
+          # Check Python syntax
+          python -m py_compile $(find . -name "*.py" -not -path "./.venv/*" -not -path "./__pycache__/*" | head -10)
+
+          # Check for common issues
+          if command -v pylint &> /dev/null; then
+            pylint --errors-only $(find . -name "*.py" -not -path "./.venv/*" -not -path "./__pycache__/*" | head -5) || true
+          fi
+
+          # Check JSON syntax
+          find . -name "*.json" -not -path "./.venv/*" -not -path "./node_modules/*" | head -5 | xargs -I {} python -c "import json; json.load(open('{}'))" || true
+
+          echo "Basic quality checks completed"

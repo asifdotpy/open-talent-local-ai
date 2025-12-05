@@ -1,0 +1,137 @@
+name: Voice Service CI/CD
+
+on:
+  push:
+    branches: [main, dev]
+    paths:
+      - 'microservices/voice-service/**'
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - 'microservices/voice-service/**'
+
+jobs:
+  test-voice-service:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('microservices/voice-service/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsndfile1 ffmpeg
+
+      - name: Install Python dependencies
+        run: |
+          cd microservices/voice-service
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-asyncio coverage[toml]
+
+      - name: Download voice models
+        run: |
+          cd microservices/voice-service
+          mkdir -p models
+          # Download Vosk model (small English model for testing)
+          if [ ! -d "models/vosk-model-small-en-us-0.15" ]; then
+            wget -O models/vosk-model-small-en-us-0.15.zip https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip
+            unzip models/vosk-model-small-en-us-0.15.zip -d models/
+            rm models/vosk-model-small-en-us-0.15.zip
+          fi
+          # Download Piper TTS model
+          if [ ! -f "models/en_US-lessac-medium.onnx" ]; then
+            wget -O models/en_US-lessac-medium.tar.gz https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/lessac/medium/en_US-lessac-medium.onnx
+            mkdir -p models/piper
+            mv models/en_US-lessac-medium.tar.gz models/piper/
+            cd models/piper
+            tar -xzf en_US-lessac-medium.tar.gz
+            mv en_US-lessac-medium.onnx ../
+            mv en_US-lessac-medium.onnx.json ../
+            cd ../..
+            rm -rf models/piper
+          fi
+          # Download Silero VAD model
+          if [ ! -f "models/silero_vad.onnx" ]; then
+            wget -O models/silero_vad.onnx https://models.silero.ai/vad/silero_vad.onnx
+          fi
+
+      - name: Run voice service tests with coverage
+        run: |
+          cd microservices/voice-service
+          python -m pytest tests/ -v --cov=services --cov=main --cov-report=xml --cov-report=html --cov-report=term-missing
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./microservices/voice-service/coverage.xml
+          flags: voice-service
+          name: voice-service-coverage
+          fail_ci_if_error: false
+
+      - name: Upload coverage HTML report
+        uses: actions/upload-artifact@v3
+        with:
+          name: voice-service-coverage-html
+          path: microservices/voice-service/htmlcov/
+          retention-days: 30
+
+      - name: Test service startup
+        run: |
+          cd microservices/voice-service
+          timeout 30s python -m uvicorn main:app --host 127.0.0.1 --port 8002 &
+          sleep 10
+          curl -f http://localhost:8002/health || (echo "Service failed to start" && exit 1)
+          pkill -f uvicorn
+
+  quality-check:
+    runs-on: ubuntu-latest
+    needs: test-voice-service
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install quality tools
+        run: |
+          pip install black flake8 isort mypy
+
+      - name: Check code formatting with Black
+        run: |
+          cd microservices/voice-service
+          black --check --diff .
+
+      - name: Check imports with isort
+        run: |
+          cd microservices/voice-service
+          isort --check-only --diff .
+
+      - name: Lint with flake8
+        run: |
+          cd microservices/voice-service
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Type check with mypy
+        run: |
+          cd microservices/voice-service
+          mypy . --ignore-missing-imports

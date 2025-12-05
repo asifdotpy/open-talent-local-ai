@@ -1,0 +1,88 @@
+name: User Service CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'user-service/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'user-service/**'
+
+jobs:
+  build-test-lint-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # Required to push Docker images to GitHub Packages or Google Artifact Registry
+      id-token: write # Required for Workload Identity Federation with GCP
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        run: |
+          pipx install poetry
+
+      - name: Install dependencies
+        run: |
+          cd user-service && poetry install --no-root
+
+      - name: Run tests
+        run: |
+          echo "Running tests for user-service (placeholder - implement pytest later)"
+          # cd user-service && poetry run pytest tests/
+
+      - name: Run linter (Ruff)
+        run: |
+          cd user-service && poetry run ruff check .
+
+      - name: Automated Security Scan (Bandit for Python)
+        run: |
+          cd user-service && poetry run bandit -r . -ll -f json -o bandit-results.json || true # Allow failure for now, review results
+          echo "Bandit scan completed. Review bandit-results.json for findings."
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Authenticate to Google Cloud Artifact Registry
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configure Docker to use Google Cloud Artifact Registry
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev
+
+      - name: Build and push Docker image to Artifact Registry
+        id: build-image
+        run: |
+          IMAGE_NAME="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/talent-ai/user-service"
+          TAG="${{ github.sha }}"
+          LATEST_TAG="latest"
+
+          docker build -t $IMAGE_NAME:$TAG -t $IMAGE_NAME:$LATEST_TAG ./user-service
+          docker push $IMAGE_NAME:$TAG
+          docker push $IMAGE_NAME:$LATEST_TAG
+        env:
+          GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Automated Security Scan (Trivy for Container Image)
+        run: |
+          docker pull aquasec/trivy:latest
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image \
+            us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/talent-ai/user-service:${{ github.sha }} \
+            --format json --output trivy-results.json || true # Allow failure for now, review results
+          echo "Trivy scan completed. Review trivy-results.json for findings."
+        env:
+          GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}

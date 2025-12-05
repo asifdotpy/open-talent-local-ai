@@ -1,0 +1,155 @@
+# Training Configuration for Vetta Granite 3.0 2B Fine-Tuning
+# This file contains all hyperparameters for LoRA fine-tuning on comprehensive dataset
+
+model:
+  name: "ibm-granite/granite-3.0-2b-instruct"
+  max_seq_length: 2048
+  load_in_4bit: true
+  dtype: null  # Auto-detect: Float16 for T4, BFloat16 for Ampere+
+
+lora:
+  r: 16
+  alpha: 16
+  dropout: 0.0
+  target_modules:
+    - "q_proj"
+    - "k_proj"
+    - "v_proj"
+    - "o_proj"
+    - "gate_proj"
+    - "up_proj"
+    - "down_proj"
+  bias: "none"
+  use_gradient_checkpointing: "unsloth"
+  random_state: 3407
+
+training:
+  # Batch settings
+  batch_size: 4
+  gradient_accumulation_steps: 2
+  effective_batch_size: 8  # batch_size * gradient_accumulation_steps
+  
+  # Duration
+  num_epochs: 5
+  
+  # Learning rate
+  learning_rate: 2.0e-4
+  warmup_steps: 10
+  
+  # Optimizer
+  optimizer: "adamw_8bit"
+  weight_decay: 0.01
+  
+  # Precision
+  fp16: auto  # Set based on GPU capabilities
+  bf16: auto
+  
+  # Logging & Checkpoints
+  logging_steps: 50
+  save_steps: 100
+  save_total_limit: 5
+  
+  # Reproducibility
+  seed: 3407
+  
+  # Packing (improved from False to True)
+  packing: true
+
+dataset:
+  # Data files (relative to notebooks/data/)
+  train_file: "llm_training_train.json"
+  validation_file: "llm_training_validation.json"
+  full_file: "llm_training_dataset.json"
+  
+  # Dataset stats
+  total_examples: 2075
+  train_examples: 1660
+  validation_examples: 415
+  train_ratio: 0.8
+  
+  # Data repetitions for reinforcement
+  repetitions: 1  # Updated from 10 to 1 (dataset already large enough)
+  
+  # Format
+  format: "alpaca"  # instruction + input + response
+  text_field: "text"
+
+directories:
+  # Google Drive paths (persistent storage)
+  project_dir: "/content/drive/MyDrive/talent-ai-vetta"
+  checkpoints_dir: "/content/drive/MyDrive/talent-ai-vetta/checkpoints"
+  models_dir: "/content/drive/MyDrive/talent-ai-vetta/models"
+  lora_dir: "/content/drive/MyDrive/talent-ai-vetta/models/lora"
+  merged_dir: "/content/drive/MyDrive/talent-ai-vetta/models/merged"
+  gguf_dir: "/content/drive/MyDrive/talent-ai-vetta/models/gguf"
+  
+  # Colab data directory
+  data_dir: "/content/data"
+
+huggingface:
+  username: "asifdotpy"
+  base_model_name: "vetta-granite-2b"
+  version: "v4"  # New version for comprehensive dataset
+  
+  # Repository IDs
+  lora_repo: "asifdotpy/vetta-granite-2b-lora-v4"
+  merged_repo: "asifdotpy/vetta-granite-2b-v4"
+  gguf_repo: "asifdotpy/vetta-granite-2b-gguf-v4"
+
+inference:
+  max_new_tokens: 256
+  temperature: 0.7
+  top_p: 0.9
+  top_k: 40
+  do_sample: true
+  repetition_penalty: 1.1
+
+# Training metadata
+metadata:
+  description: "Comprehensive TalentAI platform training covering all 8 domains"
+  domains:
+    - sourcing
+    - search
+    - engagement
+    - discovery
+    - quality
+    - market
+    - integration
+    - interview
+  
+  dataset_version: "llm_training_dataset_v1"
+  created_date: "2025-12-04"
+  updated_date: "2025-12-04"
+  
+  # Quality metrics
+  quality_metrics:
+    avg_quality: 0.875
+    high_quality_ratio: 0.828  # 82.8% examples ≥0.8
+    min_quality: 0.75
+    max_quality: 1.0
+  
+  # Expected improvements
+  expected_improvements:
+    search_capability: "0% → 80%+ (boolean query generation)"
+    engagement_capability: "0% → 85%+ (email personalization)"
+    quality_capability: "0% → 80%+ (candidate evaluation)"
+    market_capability: "0% → 75%+ (salary estimation)"
+    integration_capability: "0% → 70%+ (ATS/CRM workflows)"
+    interview_capability: "90% → 95%+ (maintain and improve)"
+
+# Colab-specific settings
+colab:
+  gpu_type: "T4"  # Free tier GPU
+  ram_gb: 12.7
+  disk_gb: 107.7
+  runtime: "Python 3.10"
+  
+  # Memory optimization
+  use_4bit: true
+  clear_cache: true
+  mixed_precision: "auto"
+  
+  # Safety features
+  auto_save: true
+  checkpoint_frequency: 100  # Save every 100 steps
+  max_checkpoints: 5  # Keep last 5 checkpoints

@@ -1,0 +1,568 @@
+{
+  "timestamp": "2025-11-12T17:21:34.301Z",
+  "summary": {
+    "status": "READY",
+    "message": "face.glb animation pipeline is production-ready"
+  },
+  "sections": {
+    "phonemeCoverage": {
+      "totalPhonemes": 39,
+      "vowels": 14,
+      "consonants": 23,
+      "special": 2,
+      "coverage": {
+        "aa": {
+          "primary": "jawOpen",
+          "primaryIntensity": 1,
+          "secondary": "mouthFunnel",
+          "secondaryIntensity": 0.3,
+          "isBlended": true
+        },
+        "ae": {
+          "primary": "jawOpen",
+          "primaryIntensity": 0.8,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "ah": {
+          "primary": "jawOpen",
+          "primaryIntensity": 1,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "ao": {
+          "primary": "mouthFunnel",
+          "primaryIntensity": 0.9,
+          "secondary": "jawOpen",
+          "secondaryIntensity": 0.5,
+          "isBlended": true
+        },
+        "ee": {
+          "primary": "mouthSmile",
+          "primaryIntensity": 0.9,
+          "secondary": "mouthStretch_L",
+          "secondaryIntensity": 0.4,
+          "isBlended": true
+        },
+        "eh": {
+          "primary": "jawOpen",
+          "primaryIntensity": 0.7,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "er": {
+          "primary": "mouthRollUpper",
+          "primaryIntensity": 0.6,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "ih": {
+          "primary": "jawOpen",
+          "primaryIntensity": 0.5,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "iy": {
+          "primary": "mouthSmile",
+          "primaryIntensity": 1,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "oh": {
+          "primary": "mouthFunnel",
+          "primaryIntensity": 1,
+          "secondary": "jawOpen",
+          "secondaryIntensity": 0.5,
+          "isBlended": true
+        },
+        "ow": {
+          "primary": "mouthFunnel",
+          "primaryIntensity": 0.8,
+          "secondary": "jawOpen",
+          "secondaryIntensity": 0.4,
+          "isBlended": true
+        },
+        "oy": {
+          "primary": "mouthSmile",
+          "primaryIntensity": 0.7,
+          "secondary": "jawOpen",
+          "secondaryIntensity": 0.5,
+          "isBlended": true
+        },
+        "uh": {
+          "primary": "mouthPucker",
+          "primaryIntensity": 0.8,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "uw": {
+          "primary": "mouthPucker",
+          "primaryIntensity": 1,
+          "secondary": "mouthFunnel",
+          "secondaryIntensity": 0.6,
+          "isBlended": true
+        },
+        "b": {
+          "primary": "mouthClose",
+          "primaryIntensity": 1,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "ch": {
+          "primary": "mouthClose",
+          "primaryIntensity": 0.8,
+          "secondary": "jawOpen",
+          "secondaryIntensity": 0.3,
+          "isBlended": true
+        },
+        "d": {
+          "primary": "jawOpen",
+          "primaryIntensity": 0.3,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "f": {
+          "primary": "mouthClose",
+          "primaryIntensity": 0.7,
+          "secondary": "mouthRollLower",
+          "secondaryIntensity": 0.5,
+          "isBlended": true
+        },
+        "g": {
+          "primary": "jawOpen",
+          "primaryIntensity": 0.2,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "hh": {
+          "primary": "jawOpen",
+          "primaryIntensity": 0.1,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "jh": {
+          "primary": "mouthClose",
+          "primaryIntensity": 0.6,
+          "secondary": "jawOpen",
+          "secondaryIntensity": 0.2,
+          "isBlended": true
+        },
+        "k": {
+          "primary": "jawOpen",
+          "primaryIntensity": 0.15,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "l": {
+          "primary": "jawOpen",
+          "primaryIntensity": 0.4,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "m": {
+          "primary": "mouthClose",
+          "primaryIntensity": 1,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "n": {
+          "primary": "jawOpen",
+          "primaryIntensity": 0.3,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "ng": {
+          "primary": "jawOpen",
+          "primaryIntensity": 0.1,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "p": {
+          "primary": "mouthClose",
+          "primaryIntensity": 1,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "r": {
+          "primary": "mouthRollUpper",
+          "primaryIntensity": 0.7,
+          "secondary": "jawOpen",
+          "secondaryIntensity": 0.3,
+          "isBlended": true
+        },
+        "s": {
+          "primary": "mouthClose",
+          "primaryIntensity": 0.6,
+          "secondary": "mouthSmile",
+          "secondaryIntensity": 0.3,
+          "isBlended": true
+        },
+        "sh": {
+          "primary": "mouthClose",
+          "primaryIntensity": 0.7,
+          "secondary": "mouthRollUpper",
+          "secondaryIntensity": 0.4,
+          "isBlended": true
+        },
+        "t": {
+          "primary": "jawOpen",
+          "primaryIntensity": 0.2,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "th": {
+          "primary": "jawOpen",
+          "primaryIntensity": 0.5,
+          "secondary": "mouthClose",
+          "secondaryIntensity": 0.3,
+          "isBlended": true
+        },
+        "v": {
+          "primary": "mouthClose",
+          "primaryIntensity": 0.7,
+          "secondary": "mouthRollLower",
+          "secondaryIntensity": 0.4,
+          "isBlended": true
+        },
+        "w": {
+          "primary": "mouthPucker",
+          "primaryIntensity": 0.8,
+          "secondary": "mouthFunnel",
+          "secondaryIntensity": 0.5,
+          "isBlended": true
+        },
+        "y": {
+          "primary": "mouthSmile",
+          "primaryIntensity": 0.6,
+          "secondary": "jawOpen",
+          "secondaryIntensity": 0.3,
+          "isBlended": true
+        },
+        "z": {
+          "primary": "mouthClose",
+          "primaryIntensity": 0.5,
+          "secondary": "mouthSmile",
+          "secondaryIntensity": 0.2,
+          "isBlended": true
+        },
+        "zh": {
+          "primary": "mouthClose",
+          "primaryIntensity": 0.6,
+          "secondary": "mouthRollUpper",
+          "secondaryIntensity": 0.3,
+          "isBlended": true
+        },
+        "sil": {
+          "primary": null,
+          "primaryIntensity": 0,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        },
+        "pau": {
+          "primary": "mouthSmile",
+          "primaryIntensity": 0.1,
+          "secondary": null,
+          "secondaryIntensity": 0,
+          "isBlended": false
+        }
+      }
+    },
+    "morphTargetUtilization": {
+      "targetsUsed": 8,
+      "targetList": {
+        "jawOpen": [
+          "aa",
+          "ae",
+          "ah",
+          "ao (secondary)",
+          "eh",
+          "ih",
+          "oh (secondary)",
+          "ow (secondary)",
+          "oy (secondary)",
+          "ch (secondary)",
+          "d",
+          "g",
+          "hh",
+          "jh (secondary)",
+          "k",
+          "l",
+          "n",
+          "ng",
+          "r (secondary)",
+          "t",
+          "th",
+          "y (secondary)"
+        ],
+        "mouthFunnel": [
+          "aa (secondary)",
+          "ao",
+          "oh",
+          "ow",
+          "uw (secondary)",
+          "w (secondary)"
+        ],
+        "mouthSmile": [
+          "ee",
+          "iy",
+          "oy",
+          "s (secondary)",
+          "y",
+          "z (secondary)",
+          "pau"
+        ],
+        "mouthStretch_L": [
+          "ee (secondary)"
+        ],
+        "mouthRollUpper": [
+          "er",
+          "r",
+          "sh (secondary)",
+          "zh (secondary)"
+        ],
+        "mouthPucker": [
+          "uh",
+          "uw",
+          "w"
+        ],
+        "mouthClose": [
+          "b",
+          "ch",
+          "f",
+          "jh",
+          "m",
+          "p",
+          "s",
+          "sh",
+          "th (secondary)",
+          "v",
+          "z",
+          "zh"
+        ],
+        "mouthRollLower": [
+          "f (secondary)",
+          "v (secondary)"
+        ]
+      },
+      "mostUsedTargets": [
+        {
+          "target": "jawOpen",
+          "usage": 22,
+          "phonemes": [
+            "aa",
+            "ae",
+            "ah",
+            "ao (secondary)",
+            "eh",
+            "ih",
+            "oh (secondary)",
+            "ow (secondary)",
+            "oy (secondary)",
+            "ch (secondary)",
+            "d",
+            "g",
+            "hh",
+            "jh (secondary)",
+            "k",
+            "l",
+            "n",
+            "ng",
+            "r (secondary)",
+            "t",
+            "th",
+            "y (secondary)"
+          ]
+        },
+        {
+          "target": "mouthClose",
+          "usage": 12,
+          "phonemes": [
+            "b",
+            "ch",
+            "f",
+            "jh",
+            "m",
+            "p",
+            "s",
+            "sh",
+            "th (secondary)",
+            "v",
+            "z",
+            "zh"
+          ]
+        },
+        {
+          "target": "mouthSmile",
+          "usage": 7,
+          "phonemes": [
+            "ee",
+            "iy",
+            "oy",
+            "s (secondary)",
+            "y",
+            "z (secondary)",
+            "pau"
+          ]
+        },
+        {
+          "target": "mouthFunnel",
+          "usage": 6,
+          "phonemes": [
+            "aa (secondary)",
+            "ao",
+            "oh",
+            "ow",
+            "uw (secondary)",
+            "w (secondary)"
+          ]
+        },
+        {
+          "target": "mouthRollUpper",
+          "usage": 4,
+          "phonemes": [
+            "er",
+            "r",
+            "sh (secondary)",
+            "zh (secondary)"
+          ]
+        }
+      ]
+    },
+    "complexSequences": {
+      "sequenceCount": 4,
+      "results": [
+        {
+          "sequence": "Simple greeting: \"hello\"",
+          "phonemeCount": 5,
+          "totalAnimations": 0,
+          "uniqueTargets": 0,
+          "totalDuration": 530
+        },
+        {
+          "sequence": "Complex sentence: \"thank you\"",
+          "phonemeCount": 7,
+          "totalAnimations": 0,
+          "uniqueTargets": 0,
+          "totalDuration": 680
+        },
+        {
+          "sequence": "Rapid sequence: \"pppbbb\"",
+          "phonemeCount": 6,
+          "totalAnimations": 6,
+          "uniqueTargets": 1,
+          "totalDuration": 300
+        },
+        {
+          "sequence": "Vowel sweep: \"aaeeiioouu\"",
+          "phonemeCount": 5,
+          "totalAnimations": 9,
+          "uniqueTargets": 5,
+          "totalDuration": 400
+        }
+      ]
+    },
+    "arKitQuality": {
+      "lipSyncTargetsAvailable": [
+        {
+          "name": "jawOpen",
+          "expectedIndex": 24,
+          "actualIndex": 24,
+          "description": "Open mouth vertically",
+          "valid": true
+        },
+        {
+          "name": "mouthFunnel",
+          "expectedIndex": 28,
+          "actualIndex": 28,
+          "description": "Rounded mouth (O/U sounds)",
+          "valid": true
+        },
+        {
+          "name": "mouthClose",
+          "expectedIndex": 36,
+          "actualIndex": 36,
+          "description": "Closed mouth (M/P/B sounds)",
+          "valid": true
+        },
+        {
+          "name": "mouthSmile",
+          "expectedIndex": 38,
+          "actualIndex": 38,
+          "description": "Smile shape (E/I sounds)",
+          "valid": true
+        }
+      ],
+      "expressionTargetsAvailable": [
+        {
+          "name": "browInnerUp",
+          "index": 0,
+          "available": true
+        },
+        {
+          "name": "eyeWide_L",
+          "index": 17,
+          "available": true
+        },
+        {
+          "name": "eyeWide_R",
+          "index": 18,
+          "available": true
+        },
+        {
+          "name": "cheekPuff",
+          "index": 19,
+          "available": true
+        },
+        {
+          "name": "mouthFrown_L",
+          "index": 39,
+          "available": true
+        }
+      ],
+      "totalCoverage": 9
+    },
+    "performance": {
+      "phonemeLookup": {
+        "iterations": 10000,
+        "totalTime": 16.28937000000002,
+        "avgTime": 0.0016309170000000023
+      },
+      "indexLookup": {
+        "iterations": 10000,
+        "totalTime": 32.23917,
+        "avgTime": 0.003225465
+      },
+      "normalization": {
+        "iterations": 2000,
+        "totalTime": 1.4661900000000117,
+        "avgTime": 0.0007430850000000078
+      }
+    },
+    "intensityDistribution": {
+      "full": 8,
+      "high": 13,
+      "medium": 9,
+      "low": 8,
+      "zero": 1
+    }
+  }
+}
