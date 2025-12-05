@@ -1,0 +1,183 @@
+# OpenTalent Pre-commit Configuration
+# Automated security scanning and code quality checks before commits
+# Install: pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # ============================================================================
+  # SECURITY SCANNING
+  # ============================================================================
+
+  # GitGuardian - Secret detection
+  - repo: https://github.com/gitguardian/ggshield
+    rev: v1.25.0
+    hooks:
+      - id: ggshield
+        language: python
+        stages: [commit]
+        entry: ggshield secret scan pre-commit
+        exclude: ^(?!.*\.py$|.*\.js$|.*\.ts$|.*\.tsx$|.*\.json$|.*\.yaml$|.*\.yml$|.*\.env.*)
+        types: [text]
+
+  # Bandit - Security issue scanner
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: [--severity-level=medium, -ll]
+        exclude: ^tests/|^scripts/test
+
+  # ============================================================================
+  # GENERAL FILE CHECKS
+  # ============================================================================
+
+  # Built-in pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      # Prevent giant files from being committed
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+
+      # Check YAML syntax
+      - id: check-yaml
+        args: [--unsafe]
+
+      # Check JSON syntax
+      - id: check-json
+
+      # Check TOML syntax
+      - id: check-toml
+
+      # Check merge conflicts
+      - id: check-merge-conflict
+
+      # Fix line endings
+      - id: fix-byte-order-marker
+
+      # Check for files that would conflict in merge
+      - id: check-case-conflict
+
+      # Detect private keys
+      - id: detect-private-key
+
+      # End of file fixes
+      - id: end-of-file-fixer
+        exclude: \.svg$
+
+      # Trim trailing whitespace
+      - id: trailing-whitespace
+        args: [--markdown-args=--ignore-missing-backlinks]
+        exclude: \.svg$
+
+  # ============================================================================
+  # PYTHON CODE QUALITY
+  # ============================================================================
+
+  # Black - Code formatter
+  - repo: https://github.com/psf/black
+    rev: 23.12.0
+    hooks:
+      - id: black
+        language_version: python3
+        exclude: ^tests/|\.venv/
+
+  # isort - Import sorting
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.0
+    hooks:
+      - id: isort
+        args: [--profile=black]
+        exclude: ^tests/|\.venv/
+
+  # Ruff - Fast Python linter
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.11
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        exclude: ^tests/|\.venv/
+
+  # ============================================================================
+  # TYPE CHECKING
+  # ============================================================================
+
+  # Mypy - Static type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.7.1
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-all]
+        exclude: ^tests/|\.venv/
+        args: [--ignore-missing-imports]
+
+  # ============================================================================
+  # MARKDOWN & DOCUMENTATION
+  # ============================================================================
+
+  # Markdownlint - Markdown linting
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.37.0
+    hooks:
+      - id: markdownlint
+        args: [--fix]
+        exclude: ^\.venv/|^node_modules/
+
+  # ============================================================================
+  # SHELL SCRIPTS
+  # ============================================================================
+
+  # ShellCheck - Shell script linting
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.5
+    hooks:
+      - id: shellcheck
+        args: [--severity=warning]
+        exclude: ^\.venv/
+
+  # ============================================================================
+  # JAVASCRIPT/TYPESCRIPT (if present)
+  # ============================================================================
+
+  # ESLint - JavaScript/TypeScript linting
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.55.0
+    hooks:
+      - id: eslint
+        types: [javascript, jsx, typescript, tsx]
+        additional_dependencies: [eslint, eslint-config-airbnb]
+        exclude: ^\.venv/|^node_modules/|build|dist
+        args: [--fix]
+    # Only run if .eslintrc exists
+    exclude_pattern: (?!.*\.js$).*(?<!\.eslintrc)
+
+  # ============================================================================
+  # GIT BEST PRACTICES
+  # ============================================================================
+
+  # Commitizen - Conventional commits
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: 3.13.0
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
+
+default_stages: [commit]
+fail_fast: false
+exclude: ^\.venv/|^node_modules/|\.git/|__pycache__|\.pytest_cache__|\.mypy_cache__|build/|dist/
+ci:
+  autofix_commit_msg: |
+    style: auto-fixes from pre-commit
+    - black
+    - isort
+    - ruff --fix
+    - trailing whitespace
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: 'chore: update pre-commit hooks'
+  autoupdate_schedule: weekly
+  skip: [shellcheck, eslint]

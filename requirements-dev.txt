@@ -1,0 +1,187 @@
+# OpenTalent Development Standards
+# Essential security, code quality, and development tools
+# Install with: pip install -r requirements-dev.txt
+
+# ============================================================================
+# SECURITY SCANNING & SECRET DETECTION
+# ============================================================================
+
+# GitGuardian - Detect secrets and API keys in code
+ggshield>=1.25.0
+
+# Bandit - Security issue scanner for Python
+bandit>=1.7.5
+
+# Safety - Check dependencies for known security vulnerabilities
+safety>=3.0.0
+
+# Ruff - Fast Python linter (security + style checks)
+ruff>=0.1.0
+
+# ============================================================================
+# CODE QUALITY & FORMATTING
+# ============================================================================
+
+# Black - Code formatter (PEP 8 compliant)
+black>=23.12.0
+
+# isort - Import statement organizer
+isort>=5.13.0
+
+# pylint - Code analysis tool
+pylint>=3.0.0
+
+# flake8 - Style guide enforcement
+flake8>=6.1.0
+
+# Autopep8 - Automatic PEP 8 formatting
+autopep8>=2.0.0
+
+# ============================================================================
+# TYPE CHECKING & STATIC ANALYSIS
+# ============================================================================
+
+# mypy - Static type checker for Python
+mypy>=1.7.0
+
+# Pyright - Static type checker (VSCode)
+pyright>=1.1.0
+
+# ============================================================================
+# TESTING FRAMEWORKS
+# ============================================================================
+
+# pytest - Testing framework
+pytest>=7.4.0
+
+# pytest-asyncio - Async test support
+pytest-asyncio>=0.21.0
+
+# pytest-cov - Coverage reporting
+pytest-cov>=4.1.0
+
+# pytest-mock - Mock fixtures
+pytest-mock>=3.12.0
+
+# pytest-xdist - Parallel test execution
+pytest-xdist>=3.5.0
+
+# Coverage.py - Coverage measurement
+coverage>=7.3.0
+
+# ============================================================================
+# DEVELOPMENT TOOLS
+# ============================================================================
+
+# pre-commit - Git hooks framework
+pre-commit>=3.5.0
+
+# GitPython - Git repository interaction
+gitpython>=3.1.40
+
+# IPython - Enhanced interactive shell
+ipython>=8.18.0
+
+# Jupyter - Notebook environment (optional, for data analysis)
+jupyter>=1.0.0
+
+# Python-dotenv - Environment variable loading
+python-dotenv>=1.0.0
+
+# ============================================================================
+# DOCUMENTATION
+# ============================================================================
+
+# MkDocs - Documentation site generator
+mkdocs>=1.5.0
+
+# MkDocs Material - Material theme
+mkdocs-material>=9.4.0
+
+# pdoc - API documentation generator
+pdoc>=14.1.0
+
+# ============================================================================
+# API & WEB DEVELOPMENT
+# ============================================================================
+
+# FastAPI - Modern web framework
+fastapi>=0.104.0
+
+# Uvicorn - ASGI server
+uvicorn>=0.24.0
+
+# Pydantic - Data validation
+pydantic>=2.5.0
+
+# Requests - HTTP library
+requests>=2.31.0
+
+# httpx - Modern HTTP client
+httpx>=0.25.0
+
+# ============================================================================
+# DATABASE & ORM
+# ============================================================================
+
+# SQLAlchemy - ORM
+sqlalchemy>=2.0.0
+
+# Alembic - Database migrations
+alembic>=1.13.0
+
+# psycopg2-binary - PostgreSQL driver
+psycopg2-binary>=2.9.0
+
+# ============================================================================
+# MONITORING & DEBUGGING
+# ============================================================================
+
+# python-dotenv - Environment configuration
+python-dotenv>=1.0.0
+
+# Structlog - Structured logging
+structlog>=24.1.0
+
+# Sentry SDK - Error tracking
+sentry-sdk>=1.40.0
+
+# ============================================================================
+# LINTING & FORMATTING HELPERS
+# ============================================================================
+
+# EditorConfig - Code style standardization
+editorconfig>=0.12.0
+
+# ============================================================================
+# VERSION CONTROL & GIT HOOKS
+# ============================================================================
+
+# commitizen - Conventional commits
+commitizen>=3.13.0
+
+# ============================================================================
+# OPTIONAL: CI/CD INTEGRATION
+# ============================================================================
+
+# tox - Test automation
+tox>=4.11.0
+
+# wheel - Package distribution
+wheel>=0.42.0
+
+# twine - PyPI upload tool
+twine>=4.0.0
+
+# ============================================================================
+# OPTIONAL: PERFORMANCE PROFILING
+# ============================================================================
+
+# line_profiler - Line-by-line profiling
+line-profiler>=4.1.1
+
+# memory-profiler - Memory profiling
+memory-profiler>=0.61.0
+
+# py-spy - Sampling profiler
+py-spy>=0.3.14
