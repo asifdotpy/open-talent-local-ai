@@ -1,0 +1,32 @@
+appId: com.opentalent.app
+productName: OpenTalent
+copyright: Copyright © 2025 OpenTalent
+
+directories:
+  buildResources: public
+  output: release
+
+files:
+  - dist/**/*
+  - build/**/*
+  - node_modules/**/*
+  - package.json
+  - "!**/*.map"
+  - "!**/*.test.*"
+
+extraMetadata:
+  main: dist/main/main.js
+
+linux:
+  target:
+    - AppImage
+  category: Development
+  
+mac:
+  target:
+    - dmg
+  category: public.app-category.developer-tools
+
+win:
+  target:
+    - nsis
