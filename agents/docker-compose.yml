@@ -157,6 +157,30 @@ services:
       - genkit-service
     restart: unless-stopped
 
+  # Data Enrichment Agent (NEW - December 10, 2025)
+  data-enrichment:
+    build:
+      context: ./data-enrichment-agent
+      dockerfile: Dockerfile
+    container_name: talent-ai-enrichment
+    ports:
+      - "8097:8097"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - PROXYCURL_API_KEY=${PROXYCURL_API_KEY}
+      - NUBELA_API_KEY=${NUBELA_API_KEY}
+      - GOOGLE_CSE_API_KEY=${GOOGLE_CSE_API_KEY}
+      - GOOGLE_SEARCH_ENGINE_ID=${GOOGLE_SEARCH_ENGINE_ID}
+      - CACHE_TTL_DAYS=30
+    depends_on:
+      - redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8097/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 volumes:
   redis_data:
     driver: local

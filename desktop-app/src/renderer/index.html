@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenTalent - Privacy-First AI Interviews</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <h1>🎯 OpenTalent</h1>
+        <p class="tagline">Privacy-First AI Interviews</p>
+      </div>
+      <div class="status">
+        <span id="ollama-status" class="status-indicator">⚪ Checking Ollama...</span>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Welcome Screen -->
+      <div id="welcome-screen" class="screen active">
+        <div class="welcome-card">
+          <h2>Welcome to OpenTalent</h2>
+          <p>Select an interview role to begin your practice session</p>
+          
+          <div class="model-selector">
+            <label for="model-select">AI Model:</label>
+            <select id="model-select">
+              <option value="">Loading models...</option>
+            </select>
+          </div>
+
+          <div class="role-selector">
+            <button class="role-btn" data-role="Software Engineer">
+              <span class="role-icon">💻</span>
+              <span class="role-title">Software Engineer</span>
+              <span class="role-desc">Technical interview with coding questions</span>
+            </button>
+            <button class="role-btn" data-role="Product Manager">
+              <span class="role-icon">📊</span>
+              <span class="role-title">Product Manager</span>
+              <span class="role-desc">Strategy and stakeholder management</span>
+            </button>
+            <button class="role-btn" data-role="Data Analyst">
+              <span class="role-icon">📈</span>
+              <span class="role-title">Data Analyst</span>
+              <span class="role-desc">SQL, statistics, and data visualization</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interview Screen -->
+      <div id="interview-screen" class="screen">
+        <div class="interview-container">
+          <div class="interview-header">
+            <h3 id="interview-role">Software Engineer Interview</h3>
+            <div class="interview-controls">
+              <button id="end-interview-btn" class="btn-secondary">End Interview</button>
+            </div>
+          </div>
+
+          <div id="conversation" class="conversation">
+            <!-- Messages will be added here dynamically -->
+          </div>
+
+          <div class="input-area">
+            <textarea 
+              id="user-input" 
+              placeholder="Type your answer here..." 
+              rows="3"
+            ></textarea>
+            <button id="send-btn" class="btn-primary">Send Answer</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Screen -->
+      <div id="results-screen" class="screen">
+        <div class="results-card">
+          <h2>Interview Complete</h2>
+          <p>Thank you for completing the interview!</p>
+          
+          <div id="conversation-summary" class="conversation-summary">
+            <!-- Conversation history will be shown here -->
+          </div>
+
+          <button id="new-interview-btn" class="btn-primary">Start New Interview</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>🔒 All processing happens locally on your device. No data is sent to the cloud.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

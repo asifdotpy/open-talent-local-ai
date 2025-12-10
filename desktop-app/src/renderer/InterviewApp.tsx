@@ -1,0 +1,317 @@
+import React, { useState, useEffect } from 'react';
+import InterviewService, {
+  InterviewSession,
+} from '../services/interview-service';
+import { AVAILABLE_MODELS, DEFAULT_MODEL, getTrainedModels } from '../services/model-config';
+import './InterviewApp.css';
+
+const service = new InterviewService();
+
+type Screen = 'setup' | 'interview' | 'summary';
+
+const InterviewApp: React.FC = () => {
+  const [screen, setScreen] = useState<Screen>('setup');
+  const [role, setRole] = useState('Software Engineer');
+  const [selectedModel, setSelectedModel] = useState(DEFAULT_MODEL);
+  const [session, setSession] = useState<InterviewSession | null>(null);
+  const [userInput, setUserInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [ollamaStatus, setOllamaStatus] = useState<boolean>(false);
+  const [availableModels, setAvailableModels] = useState<string[]>([]);
+
+  // Check Ollama status on mount
+  useEffect(() => {
+    checkOllamaStatus();
+  }, []);
+
+  const checkOllamaStatus = async () => {
+    const status = await service.checkStatus();
+    setOllamaStatus(status);
+
+    if (status) {
+      const models = await service.listModels();
+      setAvailableModels(models.map((m: any) => m.name));
+    }
+  };
+
+  const startInterview = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const newSession = await service.startInterview(
+        role,
+        selectedModel,
+        5
+      );
+      setSession(newSession);
+      setScreen('interview');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const sendResponse = async () => {
+    if (!session || !userInput.trim()) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const updatedSession = await service.sendResponse(session, userInput);
+      setSession(updatedSession);
+      setUserInput('');
+
+      // Check if interview is complete
+      if (updatedSession.isComplete) {
+        setScreen('summary');
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const restartInterview = () => {
+    setSession(null);
+    setUserInput('');
+    setError(null);
+    setScreen('setup');
+  };
+
+  const getCurrentQuestion = () => {
+    if (!session) return '';
+    // Get the last assistant message
+    const assistantMessages = session.messages.filter(
+      (m) => m.role === 'assistant'
+    );
+    return assistantMessages[assistantMessages.length - 1]?.content || '';
+  };
+
+  const getConversationHistory = () => {
+    if (!session) return [];
+    // Filter out system messages and the initial "start interview" message
+    return session.messages.filter(
+      (m) =>
+        m.role !== 'system' &&
+        !(m.role === 'user' && m.content === 'Please start the interview.')
+    );
+  };
+
+  // Setup Screen
+  if (screen === 'setup') {
+    return (
+      <div className="interview-app">
+        <div className="setup-screen">
+          <div className="header">
+            <h1>OpenTalent</h1>
+            <p className="tagline">Privacy-First AI Interviews</p>
+          </div>
+
+          <div className="status-indicator">
+            <div className={`status-dot ${ollamaStatus ? 'online' : 'offline'}`} />
+            <span>
+              Ollama: {ollamaStatus ? 'Online' : 'Offline'}
+            </span>
+          </div>
+
+          {!ollamaStatus && (
+            <div className="error-message">
+              ⚠️ Ollama is not running. Please start Ollama and refresh.
+            </div>
+          )}
+
+          {ollamaStatus && (
+            <>
+              <div className="model-info">
+                <p>Available Models: {availableModels.join(', ') || 'None'}</p>
+                <p className="model-using">Using: llama3.2:1b</p>
+              </div>
+
+              <div className="role-selection">
+                <h2>Select Interview Role</h2>
+                <div className="role-buttons">
+                  <button
+                    className={`role-btn ${
+                      role === 'Software Engineer' ? 'active' : ''
+                    }`}
+                    onClick={() => setRole('Software Engineer')}
+                  >
+                    Software Engineer
+                  </button>
+                  <button
+                    className={`role-btn ${
+                      role === 'Product Manager' ? 'active' : ''
+                    }`}
+                    onClick={() => setRole('Product Manager')}
+                  >
+                    Product Manager
+                  </button>
+                  <button
+                    className={`role-btn ${
+                      role === 'Data Analyst' ? 'active' : ''
+                    }`}
+                    onClick={() => setRole('Data Analyst')}
+                  >
+                    Data Analyst
+                  </button>
+                </div>
+              </div>
+
+              <div className="model-selection">
+                <h2>Select AI Model</h2>
+                <p className="model-subtitle">Choose from your trained models</p>
+                <div className="model-options">
+                  {getTrainedModels().map((model) => (
+                    <div
+                      key={model.id}
+                      className={`model-option ${selectedModel === model.id ? 'selected' : ''}`}
+                      onClick={() => setSelectedModel(model.id)}
+                    >
+                      <div className="model-name">{model.name}</div>
+                      <div className="model-details">
+                        {model.paramCount} • {model.ramRequired} RAM • {model.downloadSize}
+                      </div>
+                      <div className="model-description">{model.description}</div>
+                      {model.dataset && (
+                        <div className="model-dataset">
+                          📊 Dataset: {model.dataset}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                className="start-btn"
+                onClick={startInterview}
+                disabled={loading}
+              >
+                {loading ? 'Starting Interview...' : 'Start Interview'}
+              </button>
+
+              {error && <div className="error-message">{error}</div>}
+            </>
+          )}
+
+          <div className="privacy-badge">
+            <span className="lock-icon">🔒</span>
+            <span>100% Local Processing • No Cloud • Complete Privacy</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Interview Screen
+  if (screen === 'interview' && session) {
+    const history = getConversationHistory();
+    const currentQuestion = getCurrentQuestion();
+
+    return (
+      <div className="interview-app">
+        <div className="interview-screen">
+          <div className="header">
+            <h1>OpenTalent Interview</h1>
+            <p className="role-display">{session.config.role}</p>
+          </div>
+
+          <div className="progress-bar">
+            <span>
+              Question {session.currentQuestion} of{' '}
+              {session.config.totalQuestions}
+            </span>
+          </div>
+
+          <div className="conversation-container">
+            {history.map((message, index) => (
+              <div
+                key={index}
+                className={`message ${message.role === 'user' ? 'user' : 'assistant'}`}
+              >
+                <div className="message-label">
+                  {message.role === 'user' ? 'You' : 'Interviewer'}
+                </div>
+                <div className="message-content">{message.content}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="input-section">
+            <textarea
+              className="response-input"
+              placeholder="Type your response here..."
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  sendResponse();
+                }
+              }}
+              disabled={loading}
+              rows={4}
+            />
+            <button
+              className="send-btn"
+              onClick={sendResponse}
+              disabled={loading || !userInput.trim()}
+            >
+              {loading ? 'Sending...' : 'Send Response'}
+            </button>
+          </div>
+
+          {error && <div className="error-message">{error}</div>}
+
+          <button className="end-btn" onClick={() => setScreen('summary')}>
+            End Interview
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Summary Screen
+  if (screen === 'summary' && session) {
+    const summary = service.getInterviewSummary(session);
+
+    return (
+      <div className="interview-app">
+        <div className="summary-screen">
+          <div className="header">
+            <h1>Interview Complete!</h1>
+          </div>
+
+          <div className="summary-content">
+            <pre>{summary}</pre>
+          </div>
+
+          <div className="conversation-history">
+            <h2>Conversation History</h2>
+            {getConversationHistory().map((message, index) => (
+              <div key={index} className="history-item">
+                <div className="history-label">
+                  {message.role === 'user' ? 'You:' : 'Interviewer:'}
+                </div>
+                <div className="history-text">{message.content}</div>
+              </div>
+            ))}
+          </div>
+
+          <button className="restart-btn" onClick={restartInterview}>
+            Start New Interview
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+};
+
+export default InterviewApp;

@@ -9,7 +9,7 @@ import logging
 from typing import Callable, Optional, List, Dict, Any
 from datetime import datetime
 import redis.asyncio as redis
-from .models import AgentMessage, MessageType, MessagePriority
+from models import AgentMessage, MessageType, MessagePriority
 
 logger = logging.getLogger(__name__)
 

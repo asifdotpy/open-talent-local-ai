@@ -233,6 +233,11 @@ class MessageType(str, Enum):
     PIPELINE_UPDATE = "pipeline_update"
     MARKET_INSIGHT = "market_insight"
     ERROR = "error"
+    # Data Enrichment Agent messages
+    CANDIDATE_SEARCH_PROGRESS = "candidate_search_progress"
+    CANDIDATE_SEARCH_COMPLETE = "candidate_search_complete"
+    CANDIDATE_SEARCH_FAILED = "candidate_search_failed"
+    ENRICHMENT_COMPLETE = "enrichment_complete"
 
 
 class MessagePriority(str, Enum):
