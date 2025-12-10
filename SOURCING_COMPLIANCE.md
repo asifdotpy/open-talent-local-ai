@@ -27,35 +27,189 @@ The **Proactive Scanning Agent (Port 8091)** has been redesigned to prioritize *
 **Risk Level:** ✅ MINIMAL  
 **Legal Status:** ✅ FULLY COMPLIANT  
 
-#### LinkedIn Recruiter API (OAuth2)
+#### LinkedIn Recruiter API - Important Note
+
+⚠️ **Critical Reality Check:**
+The official LinkedIn Recruiter API (with scopes like `r_recruiter_search` and `r_prospect_finder`) is **only available to formal LinkedIn partners** (Workday, Greenhouse, Lever, etc.) through enterprise contracts. Individual developers and startups cannot access these scopes through the standard developer program.
+
+**Why the standard flow fails:**
+1. Requesting "Talent Solutions" in the developer program requires becoming a formal LinkedIn partner
+2. Partner approval is not given to individual developers or small startups
+3. Without partner status, your app never receives the necessary sourcing scopes
+4. Result: You can only access basic profile info (your own profile), not candidate search
+
+**What Actually Works for Sourcing:**
+
+---
+
+#### **Option 1: Google Custom Search (X-Ray Search) ✅ FREE**
+
+Uses Google Search API to find LinkedIn public profiles matching your criteria.
+
+**Setup:**
 ```
-Authentication: LinkedIn OAuth2 + Recruiter API key
-Endpoint: https://api.linkedin.com/v2/search/jobs or /search/people
-Authorization: Bearer token (from environment: LINKEDIN_API_TOKEN)
-Rate Limit: 5,000 requests/day
-Terms of Service: Explicitly allows recruiter use
-Compliance: GDPR, CCPA, Platform TOS verified
+1. Go to: https://programmablesearchengine.google.com/
+2. Create a new search engine
+3. Select "Search the entire web"
+4. Get your Search Engine ID and API Key
+5. Use Google Custom Search JSON API
 ```
 
-**What you can do:**
-- Search for candidates using boolean queries
-- Filter by: location, title, skills, experience, industry
-- Only contact candidates with "Open to Recruiter Contact" enabled
-- Respect recruitment notification settings
-- Track engagement with message delivery
+**Example Query:**
+```bash
+# Find Java developers open to work on LinkedIn
+curl "https://www.googleapis.com/customsearch/v1?q=site:linkedin.com/in+java+developer+open+to+work&cx=YOUR_SEARCH_ENGINE_ID&key=YOUR_API_KEY"
+```
+
+**Environment Variables:**
+```bash
+GOOGLE_SEARCH_ENGINE_ID=your-search-engine-id
+GOOGLE_API_KEY=your-api-key
+```
+
+**Python Example:**
+```python
+from googleapiclient.discovery import build
+import os
+
+def search_linkedin_profiles(query):
+    service = build("customsearch", "v1", 
+                   developerKey=os.getenv("GOOGLE_API_KEY"))
+    
+    results = service.cse().list(
+        q=query,
+        cx=os.getenv("GOOGLE_SEARCH_ENGINE_ID"),
+        num=10
+    ).execute()
+    
+    return results['items']
+
+# Usage
+profiles = search_linkedin_profiles("java developer london open to work site:linkedin.com/in")
+for profile in profiles:
+    print(profile['title'], profile['link'])
+```
+
+**Advantages:**
+- ✅ Free (within Google's quota)
+- ✅ No scraping, uses official Google API
+- ✅ Only returns public data
+- ✅ Compliant with LinkedIn TOS (you're not scraping LinkedIn directly)
+- ✅ Legal and sustainable
+
+**Limitations:**
+- Results are limited (Google index freshness)
+- No structured data (need to parse HTML)
+
+---
+
+#### **Option 2: Commercial Proxy APIs ✅ RECOMMENDED FOR PRODUCTION**
+
+Use vendors that provide LinkedIn data through legal, compliant APIs (they handle the data collection).
+
+**Popular Providers:**
+1. **Proxycurl** (https://proxycurl.com/)
+   - Official API for LinkedIn data
+   - Search candidates by skills, location, title
+   - Returns structured JSON
+   - Pricing: $0.01-0.05 per profile lookup
+
+2. **Nubela Recruitment APIs** (https://www.nubela.co/)
+   - Candidate search API
+   - Email finding
+   - Verified contact info
+   - Pricing: $0.005-0.02 per record
+
+3. **RapidAPI Marketplace** (https://rapidapi.com/)
+   - Multiple LinkedIn data providers
+   - Comparison pricing
+   - Test before commit
+
+**Setup Example (Proxycurl):**
+
+```bash
+# Get API key from https://proxycurl.com/
+# Store in environment
+PROXYCURL_API_KEY=your-api-key
+```
+
+```python
+import requests
+import os
+
+def search_candidates(skills, location, title):
+    """Search candidates using Proxycurl API"""
+    
+    headers = {
+        "Authorization": f"Bearer {os.getenv('PROXYCURL_API_KEY')}"
+    }
+    
+    params = {
+        "linkedin_profile_url": None,  # Or use URL if searching specific person
+        "extra": "include",
+        "github_profile_id": "include",
+        "skills": skills,
+        "location": location
+    }
+    
+    response = requests.get(
+        "https://npi.proxycurl.com/api/v2/linkedin/profile/search",
+        headers=headers,
+        params=params
+    )
+    
+    if response.status_code == 200:
+        candidates = response.json()['results']
+        return candidates
+    else:
+        raise Exception(f"API Error: {response.text}")
+
+# Usage
+candidates = search_candidates(
+    skills=["Python", "AWS", "Kubernetes"],
+    location="San Francisco, CA",
+    title="Senior Engineer"
+)
+
+for candidate in candidates:
+    print(f"{candidate['name']} - {candidate['linkedin_url']}")
+```
+
+**Advantages:**
+- ✅ Fully compliant (vendor handles compliance)
+- ✅ Structured data returned immediately
+- ✅ Candidate contact info included
+- ✅ Email verification included
+- ✅ Scale to thousands of searches
+- ✅ No scraping risk
+- ✅ Legal and sustainable
+
+**Recommended:** Use Option 2 for production sourcing at scale.
+
+---
+
+**What you CAN do (with proxy API vendors):**
+- Search for candidates using filters: skills, location, title, experience
+- Get structured candidate data (name, title, location, skills, contact)
+- Filter results by: experience level, industry, company, resume keywords
+- Retrieve email addresses (verified by vendor)
+- Contact candidates with appropriate consent messaging
+- Track all sourcing actions in audit log
 
 **What you CANNOT do:**
-- Contact users with private profiles
-- Use scraping tools or automation that violates TOS
-- Bypass rate limits
-- Store candidate data longer than agreed terms
+- Scrape LinkedIn directly (violates TOS)
+- Access private/restricted data
+- Contact users who haven't opted in
+- Store data longer than retention policy allows (1-2 years)
+- Use credentials to access LinkedIn on behalf of users
 
 **Compliance Verification:**
-- ✅ Explicit API authorization required
-- ✅ OAuth2 token management
-- ✅ Rate limiting enforced
-- ✅ Audit trail: all API calls logged
-- ✅ Consent verification: "Open to Contact" flag required
+- ✅ Using official vendor APIs (Proxycurl, Nubela)
+- ✅ Only public LinkedIn data accessed
+- ✅ Data minimization (only necessary fields)
+- ✅ Audit trail: all searches logged with filters, results, dates
+- ✅ Consent tracking: data retention limits enforced
+- ✅ Vendor responsible for LinkedIn TOS compliance
 
 ---
 
@@ -414,29 +568,47 @@ Every candidate sourced is logged with:
 
 ## 🔗 Platform-Specific Guidelines
 
-### LinkedIn (Official API)
+### LinkedIn (Official APIs via Third-Party Vendors)
 
-**✅ DO:**
-- Use LinkedIn Recruiter API with OAuth2
-- Search candidates with "Open to Recruiter Contact" enabled
-- Send InMail (doesn't bypass user settings)
-- Respect messaging limits
-- Honor profile privacy settings
+⚠️ **Important:** Direct access to LinkedIn's Recruiter API requires becoming a formal LinkedIn Partner (which requires enterprise contracts for vendors like Workday, Greenhouse, Lever). This is not available to individual developers or small startups.
+
+**✅ DO (Use Vendor APIs):**
+- Use official vendor APIs (Proxycurl, Nubela, RapidAPI providers)
+- Access only public profile data through vendor
+- Respect vendor rate limits
+- Contact candidates with explicit consent or opt-in flags
+- Honor "do not contact" preferences
+- Document all sourcing in audit trail
+- Store API keys in environment variables (never in code)
 
 **❌ DON'T:**
-- Scrape LinkedIn with automation tools
-- Use fake accounts
-- Contact users with private profiles
-- Bypass message request limits
-- Store credentials in code
-- Cache candidate data longer than 30 days
+- Scrape LinkedIn directly with selenium/BeautifulSoup
+- Use fake accounts to access LinkedIn
+- Contact users without valid consent
+- Bypass vendor rate limits
+- Store data longer than retention policy (1-2 years)
+- Use credential-stuffing or TOS-violating automation
 
 **Compliance Check:**
 ```bash
-# Verify LinkedIn API key is from official channel
-# Check: linkedin.com/developers/apps
-# Verify: OAuth2 scopes are minimal
-# Rate limit: 5,000 requests/day (enforced by API)
+# ✅ Verify using official vendor API (Proxycurl/Nubela)
+# ✅ Rate limits respected (vendor enforced)
+# ✅ Only public profile data accessed
+# ✅ Audit trail shows sourcing method (vendor API + filters used)
+```
+
+**Real Example:**
+```python
+# COMPLIANT: Using vendor API
+response = requests.get(
+    "https://npi.proxycurl.com/api/v2/linkedin/profile/search",
+    headers={"Authorization": f"Bearer {PROXYCURL_API_KEY}"},
+    params={"skills": "Python,AWS", "location": "San Francisco"}
+)
+
+# NON-COMPLIANT: Direct scraping
+from selenium import webdriver
+driver.get("https://linkedin.com")  # ❌ Violates LinkedIn TOS
 ```
 
 ---
