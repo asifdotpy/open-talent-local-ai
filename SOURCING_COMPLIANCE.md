@@ -795,6 +795,305 @@ If vendor can't answer these, it's not enterprise-ready.
 
 ---
 
+## � Cost Analysis & Pricing Strategy
+
+### Vendor API Cost Comparison (Per Profile)
+
+| Vendor | Search Cost | Enrichment Cost | Total Per Profile | Coverage | Quality |
+|--------|-------------|-----------------|-------------------|----------|---------|
+| **Proxycurl** | $0.01 | $0.03 | **$0.04** | 800M+ | ⭐⭐⭐⭐⭐ |
+| **Nubela/PDL** | $0.005 | $0.015 | **$0.02** | 500M+ | ⭐⭐⭐⭐ |
+| **Apollo.io** | $0.01 | $0.02 | **$0.03** | 270M+ | ⭐⭐⭐ |
+| **PeopleGPT** | Subscription-based | N/A | **$99-499/mo** | 800M+ | ⭐⭐⭐⭐ |
+| **Google CSE** | **Free** | Manual | **$0** | Public web | ⭐⭐ |
+
+**Real-World Cost Scenarios:**
+
+| Use Case | Method | Profiles/Month | Monthly Cost | Notes |
+|----------|--------|----------------|--------------|-------|
+| **Startup (Light)** | Google CSE + Manual | 50 | **$0** | Free tier, manual enrichment |
+| **Startup (Automated)** | Nubela API | 200 | **$4** | Pay-as-you-go |
+| **SMB Recruiter** | Proxycurl API | 500 | **$20** | Standard usage |
+| **Agency (Medium)** | Proxycurl/Nubela Mix | 2,000 | **$60** | Blended rate |
+| **Enterprise** | PDL Bulk + Proxycurl | 10,000 | **$200** | Volume discount |
+| **PeopleGPT Competitor** | Subscription Model | Unlimited* | **$99-499/mo** | *Fair use limits apply |
+
+### OpenTalent Pricing Tiers (Recommended Model)
+
+#### **Tier 1: Free (Agentic Browser Search)** 🆓
+- **Price:** $0/month
+- **What's Included:**
+  - Manual Google X-Ray search (unlimited)
+  - Agentic browser automation for search
+  - Light profile cards (title, snippet, URL)
+  - Export to CSV (up to 50 profiles/month)
+  - BYOK: Users bring their own API keys (optional)
+- **Target:** Individual recruiters, students, trial users
+- **Positioning:** "Search 800M+ profiles for free using Google"
+
+#### **Tier 2: Starter (Pay-Per-Reveal)** 💳
+- **Price:** $0.02/profile (pay-as-you-go)
+- **What's Included:**
+  - Everything in Free tier
+  - API integration (Nubela/Proxycurl BYOK)
+  - Unlimited light searches
+  - Pay only when revealing full profile
+  - Contact data (email, phone) when available
+  - Audit logging & compliance tracking
+  - GDPR/CCPA compliance tools
+  - 1-year data retention
+- **Target:** Freelance recruiters, small agencies
+- **Positioning:** "Access 800M+ profiles via data partners, pay per use"
+- **Monthly Cost Examples:**
+  - 50 reveals: $1
+  - 200 reveals: $4
+  - 500 reveals: $10
+
+#### **Tier 3: Professional (Subscription + Credits)** 🚀
+- **Price:** $49/month + $0.015/profile (bulk rate)
+- **What's Included:**
+  - Everything in Starter tier
+  - 500 free reveals/month (worth $10)
+  - Bulk discount on additional reveals
+  - Priority API rate limits
+  - Advanced search filters
+  - CRM/ATS integrations
+  - Team collaboration (up to 5 users)
+  - 2-year data retention
+  - Email support
+- **Target:** Growing agencies, in-house recruiting teams
+- **Positioning:** "Multi-source talent discovery across 800M+ global profiles"
+- **Monthly Cost Examples:**
+  - Base: $49 (includes 500 reveals)
+  - +500 reveals: $49 + $7.50 = $56.50
+  - +2,000 reveals: $49 + $30 = $79
+
+#### **Tier 4: Enterprise (Custom Volume)** 🏢
+- **Price:** Custom (bulk contract)
+- **What's Included:**
+  - Everything in Professional tier
+  - Unlimited users
+  - Custom API integration
+  - White-label option
+  - Dedicated data vendor contracts
+  - Custom retention policies
+  - Legal indemnification
+  - SLA guarantees (99.9% uptime)
+  - Dedicated account manager
+  - Custom compliance workflows
+- **Target:** Large agencies, Fortune 500 HR departments
+- **Positioning:** "Powered by [Proxycurl/PDL] with 800M+ profile coverage"
+- **Pricing Structure:**
+  - 10K profiles/month: $200/mo ($0.02/profile)
+  - 50K profiles/month: $750/mo ($0.015/profile)
+  - 100K+ profiles/month: Custom rate
+
+### Cost Comparison: OpenTalent vs. Competitors
+
+| Feature | OpenTalent Free | OpenTalent Pro | PeopleGPT | Juicebox | SeekOut |
+|---------|-----------------|----------------|-----------|----------|---------|
+| **Base Price** | $0 | $49/mo | $99/mo | $199/mo | $299/mo |
+| **Profiles Access** | 800M+ (search) | 800M+ (reveal) | 800M+ | 800M+ | 900M+ |
+| **Search Limit** | Unlimited | Unlimited | 500/mo | 1,000/mo | 2,000/mo |
+| **Reveal Limit** | 50/mo (export) | 500 + extras | Unlimited* | Unlimited* | Unlimited* |
+| **Contact Data** | Manual lookup | ✅ Included | ✅ Included | ✅ Included | ✅ Included |
+| **BYOK** | ✅ Yes | ✅ Yes | ❌ No | ❌ No | ❌ No |
+| **Agentic Search** | ✅ Yes | ✅ Yes | ❌ No | ❌ No | ❌ No |
+| **Privacy Focus** | ✅ Local-first | ✅ Local-first | ⚠️ Cloud | ⚠️ Cloud | ⚠️ Cloud |
+| **Cost at 2K reveals** | $0 (manual) | $79 | $99 | $199 | $299 |
+
+*Fair use limits typically 5K-10K reveals/month
+
+### Marketing Claims (Permissible Language)
+
+✅ **ALLOWED (with attribution):**
+- "Search 800M+ professional profiles via integrated data partners"
+- "Multi-source talent discovery across 800M+ global profiles"
+- "Powered by [Proxycurl/PDL/Nubela] with 800M+ profile coverage"
+- "Access to 800M+ profiles through leading data providers"
+- "Desktop app with 800M+ profile search capability"
+
+❌ **NOT ALLOWED:**
+- "Our database contains 800M profiles" (false ownership)
+- "800M profiles" without vendor attribution (misleading)
+- Exact competitor language ("Talent discovery across 800M+ global profiles" without differentiation)
+
+### Required Disclosures (FTC/GDPR Transparency)
+
+**In Marketing Materials:**
+```
+OpenTalent provides access to professional data through third-party 
+data providers including Proxycurl, People Data Labs, and Nubela. 
+Profile data is sourced from publicly available information aggregated 
+by our partners. Users must bring their own API keys (BYOK model) for 
+paid features. OpenTalent does not store or own candidate data; all 
+data is cached locally on your device per your retention settings.
+```
+
+**In Privacy Policy:**
+```
+Data Sources: OpenTalent integrates with third-party data providers 
+(Proxycurl, Nubela, People Data Labs) to enable candidate search. 
+These providers aggregate publicly available professional data from 
+LinkedIn, GitHub, Stack Overflow, and other public sources.
+
+Data Storage: All candidate data is stored locally on your device 
+using encrypted SQLite (SQLCipher). We do not transmit or store 
+candidate data on our servers.
+
+User Responsibility: By using BYOK (Bring Your Own Key), you agree 
+to comply with vendor terms of service and applicable data protection 
+laws (GDPR, CCPA). You are responsible for obtaining and maintaining 
+valid consent for candidate outreach.
+
+Vendor Liability: Our data partners (not OpenTalent) are responsible 
+for data sourcing compliance. We recommend reviewing vendor DPAs and 
+legal indemnification terms.
+```
+
+### Revenue Projection Model
+
+**Scenario: 1,000 Active Users (Year 1)**
+
+| Tier | Users | Monthly Rev/User | Total Monthly | Annual |
+|------|-------|------------------|---------------|--------|
+| Free | 600 | $0 | $0 | $0 |
+| Starter (PAYG) | 250 | $10 | $2,500 | $30,000 |
+| Professional | 140 | $49-79 | $8,960 | $107,520 |
+| Enterprise | 10 | $500 | $5,000 | $60,000 |
+| **Total** | **1,000** | - | **$16,460** | **$197,520** |
+
+**Growth Assumptions:**
+- 60% free tier (acquisition funnel)
+- 25% convert to Starter after 50 free reveals
+- 14% upgrade to Professional (agencies)
+- 1% Enterprise (large orgs)
+
+**Breakeven Analysis:**
+- Development cost: $120K/year (2 devs)
+- Infrastructure: $12K/year (AWS, APIs)
+- Marketing: $24K/year (content, SEO)
+- **Total Cost:** $156K/year
+- **Breakeven:** ~800 paid users
+- **Target:** 1,000 users = 25% profit margin
+
+---
+
+## �🖥️ Production Desktop Architecture (Compliant, Cost-Controlled)
+
+**Goals:** BYOK liability shield, avoid TOS scraping risk, control vendor spend, satisfy GDPR (Article 14) and CCPA.
+
+### Core Principles
+- **BYOK:** Users bring their own vendor keys (Proxycurl/Nubela/PDL). No bundled keys.
+- **Local-first:** All data, policies, and audit logs stay on the user’s machine; encrypted at rest (SQLite + SQLCipher) and via OS keychain for secrets (Keytar).
+- **Pay-to-Reveal:** Discovery is cheap; enrichment only on user action.
+- **Geofence + Consent:** Block EU profiles unless consent/notification is satisfied; honor retention limits.
+- **Deterministic Identity:** Match by canonical URL and vendor ID; avoid fuzzy matches locally.
+
+### Data Flow (Two-Stage, Pay-to-Reveal)
+1) **Discovery (cheap):** SERP provider (SerpApi/DataForSEO) → light results (title/snippet/URL) stored locally. Google CSE as fallback.
+2) **Reveal (paid):** User clicks "Reveal" (or selects top N) → vendor enrichment API → full profile stored locally.
+3) **Cache + TTL:** Store enriched records with region-based retention (e.g., 365–730 days); auto-purge on expiry.
+4) **UI:** Show light cards first; reveal button; per-source rate-limit badges; geofence/consent status chips; Article 14 countdown badge.
+
+### Policy Engine (per request)
+- **Geo/Consent:** If region == EU and no consent/notification, block or start Article 14 timer.
+- **Rate Limits:** Token bucket per vendor + per SERP; exponential backoff + circuit breaker on 429s/5xx.
+- **Data Minimization:** Only store fields required for sourcing; redact PII from logs.
+- **Article 14 Countdown (EU):**
+  - On enrich: set `enriched_at` and `notification_due = enriched_at + 30d`.
+  - If no outreach/notification logged by due date → tombstone (hide/lock) profile locally.
+  - Outreach action logs `notification_sent: true` in audit trail.
+
+### Identity Resolution (Local, Deterministic)
+- **Primary key:** Canonical LinkedIn URL (normalize trailing slash, lowercase host).
+- **Secondary:** Vendor `profile_id` when present.
+- **Avoid:** Fuzzy name/title matching locally (high false positives).
+
+### Storage & Security
+- **DB:** SQLite + SQLCipher; schema: profiles, searches, audit_logs, retention_timers.
+- **Secrets:** OS keychain via Keytar; never store API keys in localStorage/files.
+- **Audit Logs:** Append-only, redacted (query, filters, counts, source, consent status, geo decision, reveal actions, notification_sent, deletion events). No raw PII in logs.
+
+### UI/UX Hooks
+- Reveal buttons (single/top N) with credit estimate before call.
+- Badges: geo status (EU blocked/allowed), rate-limit state, Article 14 countdown (days left), data source (SERP vs vendor).
+- Controls: retention TTL per region, consent toggles, dry-run mode (log decisions, no outbound calls).
+
+### Vendor/Key Handling (Liability Shield)
+- Users paste their own keys (BYOK); your app is a client tool, not a data vendor.
+- Document vendor sourcing method and liability terms; prompt user to accept vendor TOS.
+
+### Testing Checklist
+- Policy engine unit tests: EU block, consent path, notification countdown, tombstone at Day 30.
+- Rate-limit tests: bucket depletion, backoff, circuit breaker.
+- Audit integrity: append-only, redaction verified.
+- Dry-run mode: decisions logged, zero external calls.
+
+### Policy Engine (Pseudo-code)
+```python
+def authorize_request(request, ctx):
+    # ctx: region, consent_flag, notification_sent, enriched_at, rate_buckets
+    if ctx.region == "EU":
+        # Article 14: must notify within 30 days of enrichment
+        if not ctx.consent_flag and not ctx.notification_sent:
+            if ctx.enriched_at and days_since(ctx.enriched_at) >= 30:
+                return Deny(reason="Article 14 deadline passed; tombstoned")
+            # allow discovery; enrichment starts countdown
+    # Rate limit (token bucket per vendor/source)
+    if not has_tokens(ctx.rate_buckets[request.source]):
+        return RetryAfter(reason="Rate limit", retry_in=ctx.rate_buckets[request.source].next_window())
+    # Minimal fields only; redact before logging
+    return Allow()
+```
+
+### Sample Local DB Schema (SQLite + SQLCipher)
+```sql
+-- profiles
+CREATE TABLE profiles (
+  id INTEGER PRIMARY KEY,
+  canonical_url TEXT UNIQUE,          -- normalized LinkedIn URL
+  vendor_id TEXT,                     -- vendor profile_id
+  source TEXT,                        -- vendor or serp
+  region TEXT,                        -- inferred region (e.g., EU/US)
+  enriched_at DATETIME,               -- when full data fetched
+  notification_sent BOOLEAN DEFAULT 0,
+  notification_due DATETIME,          -- enriched_at + 30d (EU)
+  retention_expiry DATETIME,          -- per-region TTL
+  payload_json TEXT,                  -- encrypted payload
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_profiles_url ON profiles(canonical_url);
+CREATE INDEX idx_profiles_vendor ON profiles(vendor_id);
+CREATE INDEX idx_profiles_retention ON profiles(retention_expiry);
+
+-- searches (light results cache)
+CREATE TABLE searches (
+  id INTEGER PRIMARY KEY,
+  query TEXT,
+  region TEXT,
+  source TEXT,           -- serp provider
+  results_json TEXT,      -- light cards (title/snippet/url)
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- audit_logs (redacted, append-only)
+CREATE TABLE audit_logs (
+  id INTEGER PRIMARY KEY,
+  event_type TEXT,        -- search, reveal, outreach, delete, tombstone
+  source TEXT,            -- vendor or serp
+  query TEXT,
+  counts INT,
+  geo TEXT,
+  consent_status TEXT,    -- none/consent/notification_sent
+  details TEXT,           -- small metadata; no PII
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+``` 
+
+---
+
 ## �🔗 Platform-Specific Guidelines
 
 ### LinkedIn (Official APIs via Third-Party Vendors)
