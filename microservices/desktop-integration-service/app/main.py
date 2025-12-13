@@ -251,6 +251,76 @@ async def select_model(model_id: str) -> Dict:
 
 
 # =========================================================================
+# Voice Service Endpoints (optional)
+# =========================================================================
+
+
+@app.post("/api/v1/voice/synthesize")
+async def synthesize_speech(payload: Dict) -> Dict:
+    """Proxy text-to-speech to voice-service when enabled."""
+    if not settings.enable_voice:
+        raise HTTPException(status_code=503, detail="Voice service disabled")
+
+    if not service_discovery or not http_client:
+        raise HTTPException(status_code=503, detail="Service discovery not initialized")
+
+    url = await service_discovery.get_service_url("voice-service")
+    if not url:
+        raise HTTPException(status_code=503, detail="Voice service unavailable")
+
+    text = payload.get("text")
+    if not text:
+        raise HTTPException(status_code=400, detail="text is required")
+
+    try:
+        response = await http_client.post(
+            f"{url}/voice/tts",
+            json={"text": text, "voice": payload.get("voice", "en-US-Neural2-C")}
+        )
+        return response.json()
+    except Exception as e:
+        logger.warning(f"Voice synthesis failed: {e}")
+        raise HTTPException(status_code=502, detail="Voice synthesis failed")
+
+
+# =========================================================================
+# Analytics Service Endpoints (optional)
+# =========================================================================
+
+
+@app.post("/api/v1/analytics/sentiment")
+async def analyze_sentiment(payload: Dict) -> Dict:
+    """Proxy sentiment analysis to analytics-service when enabled."""
+    if not settings.enable_analytics:
+        raise HTTPException(status_code=503, detail="Analytics service disabled")
+
+    if not service_discovery or not http_client:
+        raise HTTPException(status_code=503, detail="Service discovery not initialized")
+
+    url = await service_discovery.get_service_url("analytics-service")
+    if not url:
+        raise HTTPException(status_code=503, detail="Analytics service unavailable")
+
+    text = payload.get("text")
+    if not text:
+        raise HTTPException(status_code=400, detail="text is required")
+
+    try:
+        request_payload = {"text": text}
+        if "context" in payload:
+            request_payload["context"] = payload["context"]
+        
+        response = await http_client.post(
+            f"{url}/api/v1/analyze/sentiment",
+            json=request_payload
+        )
+        return response.json()
+    except Exception as e:
+        logger.warning(f"Sentiment analysis failed: {e}")
+        raise HTTPException(status_code=502, detail="Sentiment analysis failed")
+
+
+# =========================================================================
 # Agents Endpoints (optional)
 # =========================================================================
 
