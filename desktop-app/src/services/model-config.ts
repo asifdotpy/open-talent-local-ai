@@ -17,37 +17,24 @@ export interface ModelConfig {
 
 export const AVAILABLE_MODELS: ModelConfig[] = [
   {
-    id: 'vetta-granite-2b-gguf-v4',
-    name: 'Granite 2B (Trained)',
-    huggingface: 'asifdotpy/vetta-granite-2b-gguf-v4',
-    paramCount: '2B',
-    ramRequired: '8-12GB',
-    downloadSize: '1.2GB',
-    description: 'Custom trained on interview datasets (v4 GGUF format)',
-    status: 'trained',
-    dataset: 'asifdotpy/vetta-interview-dataset-enhanced',
-  },
-  {
-    id: 'vetta-granite-2b-lora-v4',
-    name: 'Granite 2B LoRA (Efficient)',
-    huggingface: 'asifdotpy/vetta-granite-2b-lora-v4',
-    paramCount: '2B + LoRA',
-    ramRequired: '6-10GB',
-    downloadSize: '500MB',
-    description: 'LoRA-fine-tuned variant (lower memory)',
-    status: 'trained',
-    dataset: 'asifdotpy/vetta-interview-dataset-enhanced',
-  },
-  {
-    id: 'vetta-granite-350m',
-    name: 'Granite 350M (Planned)',
-    huggingface: 'asifdotpy/vetta-granite-350m-gguf',
+    id: 'granite4:350m-h',
+    name: 'Granite 350M (Lightweight)',
+    huggingface: 'granite4:350m-h',
     paramCount: '350M',
     ramRequired: '2-4GB',
-    downloadSize: '400MB',
-    description: 'Low-resource model - training in progress',
-    status: 'planned',
-    dataset: 'asifdotpy/vetta-interview-dataset-enhanced',
+    downloadSize: '366MB',
+    description: 'Smallest Granite variant (fast, fits low RAM systems)',
+    status: 'trained',
+  },
+  {
+    id: 'granite4:3b',
+    name: 'Granite 3B (Clean)',
+    huggingface: 'granite4:3b',
+    paramCount: '3B',
+    ramRequired: '8-12GB',
+    downloadSize: '2.1GB',
+    description: 'Official Granite 4 base model (clean, no hallucinated context)',
+    status: 'trained',
   },
   {
     id: 'llama3.2-1b',
@@ -61,7 +48,7 @@ export const AVAILABLE_MODELS: ModelConfig[] = [
   },
 ];
 
-export const DEFAULT_MODEL = 'vetta-granite-2b-gguf-v4';
+export const DEFAULT_MODEL = 'granite4:350m-h';
 
 export function getModelConfig(modelId: string): ModelConfig | undefined {
   return AVAILABLE_MODELS.find((m) => m.id === modelId);

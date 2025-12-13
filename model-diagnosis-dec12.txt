@@ -1,0 +1,43 @@
+=== MODEL DIAGNOSIS - DEC 12, 2025 ===
+
+MODEL: granite4:350m-h (366MB)
+DATE: December 12, 2025
+TESTER: Automated Testing
+TIMESTAMP: 2025-12-12T14:40:51.528592
+
+TEST 1: SOFTWARE ENGINEER
+- First response time: 26.34s
+- Subsequent response times: 11.75, 19.38s
+- Average response time: 19.16s
+- Response quality (1-10): 9.3
+- Hallucinations: NO
+- Console errors: NO
+- Notes: All questions tested, quality measured by technical depth and coherence
+
+TEST 2: PRODUCT MANAGER
+- First response time: 17.63s
+- Subsequent response times: 8.32, 11.12s
+- Average response time: 12.36s
+- Response quality (1-10): 10.0
+- Hallucinations: NO
+- Console errors: NO
+- Notes: All questions tested, quality measured by technical depth and coherence
+
+TEST 3: DATA ANALYST
+- First response time: 18.49s
+- Subsequent response times: 23.20, 19.33s
+- Average response time: 20.34s
+- Response quality (1-10): 10.0
+- Hallucinations: NO
+- Console errors: NO
+- Notes: All questions tested, quality measured by technical depth and coherence
+
+OVERALL ASSESSMENT:
+- Model fits RAM: YES
+- Quality acceptable for demo: YES
+- Ready for Day 5-6: YES
+- Average quality across all roles: 9.8/10
+- Hallucinations detected: NO
+
+RECOMMENDATION:
+Keep 350m-h for production - clean responses, good quality, no significant hallucinations.

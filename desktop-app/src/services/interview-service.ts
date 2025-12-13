@@ -1,5 +1,7 @@
-import axios from 'axios';
 import { DEFAULT_MODEL, getModelConfig } from './model-config';
+import { ErrorHandler, HealthChecker } from '../utils/error-handler';
+import { InputValidator } from '../utils/validation';
+import { AIProvider, AIMessage } from '../providers/ai/ai-provider.interface';
 
 export interface Message {
   role: 'system' | 'user' | 'assistant';
@@ -20,41 +22,59 @@ export interface InterviewSession {
 }
 
 export class InterviewService {
-  private baseURL: string;
-  private client: any;
+  private aiProvider: AIProvider;
+  private isHealthy = false;
 
-  constructor(baseURL = 'http://localhost:11434') {
-    this.baseURL = baseURL;
-    this.client = axios.create({
-      baseURL: this.baseURL,
-      timeout: 60000, // Increased timeout for slower models
-    });
+  constructor(provider: AIProvider) {
+    this.aiProvider = provider;
+
+    HealthChecker.startHealthChecks(
+      () => this.checkStatus(),
+      (healthy) => {
+        this.isHealthy = healthy;
+      }
+    );
   }
 
   /**
-   * Check if Ollama server is running
+   * Check if Ollama server is running with retry logic
    */
   async checkStatus(): Promise<boolean> {
     try {
-      const response = await this.client.get('/api/tags');
-      return response.status === 200;
+      await ErrorHandler.retryWithBackoff(() => this.aiProvider.checkHealth(), 2, 500, 'Status check');
+      this.isHealthy = true;
+      return true;
     } catch (error) {
-      console.error('Ollama status check failed:', error);
+      this.isHealthy = false;
+      console.warn('[InterviewService] Ollama status check failed:', error);
       return false;
     }
   }
 
   /**
-   * List all available models
+   * List all available models with error handling
    */
   async listModels(): Promise<any[]> {
     try {
-      const response = await this.client.get('/api/tags');
-      return response.data.models || [];
+      const models = await ErrorHandler.retryWithBackoff(
+        () => this.aiProvider.listModels(),
+        3,
+        1000,
+        'List models'
+      );
+      return models.map((name) => ({ name }));
     } catch (error) {
-      console.error('Failed to list models:', error);
+      const appError = ErrorHandler.handleError(error, 'List models');
+      console.error('[InterviewService] Failed to list models:', appError.getUserMessage());
       return [];
     }
+  }
+
+  /**
+   * Get health status
+   */
+  isServiceHealthy(): boolean {
+    return this.isHealthy;
   }
 
   /**
@@ -62,7 +82,7 @@ export class InterviewService {
    */
   private getInterviewPrompt(role: string, totalQuestions: number = 5): string {
     const prompts: Record<string, string> = {
-      'Software Engineer': `You are an experienced technical interviewer conducting a job interview for a Junior Software Engineer position. 
+      'Software Engineer': `You are an experienced technical interviewer conducting a job interview for a Junior Software Engineer position.
 
 Your interview will consist of exactly ${totalQuestions} questions covering:
 1. Data structures and algorithms knowledge
@@ -71,7 +91,8 @@ Your interview will consist of exactly ${totalQuestions} questions covering:
 4. Team collaboration and communication
 5. Learning mindset and continuous improvement
 
-Guidelines:
+Guidelines (MANDATORY):
+- Introduce yourself as "OpenTalent Interviewer" (no placeholders or brackets)
 - Ask ONE question at a time and wait for the candidate's response
 - Keep questions clear, concise, and practical
 - Be professional but friendly
@@ -79,8 +100,9 @@ Guidelines:
 - Then ask the next question
 - Number your questions (e.g., "Question 1:", "Question 2:")
 - After ${totalQuestions} questions, thank the candidate and provide a brief summary
+- NEVER use placeholder tokens like [Your Name] or [Greeting]; do not invent candidate background
 
-Start by introducing yourself briefly and asking Question 1.`,
+Start by saying: "Hello, I'm OpenTalent Interviewer. Question 1:" and then ask the first question.`,
 
       'Product Manager': `You are an experienced interviewer conducting a job interview for a Product Manager position.
 
@@ -91,7 +113,8 @@ Your interview will consist of exactly ${totalQuestions} questions covering:
 4. Conflict resolution skills
 5. Innovation and creativity examples
 
-Guidelines:
+Guidelines (MANDATORY):
+- Introduce yourself as "OpenTalent Interviewer" (no placeholders or brackets)
 - Ask ONE question at a time and wait for the candidate's response
 - Keep questions clear, concise, and scenario-based
 - Be professional but friendly
@@ -99,8 +122,9 @@ Guidelines:
 - Then ask the next question
 - Number your questions (e.g., "Question 1:", "Question 2:")
 - After ${totalQuestions} questions, thank the candidate and provide a brief summary
+- NEVER use placeholder tokens like [Your Name] or [Greeting]; do not invent candidate background
 
-Start by introducing yourself briefly and asking Question 1.`,
+Start by saying: "Hello, I'm OpenTalent Interviewer. Question 1:" and then ask the first question.`,
 
       'Data Analyst': `You are an experienced interviewer conducting a job interview for a Data Analyst position.
 
@@ -111,7 +135,8 @@ Your interview will consist of exactly ${totalQuestions} questions covering:
 4. Business problem-solving with data
 5. Communication of insights to non-technical stakeholders
 
-Guidelines:
+Guidelines (MANDATORY):
+- Introduce yourself as "OpenTalent Interviewer" (no placeholders or brackets)
 - Ask ONE question at a time and wait for the candidate's response
 - Keep questions clear, concise, and practical
 - Be professional but friendly
@@ -119,40 +144,69 @@ Guidelines:
 - Then ask the next question
 - Number your questions (e.g., "Question 1:", "Question 2:")
 - After ${totalQuestions} questions, thank the candidate and provide a brief summary
+- NEVER use placeholder tokens like [Your Name] or [Greeting]; do not invent candidate background
 
-Start by introducing yourself briefly and asking Question 1.`,
+Start by saying: "Hello, I'm OpenTalent Interviewer. Question 1:" and then ask the first question.`,
     };
 
     return prompts[role] || prompts['Software Engineer'];
   }
 
   /**
-   * Start a new interview session
+   * Start a new interview session with comprehensive error handling
    */
   async startInterview(
     role: string = 'Software Engineer',
     model: string = DEFAULT_MODEL,
     totalQuestions: number = 5
   ): Promise<InterviewSession> {
+    // Validate inputs
+    const roleValidation = InputValidator.validateRole(role);
+    if (!roleValidation.valid) {
+      throw ErrorHandler.handleError(
+        new Error(roleValidation.error),
+        'Start interview - role validation'
+      );
+    }
+
+    const questionsValidation = InputValidator.validateTotalQuestions(totalQuestions);
+    if (!questionsValidation.valid) {
+      throw ErrorHandler.handleError(
+        new Error(questionsValidation.error),
+        'Start interview - questions validation'
+      );
+    }
+
+    // Check Ollama health
+    if (!this.isHealthy) {
+      throw ErrorHandler.handleError(
+        new Error('Ollama service is not running'),
+        'Start interview - health check'
+      );
+    }
+
     const systemPrompt = this.getInterviewPrompt(role, totalQuestions);
 
     try {
-      const response = await this.client.post('/api/chat', {
-        model: model,
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt,
-          },
-          {
-            role: 'user',
-            content: 'Please start the interview.',
-          },
-        ],
-        stream: false,
-      });
+      const response = await ErrorHandler.retryWithBackoff(
+        () =>
+          this.aiProvider.chat(
+            [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: 'Please start the interview.' },
+            ] as AIMessage[],
+            model
+          ),
+        3,
+        2000,
+        'Start interview'
+      );
 
-      const assistantMessage = response.data.message.content;
+      if (!response?.message?.content) {
+        throw new Error('Invalid response from server');
+      }
+
+      const assistantMessage = response.message.content;
 
       return {
         config: { role, model, totalQuestions },
@@ -165,30 +219,54 @@ Start by introducing yourself briefly and asking Question 1.`,
         isComplete: false,
       };
     } catch (error: any) {
-      throw new Error(`Failed to start interview: ${error.message}`);
+      const appError = ErrorHandler.handleError(error, 'Start interview');
+      ErrorHandler.logError(appError);
+      throw appError;
     }
   }
 
   /**
-   * Send a response and get the next question
+   * Send a response and get the next question with error handling
    */
   async sendResponse(
     session: InterviewSession,
     userResponse: string
   ): Promise<InterviewSession> {
+    // Validate response
+    const validation = InputValidator.validateInterviewResponse(userResponse);
+    if (!validation.valid) {
+      throw ErrorHandler.handleError(
+        new Error(validation.error),
+        'Send response - validation'
+      );
+    }
+
+    // Check Ollama health
+    if (!this.isHealthy) {
+      throw ErrorHandler.handleError(
+        new Error('Ollama service is not running'),
+        'Send response - health check'
+      );
+    }
+
     const newMessages: Message[] = [
       ...session.messages,
       { role: 'user', content: userResponse },
     ];
 
     try {
-      const response = await this.client.post('/api/chat', {
-        model: session.config.model,
-        messages: newMessages,
-        stream: false,
-      });
+      const response = await ErrorHandler.retryWithBackoff(
+        () => this.aiProvider.chat(newMessages as AIMessage[], session.config.model),
+        3,
+        2000,
+        'Send response'
+      );
 
-      const assistantMessage = response.data.message.content;
+      if (!response?.message?.content) {
+        throw new Error('Invalid response from server');
+      }
+
+      const assistantMessage = response.message.content;
 
       // Detect if interview is complete
       const isComplete =
@@ -209,7 +287,9 @@ Start by introducing yourself briefly and asking Question 1.`,
         isComplete,
       };
     } catch (error: any) {
-      throw new Error(`Failed to send response: ${error.message}`);
+      const appError = ErrorHandler.handleError(error, 'Send response');
+      ErrorHandler.logError(appError);
+      throw appError;
     }
   }
 

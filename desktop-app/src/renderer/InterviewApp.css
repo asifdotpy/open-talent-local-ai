@@ -21,6 +21,65 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
+/* Status Bar */
+.status-bar {
+  margin-bottom: 16px;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+}
+
+.status-pill.online { background: #4caf50; }
+.status-pill.degraded { background: #ff9800; }
+.status-pill.offline { background: #f44336; }
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.status-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fafafa;
+}
+
+.status-card.online { border-color: #c8e6c9; background: #f1fff1; }
+.status-card.degraded { border-color: #ffe0b2; background: #fff8e1; }
+.status-card.offline { border-color: #ffcdd2; background: #ffebee; }
+
+.status-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.status-card .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.status-card .dot.online { background: #4caf50; }
+.status-card .dot.degraded { background: #ff9800; }
+.status-card .dot.offline { background: #f44336; }
+
+.status-card .latency {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #666;
+}
+
 .header {
   text-align: center;
   margin-bottom: 30px;

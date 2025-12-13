@@ -1,0 +1,203 @@
+/**
+ * Loading Spinner Styles
+ */
+
+/* Container */
+.loading-spinner-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  min-height: 200px;
+}
+
+.loading-spinner-container.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  min-height: 100vh;
+  padding: 0;
+}
+
+.spinner-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Spinner Animation */
+.spinner {
+  position: relative;
+  display: inline-block;
+}
+
+.spinner.small {
+  width: 30px;
+  height: 30px;
+}
+
+.spinner.medium {
+  width: 50px;
+  height: 50px;
+}
+
+.spinner.large {
+  width: 70px;
+  height: 70px;
+}
+
+.spinner-circle {
+  width: 100%;
+  height: 100%;
+  border: 3px solid rgba(25, 118, 210, 0.2);
+  border-top-color: #1976d2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Message */
+.spinner-message {
+  margin: 0;
+  font-size: 16px;
+  color: #555;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Progress Bar */
+.progress-container {
+  width: 100%;
+  max-width: 300px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    #1976d2,
+    #1565c0
+  );
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.progress-text {
+  margin: 8px 0 0 0;
+  font-size: 12px;
+  color: #999;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Cancel Button */
+.cancel-button {
+  padding: 8px 16px;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.cancel-button:hover {
+  background: #d32f2f;
+}
+
+.cancel-button:active {
+  background: #c62828;
+}
+
+/* Skeleton Loader */
+.skeleton-wrapper {
+  width: 100%;
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  background: white;
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.overlay-message {
+  margin: 0;
+  font-size: 16px;
+  color: #555;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .loading-spinner-container {
+    min-height: 150px;
+  }
+
+  .spinner.large {
+    width: 50px;
+    height: 50px;
+  }
+
+  .progress-container {
+    max-width: 250px;
+  }
+}

@@ -1,37 +1,61 @@
 import React, { useState, useEffect } from 'react';
-import InterviewService, {
-  InterviewSession,
-} from '../services/interview-service';
+import InterviewService, { InterviewSession } from '../services/interview-service';
+import { useInterview } from './hooks/useInterview';
+import { useConfig } from './hooks/useConfig';
+import { useEventBus } from './hooks/useEventBus';
 import { AVAILABLE_MODELS, DEFAULT_MODEL, getTrainedModels } from '../services/model-config';
 import './InterviewApp.css';
+import StatusBar from './ui/StatusBar';
+import { fetchIntegrationHealth } from '../services/integration-service-client';
 
-const service = new InterviewService();
+const useService = () => useInterview();
 
 type Screen = 'setup' | 'interview' | 'summary';
 
 const InterviewApp: React.FC = () => {
+  const service = useService();
+  const config = useConfig();
+  const eventBus = useEventBus();
   const [screen, setScreen] = useState<Screen>('setup');
-  const [role, setRole] = useState('Software Engineer');
-  const [selectedModel, setSelectedModel] = useState(DEFAULT_MODEL);
+  const [role, setRole] = useState(() => config.get('interview').defaultRole || 'Software Engineer');
+  const [selectedModel, setSelectedModel] = useState(() => config.get('ai').ollama.defaultModel || DEFAULT_MODEL);
   const [session, setSession] = useState<InterviewSession | null>(null);
   const [userInput, setUserInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ollamaStatus, setOllamaStatus] = useState<boolean>(false);
   const [availableModels, setAvailableModels] = useState<string[]>([]);
+  const [integrationStatus, setIntegrationStatus] = useState<'online' | 'offline' | 'degraded'>('offline');
+  const [serviceStatuses, setServiceStatuses] = useState<any[]>([]);
+  const [serviceMode, setServiceMode] = useState<'integration' | 'ollama'>('integration');
 
   // Check Ollama status on mount
   useEffect(() => {
-    checkOllamaStatus();
+    checkServiceStatus();
   }, []);
 
-  const checkOllamaStatus = async () => {
+  const checkServiceStatus = async () => {
+    // Check overall service status
     const status = await service.checkStatus();
     setOllamaStatus(status);
 
+    // Check integration health
+    const health = await fetchIntegrationHealth();
+    if (health) {
+      setIntegrationStatus(health.status);
+      setServiceStatuses(health.services);
+    }
+
+    // Get service mode
+    if ((service as any).getMode) {
+      const mode = (service as any).getMode();
+      setServiceMode(mode);
+    }
+
+    // List models
     if (status) {
       const models = await service.listModels();
-      setAvailableModels(models.map((m: any) => m.name));
+      setAvailableModels(models.map((m: any) => m.name || m.id));
     }
   };
 
@@ -47,6 +71,8 @@ const InterviewApp: React.FC = () => {
       );
       setSession(newSession);
       setScreen('interview');
+      // fire event for analytics/telemetry hooks
+      eventBus.emit('interview:started', { role, model: selectedModel });
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -68,6 +94,7 @@ const InterviewApp: React.FC = () => {
       // Check if interview is complete
       if (updatedSession.isComplete) {
         setScreen('summary');
+        eventBus.emit('interview:completed', { totalQuestions: updatedSession.config.totalQuestions });
       }
     } catch (err: any) {
       setError(err.message);
@@ -107,6 +134,7 @@ const InterviewApp: React.FC = () => {
     return (
       <div className="interview-app">
         <div className="setup-screen">
+          <StatusBar services={serviceStatuses} integrationStatus={integrationStatus} />
           <div className="header">
             <h1>OpenTalent</h1>
             <p className="tagline">Privacy-First AI Interviews</p>
@@ -115,13 +143,16 @@ const InterviewApp: React.FC = () => {
           <div className="status-indicator">
             <div className={`status-dot ${ollamaStatus ? 'online' : 'offline'}`} />
             <span>
-              Ollama: {ollamaStatus ? 'Online' : 'Offline'}
+              Service: {ollamaStatus ? 'Online' : 'Offline'} 
+              {serviceMode && <span className="service-mode"> ({serviceMode === 'integration' ? '🔥 Gateway' : '🦙 Direct Ollama'})</span>}
             </span>
           </div>
 
           {!ollamaStatus && (
             <div className="error-message">
-              ⚠️ Ollama is not running. Please start Ollama and refresh.
+              ⚠️ Service is not available. Please ensure the integration service or Ollama is running.
+              <br />
+              <small>Integration Service: http://localhost:8009 | Ollama: http://localhost:11434</small>
             </div>
           )}
 
@@ -129,7 +160,7 @@ const InterviewApp: React.FC = () => {
             <>
               <div className="model-info">
                 <p>Available Models: {availableModels.join(', ') || 'None'}</p>
-                <p className="model-using">Using: llama3.2:1b</p>
+                <p className="model-using">Using: {selectedModel || DEFAULT_MODEL}</p>
               </div>
 
               <div className="role-selection">
@@ -216,6 +247,7 @@ const InterviewApp: React.FC = () => {
     return (
       <div className="interview-app">
         <div className="interview-screen">
+          <StatusBar services={serviceStatuses} integrationStatus={integrationStatus} />
           <div className="header">
             <h1>OpenTalent Interview</h1>
             <p className="role-display">{session.config.role}</p>
@@ -283,6 +315,7 @@ const InterviewApp: React.FC = () => {
     return (
       <div className="interview-app">
         <div className="summary-screen">
+          <StatusBar services={serviceStatuses} integrationStatus={integrationStatus} />
           <div className="header">
             <h1>Interview Complete!</h1>
           </div>
