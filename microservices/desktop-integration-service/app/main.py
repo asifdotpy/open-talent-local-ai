@@ -250,6 +250,65 @@ async def select_model(model_id: str) -> Dict:
     return {"selected": model_id, "timestamp": datetime.now().isoformat()}
 
 
+# =========================================================================
+# Agents Endpoints (optional)
+# =========================================================================
+
+
+@app.post("/api/v1/agents/execute")
+async def execute_agent(payload: Dict) -> Dict:
+    """Proxy agent execution to agents-service when enabled."""
+    if not settings.enable_agents or not settings.agents_url:
+        raise HTTPException(status_code=503, detail="Agents service disabled")
+
+    if not service_discovery or not http_client:
+        raise HTTPException(status_code=503, detail="Service discovery not initialized")
+
+    url = await service_discovery.get_service_url("agents-service")
+    if not url:
+        raise HTTPException(status_code=503, detail="Agents service unavailable")
+
+    action = payload.get("action", "start")
+
+    try:
+        if action == "start":
+            candidate_id = payload.get("candidate_id")
+            if not candidate_id:
+                raise HTTPException(status_code=400, detail="candidate_id is required for start")
+            response = await http_client.post(
+                f"{url}/interviews/start",
+                params={"candidate_id": candidate_id},
+            )
+        elif action == "answer":
+            interview_id = payload.get("interview_id")
+            answer = payload.get("answer")
+            if not interview_id or answer is None:
+                raise HTTPException(status_code=400, detail="interview_id and answer are required for answer")
+            response = await http_client.post(
+                f"{url}/interviews/{interview_id}/answer",
+                params={"answer": answer},
+            )
+        elif action == "status":
+            interview_id = payload.get("interview_id")
+            if not interview_id:
+                raise HTTPException(status_code=400, detail="interview_id is required for status")
+            response = await http_client.get(f"{url}/interviews/{interview_id}")
+        elif action == "next_question":
+            interview_id = payload.get("interview_id")
+            if not interview_id:
+                raise HTTPException(status_code=400, detail="interview_id is required for next_question")
+            response = await http_client.get(f"{url}/interviews/{interview_id}/next-question")
+        else:
+            raise HTTPException(status_code=400, detail=f"Unsupported action: {action}")
+
+        return response.json()
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.warning(f"Agent execution failed: {e}")
+        raise HTTPException(status_code=502, detail="Agent execution failed")
+
+
 # ============================================================================
 # Interview Endpoints
 # ============================================================================

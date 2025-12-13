@@ -37,7 +37,7 @@ class ServiceDiscovery:
     """Discover and monitor microservice health."""
 
     def __init__(self):
-        self.services = {
+        base_services = {
             "conversation-service": settings.conversation_url,
             "voice-service": settings.voice_url,
             "avatar-service": settings.avatar_url,
@@ -46,6 +46,12 @@ class ServiceDiscovery:
             "granite-interview-service": settings.granite_interview_url,
             "ollama": settings.ollama_url,
         }
+
+        optional_services = {}
+        if settings.enable_agents and settings.agents_url:
+            optional_services["agents-service"] = settings.agents_url
+
+        self.services = {**base_services, **optional_services}
         self.health_cache = ServiceHealthCache(ttl_seconds=settings.health_cache_ttl)
 
     async def check_all_services(self) -> Dict:

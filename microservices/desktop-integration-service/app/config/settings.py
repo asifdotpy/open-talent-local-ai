@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     interview_url: str = "http://localhost:8004"
     analytics_url: str = "http://localhost:8007"
     ollama_url: str = "http://localhost:11434"
+    agents_url: Optional[str] = None  # Optional: agent orchestration service
 
     # Service configuration
     service_timeout: float = 30.0
@@ -33,6 +34,7 @@ class Settings(BaseSettings):
     enable_voice: bool = True
     enable_avatar: bool = True
     enable_analytics: bool = True
+    enable_agents: bool = False
 
     # CORS
     cors_origins: list = ["*"]
