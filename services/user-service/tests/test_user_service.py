@@ -8,6 +8,7 @@ Purpose: User management, profiles, preferences
 import pytest
 import httpx
 from typing import Dict, Any
+import time
 
 
 @pytest.fixture
@@ -37,8 +38,9 @@ def auth_headers(auth_token):
 @pytest.fixture
 def user_data() -> Dict[str, Any]:
     """Sample user data"""
+    timestamp = int(time.time() * 1000)
     return {
-        "email": "user@example.com",
+        "email": f"user+{timestamp}@example.com",
         "first_name": "John",
         "last_name": "Doe",
         "phone": "+1234567890",
