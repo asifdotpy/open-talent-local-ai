@@ -9,6 +9,7 @@ import pytest
 import httpx
 from typing import Dict, Any
 import json
+import time
 
 
 @pytest.fixture
@@ -43,9 +44,10 @@ def invalid_credentials() -> Dict[str, Any]:
 
 @pytest.fixture
 def new_user_data() -> Dict[str, Any]:
-    """New user registration data"""
+    """New user registration data with unique email"""
+    timestamp = int(time.time() * 1000)
     return {
-        "email": "newuser@example.com",
+        "email": f"newuser+{timestamp}@example.com",
         "password": "SecurePassword123!",
         "first_name": "John",
         "last_name": "Doe"
