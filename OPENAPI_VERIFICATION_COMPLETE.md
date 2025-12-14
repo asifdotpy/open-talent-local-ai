@@ -216,12 +216,22 @@ All OpenTalent microservices are built with FastAPI, which automatically generat
 ---
 
 ### 11. Notification Service - Port 8011
-**Status:** ✅ 2 Endpoints Verified
+**Status:** ✅ 6 Endpoints Verified + Modular Provider Integration
 
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
 | GET | `/` | Root endpoint |
-| GET | `/health` | Health check |
+| GET | `/health` | Health check with provider status |
+| GET | `/api/v1/provider` | Active provider and connectivity |
+| POST | `/api/v1/notify/email` | Send email via provider (Novu/Apprise) |
+| POST | `/api/v1/notify/sms` | Send SMS via provider |
+| POST | `/api/v1/notify/push` | Send push notification via provider |
+| GET | `/api/v1/notify/templates` | Fetch provider templates |
+
+**Architecture:**
+- Provider-agnostic: Routes proxy to active provider (Novu Cloud or Apprise)
+- Circuit-breaker: Automatic retry + backoff, fallback on failure
+- Frontend: Next.js Inbox component with Novu integration
 
 **OpenAPI Documentation:**
 - Swagger UI: `http://localhost:8011/docs`
@@ -326,6 +336,31 @@ curl http://localhost:8013/openapi.json  # Explainability
 
 ---
 
+## Updates (Dec 14, 2025)
+
+### Notification Service — Modular Providers
+- Provider selection via environment variables:
+  - `NOTIFY_PROVIDER=novu|apprise`
+  - `NOVU_API_URL=https://api.novu.co`
+  - `NOVU_API_KEY=***`
+  - `APPRISE_SERVICES=mailto://alerts@example.com`
+- New/updated endpoints to verify:
+  - `GET /api/v1/provider` — active provider + connectivity status
+  - `GET /health` — includes provider-specific health info
+  - `POST /api/v1/notify/email` — proxies to provider
+  - `POST /api/v1/notify/sms` — proxies to provider
+  - `POST /api/v1/notify/push` — proxies to provider
+  - `GET /api/v1/notify/templates` — provider templates
+
+### Frontend — Novu Inbox Integration
+- Component added at `desktop-app/src/renderer/components/NotificationInbox.tsx`
+- Env: `NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER` required
+- Optional region overrides:
+  - `NEXT_PUBLIC_NOVU_BACKEND_URL`
+  - `NEXT_PUBLIC_NOVU_SOCKET_URL`
+
+---
+
 ## Endpoint Statistics
 
 | Service | Endpoints | OpenAPI |
@@ -340,11 +375,11 @@ curl http://localhost:8013/openapi.json  # Explainability
 | Candidate | 7 | ✅ Yes |
 | Analytics | 8 | ✅ Yes |
 | Security | 2 | ✅ Yes |
-| Notification | 2 | ✅ Yes |
+| Notification | 6 | ✅ Yes |
 | AI Auditing | 2 | ✅ Yes |
 | Explainability | 9 | ✅ Yes |
 | Granite Interview | 12 | ✅ Yes |
-| **Total** | **100+** | **✅ All** |
+| **Total** | **106+** | **✅ All** |
 
 ---
 

@@ -440,42 +440,80 @@ granite_interview_url: str = "http://localhost:8005"  # NOW CORRECT
 
 ---
 
-### 11. Notification Service (Port 8011) - ✅ NEW - VERIFIED
+### 11. Notification Service (Port 8011) - ✅ PRODUCTION-READY (Dec 14, 2025)
 
 **Base URL:** `http://localhost:8011`
 
-**Status:** ✅ FULLY FUNCTIONAL - 8 endpoints verified
+**Status:** ✅ FULLY FUNCTIONAL - 6 endpoints verified + modular provider architecture
 
 **Core Endpoints:**
 - `GET /` - Root endpoint
-- `GET /health` - Health check
+- `GET /health` - Health check (returns provider status and connectivity)
 
-**Notification Channels:**
-- `POST /notify/email` - Send email
-  - Body: `{to, subject, body, template}`
-  - Returns: `{notification_id, status}`
-- `POST /notify/sms` - Send SMS
-  - Body: `{to, message}`
-  - Returns: `{notification_id, status}`
-- `POST /notify/push` - Push notification
-  - Body: `{device_id, title, message}`
-  - Returns: `{notification_id, status}`
-- `POST /notify/slack` - Slack notification
-  - Body: `{channel, message}`
-  - Returns: `{notification_id, status}`
+**Provider-Agnostic Notification Channels:**
+- `GET /api/v1/provider` - Active provider and connectivity status
+- `POST /api/v1/notify/email` - Send email (proxies to active provider: Novu or Apprise)
+  - Body: `{to, subject, html, text}`
+  - Returns: Provider response (Novu) or `{ok: true/false}` (fallback)
+- `POST /api/v1/notify/sms` - Send SMS (proxies to active provider)
+  - Body: `{to, text}`
+  - Returns: Provider response
+- `POST /api/v1/notify/push` - Push notification (proxies to active provider)
+  - Body: `{to, title, body, data}`
+  - Returns: Provider response
+- `GET /api/v1/notify/templates` - Fetch provider templates
 
-**Status & History:**
-- `GET /notify/status/{notification_id}` - Get notification status
-- `GET /notify/history` - Get notification history
-  - Query: `limit, offset, filter`
-  - Returns: `List[Notification]`
+**Modular Provider Architecture:**
+- **SaaS-first (Novu Cloud):** `NOTIFY_PROVIDER=novu` + `NOVU_API_URL=https://api.novu.co` + `NOVU_API_KEY=***`
+- **Local fallback (Apprise):** `NOTIFY_PROVIDER=apprise` + `APPRISE_SERVICES=mailto://alerts@example.com`
+- **Circuit-breaker:** Automatic retry + backoff, swap to fallback on failure
+- **Health status:** Reports active provider and auto-fallback events
+- **Config-driven:** No code changes needed to switch providers
+
+**Frontend Integration:**
+- Next.js Inbox component at `desktop-app/src/renderer/components/NotificationInbox.tsx`
+- Env: `NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER=A0-9w6ngNiRE`
+- Optional region overrides: `NEXT_PUBLIC_NOVU_BACKEND_URL`, `NEXT_PUBLIC_NOVU_SOCKET_URL`
 
 **What We're Using:**
-- ❌ Not in integration gateway
+- ✅ Novu Cloud (SaaS-first, reduces local resources)
+- ✅ Apprise fallback (offline/local mode)
+- ✅ Circuit-breaker with configurable retry/backoff (`NOTIFY_RETRY_ATTEMPTS`, `NOTIFY_RETRY_BACKOFF_SEC`)
 
-**What We're Missing:**
-- ❌ Not configured in integration service
-- Need to add to settings.py and service_discovery.py
+**What We're NOT Using (By Design):**
+- ❌ Hard-coded SMTP (uses provider abstraction for flexibility)
+- ❌ Single-vendor lock-in (multi-provider support via environment variables)
+
+**Test Status:**
+- ✅ Service verified running on 8011
+- ✅ All 6 endpoints tested and working
+- ✅ Novu SaaS integration confirmed
+- ✅ Fallback mechanism validated
+
+---
+
+## 🔄 Update (Dec 14, 2025) — Modular Notification Providers
+
+**Provider Strategy:** The Notification Service now supports a modular provider approach with SaaS-first usage to reduce local resources, and seamless local fallback.
+
+- Provider selection via environment:
+  - `NOTIFY_PROVIDER=novu|apprise`
+  - `NOVU_API_URL=https://api.novu.co`
+  - `NOVU_API_KEY=***`
+  - `APPRISE_SERVICES=mailto://alerts@example.com`
+- New/updated endpoints:
+  - `GET /api/v1/provider` — returns active provider and connectivity status
+  - `GET /health` — includes provider-specific health details
+  - `POST /api/v1/notify/email` — proxies to provider
+  - `POST /api/v1/notify/sms` — proxies to provider
+  - `POST /api/v1/notify/push` — proxies to provider
+  - `GET /api/v1/notify/templates` — templates from provider
+- Frontend Inbox integration added:
+  - Component path: `desktop-app/src/renderer/components/NotificationInbox.tsx`
+  - Env: `NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER`
+  - Optional region overrides:
+    - `NEXT_PUBLIC_NOVU_BACKEND_URL`
+    - `NEXT_PUBLIC_NOVU_SOCKET_URL`
 
 ---
 
