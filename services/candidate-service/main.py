@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr, Field
 from typing import Dict, Any, Optional, List
 from datetime import datetime
+from enum import Enum
 import uuid
 import time
 
@@ -16,6 +17,25 @@ app = FastAPI(
     version="1.0.0",
     description="Manage candidates, job applications, skills, and resumes"
 )
+
+# ============================================================================
+# ENUMS - STRONGLY TYPED STATUS/PROFICIENCY VALUES
+# ============================================================================
+
+class ApplicationStatus(str, Enum):
+    """Application status enumeration"""
+    APPLIED = "applied"
+    REVIEWING = "reviewing"
+    INTERVIEW_SCHEDULED = "interview_scheduled"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+
+class SkillProficiency(str, Enum):
+    """Skill proficiency enumeration"""
+    BEGINNER = "beginner"
+    INTERMEDIATE = "intermediate"
+    ADVANCED = "advanced"
+    EXPERT = "expert"
 
 # ============================================================================
 # PYDANTIC MODELS
@@ -64,7 +84,7 @@ class ApplicationCreate(BaseModel):
     candidate_id: str
     job_id: str
     cover_letter: Optional[str] = None
-    status: str = Field(default="applied", pattern="^(applied|reviewing|rejected|accepted)$")
+    status: ApplicationStatus = Field(default=ApplicationStatus.APPLIED)
     
     class Config:
         json_schema_extra = {
@@ -78,7 +98,7 @@ class ApplicationCreate(BaseModel):
 
 class ApplicationUpdate(BaseModel):
     """Schema for updating an application"""
-    status: str = Field(min_length=1, max_length=100)  # Allow any status value
+    status: ApplicationStatus = Field(..., description="Application status must be one of: applied, reviewing, interview_scheduled, accepted, rejected")
     cover_letter: Optional[str] = None
 
 class ApplicationResponse(BaseModel):
@@ -86,7 +106,7 @@ class ApplicationResponse(BaseModel):
     id: str
     job_id: str
     candidate_id: str
-    status: str
+    status: ApplicationStatus
     cover_letter: Optional[str]
     created_at: str
     updated_at: str
@@ -94,7 +114,7 @@ class ApplicationResponse(BaseModel):
 class SkillCreate(BaseModel):
     """Schema for adding a skill"""
     skill: str = Field(..., min_length=1, max_length=100)
-    proficiency: str = Field(default="intermediate", pattern="^(beginner|intermediate|advanced|expert)$")
+    proficiency: SkillProficiency = Field(default=SkillProficiency.INTERMEDIATE)
     
     class Config:
         json_schema_extra = {
@@ -107,7 +127,7 @@ class SkillCreate(BaseModel):
 class SkillResponse(BaseModel):
     """Schema for skill response"""
     skill: str
-    proficiency: str
+    proficiency: SkillProficiency
     added_at: str
 
 class SkillListResponse(BaseModel):
