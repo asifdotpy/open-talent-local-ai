@@ -47,7 +47,8 @@ async def lifespan(app: FastAPI):
     """Application lifecycle management."""
     global service_discovery, http_client
 
-    logger.info("Starting Desktop Integration Service on port 8009...")
+    logger.info("🚀 Starting Desktop Integration Service (Gateway) on port 8009...")
+    logger.info("=" * 70)
 
     # Initialize service discovery
     service_discovery = ServiceDiscovery()
@@ -61,15 +62,27 @@ async def lifespan(app: FastAPI):
     # Initial health check
     health = await service_discovery.check_all_services()
     online_count = health["summary"]["online"]
-    logger.info(f"Services online: {online_count}/{health['summary']['total']}")
+    total_count = health["summary"]["total"]
+    logger.info(f"📊 Services Status: {online_count}/{total_count} services online")
+    logger.info("=" * 70)
+    
+    # List all services
+    for name, status in health["services"].items():
+        icon = "✅" if status["status"] == "online" else "❌"
+        visibility = "(hidden)" if name.startswith("_") else ""
+        latency = f"{status.get('latencyMs', 'N/A')}ms" if status.get('latencyMs') else "N/A"
+        logger.info(f"{icon} {name:30s} {status['status']:10s} {latency:>10s} {visibility}")
+    
+    logger.info("=" * 70)
+    logger.info("✨ Gateway ready to serve requests!")
 
     yield
 
     # Cleanup
-    logger.info("Shutting down Desktop Integration Service...")
+    logger.info("🛑 Shutting down Desktop Integration Service...")
     if http_client:
         await http_client.aclose()
-    logger.info("Shutdown complete")
+    logger.info("✅ Shutdown complete")
 
 
 # Create FastAPI app
@@ -125,13 +138,147 @@ async def system_status() -> Dict:
 
     health = await service_discovery.check_all_services()
 
+    # Filter out hidden services (those starting with _) from UI display
+    visible_services = {k: v for k, v in health["services"].items() if not k.startswith("_")}
+    visible_online = sum(1 for s in visible_services.values() if s["status"] == "online")
+    visible_total = len(visible_services)
+
     return {
         "gateway_version": "0.1.0",
         "status": health["status"],
         "timestamp": datetime.now().isoformat(),
-        "services_online": health["summary"]["online"],
-        "services_total": health["summary"]["total"],
-        "service_details": health["services"],
+        "services_online": visible_online,
+        "services_total": visible_total,
+        "service_details": visible_services,
+    }
+
+
+# ============================================================================
+# Service Registry Endpoint (NEW - Shows all 14 services)
+# ============================================================================
+
+
+@app.get("/api/v1/services")
+async def list_services() -> Dict:
+    """
+    List all 14 registered OpenTalent microservices.
+    
+    Returns registry with URLs and current status for each service.
+    """
+    if not service_discovery:
+        raise HTTPException(status_code=503, detail="Service discovery not initialized")
+
+    health = await service_discovery.check_all_services()
+    
+    # Organize services by category
+    service_registry = {
+        "core_services": {
+            "scout-service": {
+                "port": 8000,
+                "url": health["services"].get("scout-service", {}).get("url", ""),
+                "status": health["services"].get("scout-service", {}).get("status", "unknown"),
+                "description": "Talent sourcing and resume parsing"
+            },
+            "user-service": {
+                "port": 8001,
+                "url": health["services"].get("user-service", {}).get("url", ""),
+                "status": health["services"].get("user-service", {}).get("status", "unknown"),
+                "description": "User management and authentication"
+            },
+            "candidate-service": {
+                "port": 8006,
+                "url": health["services"].get("candidate-service", {}).get("url", ""),
+                "status": health["services"].get("candidate-service", {}).get("status", "unknown"),
+                "description": "Candidate profile management"
+            },
+        },
+        "ai_services": {
+            "conversation-service": {
+                "port": 8002,
+                "url": health["services"].get("conversation-service", {}).get("url", ""),
+                "status": health["services"].get("conversation-service", {}).get("status", "unknown"),
+                "description": "AI conversation and chat management"
+            },
+            "interview-service": {
+                "port": 8005,
+                "url": health["services"].get("interview-service", {}).get("url", ""),
+                "status": health["services"].get("interview-service", {}).get("status", "unknown"),
+                "description": "Interview orchestration and flow control"
+            },
+            "_granite-interview-service": {
+                "port": 8005,
+                "url": health["services"].get("_granite-interview-service", {}).get("url", ""),
+                "status": health["services"].get("_granite-interview-service", {}).get("status", "unknown"),
+                "description": "Granite interview with custom training (internal)",
+                "hidden": True
+            },
+        },
+        "media_services": {
+            "voice-service": {
+                "port": 8003,
+                "url": health["services"].get("voice-service", {}).get("url", ""),
+                "status": health["services"].get("voice-service", {}).get("status", "unknown"),
+                "description": "Text-to-speech synthesis with Piper"
+            },
+            "avatar-service": {
+                "port": 8004,
+                "url": health["services"].get("avatar-service", {}).get("url", ""),
+                "status": health["services"].get("avatar-service", {}).get("status", "unknown"),
+                "description": "3D avatar rendering with phoneme lip-sync"
+            },
+        },
+        "analytics_services": {
+            "analytics-service": {
+                "port": 8007,
+                "url": health["services"].get("analytics-service", {}).get("url", ""),
+                "status": health["services"].get("analytics-service", {}).get("status", "unknown"),
+                "description": "Sentiment analysis and interview metrics"
+            },
+            "ai-auditing-service": {
+                "port": 8012,
+                "url": health["services"].get("ai-auditing-service", {}).get("url", ""),
+                "status": health["services"].get("ai-auditing-service", {}).get("status", "unknown"),
+                "description": "AI bias detection and fairness auditing"
+            },
+            "explainability-service": {
+                "port": 8013,
+                "url": health["services"].get("explainability-service", {}).get("url", ""),
+                "status": health["services"].get("explainability-service", {}).get("status", "unknown"),
+                "description": "AI decision explainability and interpretability"
+            },
+        },
+        "infrastructure_services": {
+            "security-service": {
+                "port": 8010,
+                "url": health["services"].get("security-service", {}).get("url", ""),
+                "status": health["services"].get("security-service", {}).get("status", "unknown"),
+                "description": "Authentication, encryption, and access control"
+            },
+            "notification-service": {
+                "port": 8011,
+                "url": health["services"].get("notification-service", {}).get("url", ""),
+                "status": health["services"].get("notification-service", {}).get("status", "unknown"),
+                "description": "Email, SMS, and push notifications"
+            },
+        },
+        "ai_engine": {
+            "ollama": {
+                "port": 11434,
+                "url": health["services"].get("ollama", {}).get("url", ""),
+                "status": health["services"].get("ollama", {}).get("status", "unknown"),
+                "description": "Local Granite 4 AI model engine"
+            }
+        }
+    }
+    
+    return {
+        "total_services": len(service_discovery.services),
+        "gateway": {
+            "version": "0.1.0",
+            "port": 8009
+        },
+        "service_registry": service_registry,
+        "timestamp": datetime.now().isoformat(),
     }
 
 

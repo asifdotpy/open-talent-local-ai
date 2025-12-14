@@ -7,15 +7,33 @@ from typing import Optional
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
-    # Service URLs
-    granite_interview_url: str = "http://localhost:8005"  # Fixed: Was 8000, actual port is 8005
-    conversation_url: str = "http://localhost:8003"
-    voice_url: str = "http://localhost:8002"
-    avatar_url: str = "http://localhost:8001"
-    interview_url: str = "http://localhost:8004"
+    # Service URLs (All 14 OpenTalent Microservices)
+    # AI & Conversation Services
+    granite_interview_url: str = "http://localhost:8005"
+    conversation_url: str = "http://localhost:8002"
+    interview_url: str = "http://localhost:8005"
+    
+    # Voice & Avatar Services
+    voice_url: str = "http://localhost:8003"
+    avatar_url: str = "http://localhost:8004"
+    
+    # Core Services
+    scout_url: str = "http://localhost:8000"
+    user_url: str = "http://localhost:8001"
+    candidate_url: str = "http://localhost:8006"
+    
+    # Analytics & Monitoring Services
     analytics_url: str = "http://localhost:8007"
+    security_url: str = "http://localhost:8010"
+    notification_url: str = "http://localhost:8011"
+    ai_auditing_url: str = "http://localhost:8012"
+    explainability_url: str = "http://localhost:8013"
+    
+    # AI Model Service
     ollama_url: str = "http://localhost:11434"
-    agents_url: Optional[str] = None  # Optional: agent orchestration service
+    
+    # Optional: Agent Orchestration Service
+    agents_url: Optional[str] = None
 
     # Service configuration
     service_timeout: float = 30.0

@@ -1,13 +1,16 @@
-import { Briefcase, CheckCircle, Play, Users } from 'lucide-react';
-import { useState } from 'react';
+import { Briefcase, CheckCircle, Play, Users, AlertTriangle, Info } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInterviewStore } from '../stores/interviewStore';
+import integrationGatewayAPI from '../services/integrationGatewayAPI';
 
 export const InterviewDashboard = () => {
   const navigate = useNavigate();
-  const { createRoom, beginInterview, isLoading, error } = useInterviewStore();
+  const { createRoom, beginInterview, isLoading, error, setError } = useInterviewStore();
   const [candidateId, setCandidateId] = useState('');
   const [jobRole, setJobRole] = useState('');
+  const [localError, setLocalError] = useState<string | null>(null);
+  const [gatewayAvailable, setGatewayAvailable] = useState(true);
 
   const jobRoles = [
     'Software Engineer',
@@ -22,8 +25,38 @@ export const InterviewDashboard = () => {
     'Technical Lead'
   ];
 
+  // Check gateway availability on mount
+  useEffect(() => {
+    const checkGateway = async () => {
+      try {
+        await integrationGatewayAPI.health.check();
+        setGatewayAvailable(true);
+      } catch (err) {
+        setGatewayAvailable(false);
+      }
+    };
+
+    checkGateway();
+    const interval = setInterval(checkGateway, 30000); // Check every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
+
   const handleStartInterview = async () => {
-    if (!candidateId.trim() || !jobRole) {
+    setLocalError(null);
+    setError(null);
+
+    if (!candidateId.trim()) {
+      setLocalError('Please enter a candidate ID');
+      return;
+    }
+
+    if (!jobRole) {
+      setLocalError('Please select a job role');
+      return;
+    }
+
+    if (!gatewayAvailable) {
+      setLocalError('Integration service is currently unavailable. Please try again in a moment.');
       return;
     }
 
@@ -32,6 +65,8 @@ export const InterviewDashboard = () => {
       await beginInterview();
       navigate('/interview');
     } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to start interview. Please check your connection and try again.';
+      setLocalError(errorMsg);
       console.error('Failed to start interview:', err);
     }
   };
@@ -61,9 +96,36 @@ export const InterviewDashboard = () => {
           <h2 className="text-2xl font-semibold text-gray-900">Start Your Interview</h2>
         </div>
 
+        {/* Gateway Status Alert */}
+        {!gatewayAvailable && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6 flex items-start">
+            <AlertTriangle className="h-5 w-5 text-yellow-600 mr-3 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-yellow-800 font-medium">Integration service offline</p>
+              <p className="text-yellow-700 text-sm mt-1">The gateway service is temporarily unavailable. Please check your connection or try again in a moment.</p>
+            </div>
+          </div>
+        )}
+
+        {/* Validation Error */}
+        {localError && (
+          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6 flex items-start">
+            <AlertTriangle className="h-5 w-5 text-red-600 mr-3 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-red-800 font-medium">Unable to start interview</p>
+              <p className="text-red-700 text-sm mt-1">{localError}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Store-level Error */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
-            <p className="text-red-800">{error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6 flex items-start">
+            <AlertTriangle className="h-5 w-5 text-red-600 mr-3 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-red-800 font-medium">Error</p>
+              <p className="text-red-700 text-sm mt-1">{error}</p>
+            </div>
           </div>
         )}
 
@@ -110,7 +172,7 @@ export const InterviewDashboard = () => {
         <div className="text-center">
           <button
             onClick={handleStartInterview}
-            disabled={!candidateId.trim() || !jobRole || isLoading}
+            disabled={!candidateId.trim() || !jobRole || isLoading || !gatewayAvailable}
             className="inline-flex items-center px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? (
@@ -125,6 +187,9 @@ export const InterviewDashboard = () => {
               </>
             )}
           </button>
+          {!gatewayAvailable && (
+            <p className="text-red-600 text-sm mt-3">Integration service unavailable</p>
+          )}
         </div>
       </div>
 

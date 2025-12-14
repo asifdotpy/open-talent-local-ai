@@ -12,6 +12,10 @@ pydantic>=2.0.0
 dataclasses>=0.6  # Built-in for Python 3.7+
 typing>=3.7.4     # Built-in for Python 3.5+
 
-# Optional: For enhanced functionality
-# ollama>=0.1.0    # If you want to add AI parsing later
-# pandas>=1.5.0    # For data analysis
+# Agent system dependencies
+aiofiles>=24.1.0
+tenacity>=8.2.3
+
+# Logging and monitoring
+structlog>=24.1.0
+

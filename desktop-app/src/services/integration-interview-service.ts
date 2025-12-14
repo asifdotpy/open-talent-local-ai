@@ -5,10 +5,11 @@
  */
 
 import * as IntegrationClient from './integration-service-client';
-import { InterviewService as OllamaInterviewService, InterviewSession, Message } from './interview-service';
+import { InterviewService as OllamaInterviewService } from './interview-service';
+import type { InterviewSession, Message } from './interview-service';
 import { AIProvider } from '../providers/ai/ai-provider.interface';
 
-export { InterviewSession, Message };
+export type { InterviewSession, Message };
 
 export interface ModelInfo {
   id: string;

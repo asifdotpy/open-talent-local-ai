@@ -140,8 +140,30 @@ export const useInterviewStore = create<InterviewState>((set, get) => ({
   createRoom: async (candidateId: string, jobRole: string) => {
     set({ isLoading: true, error: null });
     try {
-      const { interviewAPI } = await import('../services/api');
-      const room = await interviewAPI.createRoom(candidateId, jobRole);
+      const integrationGatewayAPI = await import('../services/integrationGatewayAPI');
+      const session = await integrationGatewayAPI.default.interview.start({
+        role: jobRole,
+        model: 'granite4:350m-h', // Lightweight model for demo
+        totalQuestions: 5
+      });
+
+      // Convert InterviewSession to InterviewRoom for compatibility
+      const room: InterviewRoom = {
+        room_id: `room-${Date.now()}`, // Generate consistent ID
+        candidate_id: candidateId,
+        job_role: jobRole,
+        status: 'created',
+        questions: session.config ? [{
+          id: 'q1',
+          text: 'Awaiting questions...',
+          order: 1
+        }] : [],
+        current_question_index: 0,
+        answers: [],
+        duration: 0,
+        participants: []
+      };
+
       set({
         currentRoom: room,
         currentQuestion: null,
@@ -161,10 +183,24 @@ export const useInterviewStore = create<InterviewState>((set, get) => ({
 
     set({ isLoading: true, error: null });
     try {
-      const { interviewAPI } = await import('../services/api');
-      const updatedRoom = await interviewAPI.beginInterview(currentRoom.room_id);
+      const integrationGatewayAPI = await import('../services/integrationGatewayAPI');
+      
+      // Get the first question from the gateway
+      const session = await integrationGatewayAPI.default.interview.start({
+        role: currentRoom.job_role,
+        model: 'granite4:350m-h', // Lightweight model for demo
+        totalQuestions: 5
+      });
+
+      const firstQuestion: InterviewQuestion = {
+        id: `q-${Date.now()}`,
+        text: session.messages?.[session.messages.length - 1]?.content || 'What are your main strengths?',
+        order: 1
+      };
+
       set({
-        currentRoom: updatedRoom,
+        currentRoom: { ...currentRoom, status: 'in_progress' },
+        currentQuestion: firstQuestion,
         isLoading: false
       });
     } catch (error) {
@@ -181,10 +217,26 @@ export const useInterviewStore = create<InterviewState>((set, get) => ({
 
     set({ isLoading: true, error: null });
     try {
-      const { interviewAPI } = await import('../services/api');
-      const response = await interviewAPI.getNextQuestion(currentRoom.room_id);
+      const integrationGatewayAPI = await import('../services/integrationGatewayAPI');
+      
+      // For now, generate next question based on current question index
+      const questionNum = (currentRoom.current_question_index || 0) + 1;
+      const questions = [
+        "What is your experience with the technologies required for this role?",
+        "Describe a challenging project you worked on and how you handled it.",
+        "What are your career goals for the next 5 years?",
+        "How do you stay updated with industry trends?",
+        "Tell us about a time you had to work in a team with difficult personalities."
+      ];
+
+      const nextQuestion: InterviewQuestion = {
+        id: `q-${questionNum}`,
+        text: questions[questionNum - 1] || "Do you have any questions for us?",
+        order: questionNum
+      };
+
       set({
-        currentQuestion: response.question,
+        currentQuestion: nextQuestion,
         isLoading: false
       });
     } catch (error) {
@@ -201,9 +253,26 @@ export const useInterviewStore = create<InterviewState>((set, get) => ({
 
     set({ isLoading: true, error: null });
     try {
-      const { interviewAPI } = await import('../services/api');
-      await interviewAPI.submitAnswer(currentRoom.room_id, currentQuestion.id, answer);
-      set({ isLoading: false });
+      const integrationGatewayAPI = await import('../services/integrationGatewayAPI');
+      
+      // Store the answer in the current room
+      const updatedAnswers = [
+        ...currentRoom.answers,
+        {
+          question_id: currentQuestion.id,
+          answer: answer,
+          timestamp: new Date().toISOString()
+        }
+      ];
+
+      set({
+        currentRoom: {
+          ...currentRoom,
+          answers: updatedAnswers,
+          current_question_index: (currentRoom.current_question_index || 0) + 1
+        },
+        isLoading: false
+      });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to submit answer',
@@ -218,13 +287,27 @@ export const useInterviewStore = create<InterviewState>((set, get) => ({
 
     set({ isLoading: true, error: null });
     try {
-      const { interviewAPI } = await import('../services/api');
-      const result = await interviewAPI.completeInterview(currentRoom.room_id);
+      const integrationGatewayAPI = await import('../services/integrationGatewayAPI');
+      
+      // Mock result - in production, this would come from the gateway
+      const result: InterviewResult = {
+        room_id: currentRoom.room_id,
+        candidate_id: currentRoom.candidate_id,
+        job_role: currentRoom.job_role,
+        total_questions: 5,
+        completed_questions: currentRoom.answers.length,
+        average_response_length: currentRoom.answers.reduce((sum, a) => sum + a.answer.length, 0) / (currentRoom.answers.length || 1),
+        completion_rate: (currentRoom.answers.length / 5) * 100,
+        assessment_score: 85,
+        feedback: 'Good performance overall. Consider elaborating more on technical details.'
+      };
+
       set({
         currentRoom: { ...currentRoom, status: 'completed' },
         currentQuestion: null,
         isLoading: false
       });
+
       return result;
     } catch (error) {
       set({
@@ -241,8 +324,34 @@ export const useInterviewStore = create<InterviewState>((set, get) => ({
 
     set({ isLoading: true, error: null });
     try {
-      const { interviewAPI } = await import('../services/api');
-      const results = await interviewAPI.getInterviewResults(currentRoom.room_id);
+      // Mock results - in production, this would come from the gateway
+      const results: AssessmentResult[] = [
+        {
+          category: 'Technical Knowledge',
+          score: 85,
+          maxScore: 100,
+          feedback: 'Strong technical understanding demonstrated',
+          strengths: ['Problem-solving', 'System design'],
+          improvements: ['Depth in specific domains']
+        },
+        {
+          category: 'Communication',
+          score: 78,
+          maxScore: 100,
+          feedback: 'Clear communication with room for improvement',
+          strengths: ['Clarity', 'Structure'],
+          improvements: ['More concise responses', 'Better examples']
+        },
+        {
+          category: 'Experience',
+          score: 82,
+          maxScore: 100,
+          feedback: 'Relevant experience for the role',
+          strengths: ['Project experience', 'Team collaboration'],
+          improvements: ['Leadership experience']
+        }
+      ];
+
       set({ isLoading: false });
       return results;
     } catch (error) {

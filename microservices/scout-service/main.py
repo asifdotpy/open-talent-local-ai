@@ -4,6 +4,7 @@ import json
 import os
 import re
 from dataclasses import dataclass, asdict
+from datetime import datetime
 from typing import List, Optional, Dict, Any
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Depends
@@ -645,12 +646,34 @@ class GitHubTalentScout:
 # FastAPI App
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
+    # Startup - GitHubTalentScout
     finder = GitHubTalentScout()
     await finder.init_session()
     app.state.finder = finder
+    
+    # Startup - Agent System
+    agents_path = os.getenv("AGENT_DISCOVERY_PATH", "/home/asif1/open-talent/agents")
+    registry = get_agent_registry(agents_path=agents_path)
+    await registry.init_session()
+    await registry.discover_agents()
+    await registry.start_health_monitoring()
+    app.state.agent_registry = registry
+    app.state.agent_router = AgentRouter(registry)
+    app.state.health_monitor = HealthMonitor(registry)
+    
+    print("\n" + "="*70)
+    print("AGENT SYSTEM INITIALIZED")
+    print("="*70)
+    print(f"✓ Discovered {len(registry.get_all_agents())} agents")
+    print(f"✓ Health monitoring started")
+    print(f"✓ Agent API endpoints available at /agents/*")
+    print("="*70 + "\n")
+    
     yield
+    
     # Shutdown
+    await registry.stop_health_monitoring()
+    await registry.close_session()
     await finder.close_session()
 
 # Deprecated alias for backward compatibility
@@ -914,13 +937,301 @@ async def main():
             print(f"With LinkedIn: {sum(1 for c in candidates if c.linkedin_url)}")
             print(f"With social links: {sum(1 for c in candidates if c.linkedin_url or c.twitter_url or c.website_url)}")
             print(f"{'='*70}\n")
-
+    except Exception as e:
+        print(f"[ERROR] Search failed: {str(e)}")
+        import traceback
+        traceback.print_exc()
     finally:
-        await finder.close_session()
+        await finder.session.close()
+
+
+# ============================
+# Agent Integration (New - December 13, 2025)
+# ============================
+
+from agent_registry import AgentRegistry, AgentStatus, get_agent_registry
+from agent_health import HealthMonitor, HealthReport
+from agent_routes import AgentRouter, AgentRequest, AgentResponse, MultiAgentResponse
+import os
+
+# ============================
+# Agent API Endpoints
+# ============================
+
+@app.get("/agents/registry")
+async def get_agents_registry(
+    capability: Optional[str] = None,
+    status: Optional[str] = None
+):
+    """
+    Get agent registry with optional filtering
+    
+    Query Parameters:
+    - capability: Filter agents by capability (e.g., 'search', 'enrichment')
+    - status: Filter agents by status (e.g., 'healthy', 'unreachable')
+    
+    Returns list of all agents with metadata
+    """
+    try:
+        registry = app.state.agent_registry
+        
+        agents = registry.get_all_agents()
+        
+        # Filter by capability
+        if capability:
+            agents = [a for a in agents if capability in a.capabilities]
+        
+        # Filter by status
+        if status:
+            agents = [a for a in agents if a.status == status]
+        
+        return {
+            "total_agents": len(agents),
+            "agents": agents,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Registry lookup failed: {str(e)}")
+
+@app.get("/agents/health")
+async def get_agents_health() -> HealthReport:
+    """
+    Get comprehensive health report for all agents
+    
+    Returns overall system health and individual agent statuses
+    """
+    try:
+        monitor = app.state.health_monitor
+        report = await monitor.perform_health_check()
+        return report
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Health check failed: {str(e)}")
+
+@app.get("/agents/{agent_name}")
+async def get_agent_info(agent_name: str):
+    """Get detailed information about a specific agent"""
+    try:
+        registry = app.state.agent_registry
+        agent = registry.get_agent(agent_name)
+        
+        if not agent:
+            raise HTTPException(status_code=404, detail=f"Agent '{agent_name}' not found")
+        
+        return agent
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Lookup failed: {str(e)}")
+
+@app.post("/agents/call")
+async def call_agent_endpoint(request: AgentRequest) -> AgentResponse:
+    """
+    Call an agent endpoint directly
+    
+    Request body:
+    - agent_name: Name of the target agent
+    - endpoint: API endpoint (e.g., "/search", "/health")
+    - method: HTTP method (GET, POST, etc.)
+    - payload: Request payload (optional)
+    - params: Query parameters (optional)
+    """
+    try:
+        router = app.state.agent_router
+        
+        if not request.agent_name:
+            raise HTTPException(status_code=400, detail="agent_name is required")
+        
+        response = await router.route_to_agent(
+            agent_name=request.agent_name,
+            endpoint=request.endpoint,
+            method=request.method,
+            payload=request.payload,
+            params=request.params
+        )
+        
+        return response
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Agent call failed: {str(e)}")
+
+@app.post("/agents/search-multi")
+async def search_across_agents(request: SearchRequest) -> Dict[str, Any]:
+    """
+    Execute search across all search-capable agents
+    
+    Queries multiple agents in parallel and aggregates results
+    """
+    try:
+        router = app.state.agent_router
+        
+        results = await router.route_search_request(
+            query=request.query,
+            location=request.location,
+            max_results=request.max_results
+        )
+        
+        return results
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Multi-agent search failed: {str(e)}")
+
+@app.post("/agents/capability/{capability}")
+async def route_by_capability(
+    capability: str,
+    endpoint: str,
+    method: str = "POST",
+    payload: Optional[Dict] = None
+) -> MultiAgentResponse:
+    """
+    Route request to all agents with specific capability
+    
+    Path Parameters:
+    - capability: Required capability (e.g., 'search', 'enrichment')
+    
+    Query Parameters:
+    - endpoint: Target endpoint
+    - method: HTTP method
+    - payload: Request payload (optional)
+    """
+    try:
+        router = app.state.agent_router
+        
+        response = await router.route_by_capability(
+            capability=capability,
+            endpoint=endpoint,
+            method=method,
+            payload=payload,
+            healthy_only=True
+        )
+        
+        return response
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Routing failed: {str(e)}")
+
+# ============================
+# Enhanced Endpoints with Agent Support
+# ============================
+
+@app.post("/search/multi-agent")
+async def search_multi_agent(
+    request: SearchRequest,
+    finder: GitHubTalentScout = Depends(get_finder)
+) -> Dict[str, Any]:
+    """
+    Enhanced search using multiple agents
+    
+    This endpoint:
+    1. Performs GitHub search directly (scout-service)
+    2. Routes search to market-intelligence-agent for insights
+    3. Routes to data-enrichment-agent for enrichment
+    4. Aggregates results from all sources
+    """
+    try:
+        router = app.state.agent_router
+        
+        # Perform local search
+        local_candidates = await finder.search_github_candidates(
+            user_query=request.query,
+            location=request.location,
+            max_results=request.max_results,
+            use_ai_formatting=request.use_ai_formatting
+        )
+
+        # Route to multi-agent search for additional insights
+        agent_results = await router.route_search_request(
+            query=request.query,
+            location=request.location,
+            max_results=request.max_results
+        )
+
+        # Combine results (local + agent-sourced)
+        combined_candidates = []
+        seen_urls = set()
+
+        # Add local results first
+        for candidate in local_candidates:
+            if candidate.profile_url not in seen_urls:
+                seen_urls.add(candidate.profile_url)
+                combined_candidates.append(asdict(candidate))
+
+        # Add agent results
+        for candidate in agent_results.get("candidates", []):
+            url = candidate.get("profile_url")
+            if url not in seen_urls:
+                seen_urls.add(url)
+                combined_candidates.append(candidate)
+
+        return SearchResponse(
+            candidates=[CandidateResponse(**c) if isinstance(c, dict) else c 
+                       for c in combined_candidates[:request.max_results]],
+            total_found=len(combined_candidates),
+            search_query=request.query,
+            location=request.location
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Multi-agent search failed: {str(e)}")
+
+# ============================
+# Updated Health Endpoint
+# ============================
+
+@app.get("/health/full")
+async def full_system_health():
+    """
+    Get comprehensive system health including all agents
+    """
+    try:
+        monitor = app.state.health_monitor
+        registry = app.state.agent_registry
+        
+        health_report = await monitor.perform_health_check()
+        
+        # Check if critical agents are healthy
+        critical_agents = ["interview-agent", "scout-coordinator-agent", "data-enrichment-agent"]
+        critical_health = all(
+            registry.get_agent(name).status == AgentStatus.HEALTHY 
+            for name in critical_agents
+            if registry.get_agent(name)
+        )
+        
+        return {
+            "status": "healthy" if health_report.health_percentage >= 80 else "degraded",
+            "timestamp": datetime.now().isoformat(),
+            "critical_agents_healthy": critical_health,
+            "overall_health_percentage": health_report.health_percentage,
+            "agents_summary": {
+                "total": health_report.total_agents,
+                "healthy": health_report.healthy_agents,
+                "unhealthy": health_report.unhealthy_agents,
+                "unreachable": health_report.unreachable_agents,
+                "unknown": health_report.unknown_agents
+            },
+            "agent_details": [
+                {
+                    "name": agent.name,
+                    "status": agent.status,
+                    "port": agent.port,
+                    "capabilities": agent.capabilities,
+                    "last_check": agent.last_health_check.isoformat() if agent.last_health_check else None
+                }
+                for agent in health_report.agents
+            ]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Health check failed: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
     print("Starting FastAPI server...")
     print("API will be available at: http://localhost:8000")
     print("API documentation at: http://localhost:8000/docs")
+    print("Agent endpoints: http://localhost:8000/agents/*")
     uvicorn.run(app, host="0.0.0.0", port=8000)
