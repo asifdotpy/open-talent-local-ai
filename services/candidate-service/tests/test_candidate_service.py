@@ -8,6 +8,7 @@ Purpose: Candidate management, applications, profiles
 import pytest
 import httpx
 from typing import Dict, Any
+import time
 
 
 @pytest.fixture
@@ -27,8 +28,9 @@ def auth_headers():
 
 @pytest.fixture
 def candidate_data() -> Dict[str, Any]:
+    timestamp = int(time.time() * 1000)
     return {
-        "email": "candidate@example.com",
+        "email": f"candidate+{timestamp}@example.com",
         "first_name": "John",
         "last_name": "Candidate",
         "phone": "+1234567890",
