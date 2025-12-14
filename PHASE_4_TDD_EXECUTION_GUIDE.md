@@ -19,7 +19,7 @@ All 14 OpenTalent microservices now have complete pytest test suites written fol
 
 ### ✅ Notification Service (Port 8011)
 - **Status:** ✅ Implementation exists + Tests complete
-- **Test file:** `services/notification-service/tests/test_notification_service.py`
+- **Test file (canonical):** `services/notification-service/tests/test_notification_service.py`
 - **Test count:** 47 tests
 - **Test classes:** 8
 - **Coverage:**
@@ -35,7 +35,7 @@ All 14 OpenTalent microservices now have complete pytest test suites written fol
 
 ### ✅ Security Service (Port 8010)
 - **Status:** Tests ready for implementation
-- **Test file:** `services/security-service/tests/test_security_service.py`
+- **Test file (canonical):** `services/security-service/tests/test_security_service.py`
 - **Test count:** 43 tests
 - **Test classes:** 10
 - **Coverage:**
@@ -51,7 +51,7 @@ All 14 OpenTalent microservices now have complete pytest test suites written fol
 
 ### ✅ User Service (Port 8007)
 - **Status:** Tests ready for implementation
-- **Test file:** `services/user-service/tests/test_user_service.py`
+- **Test file (canonical):** `services/user-service/tests/test_user_service.py`
 - **Test count:** 42 tests
 - **Test classes:** 8
 - **Coverage:**
@@ -65,47 +65,47 @@ All 14 OpenTalent microservices now have complete pytest test suites written fol
   - Integration scenarios
 
 ### ✅ Candidate Service (Port 8008)
-- **Test file:** `services/candidate-service/tests/test_candidate_service.py`
+- **Test file (canonical):** `services/candidate-service/tests/test_candidate_service.py`
 - **Test count:** 18 tests
 
 ### ✅ Interview Service (Port 8006)
-- **Test file:** `services/interview-service/tests/test_interview_service.py`
+- **Test file (canonical):** `services/interview-service/tests/test_interview_service.py`
 - **Test count:** 16 tests
 
 ### ✅ Granite Interview Service (Port 8005)
-- **Test file:** `services/granite-interview-service/tests/test_granite_interview_service.py`
+- **Test file (canonical):** `services/granite-interview-service/tests/test_granite_interview_service.py`
 - **Test count:** 18 tests
 
 ### ✅ Conversation Service (Port 8014)
-- **Test file:** `services/conversation-service/tests/test_conversation_service.py`
+- **Test file (canonical):** `services/conversation-service/tests/test_conversation_service.py`
 - **Test count:** 14 tests
 
 ### ✅ Voice Service (Port 8015)
-- **Test file:** `services/voice-service/tests/test_voice_service.py`
+- **Test file (canonical):** `services/voice-service/tests/test_voice_service.py`
 - **Test count:** 10 tests
 
 ### ✅ Avatar Service (Port 8016)
-- **Test file:** `services/avatar-service/tests/test_avatar_service.py`
+- **Test file (canonical):** `services/avatar-service/tests/test_avatar_service.py`
 - **Test count:** 20 tests
 
 ### ✅ Analytics Service (Port 8017)
-- **Test file:** `services/analytics-service/tests/test_analytics_service.py`
+- **Test file (canonical):** `services/analytics-service/tests/test_analytics_service.py`
 - **Test count:** 10 tests
 
 ### ✅ Scout Service (Port 8010)
-- **Test file:** `services/scout-service/tests/test_scout_service.py`
+- **Test file (canonical):** `services/scout-service/tests/test_scout_service.py`
 - **Test count:** 8 tests
 
 ### ✅ AI Auditing Service (Port 8012)
-- **Test file:** `services/ai-auditing-service/tests/test_ai_auditing_service.py`
+- **Test file (canonical):** `services/ai-auditing-service/tests/test_ai_auditing_service.py`
 - **Test count:** 10 tests
 
 ### ✅ Explainability Service (Port 8013)
-- **Test file:** `services/explainability-service/tests/test_explainability_service.py`
+- **Test file (canonical):** `services/explainability-service/tests/test_explainability_service.py`
 - **Test count:** 10 tests
 
 ### ✅ Desktop Integration Service (Port 8009)
-- **Test file:** `services/desktop-integration-service/tests/test_desktop_integration_service.py`
+- **Test file (canonical):** `microservices/desktop-integration-service/tests/test_service_registry.py`
 - **Test count:** 8 tests
 
 ## Installation & Setup
@@ -123,7 +123,8 @@ pip install pytest pytest-asyncio httpx
 
 All test files are in place:
 ```bash
-find services/ -name "test_*.py" -type f
+ find services/ -name "test_*.py" -type f
+ find microservices/desktop-integration-service/tests -name "test_*.py" -type f
 ```
 
 Should show 14 test files (one per service).
@@ -173,19 +174,19 @@ pytest services/{service-name}/tests/ -v
 
 ```bash
 # Email notification tests
-pytest services/notification-service/tests/test_notification_service.py::TestEmailNotifications -v
+ pytest services/notification-service/tests/test_notification_service.py::TestEmailNotifications -v
 
 # Security authentication tests
-pytest services/security-service/tests/test_security_service.py::TestAuthentication -v
+ pytest services/security-service/tests/test_security_service.py::TestAuthentication -v
 
 # User CRUD tests
-pytest services/user-service/tests/test_user_service.py::TestUserCreation -v
+ pytest services/user-service/tests/test_user_service.py::TestUserCreation -v
 ```
 
 ### Run Specific Test Methods
 
 ```bash
-pytest services/notification-service/tests/test_notification_service.py::TestEmailNotifications::test_send_email_success -v
+ pytest services/notification-service/tests/test_notification_service.py::TestEmailNotifications::test_send_email_success -v
 ```
 
 ### Run Tests with Filters
@@ -251,11 +252,11 @@ For each service:
 Example for User Service:
 ```bash
 # Test just creation tests first
-pytest services/user-service/tests/test_user_service.py::TestUserCreation -v
+ pytest services/user-service/tests/test_user_service.py::TestUserCreation -v
 
 # Implement User.create() to pass these tests
 # Then test retrieval
-pytest services/user-service/tests/test_user_service.py::TestUserRetrieval -v
+ pytest services/user-service/tests/test_user_service.py::TestUserRetrieval -v
 
 # Continue with each test class
 ```
@@ -265,7 +266,7 @@ pytest services/user-service/tests/test_user_service.py::TestUserRetrieval -v
 Each test suite contains these test classes:
 
 ```
-test_{service}_service.py
+ test_{service}_service.py
 ├── TestServiceBasics (health check, root endpoint)
 ├── Test{Feature1} (core functionality)
 ├── Test{Feature2} (related functionality)
@@ -276,7 +277,7 @@ test_{service}_service.py
 
 Example - User Service:
 ```
-test_user_service.py
+ test_user_service.py
 ├── TestUserServiceBasics (2 tests)
 ├── TestUserCreation (3 tests)
 ├── TestUserRetrieval (5 tests)
@@ -450,7 +451,17 @@ jobs:
    - Begin with login/registration endpoints
    - Run tests after each feature:
      ```bash
-     pytest services/security-service/tests/test_security_service.py::TestAuthentication -v
+   pytest services/security-service/tests/test_security_service.py::TestAuthentication -v
+
+### Desktop Integration Service (Canonical Path)
+
+- **Run service registry tests:**
+  - `pytest microservices/desktop-integration-service/tests/test_service_registry.py -v`
+  - `pytest microservices/desktop-integration-service/test_endpoints.py -v`
+
+### Central Validator
+
+- **Connectivity/OpenAPI/Core endpoints:** `pytest tests/test_api_inventory_validation.py -v`
      ```
 
 3. **Continue with User Service**

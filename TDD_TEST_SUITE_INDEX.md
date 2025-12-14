@@ -10,20 +10,27 @@ All 14 microservices now have comprehensive pytest test suites written **BEFORE 
 
 | # | Service | Port | Test File | Status | Test Cases | Focus Areas |
 |---|---------|------|-----------|--------|-----------|-------------|
-| 1 | **Notification** | 8011 | `test_notification_service.py` | ✅ Tests + Implementation | 47 | Email/SMS/Push, Templates, Fallback |
-| 2 | **Security** | 8010 | `test_security_service.py` | ✅ Tests READY | 43 | Auth, MFA, Permissions, Encryption |
-| 3 | **User** | 8007 | `test_user_service.py` | ✅ Tests READY | 42 | CRUD, Profiles, Preferences, Contact |
-| 4 | **Candidate** | 8008 | `test_candidate_service.py` | ✅ Tests READY | 18 | Profiles, Applications, Skills |
-| 5 | **Interview** | 8006 | `test_interview_service.py` | ✅ Tests READY | 16 | Scheduling, Feedback, Management |
-| 6 | **Granite Interview** | 8005 | `test_granite_interview_service.py` | ✅ Tests READY | 18 | Questions, Scoring, Analysis |
-| 7 | **Conversation** | 8014 | `test_conversation_service.py` | ✅ Tests READY | 14 | Messages, History, Management |
-| 8 | **Voice** | 8015 | `test_voice_service.py` | ✅ Tests READY | 10 | TTS, Voices, Audio Modulation |
-| 9 | **Avatar** | 8016 | `test_avatar_service.py` | ✅ Tests READY | 20 | Customization, Animation, Lip-Sync |
-| 10 | **Analytics** | 8017 | `test_analytics_service.py` | ✅ Tests READY | 10 | Metrics, Reporting, Stats |
-| 11 | **Scout** | 8010 | `test_scout_service.py` | ✅ Tests READY | 8 | Search, Sourcing, Match Scoring |
-| 12 | **AI Auditing** | 8012 | `test_ai_auditing_service.py` | ✅ Tests READY | 10 | Bias Detection, Compliance |
-| 13 | **Explainability** | 8013 | `test_explainability_service.py` | ✅ Tests READY | 10 | Decision Explanation, Transparency |
-| 14 | **Desktop Integration** | 8009 | `test_desktop_integration_service.py` | ✅ Tests READY | 8 | Service Coordination, Config |
+| 1 | **Notification** | 8011 | `services/notification-service/tests/test_notification_service.py` | ✅ Tests + Implementation | 47 | Email/SMS/Push, Templates, Fallback |
+| 2 | **Security** | 8010 | `services/security-service/tests/test_security_service.py` | ✅ Tests READY | 43 | Auth, MFA, Permissions, Encryption |
+| 3 | **User** | 8007 | `services/user-service/tests/test_user_service.py` | ✅ Tests READY | 42 | CRUD, Profiles, Preferences, Contact |
+| 4 | **Candidate** | 8008 | `services/candidate-service/tests/test_candidate_service.py` | ✅ Tests READY | 18 | Profiles, Applications, Skills |
+| 5 | **Interview** | 8006 | `services/interview-service/tests/test_interview_service.py` | ✅ Tests READY | 16 | Scheduling, Feedback, Management |
+| 6 | **Granite Interview** | 8005 | `services/granite-interview-service/tests/test_granite_interview_service.py` | ✅ Tests READY | 18 | Questions, Scoring, Analysis |
+| 7 | **Conversation** | 8014 | `services/conversation-service/tests/test_conversation_service.py` | ✅ Tests READY | 14 | Messages, History, Management |
+| 8 | **Voice** | 8015 | `services/voice-service/tests/test_voice_service.py` | ✅ Tests READY | 10 | TTS, Voices, Audio Modulation |
+| 9 | **Avatar** | 8016 | `services/avatar-service/tests/test_avatar_service.py` | ✅ Tests READY | 20 | Customization, Animation, Lip-Sync |
+| 10 | **Analytics** | 8017 | `services/analytics-service/tests/test_analytics_service.py` | ✅ Tests READY | 10 | Metrics, Reporting, Stats |
+| 11 | **Scout** | 8010 | `services/scout-service/tests/test_scout_service.py` | ✅ Tests READY | 8 | Search, Sourcing, Match Scoring |
+| 12 | **AI Auditing** | 8012 | `services/ai-auditing-service/tests/test_ai_auditing_service.py` | ✅ Tests READY | 10 | Bias Detection, Compliance |
+| 13 | **Explainability** | 8013 | `services/explainability-service/tests/test_explainability_service.py` | ✅ Tests READY | 10 | Decision Explanation, Transparency |
+| 14 | **Desktop Integration** | 8009 | `microservices/desktop-integration-service/tests/test_service_registry.py` (canonical) | ✅ Tests READY | 25+ | Service Registry + Endpoints |
+
+Canonical Test Paths (Hybrid)
+
+- Central Validator: `tests/test_api_inventory_validation.py`
+- Canonical per-service (mature): `microservices/<service>/tests` (e.g., `microservices/desktop-integration-service/tests/test_service_registry.py`)
+- New TDD suites (where missing): `services/<service>/tests/test_<service>_service.py`
+- Utility scripts excluded from pytest: `services/notification-service/test_harness.py`
 
 **Total Test Cases Written:** 294 tests across all 14 services
 
