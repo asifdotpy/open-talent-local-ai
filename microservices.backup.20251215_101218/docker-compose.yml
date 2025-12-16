@@ -1,0 +1,305 @@
+version: '3.8'
+
+services:
+  # Ollama Service for AI Models (Start First)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: talent-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    command: ollama serve
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # Conversation Service - Port 8002 (Python 3.13)
+  conversation-service:
+    build:
+      context: conversation-service
+      dockerfile: Dockerfile
+    container_name: talent-conversation-service
+    ports:
+      - "8002:80"
+    environment:
+      - PYTHONPATH=/app
+      - OLLAMA_HOST=http://ollama:11434
+    depends_on:
+      ollama:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - talentai-network
+
+  # Voice Service - Port 8003 (Python 3.12)
+  voice-service:
+    build:
+      context: voice-service
+      dockerfile: Dockerfile
+    container_name: talent-voice-service
+    ports:
+      - "8003:8003"
+    environment:
+      - PYTHONPATH=/app
+      - AUDIO_DEVICE_INDEX=0
+    volumes:
+      - voice_models:/app/models
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - talentai-network
+
+  # Avatar Service - Port 8004 (Python 3.12)
+  avatar-service:
+    build:
+      context: avatar-service
+      dockerfile: Dockerfile
+    container_name: talent-avatar-service
+    ports:
+      - "8004:80"
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - avatar_models:/app/models
+      - avatar_assets:/app/app/assets
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - talentai-network
+
+  # Interview Service - Port 8005 (Python 3.13)
+  interview-service:
+    build:
+      context: interview-service
+      dockerfile: Dockerfile
+    container_name: talent-interview-service
+    ports:
+      - "8005:80"
+    environment:
+      - PYTHONPATH=/app
+    depends_on:
+      - conversation-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - talentai-network
+
+  # Scout Service - Port 8000 (Python 3.13)
+  scout-service:
+    build:
+      context: scout-service
+      dockerfile: Dockerfile
+    container_name: talent-scout-service
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - talentai-network
+
+  # User Service - Port 8001 (Python 3.13)
+  user-service:
+    build:
+      context: user-service
+      dockerfile: Dockerfile
+    container_name: talent-user-service
+    ports:
+      - "8001:80"
+    environment:
+      - PYTHONPATH=/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - talentai-network
+
+  # Candidate Service - Port 8006 (Python 3.13)
+  candidate-service:
+    build:
+      context: candidate-service
+      dockerfile: Dockerfile
+    container_name: talent-candidate-service
+    ports:
+      - "8006:8000"
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - candidate_data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - talentai-network
+
+  # Analytics Service - Port 8007 (Python 3.13)
+  analytics-service:
+    build:
+      context: analytics-service
+      dockerfile: Dockerfile
+    container_name: talent-analytics-service
+    ports:
+      - "8007:80"
+    environment:
+      - PYTHONPATH=/app
+      - PORT=80
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - talentai-network
+
+  # Desktop Integration Service - Port 8009 (Gateway) (Python 3.13)
+  desktop-integration-service:
+    build:
+      context: desktop-integration-service
+      dockerfile: Dockerfile
+    container_name: talent-desktop-integration
+    ports:
+      - "8009:8009"
+    environment:
+      - PYTHONPATH=/app
+      - OLLAMA_HOST=http://ollama:11434
+      - CONVERSATION_SERVICE_URL=http://conversation-service:80
+      - VOICE_SERVICE_URL=http://voice-service:8003
+      - AVATAR_SERVICE_URL=http://avatar-service:80
+      - INTERVIEW_SERVICE_URL=http://interview-service:80
+      - SCOUT_SERVICE_URL=http://scout-service:8000
+      - USER_SERVICE_URL=http://user-service:80
+      - CANDIDATE_SERVICE_URL=http://candidate-service:8000
+      - ANALYTICS_SERVICE_URL=http://analytics-service:80
+    depends_on:
+      - ollama
+      - conversation-service
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8009/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - talentai-network
+
+  # Security Service - Port 8010 (Python 3.13)
+  security-service:
+    build:
+      context: security-service
+      dockerfile: Dockerfile
+    container_name: talent-security-service
+    ports:
+      - "8010:80"
+    environment:
+      - PYTHONPATH=/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - talentai-network
+
+  # Notification Service - Port 8011 (Python 3.13)
+  notification-service:
+    build:
+      context: notification-service
+      dockerfile: Dockerfile
+    container_name: talent-notification-service
+    ports:
+      - "8011:80"
+    environment:
+      - PYTHONPATH=/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - talentai-network
+
+  # AI Auditing Service - Port 8012 (Python 3.13)
+  ai-auditing-service:
+    build:
+      context: ai-auditing-service
+      dockerfile: Dockerfile
+    container_name: talent-ai-auditing-service
+    ports:
+      - "8012:80"
+    environment:
+      - PYTHONPATH=/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - talentai-network
+
+  # Explainability Service - Port 8013 (Python 3.13)
+  explainability-service:
+    build:
+      context: explainability-service
+      dockerfile: Dockerfile
+    container_name: talent-explainability-service
+    ports:
+      - "8013:80"
+    environment:
+      - PYTHONPATH=/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - talentai-network
+
+volumes:
+  voice_models:
+  avatar_models:
+  avatar_assets:
+  ollama_data:
+  candidate_data:
+
+networks:
+  talentai-network:
+    driver: bridge

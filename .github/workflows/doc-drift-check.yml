@@ -1,0 +1,27 @@
+name: Doc Drift Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  drift-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps (none required)
+        run: |
+          python --version
+      - name: Run scanner
+        run: |
+          python scripts/scan_endpoints.py > scan_output.md
+      - name: Check doc drift
+        run: |
+          python scripts/check_doc_drift.py

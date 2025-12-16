@@ -3,7 +3,8 @@ Security Service - Authentication, Authorization, Permissions, MFA, Encryption
 Port: 8010
 """
 
-from fastapi import FastAPI, Depends, Body, HTTPException, status, Header
+from fastapi import FastAPI, Depends, Body, HTTPException, status, Header, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import Dict, Any, Optional
 import json
@@ -11,8 +12,38 @@ import jwt
 import secrets
 from datetime import datetime, timedelta
 from hashlib import sha256
+import os
+import bcrypt
 import base64
 from cryptography.fernet import Fernet
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+
+# Ensure local imports work when loaded via spec_from_file_location
+import sys as _sys
+_this_dir = os.path.dirname(__file__)
+if _this_dir not in _sys.path:
+    _sys.path.append(_this_dir)
+
+# Pydantic schemas
+from schemas import (
+    LoginRequest,
+    RegisterRequest,
+    TokenVerifyRequest,
+    TokenRefreshRequest,
+    ProfileResponse,
+    MFAVerifyRequest,
+    PermissionCheckRequest,
+    EncryptRequest,
+    DecryptRequest,
+    ChangePasswordRequest,
+    PasswordResetRequest,
+    PasswordResetWithTokenRequest,
+    AssignRoleRequest,
+    RevokeRoleRequest,
+)
 
 app = FastAPI(title="Security Service", version="1.0.0")
 
@@ -20,7 +51,18 @@ app = FastAPI(title="Security Service", version="1.0.0")
 # CONFIGURATION & CONSTANTS
 # ============================================================================
 
-SECRET_KEY = "your-secret-key-change-in-production"
+# Load secrets and security configs from environment (dev-safe defaults)
+SECRET_KEY = os.environ.get("SECURITY_SECRET_KEY", "DEV_ONLY_INSECURE_SECRET_CHANGE_ME")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+PASSWORD_MIN_LENGTH = 8
+RATE_LIMIT_ENABLED = os.environ.get("RATE_LIMIT_ENABLED", "true").lower() == "true"
+RATE_LIMIT_RULE = os.environ.get("RATE_LIMIT_RULE", "5/minute")
+ALLOWED_ORIGINS = [o.strip() for o in os.environ.get("CORS_ALLOW_ORIGINS", "*").split(",")]
+
+# bcrypt configuration
+BCRYPT_ROUNDS = int(os.environ.get("BCRYPT_ROUNDS", "12"))
+PEPPER = os.environ.get("PEPPER", "")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 PASSWORD_MIN_LENGTH = 8
@@ -29,6 +71,7 @@ PASSWORD_MIN_LENGTH = 8
 users_db: Dict[str, Dict[str, Any]] = {
     "user@example.com": {
         "email": "user@example.com",
+        # Legacy SHA256 hash for default user; will be migrated to bcrypt on first successful login
         "password_hash": sha256("SecurePassword123!".encode()).hexdigest(),
         "first_name": "Test",
         "last_name": "User",
@@ -46,13 +89,24 @@ sessions_db: Dict[str, Dict[str, Any]] = {}  # Active sessions
 # HELPER FUNCTIONS
 # ============================================================================
 
+def _is_bcrypt(hash_value: str) -> bool:
+    return hash_value.startswith("$2a$") or hash_value.startswith("$2b$") or hash_value.startswith("$2y$")
+
 def hash_password(password: str) -> str:
-    """Hash a password using SHA256"""
-    return sha256(password.encode()).hexdigest()
+    """Hash a password using bcrypt (with optional pepper)."""
+    pw = (password + PEPPER).encode()
+    salt = bcrypt.gensalt(rounds=BCRYPT_ROUNDS)
+    return bcrypt.hashpw(pw, salt).decode()
 
 def verify_password(password: str, hash_value: str) -> bool:
-    """Verify password against hash"""
-    return hash_password(password) == hash_value
+    """Verify password against hash; supports bcrypt and legacy SHA256 for migration."""
+    if _is_bcrypt(hash_value):
+        try:
+            return bcrypt.checkpw((password + PEPPER).encode(), hash_value.encode())
+        except ValueError:
+            return False
+    # Legacy fallback (no pepper involved in legacy)
+    return sha256(password.encode()).hexdigest() == hash_value
 
 def create_access_token(email: str, expires_delta: Optional[timedelta] = None) -> str:
     """Create JWT access token"""
@@ -116,6 +170,26 @@ def is_valid_email(email: str) -> bool:
     """Basic email validation"""
     return "@" in email and "." in email.split("@")[1]
 
+# ==========================================================================
+# CORS & Rate Limiting Setup
+# ==========================================================================
+
+# CORS configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS if ALLOWED_ORIGINS != ["*"] else ["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
+# Rate limiter
+limiter = Limiter(key_func=get_remote_address) if RATE_LIMIT_ENABLED else None
+if limiter:
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(status_code=429, content={"error": "Too many requests"}))
+    app.add_middleware(SlowAPIMiddleware)
+
 # ============================================================================
 # ROOT & HEALTH ENDPOINTS
 # ============================================================================
@@ -135,12 +209,13 @@ async def health():
 # ============================================================================
 
 @app.post("/api/v1/auth/register")
-async def register(payload: dict = Body(...)):
+@limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
+async def register(request: Request, payload: RegisterRequest = Body(...)):
     """Register a new user"""
-    email = payload.get("email", "").strip()
-    password = payload.get("password", "").strip()
-    first_name = payload.get("first_name", "").strip()
-    last_name = payload.get("last_name", "").strip()
+    email = payload.email.strip()
+    password = payload.password.strip()
+    first_name = (payload.first_name or "").strip()
+    last_name = (payload.last_name or "").strip()
     
     # Validate inputs
     if not email or not password:
@@ -187,10 +262,11 @@ async def register(payload: dict = Body(...)):
     )
 
 @app.post("/api/v1/auth/login")
-async def login(payload: dict = Body(...)):
+@limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
+async def login(request: Request, payload: LoginRequest = Body(...)):
     """Login and get access token"""
-    email = payload.get("email", "").strip()
-    password = payload.get("password", "").strip()
+    email = payload.email.strip()
+    password = payload.password.strip()
     
     # Validate inputs
     if not email or not password:
@@ -214,6 +290,10 @@ async def login(payload: dict = Body(...)):
             status_code=401,
             content={"error": "Invalid credentials"}
         )
+
+    # If legacy SHA256 was used, migrate to bcrypt transparently after successful login
+    if not _is_bcrypt(user["password_hash"]):
+        user["password_hash"] = hash_password(password)
     
     # Create tokens
     access_token = create_access_token(email)
@@ -246,9 +326,9 @@ async def logout(current_user: Optional[str] = Depends(get_current_user)):
     )
 
 @app.post("/api/v1/auth/verify")
-async def verify(payload: dict = Body(...)):
+async def verify(payload: TokenVerifyRequest = Body(...)):
     """Verify if token is valid"""
-    token = payload.get("token")
+    token = payload.token
     
     if not token:
         return JSONResponse(
@@ -269,9 +349,9 @@ async def verify(payload: dict = Body(...)):
     )
 
 @app.post("/api/v1/auth/refresh")
-async def refresh(payload: dict = Body(...)):
+async def refresh(payload: TokenRefreshRequest = Body(...)):
     """Refresh access token"""
-    refresh_token = payload.get("refresh_token")
+    refresh_token = payload.refresh_token
     
     if not refresh_token:
         return JSONResponse(
@@ -370,7 +450,7 @@ async def setup_mfa(current_user: Optional[str] = Depends(get_current_user)):
     )
 
 @app.post("/api/v1/auth/mfa/verify")
-async def verify_mfa(payload: dict = Body(...), current_user: Optional[str] = Depends(get_current_user)):
+async def verify_mfa(payload: MFAVerifyRequest = Body(...), current_user: Optional[str] = Depends(get_current_user)):
     """Verify MFA code"""
     email = current_user
     
@@ -380,7 +460,7 @@ async def verify_mfa(payload: dict = Body(...), current_user: Optional[str] = De
             content={"error": "Unauthorized"}
         )
     
-    code = payload.get("code")
+    code = payload.code
     
     if not code:
         return JSONResponse(
@@ -463,7 +543,7 @@ async def get_permissions(current_user: Optional[str] = Depends(get_current_user
     )
 
 @app.post("/api/v1/auth/permissions/check")
-async def check_permission(payload: dict = Body(...), current_user: Optional[str] = Depends(get_current_user)):
+async def check_permission(payload: PermissionCheckRequest = Body(...), current_user: Optional[str] = Depends(get_current_user)):
     """Check if user has specific permission"""
     email = current_user
     
@@ -473,7 +553,7 @@ async def check_permission(payload: dict = Body(...), current_user: Optional[str
             content={"error": "Unauthorized"}
         )
     
-    permission = payload.get("permission")
+    permission = payload.permission
     
     if not permission:
         return JSONResponse(
@@ -504,9 +584,9 @@ encryption_key = Fernet.generate_key()
 cipher_suite = Fernet(encryption_key)
 
 @app.post("/api/v1/encrypt")
-async def encrypt_data(payload: dict = Body(...)):
+async def encrypt_data(payload: EncryptRequest = Body(...)):
     """Encrypt data"""
-    data = payload.get("data")
+    data = payload.data
     
     if not data:
         return JSONResponse(
@@ -526,9 +606,9 @@ async def encrypt_data(payload: dict = Body(...)):
     )
 
 @app.post("/api/v1/decrypt")
-async def decrypt_data(payload: dict = Body(...)):
+async def decrypt_data(payload: DecryptRequest = Body(...)):
     """Decrypt data"""
-    encrypted = payload.get("encrypted") or payload.get("ciphertext")
+    encrypted = payload.encrypted or payload.ciphertext
     
     if not encrypted:
         return JSONResponse(
@@ -558,7 +638,8 @@ async def decrypt_data(payload: dict = Body(...)):
 # ============================================================================
 
 @app.post("/api/v1/auth/password/change")
-async def change_password(payload: dict = Body(...), current_user: Optional[str] = Depends(get_current_user)):
+@limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
+async def change_password(request: Request, payload: ChangePasswordRequest = Body(...), current_user: Optional[str] = Depends(get_current_user)):
     """Change user password"""
     email = current_user
     
@@ -568,8 +649,8 @@ async def change_password(payload: dict = Body(...), current_user: Optional[str]
             content={"error": "Unauthorized"}
         )
     
-    current_password = payload.get("current_password", "").strip()
-    new_password = payload.get("new_password", "").strip()
+    current_password = payload.current_password.strip()
+    new_password = payload.new_password.strip()
     
     if not current_password or not new_password:
         return JSONResponse(
@@ -608,9 +689,10 @@ async def change_password(payload: dict = Body(...), current_user: Optional[str]
     )
 
 @app.post("/api/v1/auth/password/reset-request")
-async def request_password_reset(payload: dict = Body(...)):
+@limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
+async def request_password_reset(request: Request, payload: PasswordResetRequest = Body(...)):
     """Request password reset"""
-    email = payload.get("email", "").strip()
+    email = payload.email.strip()
     
     if not email:
         return JSONResponse(
@@ -627,10 +709,11 @@ async def request_password_reset(payload: dict = Body(...)):
     )
 
 @app.post("/api/v1/auth/password/reset")
-async def reset_password(payload: dict = Body(...)):
+@limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
+async def reset_password(request: Request, payload: PasswordResetWithTokenRequest = Body(...)):
     """Reset password with token"""
-    token = payload.get("token")
-    new_password = payload.get("new_password", "").strip()
+    token = payload.token
+    new_password = payload.new_password.strip()
     
     if not token or not new_password:
         return JSONResponse(
@@ -680,7 +763,7 @@ async def get_roles(current_user: Optional[str] = Depends(get_current_user)):
     )
 
 @app.post("/api/v1/roles/assign")
-async def assign_role(payload: dict = Body(...), current_user: Optional[str] = Depends(get_current_user)):
+async def assign_role(payload: AssignRoleRequest = Body(...), current_user: Optional[str] = Depends(get_current_user)):
     """Assign role to user"""
     email = current_user
     
@@ -690,8 +773,8 @@ async def assign_role(payload: dict = Body(...), current_user: Optional[str] = D
             content={"error": "Unauthorized"}
         )
     
-    user_id = payload.get("user_id")
-    role = payload.get("role")
+    user_id = payload.user_id
+    role = payload.role
     
     if not user_id or not role:
         return JSONResponse(
@@ -729,7 +812,7 @@ async def assign_role(payload: dict = Body(...), current_user: Optional[str] = D
     )
 
 @app.delete("/api/v1/roles/revoke")
-async def revoke_role(payload: dict = Body(...), current_user: Optional[str] = Depends(get_current_user)):
+async def revoke_role(payload: RevokeRoleRequest = Body(...), current_user: Optional[str] = Depends(get_current_user)):
     """Revoke role from user"""
     email = current_user
     
@@ -739,8 +822,8 @@ async def revoke_role(payload: dict = Body(...), current_user: Optional[str] = D
             content={"error": "Unauthorized"}
         )
     
-    user_id = payload.get("user_id")
-    role = payload.get("role")
+    user_id = payload.user_id
+    role = payload.role
     
     if not user_id or not role:
         return JSONResponse(
@@ -779,4 +862,5 @@ async def revoke_role(payload: dict = Body(...), current_user: Optional[str] = D
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8010)
+    port = int(os.environ.get("SECURITY_SERVICE_PORT", "8010"))
+    uvicorn.run(app, host="0.0.0.0", port=port)

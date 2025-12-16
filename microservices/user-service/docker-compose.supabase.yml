@@ -1,0 +1,31 @@
+services:
+  user_db:
+    image: postgres:15-alpine
+    container_name: user_service_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: supabase_pass
+      POSTGRES_USER: supabase_user
+      POSTGRES_DB: user_service
+    ports:
+      - "54322:5432"
+    volumes:
+      - user_db_data:/var/lib/postgresql/data
+
+  postgrest:
+    image: postgrest/postgrest:v12.2.0
+    container_name: user_service_postgrest
+    restart: unless-stopped
+    depends_on:
+      - user_db
+    environment:
+      PGRST_DB_URI: postgres://supabase_user:supabase_pass@user_db:5432/user_service
+      PGRST_DB_SCHEMA: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+      PGRST_LOG_LEVEL: info
+    ports:
+      - "54323:3000"
+
+volumes:
+  user_db_data:

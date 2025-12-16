@@ -1,0 +1,2 @@
+# Deprecated: audio-service
+# Use services/voice-service requirements instead.

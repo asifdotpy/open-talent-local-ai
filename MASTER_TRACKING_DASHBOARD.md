@@ -76,13 +76,13 @@ Desktop Integration Service (Port 8009)
 | Scout Service | 8000 | ✅ Operational | GitHub candidate finder & agent orchestrator |
 | Interview Service | 8001 | ✅ Operational | Interview management & WebSocket |
 | Conversation Service | 8002 | ✅ Operational | Granite AI conversation engine |
-| Voice Service | 8003 | 🔧 Setup Needed | Text-to-speech (Python 3.12) |
+| Voice Service | 8003 | 🔧 Setup Needed | 60 endpoints (TTS/STT/WebSocket) |
 | Avatar Service | 8004 | 🔧 Setup Needed | 3D avatar rendering (Python 3.12) |
 | User Service | 8005 | ✅ Operational | User authentication |
-| Candidate Service | 8006 | ✅ Operational | Candidate data & embeddings |
+| Candidate Service | 8006 | ✅ Operational | 76 endpoints (profiles, applications, skills) |
 | Analytics Service | 8007 | ✅ Operational | Interview analytics |
-| **Desktop Integration** | **8009** | ✅ **Operational** | **Gateway & orchestration** |
-| Security Service | 8010 | ✅ Operational | Security & compliance |
+| **Desktop Integration** | **8009** | ✅ **Operational** | **Gateway & orchestration (26 endpoints)** |
+| Security Service | 8010 | ✅ Operational | 42 endpoints (auth/MFA/permissions) |
 
 **Key Deliverables:**
 - ✅ Desktop Integration Service (FastAPI gateway on port 8009)

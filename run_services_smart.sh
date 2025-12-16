@@ -6,7 +6,7 @@
 # This script intelligently starts microservices using appropriate Python versions
 # Services:
 #   - Avatar Service (port 8001) - uses Python 3.12 if available
-#   - Voice Service (port 8002) - uses Python 3.12 if available
+#   - Voice Service (port 8015) - uses Python 3.12 if available
 #   - Conversation Service (port 8003)
 #   - Interview Service (port 8004)
 #   - Analytics Service (port 8007)
@@ -58,7 +58,7 @@ echo "Log file: $MAIN_LOG_FILE" | tee -a "$MAIN_LOG_FILE"
 # Services to start
 declare -a SERVICES=(
     "avatar-service:8001"
-    "voice-service:8002"
+    "voice-service:8015"
     "conversation-service:8003"
     "interview-service:8004"
     "analytics-service:8007"
@@ -369,7 +369,7 @@ fi
 # Show service information
 log_header "📍 Service Endpoints"
 echo "Avatar Service:             http://localhost:8001" | tee -a "$MAIN_LOG_FILE"
-echo "Voice Service:              http://localhost:8002" | tee -a "$MAIN_LOG_FILE"
+echo "Voice Service:              http://localhost:8015" | tee -a "$MAIN_LOG_FILE"
 echo "Conversation Service:       http://localhost:8003" | tee -a "$MAIN_LOG_FILE"
 echo "Interview Service:          http://localhost:8004/docs" | tee -a "$MAIN_LOG_FILE"
 echo "Analytics Service:          http://localhost:8007" | tee -a "$MAIN_LOG_FILE"

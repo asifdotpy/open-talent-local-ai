@@ -394,6 +394,39 @@ python -m pytest tests/test_service_registry.py::TestModularArchitecture -v
 - [AGENTS.md](AGENTS.md)
 - [LOCAL_AI_ARCHITECTURE.md](LOCAL_AI_ARCHITECTURE.md)
 
+---
+
+## Update (Dec 15) — Proxy Coverage for Completed Services
+
+To align the gateway with completed downstream services, ensure these proxy routes exist and are documented in the gateway OpenAPI:
+
+- Voice
+  - POST /api/v1/voice/synthesize → voice-service /voice/tts
+  - POST /api/v1/voice/transcribe → voice-service /voice/stt
+
+- Candidates
+  - GET/POST /api/v1/candidates
+  - GET/PUT/DELETE /api/v1/candidates/{id}
+  - GET /api/v1/candidates/{id}/applications
+  - POST /api/v1/applications, GET /api/v1/applications, PATCH /api/v1/applications/{app_id}
+  - GET/POST /api/v1/candidates/{id}/resume
+  - GET/POST /api/v1/candidates/{id}/skills
+
+- Users
+  - GET/PUT /api/v1/users/me/preferences
+  - GET/PUT /api/v1/users/{id}/preferences
+  - GET/POST/DELETE /api/v1/users/{id}/emails
+  - GET/POST/DELETE /api/v1/users/{id}/phones
+  - GET /api/v1/users/{id}/activity
+  - GET /api/v1/users/{id}/sessions, DELETE /api/v1/users/{id}/sessions/{session_id}
+  - GET /api/v1/users/{id}/statistics
+
+- Interviews
+  - POST /api/v1/interviews/start → interview-service /start
+  - Room routes proxied to interview-service (create/join/end/status/list/participants)
+
+Action: Confirm wiring and add regression tests that exercise these through the gateway.
+
 ## 📞 Contact & Next Steps
 
 **For Questions:**

@@ -425,9 +425,9 @@ status: ApplicationStatus = Field(...)
 
 **Status:**
 - ✅ **Candidate Service:** Fixed with proper enums (15/15 tests passing)
-- 🟡 **Security Service:** Roles/Permissions need enum conversion
+- 🟡 **Security Service:** Roles/Permissions need enum conversion (in progress)
 - 🟡 **User Service:** Status fields need enum conversion
-- 🟡 **Notification Service:** Need Pydantic models (currently using dicts)
+- ✅ **Notification Service:** Uses Pydantic request models (email/SMS/push); consider stronger phone/email patterns
 
 **Remediation Time:** 7-10 hours for all services
 

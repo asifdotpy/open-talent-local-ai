@@ -176,46 +176,26 @@ class Permission(str, Enum):
 
 ---
 
-### 4. Notification Service (NOT YET 🟡)
+### 4. Notification Service (DONE ✅)
 
-**Issue:**
+**Current Implementation:**
 ```python
-# Lines 23, 28, 33: All payload validation is generic dict
-async def notify_email(payload: dict = Body(...), p=Depends(provider_dep)):
-async def notify_sms(payload: dict = Body(...), p=Depends(provider_dep)):
-async def notify_push(payload: dict = Body(...), p=Depends(provider_dep)):
+# Endpoints already use Pydantic models
+async def notify_email(payload: EmailNotificationRequest = Body(...), p=Depends(provider_dep))
+async def notify_sms(payload: SMSNotificationRequest = Body(...), p=Depends(provider_dep))
+async def notify_push(payload: PushNotificationRequest = Body(...), p=Depends(provider_dep))
 ```
 
-**Problems:**
-- No type validation on email payloads
-- Can't generate OpenAPI schema properly
-- Client code has no hints about required fields
-- No validation that "to" is valid email format
+**Models Present:**
+- `EmailNotificationRequest` with `to: EmailStr`, `subject`, optional `html`/`text`
+- `SMSNotificationRequest` with `to` and `text` constraints
+- `PushNotificationRequest` with `to`, `title`, `body`, optional `data`
 
-**Needed Models:**
-```python
-class EmailNotification(BaseModel):
-    to: EmailStr  # Validates format
-    subject: str = Field(..., min_length=1, max_length=255)
-    html: Optional[str] = None
-    text: Optional[str] = None
-    priority: NotificationPriority = Field(...)
-    template: Optional[str] = None
+**Enhancements Suggested:**
+- Strengthen `SMSNotificationRequest.to` with phone pattern (E.164)
+- Consider `NotificationPriority` enum if prioritization is needed
 
-class SMSNotification(BaseModel):
-    to: str = Field(..., pattern=r'^\+?1?\d{9,15}$')  # Phone validation
-    text: str = Field(..., min_length=1, max_length=160)
-    priority: NotificationPriority = Field(...)
-
-class NotificationPriority(str, Enum):
-    LOW = "low"
-    NORMAL = "normal"
-    HIGH = "high"
-    URGENT = "urgent"
-```
-
-**Estimated Fix Time:** 1-2 hours
-
+**Status:** No dict payloads; OpenAPI schemas generate correctly.
 ---
 
 ## Propagation Analysis

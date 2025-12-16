@@ -3,10 +3,27 @@ Tests for Notification Service
 Following TDD principles - tests written before implementation
 """
 
+import importlib
+import os
 import pytest
 import httpx
+from httpx import ASGITransport
 from typing import Dict, Any
 import json
+
+
+def _load_app():
+    """Load a fresh FastAPI app instance for in-process testing."""
+    if "services.notification-service.main" in importlib.sys.modules:
+        del importlib.sys.modules["services.notification-service.main"]
+    spec = importlib.util.spec_from_file_location(
+        "notification_service_main",
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "main.py")),
+    )
+    module = importlib.util.module_from_spec(spec)
+    assert spec and spec.loader
+    spec.loader.exec_module(module)
+    return module.app
 
 
 # ============================================================================
@@ -16,13 +33,16 @@ import json
 @pytest.fixture
 def notification_service_url():
     """Base URL for notification service"""
-    return "http://localhost:8011"
+    return "http://testserver"
 
 
 @pytest.fixture
-def async_client():
-    """Async HTTP client"""
-    return httpx.AsyncClient(timeout=5.0)
+async def async_client():
+    """Async HTTP client wired to the app via ASGI transport (no external server)."""
+    app = _load_app()
+    transport = ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testserver", timeout=5.0) as client:
+        yield client
 
 
 @pytest.fixture
@@ -187,7 +207,7 @@ class TestSMSNotifications:
     
     @pytest.mark.asyncio
     async def test_sms_phone_number_validation(self, notification_service_url, async_client):
-        """Test that invalid phone numbers are rejected"""
+        """Test that invalid phone numbers are rejected (E.164 pattern)"""
         invalid_data = {
             "to": "invalid-phone",
             "text": "Test message"
@@ -196,8 +216,8 @@ class TestSMSNotifications:
             f"{notification_service_url}/api/v1/notify/sms",
             json=invalid_data
         )
-        # Should either be rejected or accepted with fallback
-        assert response.status_code in [200, 400, 422]
+        # Should be rejected due to E.164 validation
+        assert response.status_code in [400, 422]
 
 
 # ============================================================================
