@@ -36,6 +36,8 @@ MANIFEST
 # Virtual environments
 venv/
 .venv/
+.venv-1/
+.venv-*/
 env/
 ENV/
 env.bak/
@@ -111,11 +113,15 @@ __pypackages__/
 #===============================================================================
 # Dependencies
 node_modules/
+desktop-app/node_modules/
 jspm_packages/
 
 # Build outputs
 dist/
 dist-ssr/
+desktop-app/dist/
+desktop-app/out/
+desktop-app/release/
 *.local
 
 # Logs
@@ -366,6 +372,15 @@ $RECYCLE.BIN/
 **/whisper_*.pt
 **/ggml-*.bin
 
+# Ollama/Granite models and Piper voices (local-only assets)
+desktop-app/resources/ollama/**
+desktop-app/resources/piper/**
+desktop-app/resources/models/**
+OpenTalent/models/**
+~/OpenTalent/models/**
+~/OpenTalent/cache/**
+~/OpenTalent/logs/**
+
 #===============================================================================
 # HUGGING FACE MODELS, DATASETS & CACHE
 #===============================================================================
@@ -474,6 +489,15 @@ __pycache__/
 
 # Playwright
 .playwright-mcp/
+
+# Electron packaging
+*.asar
+*.asar.unpacked
+*.app.zip
+*.dmg
+*.exe
+*.AppImage
+*.snap
 
 # Git Guardian
 .cache_ggshield
