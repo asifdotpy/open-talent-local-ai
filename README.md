@@ -1,120 +1,65 @@
-# TalentAI Platform
+# OpenTalent Local AI Interview Platform
 
-[![Status: In Dev](https://img.shields.io/badge/status-in_dev-blue)](./GEMINI.md)
-
-Welcome to the TalentAI Platform, a web-based recruitment system that uses AI agents to automate and enhance the hiring process. This repository is the root of the entire platform, containing all microservice code, infrastructure configurations, and technical specifications.
+Privacy-first, desktop-first interview platform that runs 100% locally. No cloud calls, no API keys, no data leaves the user's device.
 
 ---
 
-## 🚀 Project Overview
+## What this repo is
+- Source of truth for OpenTalent's offline AI interview stack (Electron desktop app, local AI services, docs).
+- Implements the December 2025 pivot to local AI (Ollama + Granite 4 models, Piper TTS, WebGL avatar) as defined in [AGENTS.md](AGENTS.md) and [LOCAL_AI_ARCHITECTURE.md](LOCAL_AI_ARCHITECTURE.md).
+- Not affiliated with the UK-based "Open Talent" HR services company on LinkedIn; this is an open-source, local-AI interview project.
 
-The TalentAI platform is built on a modern, scalable architecture designed for rapid dev and long-term maintainability. Our primary goal is to deliver a robust MVP that showcases the power of AI in streamlining recruitment workflows.
+## Core capabilities
+- Local LLM conversation via Ollama using Granite 4 models (350M / 2B / 8B; 4-bit/8-bit).
+- Local TTS with Piper (small/medium/large voice models) and audio caching.
+- WebGL/Three.js avatar with phoneme-driven lip-sync.
+- Hardware-aware model selection (RAM-based recommendations with user override).
+- Offline-first packaging: Electron bundles Ollama and Piper binaries for Windows/macOS/Linux.
 
-This `README.md` serves as the central dashboard for the project. Use the links below to navigate to our key sources of truth.
+## Architecture (current plan)
+- Desktop app (Electron + React) with setup wizard, settings, and avatar UI.
+- Local services orchestrated by the Electron main process: Ollama server, Piper TTS, hardware detection, model download manager.
+- Model store under `~/OpenTalent/models/` with Granite and Piper artifacts; caches for conversations, audio, and avatars.
+- Security posture: zero cloud dependencies, no key storage, local logs only (see [SECURITY_AND_CODE_QUALITY_CHECKLIST.md](SECURITY_AND_CODE_QUALITY_CHECKLIST.md)).
 
-## 💡 VS Code & Git Submodules
+## Repo layout (high level)
+- [AGENTS.md](AGENTS.md): Architecture overview and current phase plan.
+- [LOCAL_AI_ARCHITECTURE.md](LOCAL_AI_ARCHITECTURE.md): Detailed local AI spec.
+- [CONTRIBUTING.md](CONTRIBUTING.md): Dev standards and workflow.
+- [specs/](specs): Architectural specs, API contracts, requirements.
+- [services/](services): Conversation, voice, avatar, and interview services (offline-focused).
+- [desktop-app/](desktop-app): Electron app scaffolding (planned/under construction).
 
-This project uses Git submodules for modular dev. If you see a VS Code warning about submodules not being opened automatically, this is normal behavior for performance and security reasons.
+## Hardware guidance
+- Granite-350M: 2-4GB RAM (minimal), ~400MB download, fastest.
+- Granite-2B: 8-12GB RAM (balanced), ~1.2GB download.
+- Granite-8B: 16-32GB RAM (maximum quality), ~4.5GB download.
 
-**Quick Solutions:**
-- 📖 **[Complete VS Code Submodule Guide](./docs/VSCODE_SUBMODULE_GUIDE.md)** - Detailed explanation and solutions
-- 🔧 **Use the workspace file**: Open `talent-ai-platform.code-workspace` for multi-repo dev
-- 🛠️ **Management script**: Run `./scripts/manage-submodules.sh help` for submodule operations
-
-**Quick Start:**
+## Getting started (dev)
+1) Prereqs: Node 20+, Python 3.12+, Git, `ollama` (optional for local testing), `piper` binary (optional).
+2) Install deps:
 ```bash
-# Open the multi-root workspace
-code talent-ai-platform.code-workspace
-
-# Or manage submodules with our helper script
-./scripts/manage-submodules.sh status
-./scripts/manage-submodules.sh open talent-ai-microservices
+npm install
+pip install -r requirements.txt
+```
+3) Run dev environment (placeholder commands; desktop app wiring in progress):
+```bash
+npm run dev
 ```
 
-## 📂 Directory Structure
+## Roadmap (abridged)
+- Phase 5: Electron desktop app setup, bundle Ollama/Piper binaries, setup wizard and hardware detection.
+- Phase 6: Ollama integration with Granite 4 model selection and GPU acceleration paths.
+- Phase 7: Piper TTS integration with quality tiers and caching.
+- Phase 8: Avatar rendering with lip-sync and caching.
+- Phase 9: Benchmarks on low-end/high-end hardware; optimization and testing.
 
-The project is organized into multiple submodules:
+## Security and privacy
+- 100% offline operation after initial model download.
+- No cloud telemetry or external API calls.
+- Local logs and caches under `~/OpenTalent/` with optional purge/export.
+- Automated security checks documented in [SECURITY_AND_CODE_QUALITY_CHECKLIST.md](SECURITY_AND_CODE_QUALITY_CHECKLIST.md) and [SECURITY_QUICK_START.md](SECURITY_QUICK_START.md).
 
--   **[`microservices/`](./microservices/)**: Contains the source code for all backend microservices (FastAPI, Python) with EU AI compliance features.
--   **[`agents/`](./agents/)**: AI agents for specialized recruitment tasks (scouting, engagement, quality assessment).
--   **[`infrastructure/`](./infrastructure/)**: Contains the Infrastructure as Code (Terraform) for our Google Cloud Platform environment.
--   **[`frontend/`](./frontend/)**: React-based frontend applications (admin panel, dashboard, landing page).
--   **[`ai-orchestra-simulation/`](./ai-orchestra-simulation/)**: AI avatar simulation and testing environment.
-
----
-
-## 📚 Key Documents & Knowledgebase
-
-This is the master index for our project's knowledgebase. For any questions about architecture, standards, or current tasks, start here.
-
-| Document / Section | Description |
-| :--- | :--- |
-| 📖 **[Dev Guide](./DEVELOPMENT_GUIDE.md)** | **Your first stop.** The authoritative guide for local setup, Git workflow, coding standards, and testing procedures. |
-| 🤗 **[Hugging Face Setup](./docs/development/HUGGINGFACE_SETUP_GUIDE.md)** | Complete guide for Hugging Face model management, dataset handling, and large file configuration. |
-| 💎 **[Detailed Project Guide](./quarkdown-specs/GEMINI.md)** | The comprehensive guide to the project's architecture, full tech stack, and dev principles. |
-| 🗺️ **[System Architecture Diagrams](./quarkdown-specs/architecture/diagrams/)** | Visual diagrams illustrating the high-level system context and microservice interactions. |
-| ⚖️ **[Architectural Decision Records](./quarkdown-specs/architecture/decisions/)** | The official log of all significant technical decisions and their rationale. |
-| ✅ **[Current Task Plans](./quarkdown-specs/TASKS/)** | Detailed plans and status updates for ongoing dev tasks. |
-
----
-
-## 🎯 Current Dev Focus
-
-Our current efforts are concentrated on the following high-priority workstreams:
-
-1.  **✅ AI Avatar Interview Platform MVP:** **COMPLETE** - All four core microservices implemented with full end-to-end integration
-2.  **Frontend Integration:** Connecting React dashboard to interview APIs
-3.  **Production API Research:** Investigating OpenAI TTS and Anam.ai avatar platform integration
-4.  **Agent-Microservice Integration:** Connecting AI agents with microservices for end-to-end recruitment workflows
-5.  **Infrastructure Deployment:** Preparing for the initial deployment of our GCP infrastructure with microservices orchestration
-
----
-
-## 🛠️ Core Technology Stack
-
-| Category | Technology |
-| :--- | :--- |
-| **Backend** | FastAPI (Python 3.11+) |
-| **Frontend** | React (TypeScript), Vite, Tailwind CSS |
-| **Infrastructure** | Google Cloud Platform (GCP), GKE, Terraform |
-| **Authentication** | Keycloak |
-| **AI / Media** | Remotion, LangChain, OpenAI |
-| **Database** | PostgreSQL, SQLAlchemy |
-
----
-
-## 🔒 Security & Compliance
-
-| Tool | Purpose | Status |
-| :--- | :--- | :--- |
-| **GitGuardian** | Pre-commit secret scanning | ✅ Active |
-| **GitHub CodeQL** | Automated vulnerability scanning | ✅ Active |
-| **License Compliance** | MIT license enforcement | ✅ Resolved |
-| **Security Policy** | Vulnerability reporting process | ✅ Published |
-
-### Security Setup
-- **GitGuardian**: Pre-commit secret scanning on all commits
-- **CodeQL Analysis**: Automated vulnerability scanning on PRs and pushes
-- **Security Policy**: Published vulnerability reporting process
-- **CI Security**: GitHub Actions use secure secret references
-
-📖 **[GitGuardian Setup Guide](./docs/GITGUARDIAN_SETUP.md)** - Complete security configuration and usage instructions
-📖 **[Security Policy](./SECURITY.md)** - Vulnerability reporting and security measures
-
----
-
-## 📖 User Documentation
-
-Comprehensive user guides for all platform users:
-
-| User Type | Guide | Description |
-|-----------|-------|-------------|
-| 👥 **All Users** | **[Getting Started](./docs/user-guides/getting-started.md)** | Platform basics and initial setup |
-| 🎯 **Candidates** | **[Candidate Guide](./docs/user-guides/candidates/README.md)** | Complete interview preparation and process |
-| 👔 **Recruiters** | **[Recruiter Guide](./docs/user-guides/recruiters/README.md)** | Hiring workflows and candidate management |
-| 👨‍💼 **Interviewers** | **[Interviewer Guide](./docs/user-guides/interviewers/README.md)** | Interview monitoring and customization |
-| ⚙️ **Administrators** | **[Admin Guide](./docs/user-guides/administrators/README.md)** | System management and configuration |
-| ❓ **FAQ** | **[Frequently Asked Questions](./docs/user-guides/faq.md)** | Answers to common questions |
-| 🔧 **Troubleshooting** | **[Technical Support](./docs/user-guides/troubleshooting.md)** | Solutions for common issues |
-
-📖 **[Documentation Overview](./docs/user-guides/overview.md)** - Complete navigation guide for all documentation
+## Contact / support
+- Issues and discussions: use the GitHub repo once created (private for now).
+- Branding note: unrelated to the HR firm "Open Talent" on LinkedIn; this project focuses on an offline AI interview desktop app.
