@@ -40,19 +40,6 @@ current_session = {
     "phonemes": None
 }
 
-@router.get("/")
-async def get_avatar_page():
-    """Serve the avatar HTML page from shared ai-orchestra-simulation library."""
-    try:
-        # Use shared avatar.html from ai-orchestra-simulation
-        html_path = Path(__file__).parent.parent.parent.parent.parent / "ai-orchestra-simulation" / "avatar.html"
-        with open(html_path, 'r') as f:
-            html_content = f.read()
-        return HTMLResponse(content=html_content, status_code=200)
-    except Exception as e:
-        logger.error(f"Failed to serve avatar page: {e}")
-        raise HTTPException(status_code=500, detail="Avatar page not available")
-
 @router.get("/src/{path:path}")
 async def serve_src_files(path: str):
     """Serve JavaScript source files from shared ai-orchestra-simulation library."""
@@ -264,20 +251,3 @@ async def get_avatar_info():
     except Exception as e:
         logger.error(f"Failed to get avatar info: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-
-@router.get("/health")
-async def avatar_health():
-    """Avatar rendering service health check."""
-    try:
-        info = await avatar_service.get_avatar_info()
-        return {
-            "status": "healthy",
-            "component": "avatar_rendering",
-            "details": info
-        }
-    except Exception as e:
-        return {
-            "status": "unhealthy",
-            "component": "avatar_rendering",
-            "error": str(e)
-        }

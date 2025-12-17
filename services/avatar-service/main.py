@@ -63,6 +63,23 @@ logging.basicConfig(
 )
 logger = logging.getLogger("avatar-service")
 
+# Local voice models and service (fallback endpoints)
+# Add current directory to path for 'app' imports
+import sys
+from pathlib import Path
+_service_dir = Path(__file__).parent
+if str(_service_dir) not in sys.path:
+    sys.path.insert(0, str(_service_dir))
+
+try:
+    from app.models.voice import VoiceRequest, VoiceResponse, VoiceListResponse
+    from app.services.voice_service import voice_service
+    VOICE_MODULES_AVAILABLE = True
+    logger.info("Voice modules imported successfully")
+except ImportError as e:
+    VOICE_MODULES_AVAILABLE = False
+    logger.warning(f"Voice modules import failed: {e}")
+
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
@@ -117,12 +134,21 @@ def create_app() -> FastAPI:
     # Include external routers if available
     if USE_EXTERNAL_MODULES:
         app.include_router(avatar_router)
-        # Also include avatar_v1 router for comprehensive API coverage
-        try:
-            from app.routes.avatar_v1 import router as avatar_v1_router
-            app.include_router(avatar_v1_router)
-        except ImportError:
-            logger.warning("avatar_v1 router not available")
+
+    # Include avatar_v1 router unconditionally (safe import), to expose planned API surface
+    try:
+        from app.routes.avatar_v1 import router as avatar_v1_router
+        app.include_router(avatar_v1_router)
+        logger.info("avatar_v1 router included with prefix: /api/v1/avatars")
+    except ImportError:
+        logger.warning("avatar_v1 router not available")
+
+    # Include voice routes for US English voice endpoints (attempt regardless of module availability)
+    try:
+        from app.routes.voice_routes import router as voice_router
+        app.include_router(voice_router)
+    except ImportError:
+        logger.warning("voice_routes not available")
 
     # Static files are served via routes from ai-orchestra-simulation
     # No need for additional mounts
@@ -168,6 +194,12 @@ async def root():
     }
 
 
+@app.get("/ping")
+async def ping():
+    """Simple ping endpoint for load balancer health checks."""
+    return {"status": "ok"}
+
+
 @app.get("/doc", include_in_schema=False)
 async def doc_redirect():
     """Alternative redirect to API documentation."""
@@ -211,10 +243,11 @@ async def health_check():
             "service": "avatar-service",
             "version": SERVICE_VERSION,
             "timestamp": datetime.now().isoformat(),
+            "voice_integration": "AI Voice",
             "components": {
                 "api": "healthy",
-                "avatar_rendering": "real",  # Now using real video generation
-                "voice_integration": "active"  # Integrated with voice service
+                "avatar_rendering": "real",
+                "voice_integration": "active"
             }
         }
 

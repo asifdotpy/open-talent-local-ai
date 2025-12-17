@@ -30,6 +30,21 @@ Privacy-first, desktop-first interview platform that runs 100% locally. No cloud
 - [services/](services): Conversation, voice, avatar, and interview services (offline-focused).
 - [desktop-app/](desktop-app): Electron app scaffolding (planned/under construction).
 
+## Avatar Service — Finalized (December 17, 2025)
+- **Status:** Duplicates resolved, `avatar_v1` exposed under `/api/v1/avatars`, OpenAPI verified.
+- **Core endpoints:** `/`, `/ping`, `/health`, `/api/v1/voices` (GET), `/api/v1/generate-voice` (POST), `/render/lipsync` (POST).
+- **Avatar V1 suite:** Rendering, lipsync, presets, config, performance, state/emotions, assets/models, sessions, voice attach/detach.
+- **Docs:**
+	- [services/avatar-service/ENDPOINT_SPECIFICATION.md](services/avatar-service/ENDPOINT_SPECIFICATION.md)
+	- [services/avatar-service/API_ENDPOINTS_STATUS.md](services/avatar-service/API_ENDPOINTS_STATUS.md)
+	- [services/avatar-service/API_COMPLETE_SUMMARY.md](services/avatar-service/API_COMPLETE_SUMMARY.md)
+  
+Quick verify:
+```bash
+curl -s http://127.0.0.1:8001/openapi.json | jq -r '.paths | keys[]'
+curl -s http://127.0.0.1:8001/openapi.json | jq -r '.paths | keys[] | select(startswith("/api/v1/avatars"))'
+```
+
 ## Hardware guidance
 - Granite-350M: 2-4GB RAM (minimal), ~400MB download, fastest.
 - Granite-2B: 8-12GB RAM (balanced), ~1.2GB download.

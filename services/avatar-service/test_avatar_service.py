@@ -67,9 +67,9 @@ class TestAvatarService:
             
             assert response.status_code == 200
             data = response.json()
-            assert "primary_irish_voice" in data
-            assert "Local TTS" in data["primary_irish_voice"]
-            assert isinstance(data["irish_voices"], list)
+            assert "primary_us_voice" in data
+            assert "Local TTS" in data["primary_us_voice"]
+            assert isinstance(data["us_voices"], list)
             assert data["total_voices"] == 0  # No voices available yet
             print("✅ Voice listing endpoint passed")
 

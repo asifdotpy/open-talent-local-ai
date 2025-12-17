@@ -19,7 +19,7 @@ class VoiceService:
         """Initialize with mock implementation."""
         self.mock_available = True
 
-    async def generate_irish_voice(self, request: VoiceRequest) -> VoiceResponse:
+    async def generate_us_voice(self, request: VoiceRequest) -> VoiceResponse:
         """Mock voice generation - local implementation planned."""
         return VoiceResponse(
             success=False,
@@ -29,8 +29,8 @@ class VoiceService:
     async def list_available_voices(self) -> VoiceListResponse:
         """Mock voice listing - local implementation planned."""
         return VoiceListResponse(
-            primary_irish_voice="Local TTS (planned)",
-            irish_voices=[],
+            primary_us_voice="Local TTS (planned)",
+            us_voices=[],
             total_voices=0,
             note="Local voice synthesis research in progress"
         )
