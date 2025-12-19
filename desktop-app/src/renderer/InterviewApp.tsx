@@ -12,7 +12,12 @@ const useService = () => useInterview();
 
 type Screen = 'setup' | 'interview' | 'summary';
 
-const InterviewApp: React.FC = () => {
+interface InterviewAppProps {
+  onSwitchToDemo?: () => void;
+  config?: any;
+}
+
+const InterviewApp: React.FC<InterviewAppProps> = ({ onSwitchToDemo, config: appConfig }) => {
   const service = useService();
   const config = useConfig();
   const eventBus = useEventBus();
@@ -218,13 +223,25 @@ const InterviewApp: React.FC = () => {
                 </div>
               </div>
 
-              <button
-                className="start-btn"
-                onClick={startInterview}
-                disabled={loading}
-              >
-                {loading ? 'Starting Interview...' : 'Start Interview'}
-              </button>
+              <div className="button-group">
+                <button
+                  className="start-btn"
+                  onClick={startInterview}
+                  disabled={loading}
+                >
+                  {loading ? 'Starting Interview...' : 'Start Interview'}
+                </button>
+
+                {onSwitchToDemo && (
+                  <button
+                    className="demo-btn"
+                    onClick={onSwitchToDemo}
+                    disabled={loading}
+                  >
+                    🎬 View Demo
+                  </button>
+                )}
+              </div>
 
               {error && <div className="error-message">{error}</div>}
             </>

@@ -5,6 +5,9 @@ import { detectHardware, HardwareInfo } from './hardware';
 import { recommendModel } from './recommender';
 import { loadConfigFile, saveConfigFile } from './config';
 
+// Disable GPU early to prevent Linux GPU init errors
+app.disableHardwareAcceleration();
+
 let mainWindow: BrowserWindow | null = null;
 
 function createWindow() {
@@ -16,7 +19,9 @@ function createWindow() {
       contextIsolation: true,
       // Preload lives in dist/preload when compiled
       preload: path.join(__dirname, '../preload/preload.js'),
-      sandbox: true
+      sandbox: true,
+      // Disable web security in dev (still isolated), enable in production
+      webSecurity: !isDev,
     }
   });
 

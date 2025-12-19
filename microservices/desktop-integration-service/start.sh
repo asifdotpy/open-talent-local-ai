@@ -10,7 +10,16 @@ echo ""
 # Check if virtual environment exists
 if [ ! -d "venv" ]; then
     echo "📦 Creating virtual environment..."
-    python3 -m venv venv
+    # Prefer a Python with widespread wheels for deps (3.12 → 3.11 → fallback)
+    if command -v python3.12 >/dev/null 2>&1; then
+        PY_BIN="python3.12"
+    elif command -v python3.11 >/dev/null 2>&1; then
+        PY_BIN="python3.11"
+    else
+        PY_BIN="python3"
+    fi
+    echo "   Using interpreter: $PY_BIN"
+    "$PY_BIN" -m venv venv
 fi
 
 # Activate virtual environment
@@ -19,6 +28,8 @@ source venv/bin/activate
 # Install dependencies
 echo "📦 Installing dependencies..."
 pip install -q --upgrade pip
+# Ensure modern build tooling for wheels
+pip install -q --upgrade wheel setuptools
 pip install -q -r requirements.txt
 
 # Create .env if it doesn't exist

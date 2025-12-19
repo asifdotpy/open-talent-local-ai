@@ -9,7 +9,7 @@ import logging
 import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Union
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,6 +18,27 @@ import httpx
 
 from app.config.settings import settings
 from app.core.service_discovery import ServiceDiscovery
+
+
+def format_bytes(size: Union[int, str, None]) -> str:
+    """Convert bytes (int) to human-readable format (string)."""
+    if size is None or size == "unknown":
+        return "unknown"
+    if isinstance(size, str):
+        return size
+    
+    # Convert int to human-readable format
+    try:
+        size_int = int(size)
+        for unit in ["B", "KB", "MB", "GB", "TB"]:
+            if size_int < 1024:
+                if unit == "B":
+                    return f"{size_int}{unit}"
+                return f"{size_int:.1f}{unit}"
+            size_int /= 1024
+        return f"{size_int:.1f}PB"
+    except (ValueError, TypeError):
+        return "unknown"
 from app.models.schemas import (
     StartInterviewRequest,
     InterviewResponseRequest,
@@ -27,6 +48,11 @@ from app.models.schemas import (
     ModelsResponse,
     ModelInfo,
     HealthResponse,
+    SynthesizeSpeechRequest,
+    SynthesizeSpeechResponse,
+    AnalyzeSentimentRequest,
+    AnalyzeSentimentResponse,
+    SentimentScore,
 )
 
 # Configure logging
@@ -364,7 +390,7 @@ async def list_models() -> ModelsResponse:
                             name=model.get("name", "Unknown"),
                             paramCount="varies",
                             ramRequired="varies",
-                            downloadSize=model.get("size", "unknown"),
+                            downloadSize=format_bytes(model.get("size", "unknown")),
                             description="Model from Ollama",
                             dataset=None,
                             source="ollama",
@@ -402,8 +428,8 @@ async def select_model(model_id: str) -> Dict:
 # =========================================================================
 
 
-@app.post("/api/v1/voice/synthesize")
-async def synthesize_speech(payload: Dict) -> Dict:
+@app.post("/api/v1/voice/synthesize", response_model=SynthesizeSpeechResponse)
+async def synthesize_speech(request: SynthesizeSpeechRequest) -> SynthesizeSpeechResponse:
     """Proxy text-to-speech to voice-service when enabled."""
     if not settings.enable_voice:
         raise HTTPException(status_code=503, detail="Voice service disabled")
@@ -415,16 +441,25 @@ async def synthesize_speech(payload: Dict) -> Dict:
     if not url:
         raise HTTPException(status_code=503, detail="Voice service unavailable")
 
-    text = payload.get("text")
-    if not text:
-        raise HTTPException(status_code=400, detail="text is required")
-
     try:
         response = await http_client.post(
             f"{url}/voice/tts",
-            json={"text": text, "voice": payload.get("voice", "en-US-Neural2-C")}
+            json={
+                "text": request.text,
+                "voice": request.voice,
+                "speed": request.speed,
+                "pitch": request.pitch
+            }
         )
-        return response.json()
+        data = response.json()
+        return SynthesizeSpeechResponse(
+            audioUrl=data.get("audioUrl"),
+            audioBase64=data.get("audioBase64"),
+            duration=data.get("duration"),
+            format=data.get("format", "mp3"),
+            text=request.text,
+            voice=request.voice
+        )
     except Exception as e:
         logger.warning(f"Voice synthesis failed: {e}")
         raise HTTPException(status_code=502, detail="Voice synthesis failed")
@@ -435,8 +470,8 @@ async def synthesize_speech(payload: Dict) -> Dict:
 # =========================================================================
 
 
-@app.post("/api/v1/analytics/sentiment")
-async def analyze_sentiment(payload: Dict) -> Dict:
+@app.post("/api/v1/analytics/sentiment", response_model=AnalyzeSentimentResponse)
+async def analyze_sentiment(request: AnalyzeSentimentRequest) -> AnalyzeSentimentResponse:
     """Proxy sentiment analysis to analytics-service when enabled."""
     if not settings.enable_analytics:
         raise HTTPException(status_code=503, detail="Analytics service disabled")
@@ -448,20 +483,29 @@ async def analyze_sentiment(payload: Dict) -> Dict:
     if not url:
         raise HTTPException(status_code=503, detail="Analytics service unavailable")
 
-    text = payload.get("text")
-    if not text:
-        raise HTTPException(status_code=400, detail="text is required")
-
     try:
-        request_payload = {"text": text}
-        if "context" in payload:
-            request_payload["context"] = payload["context"]
+        request_payload = {"text": request.text}
+        if request.context:
+            request_payload["context"] = request.context
         
         response = await http_client.post(
             f"{url}/api/v1/analyze/sentiment",
             json=request_payload
         )
-        return response.json()
+        data = response.json()
+        
+        # Parse sentiment from response
+        sentiment_data = data.get("sentiment", {})
+        return AnalyzeSentimentResponse(
+            sentiment=SentimentScore(
+                score=sentiment_data.get("score", 0.0),
+                magnitude=sentiment_data.get("magnitude", 0.0),
+                label=sentiment_data.get("label", "neutral")
+            ),
+            text=request.text,
+            context=request.context,
+            sentences=data.get("sentences")
+        )
     except Exception as e:
         logger.warning(f"Sentiment analysis failed: {e}")
         raise HTTPException(status_code=502, detail="Sentiment analysis failed")
@@ -697,6 +741,7 @@ async def respond_to_interview(request: InterviewResponseRequest) -> InterviewSe
     Submit candidate response and get next question.
 
     Continues interview flow with next question or marks complete if all questions done.
+    Includes sentiment analysis and quality assessment when analytics service is available.
     """
     if not request.session:
         raise HTTPException(status_code=400, detail="Session data required")
@@ -707,6 +752,58 @@ async def respond_to_interview(request: InterviewResponseRequest) -> InterviewSe
 
     # Add user message
     session.messages.append(Message(role="user", content=request.message))
+
+    # Perform analytics on the response (if analytics service available)
+    analytics_data = {}
+    try:
+        if service_discovery and http_client and settings.enable_analytics:
+            url = await service_discovery.get_service_url("analytics-service")
+            if url:
+                # Sentiment analysis
+                sentiment_response = await http_client.post(
+                    f"{url}/api/v1/analyze/sentiment",
+                    json={"text": request.message, "context": "interview_response"},
+                    timeout=3.0
+                )
+                if sentiment_response.status_code == 200:
+                    sentiment_data = sentiment_response.json()
+                    analytics_data["sentiment"] = {
+                        "score": sentiment_data.get("polarity", 0.0),
+                        "magnitude": sentiment_data.get("intensity", 0.0),
+                        "label": sentiment_data.get("emotion", "neutral"),
+                        "confidence": sentiment_data.get("confidence", 0.8),
+                        "keywords": sentiment_data.get("keywords", [])
+                    }
+
+                # Response quality analysis
+                quality_response = await http_client.post(
+                    f"{url}/api/v1/analyze/quality",
+                    json={
+                        "response_text": request.message,
+                        "question_context": session.messages[-2].content if len(session.messages) >= 2 else ""
+                    },
+                    timeout=3.0
+                )
+                if quality_response.status_code == 200:
+                    quality_data = quality_response.json()
+                    analytics_data["quality"] = {
+                        "overall_score": quality_data.get("overall_score", 5.0),
+                        "completeness": quality_data.get("completeness", 0.5),
+                        "relevance": quality_data.get("relevance", 0.5),
+                        "clarity": quality_data.get("clarity", 0.5),
+                        "technical_accuracy": quality_data.get("technical_accuracy", 0.5),
+                        "strengths": quality_data.get("strengths", []),
+                        "improvements": quality_data.get("improvements", [])
+                    }
+
+                # Store analytics in session (extend session schema later)
+                if analytics_data:
+                    # For now, store in a simple way - we'll enhance the schema later
+                    session.messages[-1].content += f"\n[ANALYTICS:{json.dumps(analytics_data)}]"
+
+    except Exception as e:
+        logger.warning(f"Analytics failed for response: {e}")
+        # Continue without analytics - don't fail the interview
 
     # Try to get next question from granite-interview-service
     try:
@@ -772,24 +869,86 @@ async def get_interview_summary(session: InterviewSession) -> Dict:
     """
     Get interview summary and assessment.
 
-    Returns simple summary with question count and candidate info.
+    Returns enhanced summary with analytics when available.
     """
     user_responses = [m for m in session.messages if m.role == "user"]
     response_count = len([r for r in user_responses if r.content != "Please start the interview."])
 
-    return {
+    # Extract analytics from user messages
+    analytics_results = []
+    sentiment_scores = []
+    quality_scores = []
+
+    for message in user_responses:
+        if "[ANALYTICS:" in message.content:
+            try:
+                # Extract analytics JSON from message
+                analytics_start = message.content.find("[ANALYTICS:")
+                analytics_end = message.content.find("]", analytics_start)
+                if analytics_end > analytics_start:
+                    analytics_json = message.content[analytics_start + 11:analytics_end]
+                    analytics_data = json.loads(analytics_json)
+
+                    if "sentiment" in analytics_data:
+                        sentiment = analytics_data["sentiment"]
+                        sentiment_scores.append(sentiment.get("score", 0))
+
+                    if "quality" in analytics_data:
+                        quality = analytics_data["quality"]
+                        quality_scores.append(quality.get("overall_score", 5.0))
+
+                    analytics_results.append(analytics_data)
+            except Exception as e:
+                logger.warning(f"Failed to parse analytics from message: {e}")
+
+    # Calculate aggregates
+    avg_sentiment = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0
+    avg_quality = sum(quality_scores) / len(quality_scores) if quality_scores else 5.0
+
+    # Generate recommendations based on analytics
+    recommendations = []
+    if avg_sentiment < -0.2:
+        recommendations.append("Consider working on communication confidence and enthusiasm")
+    if avg_quality < 6.0:
+        recommendations.append("Focus on providing more detailed, specific examples in responses")
+    if len(sentiment_scores) > 1:
+        sentiment_trend = "improving" if sentiment_scores[-1] > sentiment_scores[0] else "stable"
+        if sentiment_trend == "improving":
+            recommendations.append("Great job building confidence throughout the interview!")
+
+    # Enhanced summary
+    summary = {
         "role": session.config.role,
         "questionsAsked": session.config.totalQuestions,
         "responsesGiven": response_count,
+        "analyticsAvailable": len(analytics_results) > 0,
+        "averageSentiment": round(avg_sentiment, 2),
+        "averageQuality": round(avg_quality, 2),
+        "sentimentTrend": "improving" if len(sentiment_scores) > 1 and sentiment_scores[-1] > sentiment_scores[0] else "stable",
+        "recommendations": recommendations if recommendations else ["Continue developing your technical skills and communication abilities"],
         "summary": f"""Interview Complete!
 
 Role: {session.config.role}
 Questions Asked: {session.config.totalQuestions}
 Responses Provided: {response_count}
 
+Performance Metrics:
+• Average Response Quality: {round(avg_quality, 1)}/10
+• Sentiment Trend: {'Positive and improving' if avg_sentiment > 0.1 else 'Neutral to positive' if avg_sentiment > -0.1 else 'Areas for confidence building'}
+
 Thank you for participating in this OpenTalent interview.""",
         "timestamp": datetime.now().isoformat(),
     }
+
+    # Add detailed analytics if available
+    if analytics_results:
+        summary["detailedAnalytics"] = {
+            "sentimentScores": sentiment_scores,
+            "qualityScores": quality_scores,
+            "responseCount": len(analytics_results)
+        }
+
+    return summary
 
 
 # ============================================================================

@@ -4,6 +4,41 @@ Privacy-first, desktop-first interview platform that runs 100% locally. No cloud
 
 ---
 
+## 🚀 Demo Environment (Ready Now!)
+
+**Experience OpenTalent's enhanced interview analytics today!**
+
+### Quick Start
+```bash
+# Start the complete demo environment
+./start-demo.sh
+
+# Access the application
+open http://localhost:3000
+
+# Stop when done
+./stop-demo.sh
+```
+
+### What You'll See
+- **Enhanced Interview Results**: Sentiment analysis, quality scoring, and AI recommendations
+- **Real-time Analytics**: Live processing during interviews with visual feedback
+- **Privacy-First**: Everything runs locally - no cloud dependencies
+- **Rich Insights**: Comprehensive candidate assessment with detailed metrics
+
+### Demo Flow
+1. **Start**: `./start-demo.sh` (2-3 minutes setup)
+2. **Interview**: Enter "test-001" → Select "Frontend" → Start Interview
+3. **Results**: View enhanced analytics dashboard with charts and recommendations
+4. **Stop**: `./stop-demo.sh`
+
+### Documentation
+- **[DEMO_ENVIRONMENT_GUIDE.md](DEMO_ENVIRONMENT_GUIDE.md)**: Complete setup and troubleshooting guide
+- **[DEMO_QUICK_REFERENCE.md](DEMO_QUICK_REFERENCE.md)**: Quick commands and demo script
+- **[INTERVIEW_RESULTS_ENHANCEMENT_PLAN.md](INTERVIEW_RESULTS_ENHANCEMENT_PLAN.md)**: Technical implementation details
+
+---
+
 ## What this repo is
 - Source of truth for OpenTalent's offline AI interview stack (Electron desktop app, local AI services, docs).
 - Implements the December 2025 pivot to local AI (Ollama + Granite 4 models, Piper TTS, WebGL avatar) as defined in [AGENTS.md](AGENTS.md) and [LOCAL_AI_ARCHITECTURE.md](LOCAL_AI_ARCHITECTURE.md).
@@ -51,6 +86,16 @@ curl -s http://127.0.0.1:8001/openapi.json | jq -r '.paths | keys[] | select(sta
 - Granite-8B: 16-32GB RAM (maximum quality), ~4.5GB download.
 
 ## Getting started (dev)
+
+### Demo Environment (Recommended)
+For the best experience, use the automated demo environment:
+```bash
+./start-demo.sh  # Start all services
+# Access: http://localhost:3000
+./stop-demo.sh   # Stop all services
+```
+
+### Manual Development Setup
 1) Prereqs: Node 20+, Python 3.12+, Git, `ollama` (optional for local testing), `piper` binary (optional).
 2) Install deps:
 ```bash

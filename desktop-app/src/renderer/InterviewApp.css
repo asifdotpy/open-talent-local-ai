@@ -522,3 +522,37 @@
   display: inline-block;
 }
 
+/* Button Group */
+.button-group {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.demo-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.demo-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ff5252 0%, #d84315 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+.demo-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+

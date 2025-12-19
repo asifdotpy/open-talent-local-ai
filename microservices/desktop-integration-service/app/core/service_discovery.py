@@ -105,10 +105,14 @@ class ServiceDiscovery:
         visible_statuses = {k: v for k, v in status_dict.items() if not k.startswith("_")}
         online_count = sum(1 for s in visible_statuses.values() if s["status"] == "online")
         total_count = len(visible_statuses)
+        
+        # Check if critical services are online
+        ollama_online = status_dict.get("ollama", {}).get("status") == "online"
 
         if online_count >= 6:
             overall_status = "online"
-        elif online_count >= 3:
+        elif online_count >= 3 or ollama_online:
+            # At least degraded if 3+ services OR Ollama is online (critical for interviews)
             overall_status = "degraded"
         else:
             overall_status = "offline"

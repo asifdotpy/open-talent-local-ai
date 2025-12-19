@@ -31,7 +31,11 @@ declare global {
   }
 }
 
-function App() {
+interface AppProps {
+  onComplete?: (config: Config) => void;
+}
+
+function App({ onComplete }: AppProps) {
   const [hardware, setHardware] = useState<HardwareInfo | null>(null);
   const [recommendation, setRecommendation] = useState<ModelRecommendation | null>(null);
   const [config, setConfig] = useState<Config | null>(null);
@@ -186,8 +190,8 @@ function App() {
               </p>
             </div>
             <div className="buttonGroup">
-              <button className="btn-primary" onClick={() => window.close()}>
-                Close Setup
+              <button className="btn-primary" onClick={() => onComplete?.(config!)}>
+                Start Interview
               </button>
             </div>
           </div>

@@ -2,9 +2,12 @@
  * Integration Interview Service
  * Routes all operations through the Desktop Integration Service (port 8009)
  * Falls back to direct Ollama if integration service unavailable
+ * 
+ * Now uses enhanced gateway client with typed wrappers for voice, analytics, etc.
  */
 
 import * as IntegrationClient from './integration-service-client';
+import { GatewayClient } from './gateway-enhanced-client';
 import { InterviewService as OllamaInterviewService } from './interview-service';
 import type { InterviewSession, Message } from './interview-service';
 import { AIProvider } from '../providers/ai/ai-provider.interface';
@@ -225,5 +228,35 @@ export class IntegrationInterviewService {
       return await IntegrationClient.getDashboard();
     }
     return null;
+  }
+
+  /**
+   * Access to voice API (TTS) via gateway
+   * Returns the voice API for direct use (when integration mode is active)
+   */
+  getVoiceAPI() {
+    return GatewayClient.voice;
+  }
+
+  /**
+   * Access to analytics API (sentiment) via gateway
+   * Returns the analytics API for direct use (when integration mode is active)
+   */
+  getAnalyticsAPI() {
+    return GatewayClient.analytics;
+  }
+
+  /**
+   * Access to models API via gateway
+   */
+  getModelsAPI() {
+    return GatewayClient.models;
+  }
+
+  /**
+   * Access to system/health API via gateway
+   */
+  getSystemAPI() {
+    return GatewayClient.system;
   }
 }

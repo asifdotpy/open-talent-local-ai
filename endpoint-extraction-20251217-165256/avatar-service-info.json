@@ -1,0 +1,5 @@
+{
+  "title": "TalentAI - Avatar Service",
+  "description": "Manages AI avatar interactions and rendering\n        \n        **Capabilities:**\n        - AI avatar rendering and animation\n        - Lip-sync video generation\n        - Voice integration with voice service\n        - Real-time avatar interactions\n        \n        **API Documentation:**\n        - Interactive Swagger UI: `/docs`\n        - Alternative docs URL: `/doc`\n        - ReDoc documentation: `/redoc`\n        - OpenAPI schema: `/openapi.json`\n        - API endpoints summary: `/api-docs`\n        ",
+  "version": "0.1.0"
+}

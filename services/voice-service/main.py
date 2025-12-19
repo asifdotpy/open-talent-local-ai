@@ -8,6 +8,7 @@ from fastapi.responses import StreamingResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
+from datetime import datetime
 import os
 import tempfile
 import logging
@@ -15,11 +16,11 @@ import asyncio
 import base64
 from io import BytesIO
 
-from .services.vosk_stt_service import VoskSTTService, MockVoskSTTService
-from .services.modular_tts_service import ModularTTSService, MockModularTTSService
-from .services.silero_vad_service import SileroVADService, MockSileroVADService
-from .services.stream_service import UnifiedStreamService
-from .services.phoneme_extractor import PhonemeExtractor
+from services.vosk_stt_service import VoskSTTService, MockVoskSTTService
+from services.modular_tts_service import ModularTTSService, MockModularTTSService
+from services.silero_vad_service import SileroVADService, MockSileroVADService
+from services.stream_service import UnifiedStreamService
+from services.phoneme_extractor import PhonemeExtractor
 from pydub import AudioSegment
 from pydub.silence import split_on_silence
 
@@ -139,7 +140,7 @@ app.add_middleware(
 )
 
 # Add security headers middleware
-from .app.security import SecurityHeadersMiddleware, RequestSizeLimitMiddleware, RateLimitMiddleware
+from app.security import SecurityHeadersMiddleware, RequestSizeLimitMiddleware, RateLimitMiddleware
 app.add_middleware(SecurityHeadersMiddleware)
 # Configure request size limit via env var (bytes), default 10MB
 try:
@@ -279,12 +280,54 @@ async def startup_event():
 
 
 # --- Request and Response Models ---
-from .app.schemas import (
+# Import from root schemas.py (comprehensive schema definitions)
+from schemas import (
+    # TTS Schemas
     TTSRequest,
     TTSResponse,
+    TTSSynthesizeRequest,
+    # STT Schemas
+    STTRequest,
     STTResponse,
-    VADRequest,
+    WordTimestamp,
+    # VAD Schemas (using base models from app/schemas for backward compatibility)
+    # Audio Processing
+    AudioProcessRequest,
+    AudioEnhanceRequest,
+    AudioConvertRequest,
+    AudioMetadata,
+    # WebRTC
+    WebRTCOffer,
+    WebRTCAnswer,
+    ICECandidate,
+    WebRTCConnectionRequest,
+    WebRTCStatus,
+    # Phonemes
+    PhonemeExtractionRequest,
+    PhonemeExtractionResponse,
+    PhonemeTiming,
+    PhonemeMapping,
+    # Voice Analytics
+    VoiceQualityAnalysisRequest,
+    VoiceQualityAnalysisResponse,
+    SpeechRateAnalysisRequest,
+    SpeechRateAnalysisResponse,
+    EmotionDetectionRequest,
+    EmotionDetectionResponse,
+    # Voice Info
+    VoiceInfo,
+    VoiceConfigUpdate,
+    # Batch Processing
+    BatchProcessRequest,
+    BatchProcessResponse,
+    # Service Info
+    VoiceServiceInfo,
+    HealthCheckResponse,
+    ErrorResponse,
 )
+
+# Keep legacy imports from app/schemas for backward compatibility
+from app.schemas import VADRequest
 
 
 # --- API Endpoints ---
@@ -427,8 +470,8 @@ async def api_docs_info():
     }
 
 
-@app.get("/health", tags=["health"], summary="Health check endpoint")
-async def health_check():
+@app.get("/health", tags=["health"], summary="Health check endpoint", response_model=HealthCheckResponse)
+async def health_check() -> HealthCheckResponse:
     """Health check endpoint with service status."""
     stt_health = stt_service.health_check()
     tts_health = tts_service.health_check()
@@ -436,20 +479,16 @@ async def health_check():
     
     # Core services (STT/TTS) must be healthy, VAD is optional
     core_healthy = stt_health and tts_health
-    all_healthy = core_healthy and vad_health
     
-    return {
-        "status": "healthy" if core_healthy else "unhealthy",
-        "services": {
-            "stt": "ready" if stt_health else "not_ready",
-            "tts": "ready" if tts_health else "not_ready",
-            "vad": "ready" if vad_health else "degraded",
-            "streaming": "ready"
-        },
-        "active_connections": stream_service.get_connection_count(),
-        "mode": "mock" if USE_MOCK else "local",
-        "note": "VAD degradation doesn't affect core functionality" if core_healthy and not vad_health else None
-    }
+    return HealthCheckResponse(
+        status="healthy" if core_healthy else "unhealthy",
+        timestamp=datetime.utcnow(),
+        tts_available=tts_health,
+        stt_available=stt_health,
+        webrtc_available=WEBRTC_AVAILABLE and ENABLE_WEBRTC,
+        audio_processing_available=True,
+        uptime_seconds=0.0  # TODO: Track actual uptime
+    )
 
 
 @app.get("/voices", tags=["voice-processing"], summary="Get available TTS voices")

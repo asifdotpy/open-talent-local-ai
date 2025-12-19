@@ -1,7 +1,15 @@
 /**
- * Integration Service Client
+ * Integration Service Client (typed)
  * Connects desktop app to microservices gateway (port 8009)
+ * Now uses generated OpenAPI client where available.
  */
+
+import { DefaultService, OpenAPI } from '../api/gateway';
+import type { HealthResponse } from '../api/gateway/models/HealthResponse';
+import type { ModelsResponse } from '../api/gateway/models/ModelsResponse';
+import type { StartInterviewRequest as StartReq } from '../api/gateway/models/StartInterviewRequest';
+import type { InterviewResponseRequest as RespondReq } from '../api/gateway/models/InterviewResponseRequest';
+import type { InterviewSession as SessionModel } from '../api/gateway/models/InterviewSession';
 
 export interface ServiceHealth {
   name: string;
@@ -57,46 +65,44 @@ export interface InterviewResponseRequest {
 }
 
 const INTEGRATION_BASE_URL = process.env.INTEGRATION_BASE_URL || 'http://localhost:8009';
+OpenAPI.BASE = INTEGRATION_BASE_URL;
 
 /**
- * Fetch gateway and service health status
+ * Convert generated HealthResponse to local IntegrationHealth shape
+ */
+function toIntegrationHealth(hr: HealthResponse): IntegrationHealth {
+  const services: ServiceHealth[] = Object.entries(hr.services || {}).map(([name, info]) => {
+    const statusRaw: any = (info as any)?.status ?? info ?? 'offline';
+    const status = typeof statusRaw === 'string' ? statusRaw.toLowerCase() : 'offline';
+    return {
+      name,
+      status: (status === 'healthy' || status === 'online' ? 'online' : (status as any)) as any,
+      latencyMs: (info as any)?.latencyMs,
+      details: info as any,
+    };
+  });
+  return { status: (hr.status as any) ?? 'offline', services };
+}
+
+/**
+ * Fetch gateway and service health status (typed)
  */
 export async function fetchIntegrationHealth(): Promise<IntegrationHealth | null> {
   try {
-    const res = await fetch(`${INTEGRATION_BASE_URL}/health`);
-    if (!res.ok) return null;
-    const data = await res.json();
-
-    // Normalize a few common shapes into IntegrationHealth
-    const services: ServiceHealth[] = [];
-    const svc = data.services || data?.serviceStatuses || {};
-    for (const [name, info] of Object.entries(svc)) {
-      const statusRaw = (info as any)?.status || (info as any) || 'offline';
-      const status = typeof statusRaw === 'string' ? statusRaw.toLowerCase() : 'offline';
-      services.push({
-        name,
-        status: status === 'healthy' || status === 'online' ? 'online' : (status as any),
-        latencyMs: (info as any)?.latencyMs,
-        details: (info as any) || undefined,
-      });
-    }
-
-    const overall = (data.status || 'online').toLowerCase();
-    return { status: overall as any, services };
+    const data = await DefaultService.healthCheckHealthGet();
+    return toIntegrationHealth(data);
   } catch {
     return null;
   }
 }
 
 /**
- * List all available AI models from gateway
+ * List all available AI models from gateway (typed)
  */
 export async function listModels(): Promise<ModelInfo[]> {
   try {
-    const res = await fetch(`${INTEGRATION_BASE_URL}/api/v1/models`);
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.models || [];
+    const data: ModelsResponse = await DefaultService.listModelsApiV1ModelsGet();
+    return (data.models || []) as unknown as ModelInfo[];
   } catch (error) {
     console.error('[IntegrationClient] Failed to list models:', error);
     return [];
@@ -104,19 +110,19 @@ export async function listModels(): Promise<ModelInfo[]> {
 }
 
 /**
- * Start a new interview via gateway
+ * Start a new interview via gateway (typed)
  */
 export async function startInterview(
   request: StartInterviewRequest
 ): Promise<InterviewSession | null> {
   try {
-    const res = await fetch(`${INTEGRATION_BASE_URL}/api/v1/interviews/start`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(request),
-    });
-    if (!res.ok) return null;
-    return await res.json();
+    const body: StartReq = {
+      role: request.role,
+      model: request.model,
+      totalQuestions: request.totalQuestions,
+    };
+    const session: SessionModel = await DefaultService.startInterviewApiV1InterviewsStartPost(body);
+    return session as unknown as InterviewSession;
   } catch (error) {
     console.error('[IntegrationClient] Failed to start interview:', error);
     return null;
@@ -124,19 +130,19 @@ export async function startInterview(
 }
 
 /**
- * Submit candidate response and get next question
+ * Submit candidate response and get next question (typed)
  */
 export async function respondToInterview(
   request: InterviewResponseRequest
 ): Promise<InterviewSession | null> {
   try {
-    const res = await fetch(`${INTEGRATION_BASE_URL}/api/v1/interviews/respond`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(request),
-    });
-    if (!res.ok) return null;
-    return await res.json();
+    const body: RespondReq = {
+      message: request.message,
+      session: request.session as any,
+      sessionId: request.sessionId,
+    };
+    const updated: SessionModel = await DefaultService.respondToInterviewApiV1InterviewsRespondPost(body);
+    return updated as unknown as InterviewSession;
   } catch (error) {
     console.error('[IntegrationClient] Failed to respond to interview:', error);
     return null;
@@ -144,19 +150,14 @@ export async function respondToInterview(
 }
 
 /**
- * Get interview summary
+ * Get interview summary (typed)
  */
 export async function getInterviewSummary(
   session: InterviewSession
 ): Promise<{ summary: string; role: string; questionsAsked: number; responsesGiven: number } | null> {
   try {
-    const res = await fetch(`${INTEGRATION_BASE_URL}/api/v1/interviews/summary`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(session),
-    });
-    if (!res.ok) return null;
-    return await res.json();
+    const res = await DefaultService.getInterviewSummaryApiV1InterviewsSummaryPost(session as any);
+    return res as any;
   } catch (error) {
     console.error('[IntegrationClient] Failed to get interview summary:', error);
     return null;
@@ -168,9 +169,7 @@ export async function getInterviewSummary(
  */
 export async function getDashboard(): Promise<any> {
   try {
-    const res = await fetch(`${INTEGRATION_BASE_URL}/api/v1/dashboard`);
-    if (!res.ok) return null;
-    return await res.json();
+    return await DefaultService.getDashboardApiV1DashboardGet();
   } catch (error) {
     console.error('[IntegrationClient] Failed to get dashboard:', error);
     return null;

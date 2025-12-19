@@ -4,18 +4,84 @@ from uuid import UUID
 import csv
 import io
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, status
+from pydantic import BaseModel
 from fastapi.responses import StreamingResponse
 from sqlalchemy import select, or_, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import get_session
 from .models import User, UserProfile, UserPreferences, UserActivity, UserSession, UserRole, UserStatus
-from .schemas import (
-    HealthResponse, RootResponse, UserCreate, UserRead, UserUpdate,
-    UserProfileCreate, UserProfileUpdate, UserProfileRead,
-    UserPreferencesCreate, UserPreferencesUpdate, UserPreferencesRead,
-    UserActivityRead, UserSessionRead,
+# Import comprehensive schemas from root schemas.py
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from schemas import (
+    # User Core
+    UserCreate,
+    UserUpdate,
+    UserResponse as UserRead,
+    UserListResponse,
+    # Profile
+    ProfileCreate as UserProfileCreate,
+    ProfileUpdate as UserProfileUpdate,
+    ProfileResponse as UserProfileRead,
+    ProfilePhotoUpload,
+    # Preferences & Settings
+    UserPreferences as UserPreferencesRead,  # Base preferences model used for response
+    UserSettings,
+    # Activity & Sessions
+    ActivityLog as UserActivityRead,
+    ActivityLogRequest,
+    SessionInfo as UserSessionRead,
+    LoginHistoryEntry,
+    # Search & Filtering
+    UserSearchRequest,
+    UserFilterRequest,
+    UserBulkLookupRequest,
+    # Statistics
+    UserStatistics,
+    # Notifications
+    NotificationRequest,
+    NotificationResponse,
+    # Integration
+    UserInviteRequest,
+    UserInviteResponse,
+    UserExportRequest,
+    UserImportRequest,
+    # Status
+    UserStatusUpdate,
+    HealthCheckResponse as HealthResponse,
+    ErrorResponse,
+    ValidationErrorResponse,
 )
+
+# Note: UserPreferencesCreate and UserPreferencesUpdate not in comprehensive schemas
+# Define minimal versions here for backward compatibility
+class UserPreferencesCreate(BaseModel):
+    user_id: str
+    notification_email: Optional[bool] = True
+    notification_sms: Optional[bool] = False
+    notification_push: Optional[bool] = False
+    theme: Optional[str] = "light"
+    language: Optional[str] = "en"
+    tenant_id: Optional[str] = None
+
+class UserPreferencesUpdate(BaseModel):
+    notification_email: Optional[bool] = None
+    notification_sms: Optional[bool] = None
+    notification_push: Optional[bool] = None
+    theme: Optional[str] = None
+    language: Optional[str] = None
+
+# Legacy response schemas for simple endpoints
+class RootResponse(BaseModel):
+    service: str
+    status: str
+
+class SimpleHealthResponse(BaseModel):
+    service: str
+    status: str
 from .utils import get_current_user, get_jwt_claims, require_role, JWTClaims
 
 router = APIRouter()
@@ -26,9 +92,9 @@ async def root() -> RootResponse:
     return RootResponse(service="user", status="ok")
 
 
-@router.get("/health", response_model=HealthResponse)
-async def health() -> HealthResponse:
-    return HealthResponse(service="user", status="healthy")
+@router.get("/health", response_model=SimpleHealthResponse)
+async def health() -> SimpleHealthResponse:
+    return SimpleHealthResponse(service="user", status="healthy")
 
 
 # ============================================================================
