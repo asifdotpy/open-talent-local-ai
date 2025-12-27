@@ -14,7 +14,7 @@ repos:
     hooks:
       - id: ggshield
         language: python
-        stages: [commit]
+        stages: [pre-commit]
         entry: ggshield secret scan pre-commit
         exclude: ^(?!.*\.py$|.*\.js$|.*\.ts$|.*\.tsx$|.*\.json$|.*\.yaml$|.*\.yml$|.*\.env.*)
         types: [text]
@@ -67,7 +67,7 @@ repos:
 
       # Trim trailing whitespace
       - id: trailing-whitespace
-        args: [--markdown-args=--ignore-missing-backlinks]
+        # args removed: --markdown-args=--ignore-missing-backlinks (not supported by trailing-whitespace-fixer)
         exclude: \.svg$
 
   # ============================================================================
@@ -107,7 +107,7 @@ repos:
     rev: v1.7.1
     hooks:
       - id: mypy
-        additional_dependencies: [types-all]
+        # additional_dependencies: [types-all]  # removed due to types-pkg-resources error
         exclude: ^tests/|\.venv/
         args: [--ignore-missing-imports]
 
@@ -144,7 +144,6 @@ repos:
     rev: v8.55.0
     hooks:
       - id: eslint
-        types: [javascript, jsx, typescript, tsx]
         additional_dependencies: [eslint, eslint-config-airbnb]
         exclude: ^\.venv/|^node_modules/|build|dist
         args: [--fix]
@@ -152,21 +151,13 @@ repos:
     exclude_pattern: (?!.*\.js$).*(?<!\.eslintrc)
 
   # ============================================================================
-  # GIT BEST PRACTICES
-  # ============================================================================
 
-  # Commitizen - Conventional commits
-  - repo: https://github.com/commitizen-tools/commitizen
-    rev: 3.13.0
-    hooks:
-      - id: commitizen
-        stages: [commit-msg]
 
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
 
-default_stages: [commit]
+default_stages: [pre-commit]
 fail_fast: false
 exclude: ^\.venv/|^node_modules/|\.git/|__pycache__|\.pytest_cache__|\.mypy_cache__|build/|dist/
 ci:

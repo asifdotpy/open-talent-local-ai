@@ -96,7 +96,7 @@ All dashboard calls now route through unified gateway:
 ### Step 1: User Sees Status
 ```
 ┌─────────────────────────────────────────────────────┐
-│ TalentAI Interview  [🟢 All Systems Operational]    │
+│ OpenTalent Interview  [🟢 All Systems Operational]    │
 │                     [4/7 services online]           │
 │ Dashboard | Questions | Results                     │
 └─────────────────────────────────────────────────────┘
@@ -324,7 +324,7 @@ Header shows real-time:
 ✅ Comprehensive documentation provided  
 ✅ Production-ready code quality  
 
-**The dashboard is now a fully functional, professionally polished frontend for the microservices-first TalentAI platform.**
+**The dashboard is now a fully functional, professionally polished frontend for the microservices-first OpenTalent platform.**
 
 **Status: READY FOR SELECTUSA DEMO** 🚀
 

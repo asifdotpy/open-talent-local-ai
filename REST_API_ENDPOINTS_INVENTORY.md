@@ -25,7 +25,7 @@
 
 ## 1. Granite Interview Service
 
-**Service Name:** TalentAI Granite Interview Service  
+**Service Name:** OpenTalent Granite Interview Service  
 **Port:** 8005 (default)  
 **Description:** Modular AI service supporting multiple model architectures for interview intelligence. Supports Granite, Llama, Mistral, and other models with fine-tuning capabilities.
 
@@ -100,7 +100,7 @@
 
 ## 2. Conversation Service
 
-**Service Name:** TalentAI - Conversation Service  
+**Service Name:** OpenTalent - Conversation Service  
 **Port:** 8003 (default)  
 **Description:** AI-powered conversation management for interview automation with natural language processing and context-aware responses.
 
@@ -200,7 +200,7 @@ Conversation service includes a router from `app.api.endpoints.interview` module
 
 ## 4. Avatar Service
 
-**Service Name:** TalentAI - Avatar Service  
+**Service Name:** OpenTalent - Avatar Service  
 **Port:** 8001 (default)  
 **Description:** Manages AI avatar interactions and rendering for recruitment platform. Avatar and voice generation implemented locally.
 
@@ -247,7 +247,7 @@ Conversation service includes a router from `app.api.endpoints.interview` module
 
 ## 5. Interview Service
 
-**Service Name:** TalentAI Interview Service  
+**Service Name:** OpenTalent Interview Service  
 **Description:** Main interview orchestration service. Uses modular router pattern with API routes included via `app.api.main.api_router`.
 
 ### Endpoints
@@ -263,7 +263,7 @@ Endpoints are accessible at `/{API_V1_STR}/*` (typically `/api/v1/*`)
 
 ## 6. Analytics Service
 
-**Service Name:** TalentAI Analytics Service API  
+**Service Name:** OpenTalent Analytics Service API  
 **Port:** 8005 (default)  
 **Description:** AI-powered analytics and intelligence service for interview analysis.
 
@@ -431,7 +431,7 @@ Endpoints are accessible at `/{API_V1_STR}/*` (typically `/api/v1/*`)
 
 ## 8. Candidate Service
 
-**Service Name:** TalentAI - Candidate Service  
+**Service Name:** OpenTalent - Candidate Service  
 **Port:** 8000 (default)  
 **Description:** Candidate profile management and intelligent matching service using vector search (FastEmbed + LanceDB).
 
@@ -563,7 +563,7 @@ Endpoints are accessible at `/{API_V1_STR}/*` (typically `/api/v1/*`)
 
 ## 13. Explainability Service
 
-**Service Name:** TalentAI Explainability Service API  
+**Service Name:** OpenTalent Explainability Service API  
 **Port:** (not specified in main.py)  
 **Description:** AI explainability and transparency service for model interpretability, bias detection, and compliance support.
 

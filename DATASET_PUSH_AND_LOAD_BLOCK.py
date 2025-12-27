@@ -50,7 +50,7 @@ if local_train.exists() and local_val.exists():
         dataset_dict.push_to_hub(
             config['huggingface']['dataset_repo'],
             private=True,  # Keep dataset private
-            commit_message="Upload comprehensive TalentAI platform dataset"
+            commit_message="Upload comprehensive OpenTalent platform dataset"
         )
         print(f"✅ Successfully pushed to: {config['huggingface']['dataset_repo']}")
         print(f"   - Train split: {len(train_data)} examples")

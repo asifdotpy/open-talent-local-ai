@@ -215,6 +215,11 @@ vite.config.ts.timestamp-*
 *.p12
 secrets/
 credentials/
+.vercel/
+deploy_api.py
+check_status.py
+deploy.sh
+.vercel_env.sh
 
 #===============================================================================
 # DOCKER

@@ -1,6 +1,6 @@
-# Contributing to TalentAI Platform
+# Contributing to OpenTalent
 
-Thank you for your interest in contributing to the TalentAI Platform! This document provides guidelines and instructions for contributing to this project.
+Thank you for your interest in contributing to the OpenTalent! This document provides guidelines and instructions for contributing to this project.
 
 ## Table of Contents
 
@@ -31,8 +31,8 @@ Thank you for your interest in contributing to the TalentAI Platform! This docum
 
 ```bash
 # Clone the repository
-git clone https://github.com/asifdotpy/talent-ai-platform.git
-cd talent-ai-platform
+git clone https://github.com/asifdotpy/open-talent.git
+cd open-talent
 
 # Initialize submodules
 git submodule update --init --recursive
@@ -54,7 +54,7 @@ cp .env.example .env
 For the best development experience, use the VS Code workspace file:
 
 ```bash
-code talent-ai-platform.code-workspace
+code open-talent.code-workspace
 ```
 
 This opens all submodules in a multi-root workspace.
@@ -142,7 +142,7 @@ from pydantic import BaseModel
 
 class CandidateProfile(BaseModel):
     """Represents a candidate profile with scoring metadata.
-    
+
     Attributes:
         candidate_id: Unique identifier for the candidate
         skills: List of technical skills
@@ -159,20 +159,20 @@ def calculate_skill_match(
     required_skills: List[str]
 ) -> float:
     """Calculate the percentage of required skills present in candidate profile.
-    
+
     Args:
         candidate_skills: List of skills from candidate's profile
         required_skills: List of skills required for the job
-    
+
     Returns:
         Percentage match as a float between 0 and 100
-    
+
     Raises:
         ValueError: If either list is empty
     """
     if not candidate_skills or not required_skills:
         raise ValueError("Skill lists cannot be empty")
-    
+
     matched = set(candidate_skills) & set(required_skills)
     return (len(matched) / len(required_skills)) * 100
 ```
@@ -337,23 +337,23 @@ def sample_candidate():
 async def test_calculate_skill_match(sample_candidate):
     """Test skill match calculation returns correct percentage."""
     required_skills = ["Python", "Django", "AWS"]
-    
+
     result = calculate_skill_match(
         sample_candidate.skills,
         required_skills
     )
-    
+
     assert result == 66.67  # 2 out of 3 skills matched
-    
+
 @pytest.mark.asyncio
 async def test_score_candidate_api_call():
     """Test candidate scoring makes correct API calls."""
     with patch('httpx.AsyncClient.post', new_callable=AsyncMock) as mock_post:
         mock_post.return_value.json.return_value = {"score": 85}
-        
+
         agent = QualityAgent()
         result = await agent.score_candidate("cand_123")
-        
+
         assert result["score"] == 85
         mock_post.assert_called_once()
 ```
@@ -681,4 +681,4 @@ app = FastAPI(
 
 ---
 
-Thank you for contributing to TalentAI Platform! 🚀
+Thank you for contributing to OpenTalent! 🚀

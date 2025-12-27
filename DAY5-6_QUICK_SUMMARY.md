@@ -22,13 +22,13 @@
 ```tsx
 // BEFORE
 <header>
-  <Link>TalentAI Interview</Link>
+  <Link>OpenTalent Interview</Link>
   <nav>Dashboard | Questions | Results</nav>
 </header>
 
 // AFTER
 <header>
-  <Link>TalentAI Interview</Link>
+  <Link>OpenTalent Interview</Link>
   <ServiceStatus />  ← NEW: Real-time health display
   <nav>Dashboard | Questions | Results</nav>
 </header>

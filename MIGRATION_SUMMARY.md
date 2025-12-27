@@ -6,7 +6,7 @@
 
 ## Migration Overview
 
-Successfully migrated TalentAI platform from `talent-ai-platform` to `open-talent` directory with careful file filtering and git initialization.
+Successfully migrated OpenTalent platform from `talent-ai-platform` to `open-talent` directory with careful file filtering and git initialization.
 
 ## Key Metrics
 
@@ -62,7 +62,7 @@ Successfully migrated TalentAI platform from `talent-ai-platform` to `open-talen
 ### Step 4: Git Initialization ✅
 - Initialized fresh git repository in `/home/asif1/open-talent`
 - First commit: "init: OpenTalent project migration from talent-ai-platform"
-- Configured git user: "Asif - TalentAI"
+- Configured git user: "Asif - OpenTalent"
 - Git status: Ready for development
 
 ## Directory Structure

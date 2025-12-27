@@ -191,7 +191,7 @@ const ttsResponse = await fetch('http://localhost:8002/voice/tts', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    text: 'Welcome to TalentAI Avatar Service',
+    text: 'Welcome to OpenTalent Avatar Service',
     voice: 'en_US-lessac-medium',
     extract_phonemes: true
   })
@@ -332,14 +332,14 @@ TOTAL: 115 passing, 1 skipped (99.1% pass rate)
 ```
 1. CLIENT → POST /avatar/generate
    {
-     "text": "Welcome to TalentAI",
+     "text": "Welcome to OpenTalent",
      "voice": "en_US-lessac-medium",
      "avatar_id": "default"
    }
 
 2. AVATAR SERVICE → POST http://localhost:8002/voice/tts
    {
-     "text": "Welcome to TalentAI",
+     "text": "Welcome to OpenTalent",
      "voice": "en_US-lessac-medium",
      "extract_phonemes": true
    }
@@ -360,7 +360,7 @@ TOTAL: 115 passing, 1 skipped (99.1% pass rate)
      "phonemes": [...],
      "duration": 3.5,
      "model": "face",
-     "text": "Welcome to TalentAI"
+     "text": "Welcome to OpenTalent"
    }
 
 5. RENDERER (render.js):

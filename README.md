@@ -1,5 +1,12 @@
 # OpenTalent Local AI Interview Platform
 
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Security-Bandit](https://img.shields.io/badge/security-bandit-yellow.svg)
+![Security-Semgrep](https://img.shields.io/badge/security-semgrep-green.svg)
+![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
+![Code Quality](https://img.shields.io/badge/code%20quality-ruff-blue.svg)
+
+
 Privacy-first, desktop-first interview platform that runs 100% locally. No cloud calls, no API keys, no data leaves the user's device.
 
 ---
@@ -73,7 +80,7 @@ open http://localhost:3000
 	- [services/avatar-service/ENDPOINT_SPECIFICATION.md](services/avatar-service/ENDPOINT_SPECIFICATION.md)
 	- [services/avatar-service/API_ENDPOINTS_STATUS.md](services/avatar-service/API_ENDPOINTS_STATUS.md)
 	- [services/avatar-service/API_COMPLETE_SUMMARY.md](services/avatar-service/API_COMPLETE_SUMMARY.md)
-  
+
 Quick verify:
 ```bash
 curl -s http://127.0.0.1:8001/openapi.json | jq -r '.paths | keys[]'

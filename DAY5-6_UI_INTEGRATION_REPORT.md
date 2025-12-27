@@ -120,7 +120,7 @@ React Dashboard
 
 **Visual Hierarchy:**
 ```
-[TalentAI Interview] ..................... [All Systems Operational] [4/7 services]
+[OpenTalent Interview] ..................... [All Systems Operational] [4/7 services]
 [Dashboard] [Question Builder] [Results]
 ```
 

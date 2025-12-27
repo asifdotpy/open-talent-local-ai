@@ -559,18 +559,18 @@ message_data = await service_clients.genkit.generate_engagement_message(
     candidate_name="LinkedIn Candidate 0",
     candidate_role="Software Engineer",
     job_title="Senior Backend Engineer",
-    company_name="TalentAI"
+    company_name="OpenTalent"
 )
 
 # Genkit generates:
 message_data = {
-    "subject": "Exciting Opportunity - Senior Backend Engineer at TalentAI",
+    "subject": "Exciting Opportunity - Senior Backend Engineer at OpenTalent",
     "message": """
     Hi LinkedIn Candidate 0,
 
     We came across your profile and were impressed by your experience as a Software Engineer 
     with expertise in Python and Django. We're currently hiring for a Senior Backend Engineer 
-    position at TalentAI, and we believe your skills would be a perfect fit.
+    position at OpenTalent, and we believe your skills would be a perfect fit.
 
     The role involves:
     - Building scalable microservices with FastAPI and PostgreSQL
@@ -580,7 +580,7 @@ message_data = {
     Would you be interested in a quick conversation about this opportunity?
 
     Best regards,
-    TalentAI Recruiting
+    OpenTalent Recruiting
     """
 }
 ```
@@ -590,7 +590,7 @@ message_data = {
 ```python
 success = await send_email(
     to_email="candidate0@linkedin.example.com",
-    subject="Exciting Opportunity - Senior Backend Engineer at TalentAI",
+    subject="Exciting Opportunity - Senior Backend Engineer at OpenTalent",
     body=message_data.get("message")
 )
 
@@ -715,7 +715,7 @@ REST API endpoint: `POST /interviews/start`
   "candidate_id": "linkedin_pipeline_123_0",
   "pipeline_id": "pipeline_project_123_1733740234",
   "job_title": "Senior Backend Engineer",
-  "company_name": "TalentAI"
+  "company_name": "OpenTalent"
 }
 ```
 

@@ -165,7 +165,7 @@
    - "Vendor lock-in (OpenAI API dependency)"
 
 2. **Solution (30 seconds)**
-   - "OpenTalent/TalentAI runs 100% locally on your device"
+   - "OpenTalent/OpenTalent runs 100% locally on your device"
    - "No cloud, no API keys, complete privacy"
    - "10x cheaper than competitors"
 
@@ -179,7 +179,7 @@
    - Show ServiceStatus showing "All Systems Operational"
 
 4. **Impact (30 seconds)**
-   - "OpenTalent/TalentAI: Privacy-first AI interviews"
+   - "OpenTalent/OpenTalent: Privacy-first AI interviews"
    - "Available for Windows, macOS, Linux"
    - "Starting with Bangladesh pilot in Q1 2026"
    - "Call to action: Join us at SelectUSA 2026"
@@ -293,7 +293,7 @@
 **Structure (500-700 words each section):**
 
 1. **WHAT: Product Description**
-   - What is OpenTalent/TalentAI?
+   - What is OpenTalent/OpenTalent?
    - Key features and differentiators
    - 4P Marketing Mix (Product, Price, Place, Promotion)
    - Unique Selling Proposition (USP)

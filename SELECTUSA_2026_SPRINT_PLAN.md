@@ -209,7 +209,7 @@
   - [ ] Script: Problem → Solution → Demo → Impact
   - [ ] Scene 1 (30s): Introduce problem
     - "Traditional AI interview platforms cost $50k/year and send your data to cloud servers"
-  - [ ] Scene 2 (30s): Introduce OpenTalent/TalentAI
+  - [ ] Scene 2 (30s): Introduce OpenTalent/OpenTalent
     - "Our platform runs 100% on your device. No API keys, no cloud, complete privacy."
   - [ ] Scene 3 (2-3 min): Live demo
     - Show dashboard with ServiceStatus header
@@ -218,7 +218,7 @@
     - Highlight service health monitoring
     - Highlight: "All processing happens locally. Internet can be disconnected."
   - [ ] Scene 4 (30s): Call to action
-    - "TalentAI: Privacy-first AI interviews for the future of hiring"
+    - "OpenTalent: Privacy-first AI interviews for the future of hiring"
 - [ ] Polish dashboard UI for video
   - [ ] Ensure font sizes readable on 1080p video
   - [ ] Test on light/dark backgrounds

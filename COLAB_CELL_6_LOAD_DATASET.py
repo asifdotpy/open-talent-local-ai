@@ -8,7 +8,7 @@
 from datasets import load_dataset
 import os
 
-print("🚀 Loading TalentAI Dataset from HuggingFace Hub")
+print("🚀 Loading OpenTalent Dataset from HuggingFace Hub")
 print("=" * 60)
 
 # Configuration

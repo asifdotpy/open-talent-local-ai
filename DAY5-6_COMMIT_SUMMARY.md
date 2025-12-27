@@ -67,7 +67,7 @@
 **Before:**
 ```tsx
 <header>
-  <Link>TalentAI Interview</Link>
+  <Link>OpenTalent Interview</Link>
   <nav>...</nav>
 </header>
 ```
@@ -77,7 +77,7 @@
 <header>
   <ServiceStatus />  ← NEW
   <div>
-    <Link>TalentAI Interview</Link>
+    <Link>OpenTalent Interview</Link>
     <ServiceStatus />
   </div>
   <nav>...</nav>

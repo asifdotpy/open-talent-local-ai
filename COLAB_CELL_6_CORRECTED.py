@@ -46,7 +46,7 @@ if local_train.exists() and local_val.exists():
         dataset_dict.push_to_hub(
             config['huggingface']['dataset_repo'],
             private=True,
-            commit_message="TalentAI comprehensive dataset - 8 domains, 2075 examples"
+            commit_message="OpenTalent comprehensive dataset - 8 domains, 2075 examples"
         )
         print(f"✅ Pushed to HF Hub: {config['huggingface']['dataset_repo']}")
     except Exception as e:
