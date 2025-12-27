@@ -1,1 +1,0 @@
-# TalentAI Avatar Service Package

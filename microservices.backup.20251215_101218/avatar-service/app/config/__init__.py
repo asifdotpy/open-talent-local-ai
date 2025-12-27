@@ -1,1 +1,0 @@
-# Avatar Service Configuration
