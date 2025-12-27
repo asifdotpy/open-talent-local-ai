@@ -13,6 +13,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 class NotificationPriority(str, Enum):
     """Priority levels for notifications"""
+
     LOW = "low"
     NORMAL = "normal"
     HIGH = "high"
@@ -21,6 +22,7 @@ class NotificationPriority(str, Enum):
 
 class NotificationStatus(str, Enum):
     """Notification delivery status"""
+
     PENDING = "pending"
     SENT = "sent"
     DELIVERED = "delivered"
@@ -30,6 +32,7 @@ class NotificationStatus(str, Enum):
 
 class NotificationType(str, Enum):
     """Notification channel type"""
+
     EMAIL = "email"
     SMS = "sms"
     PUSH = "push"
@@ -39,6 +42,7 @@ class NotificationType(str, Enum):
 # ============================================================================
 # REQUEST SCHEMAS
 # ============================================================================
+
 
 class EmailNotificationRequest(BaseModel):
     to: EmailStr
@@ -53,7 +57,7 @@ class EmailNotificationRequest(BaseModel):
 
 class SMSNotificationRequest(BaseModel):
     # E.164 phone format: optional +, up to 15 digits
-    to: str = Field(..., pattern=r'^\+?[1-9]\d{1,14}$', strip_whitespace=True)
+    to: str = Field(..., pattern=r"^\+?[1-9]\d{1,14}$", strip_whitespace=True)
     text: str = Field(..., min_length=1, max_length=1600, strip_whitespace=True)
     priority: NotificationPriority | None = Field(default=NotificationPriority.NORMAL)
 
@@ -70,16 +74,18 @@ class PushNotificationRequest(BaseModel):
 
 class InAppNotificationRequest(BaseModel):
     """In-app notification request"""
+
     user_id: str
     title: str = Field(..., min_length=1, max_length=200)
     message: str = Field(..., min_length=1, max_length=1000)
-    type: str = Field(..., pattern=r'^(info|success|warning|error)$')
+    type: str = Field(..., pattern=r"^(info|success|warning|error)$")
     action_url: str | None = None
     data: dict[str, Any] | None = None
 
 
 class BulkNotificationRequest(BaseModel):
     """Bulk notification request"""
+
     recipients: list[str] = Field(..., min_length=1, max_length=1000)
     notification_type: NotificationType
     template_id: str | None = None
@@ -93,8 +99,10 @@ class BulkNotificationRequest(BaseModel):
 # RESPONSE SCHEMAS
 # ============================================================================
 
+
 class NotificationResponse(BaseModel):
     """Notification response"""
+
     id: str
     status: NotificationStatus
     message: str
@@ -105,6 +113,7 @@ class NotificationResponse(BaseModel):
 
 class BulkNotificationResponse(BaseModel):
     """Bulk notification response"""
+
     total: int
     sent: int
     failed: int
@@ -114,6 +123,7 @@ class BulkNotificationResponse(BaseModel):
 
 class NotificationHistoryResponse(BaseModel):
     """Notification history entry"""
+
     id: str
     notification_type: NotificationType
     recipient: str
@@ -128,6 +138,7 @@ class NotificationHistoryResponse(BaseModel):
 
 class NotificationHistoryListResponse(BaseModel):
     """Paginated notification history"""
+
     items: list[NotificationHistoryResponse]
     total: int
     page: int
@@ -139,8 +150,10 @@ class NotificationHistoryListResponse(BaseModel):
 # TEMPLATE SCHEMAS
 # ============================================================================
 
+
 class TemplateBase(BaseModel):
     """Base template model"""
+
     name: str = Field(..., min_length=1, max_length=100)
     notification_type: NotificationType
     subject: str | None = Field(None, max_length=200)
@@ -150,11 +163,13 @@ class TemplateBase(BaseModel):
 
 class TemplateCreate(TemplateBase):
     """Create template request"""
+
     pass
 
 
 class TemplateUpdate(BaseModel):
     """Update template request"""
+
     name: str | None = Field(None, min_length=1, max_length=100)
     subject: str | None = Field(None, max_length=200)
     content: str | None = None
@@ -163,6 +178,7 @@ class TemplateUpdate(BaseModel):
 
 class TemplateResponse(TemplateBase):
     """Template response with metadata"""
+
     id: str
     created_at: datetime
     updated_at: datetime
@@ -173,6 +189,7 @@ class TemplateResponse(TemplateBase):
 
 class TemplateListResponse(BaseModel):
     """Paginated template list"""
+
     items: list[TemplateResponse]
     total: int
     page: int
@@ -183,8 +200,10 @@ class TemplateListResponse(BaseModel):
 # PREFERENCES SCHEMAS
 # ============================================================================
 
+
 class NotificationPreferencesBase(BaseModel):
     """Base notification preferences"""
+
     email_enabled: bool = True
     sms_enabled: bool = True
     push_enabled: bool = True
@@ -197,11 +216,13 @@ class NotificationPreferencesBase(BaseModel):
 
 class NotificationPreferencesCreate(NotificationPreferencesBase):
     """Create notification preferences"""
+
     user_id: str
 
 
 class NotificationPreferencesUpdate(BaseModel):
     """Update notification preferences"""
+
     email_enabled: bool | None = None
     sms_enabled: bool | None = None
     push_enabled: bool | None = None
@@ -214,6 +235,7 @@ class NotificationPreferencesUpdate(BaseModel):
 
 class NotificationPreferencesResponse(NotificationPreferencesBase):
     """Notification preferences response"""
+
     id: str
     user_id: str
     created_at: datetime
@@ -226,8 +248,10 @@ class NotificationPreferencesResponse(NotificationPreferencesBase):
 # ANALYTICS SCHEMAS
 # ============================================================================
 
+
 class NotificationAnalyticsRequest(BaseModel):
     """Notification analytics request"""
+
     start_date: datetime
     end_date: datetime
     notification_type: NotificationType | None = None
@@ -235,6 +259,7 @@ class NotificationAnalyticsRequest(BaseModel):
 
 class NotificationAnalyticsResponse(BaseModel):
     """Notification analytics response"""
+
     total_sent: int
     total_delivered: int
     total_failed: int
@@ -248,8 +273,10 @@ class NotificationAnalyticsResponse(BaseModel):
 # HEALTH & SERVICE INFO
 # ============================================================================
 
+
 class HealthCheckResponse(BaseModel):
     """Service health check"""
+
     status: str
     timestamp: datetime
     version: str
@@ -260,7 +287,7 @@ class HealthCheckResponse(BaseModel):
 
 class ErrorResponse(BaseModel):
     """Error response"""
+
     error: str
     detail: str | None = None
     timestamp: datetime
-

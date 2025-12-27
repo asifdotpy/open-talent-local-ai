@@ -31,7 +31,7 @@ from loguru import logger
 warnings.warn(
     "WhisperSTTService is deprecated. Use VoskSTTService for production deployments.",
     DeprecationWarning,
-    stacklevel=2
+    stacklevel=2,
 )
 
 
@@ -50,7 +50,9 @@ class WhisperSTTService:
         self.model_size = model_size
         self.model = None
         self.device = device or "cpu"
-        logger.info(f"Initializing DEPRECATED Whisper STT (model: {model_size}, device: {self.device})")
+        logger.info(
+            f"Initializing DEPRECATED Whisper STT (model: {model_size}, device: {self.device})"
+        )
 
     def load_model(self):
         """Load Whisper model - DEPRECATED."""

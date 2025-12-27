@@ -1,7 +1,6 @@
 """Tests for the interview process."""
 
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
 
 from app.core.config import settings
 
@@ -14,7 +13,7 @@ def test_start_interview(test_client: TestClient) -> None:
             "requiredSkills": ["Python", "FastAPI"],
             "niceToHaveSkills": ["React", "Docker"],
             "companyCulture": ["Agile", "Remote"],
-            "experienceLevel": "Senior"
+            "experienceLevel": "Senior",
         },
         "candidateProfile": {
             "fullName": "John Doe",
@@ -25,28 +24,27 @@ def test_start_interview(test_client: TestClient) -> None:
                     "title": "Senior Software Engineer",
                     "company": "Acme Inc.",
                     "duration": "2 years",
-                    "responsibilities": ["Developed and maintained web applications using Python and FastAPI."]
+                    "responsibilities": [
+                        "Developed and maintained web applications using Python and FastAPI."
+                    ],
                 }
             ],
             "education": [
                 {
                     "institution": "University of Example",
                     "degree": "B.S. in Computer Science",
-                    "year": "2018"
+                    "year": "2018",
                 }
             ],
-            "skills": {
-                "matched": ["Python", "FastAPI"],
-                "unmatched": ["Java"]
-            },
+            "skills": {"matched": ["Python", "FastAPI"], "unmatched": ["Java"]},
             "alignmentScore": 0.85,
             "initialQuestions": [
                 {
                     "question": "Tell me about your experience with FastAPI.",
-                    "reasoning": "To assess the candidate's hands-on experience with the required framework."
+                    "reasoning": "To assess the candidate's hands-on experience with the required framework.",
                 }
-            ]
-        }
+            ],
+        },
     }
 
     response = test_client.post(f"{settings.API_V1_STR}/interview/start", json=payload)

@@ -22,15 +22,19 @@ logger = logging.getLogger(__name__)
 # Models
 # ============================
 
+
 class AgentStatus(str, Enum):
     """Agent health status."""
+
     HEALTHY = "healthy"
     UNHEALTHY = "unhealthy"
     UNREACHABLE = "unreachable"
     UNKNOWN = "unknown"
 
+
 class AgentMetadata(BaseModel):
     """Agent metadata and configuration."""
+
     name: str = Field(..., description="Agent name (e.g., 'scout-coordinator-agent')")
     port: int = Field(..., description="Port the agent runs on")
     url: str = Field(..., description="Full URL for agent API")
@@ -45,9 +49,11 @@ class AgentMetadata(BaseModel):
     class Config:
         use_enum_values = True
 
+
 # ============================
 # Agent Registry
 # ============================
+
 
 class AgentRegistry:
     """Manages agent discovery, metadata, and health monitoring."""
@@ -57,48 +63,48 @@ class AgentRegistry:
         "scout-coordinator-agent": {
             "port": 8090,
             "purpose": "Orchestrates intelligent talent sourcing workflow across specialized agents",
-            "capabilities": ["coordination", "workflow", "orchestration"]
+            "capabilities": ["coordination", "workflow", "orchestration"],
         },
         "proactive-scanning-agent": {
             "port": 8091,
             "purpose": "Proactive candidate identification and monitoring",
-            "capabilities": ["scanning", "monitoring", "identification"]
+            "capabilities": ["scanning", "monitoring", "identification"],
         },
         "boolean-mastery-agent": {
             "port": 8092,
             "purpose": "Boolean query optimization and search refinement",
-            "capabilities": ["search", "query-optimization", "refinement"]
+            "capabilities": ["search", "query-optimization", "refinement"],
         },
         "personalized-engagement-agent": {
             "port": 8093,
             "purpose": "Personalized candidate engagement and outreach",
-            "capabilities": ["engagement", "outreach", "personalization"]
+            "capabilities": ["engagement", "outreach", "personalization"],
         },
         "market-intelligence-agent": {
             "port": 8094,
             "purpose": "Market and industry intelligence gathering",
-            "capabilities": ["market-research", "intelligence", "analysis"]
+            "capabilities": ["market-research", "intelligence", "analysis"],
         },
         "tool-leverage-agent": {
             "port": 8095,
             "purpose": "Tool and skill optimization for talent matching",
-            "capabilities": ["tool-optimization", "matching", "skill-assessment"]
+            "capabilities": ["tool-optimization", "matching", "skill-assessment"],
         },
         "quality-focused-agent": {
             "port": 8096,
             "purpose": "Quality assurance and candidate assessment",
-            "capabilities": ["quality-assurance", "assessment", "validation"]
+            "capabilities": ["quality-assurance", "assessment", "validation"],
         },
         "data-enrichment-agent": {
             "port": 8097,
             "purpose": "Profile enrichment with free/paid vendor APIs",
-            "capabilities": ["enrichment", "data-collection", "validation"]
+            "capabilities": ["enrichment", "data-collection", "validation"],
         },
         "interviewer-agent": {
             "port": 8080,
             "purpose": "Interview orchestration and candidate evaluation",
-            "capabilities": ["interview", "evaluation", "assessment"]
-        }
+            "capabilities": ["interview", "evaluation", "assessment"],
+        },
     }
 
     def __init__(self, host: str = "localhost", agents_path: str | None = None):
@@ -109,7 +115,9 @@ class AgentRegistry:
             agents_path: Path to agents directory for venv discovery
         """
         self.host = host
-        self.agents_path = Path(agents_path) if agents_path else Path("/home/asif1/open-talent/agents")
+        self.agents_path = (
+            Path(agents_path) if agents_path else Path("/home/asif1/open-talent/agents")
+        )
         self.agents: dict[str, AgentMetadata] = {}
         self.health_check_interval = 30  # seconds
         self.health_check_timeout = 5  # seconds
@@ -155,7 +163,7 @@ class AgentRegistry:
                     status=AgentStatus.UNKNOWN,
                     venv_path=self._get_venv_path(agent_name),
                     requires_python_version=python_version,
-                    endpoints=[]  # Will be populated by health check
+                    endpoints=[],  # Will be populated by health check
                 )
 
                 self.agents[agent_name] = agent
@@ -278,7 +286,9 @@ class AgentRegistry:
             else:
                 health_status[agent_name] = result
 
-        logger.info(f"Health check complete: {sum(1 for s in health_status.values() if s == AgentStatus.HEALTHY)}/{len(health_status)} agents healthy")
+        logger.info(
+            f"Health check complete: {sum(1 for s in health_status.values() if s == AgentStatus.HEALTHY)}/{len(health_status)} agents healthy"
+        )
         return health_status
 
     async def start_health_monitoring(self):
@@ -360,7 +370,7 @@ class AgentRegistry:
         endpoint: str,
         method: str = "GET",
         data: dict | None = None,
-        params: dict | None = None
+        params: dict | None = None,
     ) -> tuple[int, dict | None]:
         """Invoke a specific endpoint on a target agent via the registry's session.
 
@@ -390,11 +400,7 @@ class AgentRegistry:
             url = f"{agent.url}{endpoint}"
 
             async with self._session.request(
-                method=method,
-                url=url,
-                json=data,
-                params=params,
-                timeout=30
+                method=method, url=url, json=data, params=params, timeout=30
             ) as response:
                 response_data = None
                 if response.status in [200, 201]:
@@ -409,11 +415,13 @@ class AgentRegistry:
             logger.error(f"Error calling {agent_name}{endpoint}: {e}")
             return 500, None
 
+
 # ============================
 # Singleton Instance
 # ============================
 
 _registry_instance: AgentRegistry | None = None
+
 
 def get_agent_registry(host: str = "localhost", agents_path: str | None = None) -> AgentRegistry:
     """Get or create agent registry instance."""
@@ -423,4 +431,3 @@ def get_agent_registry(host: str = "localhost", agents_path: str | None = None) 
         _registry_instance = AgentRegistry(host=host, agents_path=agents_path)
 
     return _registry_instance
-

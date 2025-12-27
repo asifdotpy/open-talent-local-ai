@@ -39,7 +39,6 @@ service_discovery: ServiceDiscovery | None = None
 http_client: httpx.AsyncClient | None = None
 
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifecycle management."""
@@ -68,7 +67,7 @@ async def lifespan(app: FastAPI):
     for name, status in health["services"].items():
         icon = "✅" if status["status"] == "online" else "❌"
         visibility = "(hidden)" if name.startswith("_") else ""
-        latency = f"{status.get('latencyMs', 'N/A')}ms" if status.get('latencyMs') else "N/A"
+        latency = f"{status.get('latencyMs', 'N/A')}ms" if status.get("latencyMs") else "N/A"
         logger.info(f"{icon} {name:30s} {status['status']:10s} {latency:>10s} {visibility}")
 
     logger.info("=" * 70)
@@ -175,40 +174,44 @@ async def list_services() -> dict:
                 "port": 8000,
                 "url": health["services"].get("scout-service", {}).get("url", ""),
                 "status": health["services"].get("scout-service", {}).get("status", "unknown"),
-                "description": "Talent sourcing and resume parsing"
+                "description": "Talent sourcing and resume parsing",
             },
             "user-service": {
                 "port": 8001,
                 "url": health["services"].get("user-service", {}).get("url", ""),
                 "status": health["services"].get("user-service", {}).get("status", "unknown"),
-                "description": "User management and authentication"
+                "description": "User management and authentication",
             },
             "candidate-service": {
                 "port": 8006,
                 "url": health["services"].get("candidate-service", {}).get("url", ""),
                 "status": health["services"].get("candidate-service", {}).get("status", "unknown"),
-                "description": "Candidate profile management"
+                "description": "Candidate profile management",
             },
         },
         "ai_services": {
             "conversation-service": {
                 "port": 8002,
                 "url": health["services"].get("conversation-service", {}).get("url", ""),
-                "status": health["services"].get("conversation-service", {}).get("status", "unknown"),
-                "description": "AI conversation and chat management"
+                "status": health["services"]
+                .get("conversation-service", {})
+                .get("status", "unknown"),
+                "description": "AI conversation and chat management",
             },
             "interview-service": {
                 "port": 8005,
                 "url": health["services"].get("interview-service", {}).get("url", ""),
                 "status": health["services"].get("interview-service", {}).get("status", "unknown"),
-                "description": "Interview orchestration and flow control"
+                "description": "Interview orchestration and flow control",
             },
             "_granite-interview-service": {
                 "port": 8005,
                 "url": health["services"].get("_granite-interview-service", {}).get("url", ""),
-                "status": health["services"].get("_granite-interview-service", {}).get("status", "unknown"),
+                "status": health["services"]
+                .get("_granite-interview-service", {})
+                .get("status", "unknown"),
                 "description": "Granite interview with custom training (internal)",
-                "hidden": True
+                "hidden": True,
             },
         },
         "media_services": {
@@ -216,13 +219,13 @@ async def list_services() -> dict:
                 "port": 8003,
                 "url": health["services"].get("voice-service", {}).get("url", ""),
                 "status": health["services"].get("voice-service", {}).get("status", "unknown"),
-                "description": "Text-to-speech synthesis with Piper"
+                "description": "Text-to-speech synthesis with Piper",
             },
             "avatar-service": {
                 "port": 8004,
                 "url": health["services"].get("avatar-service", {}).get("url", ""),
                 "status": health["services"].get("avatar-service", {}).get("status", "unknown"),
-                "description": "3D avatar rendering with phoneme lip-sync"
+                "description": "3D avatar rendering with phoneme lip-sync",
             },
         },
         "analytics_services": {
@@ -230,19 +233,23 @@ async def list_services() -> dict:
                 "port": 8007,
                 "url": health["services"].get("analytics-service", {}).get("url", ""),
                 "status": health["services"].get("analytics-service", {}).get("status", "unknown"),
-                "description": "Sentiment analysis and interview metrics"
+                "description": "Sentiment analysis and interview metrics",
             },
             "ai-auditing-service": {
                 "port": 8012,
                 "url": health["services"].get("ai-auditing-service", {}).get("url", ""),
-                "status": health["services"].get("ai-auditing-service", {}).get("status", "unknown"),
-                "description": "AI bias detection and fairness auditing"
+                "status": health["services"]
+                .get("ai-auditing-service", {})
+                .get("status", "unknown"),
+                "description": "AI bias detection and fairness auditing",
             },
             "explainability-service": {
                 "port": 8013,
                 "url": health["services"].get("explainability-service", {}).get("url", ""),
-                "status": health["services"].get("explainability-service", {}).get("status", "unknown"),
-                "description": "AI decision explainability and interpretability"
+                "status": health["services"]
+                .get("explainability-service", {})
+                .get("status", "unknown"),
+                "description": "AI decision explainability and interpretability",
             },
         },
         "infrastructure_services": {
@@ -250,13 +257,15 @@ async def list_services() -> dict:
                 "port": 8010,
                 "url": health["services"].get("security-service", {}).get("url", ""),
                 "status": health["services"].get("security-service", {}).get("status", "unknown"),
-                "description": "Authentication, encryption, and access control"
+                "description": "Authentication, encryption, and access control",
             },
             "notification-service": {
                 "port": 8011,
                 "url": health["services"].get("notification-service", {}).get("url", ""),
-                "status": health["services"].get("notification-service", {}).get("status", "unknown"),
-                "description": "Email, SMS, and push notifications"
+                "status": health["services"]
+                .get("notification-service", {})
+                .get("status", "unknown"),
+                "description": "Email, SMS, and push notifications",
             },
         },
         "ai_engine": {
@@ -264,17 +273,14 @@ async def list_services() -> dict:
                 "port": 11434,
                 "url": health["services"].get("ollama", {}).get("url", ""),
                 "status": health["services"].get("ollama", {}).get("status", "unknown"),
-                "description": "Local Granite 4 AI model engine"
+                "description": "Local Granite 4 AI model engine",
             }
-        }
+        },
     }
 
     return {
         "total_services": len(service_discovery.services),
-        "gateway": {
-            "version": "0.1.0",
-            "port": 8009
-        },
+        "gateway": {"version": "0.1.0", "port": 8009},
         "service_registry": service_registry,
         "timestamp": datetime.now().isoformat(),
     }
@@ -327,9 +333,7 @@ async def list_models() -> ModelsResponse:
     try:
         url = await service_discovery.get_service_url("granite-interview-service")
         if url:
-            response = await http_client.get(
-                f"{url}/api/v1/models", timeout=5.0
-            )
+            response = await http_client.get(f"{url}/api/v1/models", timeout=5.0)
             if response.status_code == 200:
                 granite_models = response.json().get("models", [])
                 for model in granite_models:
@@ -420,7 +424,7 @@ async def synthesize_speech(payload: dict) -> dict:
     try:
         response = await http_client.post(
             f"{url}/voice/tts",
-            json={"text": text, "voice": payload.get("voice", "en-US-Neural2-C")}
+            json={"text": text, "voice": payload.get("voice", "en-US-Neural2-C")},
         )
         return response.json()
     except Exception as e:
@@ -455,10 +459,7 @@ async def analyze_sentiment(payload: dict) -> dict:
         if "context" in payload:
             request_payload["context"] = payload["context"]
 
-        response = await http_client.post(
-            f"{url}/api/v1/analyze/sentiment",
-            json=request_payload
-        )
+        response = await http_client.post(f"{url}/api/v1/analyze/sentiment", json=request_payload)
         return response.json()
     except Exception as e:
         logger.warning(f"Sentiment analysis failed: {e}")
@@ -498,7 +499,9 @@ async def execute_agent(payload: dict) -> dict:
             interview_id = payload.get("interview_id")
             answer = payload.get("answer")
             if not interview_id or answer is None:
-                raise HTTPException(status_code=400, detail="interview_id and answer are required for answer")
+                raise HTTPException(
+                    status_code=400, detail="interview_id and answer are required for answer"
+                )
             response = await http_client.post(
                 f"{url}/interviews/{interview_id}/answer",
                 params={"answer": answer},
@@ -511,7 +514,9 @@ async def execute_agent(payload: dict) -> dict:
         elif action == "next_question":
             interview_id = payload.get("interview_id")
             if not interview_id:
-                raise HTTPException(status_code=400, detail="interview_id is required for next_question")
+                raise HTTPException(
+                    status_code=400, detail="interview_id is required for next_question"
+                )
             response = await http_client.get(f"{url}/interviews/{interview_id}/next-question")
         else:
             raise HTTPException(status_code=400, detail=f"Unsupported action: {action}")
@@ -708,11 +713,7 @@ async def respond_to_interview(request: InterviewResponseRequest) -> InterviewSe
 
     # Try to get next question from granite-interview-service
     try:
-        if (
-            service_discovery
-            and http_client
-            and session.currentQuestion < total_questions
-        ):
+        if service_discovery and http_client and session.currentQuestion < total_questions:
             url = await service_discovery.get_service_url("granite-interview-service")
             if url:
                 response = await http_client.post(
@@ -731,9 +732,7 @@ async def respond_to_interview(request: InterviewResponseRequest) -> InterviewSe
                         "next_question",
                         f"Question {session.currentQuestion + 1}: Thank you for that response.",
                     )
-                    session.messages.append(
-                        Message(role="assistant", content=next_question)
-                    )
+                    session.messages.append(Message(role="assistant", content=next_question))
                     session.currentQuestion += 1
 
                     if session.currentQuestion > total_questions:
@@ -753,12 +752,8 @@ async def respond_to_interview(request: InterviewResponseRequest) -> InterviewSe
         next_question = "Thank you for completing the interview. We appreciate your time!"
     else:
         # Get next templated question
-        question_idx = min(
-            session.currentQuestion - 1, len(prompts["questions"]) - 1
-        )
-        next_question = (
-            f"Question {session.currentQuestion}: {prompts['questions'][question_idx]}"
-        )
+        question_idx = min(session.currentQuestion - 1, len(prompts["questions"]) - 1)
+        next_question = f"Question {session.currentQuestion}: {prompts['questions'][question_idx]}"
 
     session.messages.append(Message(role="assistant", content=next_question))
 

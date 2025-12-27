@@ -76,7 +76,8 @@ class DatabaseService:
         cursor = self.connection.cursor()
 
         # Conversations table
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS conversations (
                 conversation_id TEXT PRIMARY KEY,
                 session_id TEXT NOT NULL,
@@ -93,10 +94,12 @@ class DatabaseService:
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                 updated_at TEXT DEFAULT CURRENT_TIMESTAMP
             )
-        """)
+        """
+        )
 
         # Messages table
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS messages (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 conversation_id TEXT NOT NULL,
@@ -109,7 +112,8 @@ class DatabaseService:
                 created_at TEXT DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (conversation_id) REFERENCES conversations(conversation_id)
             )
-        """)
+        """
+        )
 
         # Create indexes
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_session ON conversations(session_id)")
@@ -124,7 +128,8 @@ class DatabaseService:
         cursor = self.connection.cursor()
 
         # Conversations table
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS conversations (
                 conversation_id VARCHAR(255) PRIMARY KEY,
                 session_id VARCHAR(255) NOT NULL,
@@ -141,10 +146,12 @@ class DatabaseService:
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        """)
+        """
+        )
 
         # Messages table
-        cursor.execute("""
+        cursor.execute(
+            """
             CREATE TABLE IF NOT EXISTS messages (
                 id SERIAL PRIMARY KEY,
                 conversation_id VARCHAR(255) NOT NULL,
@@ -157,7 +164,8 @@ class DatabaseService:
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (conversation_id) REFERENCES conversations(conversation_id)
             )
-        """)
+        """
+        )
 
         # Create indexes
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_session ON conversations(session_id)")
@@ -177,34 +185,46 @@ class DatabaseService:
 
             # Serialize complex fields
             candidate_profile = json.dumps(conversation.get("candidate_profile", {}))
-            start_time = conversation["start_time"].isoformat() if isinstance(conversation["start_time"], datetime) else conversation["start_time"]
+            start_time = (
+                conversation["start_time"].isoformat()
+                if isinstance(conversation["start_time"], datetime)
+                else conversation["start_time"]
+            )
             end_time = conversation.get("end_time")
             if end_time and isinstance(end_time, datetime):
                 end_time = end_time.isoformat()
-            last_activity = conversation["last_activity"].isoformat() if isinstance(conversation["last_activity"], datetime) else conversation["last_activity"]
+            last_activity = (
+                conversation["last_activity"].isoformat()
+                if isinstance(conversation["last_activity"], datetime)
+                else conversation["last_activity"]
+            )
 
             if self.db_type == "sqlite":
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT OR REPLACE INTO conversations
                     (conversation_id, session_id, job_description, candidate_profile, interview_type,
                      tone, status, current_topic, question_count, start_time, end_time, last_activity, updated_at)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-                """, (
-                    conversation["conversation_id"],
-                    conversation["session_id"],
-                    conversation.get("job_description"),
-                    candidate_profile,
-                    conversation.get("interview_type"),
-                    conversation.get("tone"),
-                    conversation.get("status"),
-                    conversation.get("current_topic"),
-                    conversation.get("question_count", 0),
-                    start_time,
-                    end_time,
-                    last_activity
-                ))
+                """,
+                    (
+                        conversation["conversation_id"],
+                        conversation["session_id"],
+                        conversation.get("job_description"),
+                        candidate_profile,
+                        conversation.get("interview_type"),
+                        conversation.get("tone"),
+                        conversation.get("status"),
+                        conversation.get("current_topic"),
+                        conversation.get("question_count", 0),
+                        start_time,
+                        end_time,
+                        last_activity,
+                    ),
+                )
             else:  # PostgreSQL
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT INTO conversations
                     (conversation_id, session_id, job_description, candidate_profile, interview_type,
                      tone, status, current_topic, question_count, start_time, end_time, last_activity, updated_at)
@@ -216,20 +236,22 @@ class DatabaseService:
                         end_time = EXCLUDED.end_time,
                         last_activity = EXCLUDED.last_activity,
                         updated_at = CURRENT_TIMESTAMP
-                """, (
-                    conversation["conversation_id"],
-                    conversation["session_id"],
-                    conversation.get("job_description"),
-                    candidate_profile,
-                    conversation.get("interview_type"),
-                    conversation.get("tone"),
-                    conversation.get("status"),
-                    conversation.get("current_topic"),
-                    conversation.get("question_count", 0),
-                    start_time,
-                    end_time,
-                    last_activity
-                ))
+                """,
+                    (
+                        conversation["conversation_id"],
+                        conversation["session_id"],
+                        conversation.get("job_description"),
+                        candidate_profile,
+                        conversation.get("interview_type"),
+                        conversation.get("tone"),
+                        conversation.get("status"),
+                        conversation.get("current_topic"),
+                        conversation.get("question_count", 0),
+                        start_time,
+                        end_time,
+                        last_activity,
+                    ),
+                )
 
             self.connection.commit()
             logger.debug(f"Saved conversation {conversation['conversation_id']}")
@@ -248,7 +270,7 @@ class DatabaseService:
         speaker: str = "ai",
         confidence: float | None = None,
         metadata: dict[str, Any] | None = None,
-        timestamp: datetime | None = None
+        timestamp: datetime | None = None,
     ) -> bool:
         """Save a message to the database."""
         if not self.use_database:
@@ -261,17 +283,39 @@ class DatabaseService:
             metadata_json = json.dumps(metadata or {})
 
             if self.db_type == "sqlite":
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT INTO messages
                     (conversation_id, message_type, content, speaker, confidence, metadata, timestamp)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
-                """, (conversation_id, message_type, content, speaker, confidence, metadata_json, timestamp_str))
+                """,
+                    (
+                        conversation_id,
+                        message_type,
+                        content,
+                        speaker,
+                        confidence,
+                        metadata_json,
+                        timestamp_str,
+                    ),
+                )
             else:  # PostgreSQL
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT INTO messages
                     (conversation_id, message_type, content, speaker, confidence, metadata, timestamp)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """, (conversation_id, message_type, content, speaker, confidence, metadata_json, timestamp_str))
+                """,
+                    (
+                        conversation_id,
+                        message_type,
+                        content,
+                        speaker,
+                        confidence,
+                        metadata_json,
+                        timestamp_str,
+                    ),
+                )
 
             self.connection.commit()
             logger.debug(f"Saved message for conversation {conversation_id}")
@@ -291,9 +335,13 @@ class DatabaseService:
             cursor = self.connection.cursor()
 
             if self.db_type == "sqlite":
-                cursor.execute("SELECT * FROM conversations WHERE conversation_id = ?", (conversation_id,))
+                cursor.execute(
+                    "SELECT * FROM conversations WHERE conversation_id = ?", (conversation_id,)
+                )
             else:
-                cursor.execute("SELECT * FROM conversations WHERE conversation_id = %s", (conversation_id,))
+                cursor.execute(
+                    "SELECT * FROM conversations WHERE conversation_id = %s", (conversation_id,)
+                )
 
             row = cursor.fetchone()
             if row:
@@ -313,19 +361,25 @@ class DatabaseService:
             cursor = self.connection.cursor()
 
             if self.db_type == "sqlite":
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT * FROM messages
                     WHERE conversation_id = ?
                     ORDER BY timestamp ASC
                     LIMIT ?
-                """, (conversation_id, limit))
+                """,
+                    (conversation_id, limit),
+                )
             else:
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT * FROM messages
                     WHERE conversation_id = %s
                     ORDER BY timestamp ASC
                     LIMIT %s
-                """, (conversation_id, limit))
+                """,
+                    (conversation_id, limit),
+                )
 
             rows = cursor.fetchall()
             return [dict(row) for row in rows]
@@ -343,9 +397,15 @@ class DatabaseService:
             cursor = self.connection.cursor()
 
             if self.db_type == "sqlite":
-                cursor.execute("SELECT * FROM conversations WHERE session_id = ? ORDER BY start_time DESC LIMIT 1", (session_id,))
+                cursor.execute(
+                    "SELECT * FROM conversations WHERE session_id = ? ORDER BY start_time DESC LIMIT 1",
+                    (session_id,),
+                )
             else:
-                cursor.execute("SELECT * FROM conversations WHERE session_id = %s ORDER BY start_time DESC LIMIT 1", (session_id,))
+                cursor.execute(
+                    "SELECT * FROM conversations WHERE session_id = %s ORDER BY start_time DESC LIMIT 1",
+                    (session_id,),
+                )
 
             row = cursor.fetchone()
             if row:

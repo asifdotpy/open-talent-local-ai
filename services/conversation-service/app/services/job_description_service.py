@@ -28,9 +28,7 @@ class JobDescriptionService:
         self.client = httpx.AsyncClient(timeout=10.0)
 
     async def get_job_description(
-        self,
-        project_id: str | None = None,
-        job_id: str | None = None
+        self, project_id: str | None = None, job_id: str | None = None
     ) -> dict[str, Any]:
         """Fetch a job description from the project service or a mock source.
 
@@ -100,7 +98,7 @@ class JobDescriptionService:
             "experience_level": job_data.get("experience_level", "mid"),
             "department": job_data.get("department", "Engineering"),
             "location": job_data.get("location", "Remote"),
-            "employment_type": job_data.get("employment_type", "Full-time")
+            "employment_type": job_data.get("employment_type", "Full-time"),
         }
 
     def _get_mock_job_description(self, job_id: str | None = None) -> dict[str, Any]:
@@ -110,18 +108,26 @@ class JobDescriptionService:
                 "job_id": "python-backend",
                 "title": "Senior Python Backend Engineer",
                 "description": "We're seeking an experienced Python backend engineer to join our team. You'll work on building scalable microservices using Django and FastAPI.",
-                "required_skills": ["Python", "Django", "FastAPI", "PostgreSQL", "Redis", "Docker", "AWS"],
+                "required_skills": [
+                    "Python",
+                    "Django",
+                    "FastAPI",
+                    "PostgreSQL",
+                    "Redis",
+                    "Docker",
+                    "AWS",
+                ],
                 "key_responsibilities": [
                     "Design and implement RESTful APIs",
                     "Optimize database queries and improve performance",
                     "Write comprehensive unit and integration tests",
                     "Collaborate with frontend team on API contracts",
-                    "Mentor junior developers"
+                    "Mentor junior developers",
                 ],
                 "experience_level": "senior",
                 "department": "Engineering",
                 "location": "Remote",
-                "employment_type": "Full-time"
+                "employment_type": "Full-time",
             },
             "frontend-react": {
                 "job_id": "frontend-react",
@@ -133,30 +139,38 @@ class JobDescriptionService:
                     "Implement responsive designs",
                     "Optimize application performance",
                     "Write unit tests with Jest and React Testing Library",
-                    "Collaborate with designers and backend engineers"
+                    "Collaborate with designers and backend engineers",
                 ],
                 "experience_level": "mid",
                 "department": "Engineering",
                 "location": "Hybrid",
-                "employment_type": "Full-time"
+                "employment_type": "Full-time",
             },
             "devops": {
                 "job_id": "devops",
                 "title": "DevOps Engineer",
                 "description": "We need a DevOps engineer to manage our cloud infrastructure and CI/CD pipelines.",
-                "required_skills": ["Kubernetes", "Docker", "AWS", "Terraform", "Jenkins", "Python", "Bash"],
+                "required_skills": [
+                    "Kubernetes",
+                    "Docker",
+                    "AWS",
+                    "Terraform",
+                    "Jenkins",
+                    "Python",
+                    "Bash",
+                ],
                 "key_responsibilities": [
                     "Manage Kubernetes clusters",
                     "Build and maintain CI/CD pipelines",
                     "Monitor system performance and reliability",
                     "Automate infrastructure provisioning",
-                    "Implement security best practices"
+                    "Implement security best practices",
                 ],
                 "experience_level": "senior",
                 "department": "Infrastructure",
                 "location": "Remote",
-                "employment_type": "Full-time"
-            }
+                "employment_type": "Full-time",
+            },
         }
 
         # Return specific job or default to Python backend
@@ -175,11 +189,11 @@ class JobDescriptionService:
             "skills": ["Python", "Django", "React", "PostgreSQL", "Docker"],
             "previous_roles": [
                 "Senior Software Engineer at Tech Corp",
-                "Software Engineer at StartupXYZ"
+                "Software Engineer at StartupXYZ",
             ],
             "education": "BS Computer Science",
             "location": "San Francisco, CA",
-            "availability": "2 weeks notice"
+            "availability": "2 weeks notice",
         }
 
     def build_job_description_text(self, job_data: dict[str, Any]) -> str:
@@ -206,7 +220,7 @@ Required Skills:
 Key Responsibilities:
 """
 
-        for i, responsibility in enumerate(job_data.get('key_responsibilities', []), 1):
+        for i, responsibility in enumerate(job_data.get("key_responsibilities", []), 1):
             text += f"{i}. {responsibility}\n"
 
         return text.strip()

@@ -23,7 +23,9 @@ def _load_app():
 async def async_client():
     app = _load_app()
     transport = ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://testserver", timeout=5.0) as client:
+    async with httpx.AsyncClient(
+        transport=transport, base_url="http://testserver", timeout=5.0
+    ) as client:
         yield client
 
 
@@ -55,7 +57,7 @@ async def test_config_validation(async_client):
     invalid_cfg = {
         "default_ruleset": ["enum_validation"],
         "fail_on_severity": "high",
-        "max_findings": 0
+        "max_findings": 0,
     }
     put = await async_client.put("/api/v1/audit/config", json=invalid_cfg)
     # Should be rejected by Pydantic (422) or accepted with correction (200)
@@ -90,6 +92,7 @@ async def test_history_populates(async_client):
     run.json()["job_id"]
     # Wait for background worker to complete
     import asyncio
+
     await asyncio.sleep(1.2)
     hist = await async_client.get("/api/v1/audit/history")
     assert hist.status_code == 200

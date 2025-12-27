@@ -9,10 +9,10 @@ from .model_loader import ModelLoader, model_loader
 from .training_service import TrainingService, training_service
 
 __all__ = [
-    'model_loader',
-    'ModelLoader',
-    'inference_engine',
-    'InferenceEngine',
-    'training_service',
-    'TrainingService'
+    "model_loader",
+    "ModelLoader",
+    "inference_engine",
+    "InferenceEngine",
+    "training_service",
+    "TrainingService",
 ]

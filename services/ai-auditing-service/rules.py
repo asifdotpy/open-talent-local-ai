@@ -1,4 +1,3 @@
-
 from schemas import AuditRule, Severity
 
 # Central rule registry to keep RULES and validation aligned

@@ -29,7 +29,9 @@ class User(Base):
     first_name = Column(String(100), nullable=True)
     last_name = Column(String(100), nullable=True)
     role = Column(SAEnum(UserRole, name="userrole"), nullable=False, default=UserRole.CANDIDATE)
-    status = Column(SAEnum(UserStatus, name="userstatus"), nullable=False, default=UserStatus.ACTIVE)
+    status = Column(
+        SAEnum(UserStatus, name="userstatus"), nullable=False, default=UserStatus.ACTIVE
+    )
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     last_login = Column(DateTime, nullable=True)

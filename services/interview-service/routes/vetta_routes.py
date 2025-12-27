@@ -14,8 +14,10 @@ router = APIRouter(prefix="/api/v1/vetta", tags=["vetta-ai"])
 
 # Request/Response Models
 
+
 class CandidateAssessmentRequest(BaseModel):
     """Request for candidate skill assessment."""
+
     candidate_info: str = Field(..., description="Candidate profile/resume text")
     job_description: str = Field(..., description="Job requirements and description")
     role: str = Field(default="Software Engineer", description="Role title")
@@ -23,13 +25,17 @@ class CandidateAssessmentRequest(BaseModel):
 
 class InterviewQuestionRequest(BaseModel):
     """Request for AI-generated interview question."""
-    previous_responses: list[str] = Field(default_factory=list, description="Previous candidate responses")
+
+    previous_responses: list[str] = Field(
+        default_factory=list, description="Previous candidate responses"
+    )
     job_requirements: str = Field(..., description="Job requirements")
     expertise_level: str = Field(default="intermediate", description="Candidate expertise level")
 
 
 class OutreachMessageRequest(BaseModel):
     """Request for personalized outreach message."""
+
     candidate_name: str = Field(..., description="Candidate's name")
     candidate_skills: str = Field(..., description="Key skills to highlight")
     role: str = Field(..., description="Role title")
@@ -38,6 +44,7 @@ class OutreachMessageRequest(BaseModel):
 
 class QualityScoringRequest(BaseModel):
     """Request for candidate quality scoring."""
+
     candidate_profile: str = Field(..., description="Candidate information")
     job_requirements: str = Field(..., description="Job requirements")
     scoring_criteria: list[str] | None = Field(None, description="Custom scoring criteria")
@@ -45,11 +52,13 @@ class QualityScoringRequest(BaseModel):
 
 class SentimentAnalysisRequest(BaseModel):
     """Request for response sentiment analysis."""
+
     response_text: str = Field(..., description="Candidate's response to analyze")
 
 
 class GenerateRequest(BaseModel):
     """Generic generation request."""
+
     instruction: str = Field(..., description="Task instruction")
     context: str | None = Field(None, description="Optional context")
     max_tokens: int = Field(default=256, description="Maximum tokens to generate")
@@ -58,6 +67,7 @@ class GenerateRequest(BaseModel):
 
 
 # API Endpoints
+
 
 @router.get("/info")
 async def get_model_info():
@@ -83,14 +93,14 @@ async def generate_response(request: GenerateRequest):
             context=request.context,
             max_tokens=request.max_tokens,
             temperature=request.temperature,
-            top_p=request.top_p
+            top_p=request.top_p,
         )
 
         return {
             "response": response,
             "instruction": request.instruction,
             "model": vetta.model_name,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
     except Exception as e:
@@ -109,7 +119,7 @@ async def assess_candidate(request: CandidateAssessmentRequest):
         assessment = await vetta.assess_candidate(
             candidate_info=request.candidate_info,
             job_description=request.job_description,
-            role=request.role
+            role=request.role,
         )
 
         return assessment
@@ -130,14 +140,14 @@ async def generate_interview_question(request: InterviewQuestionRequest):
         question = await vetta.generate_interview_question(
             previous_responses=request.previous_responses,
             job_requirements=request.job_requirements,
-            expertise_level=request.expertise_level
+            expertise_level=request.expertise_level,
         )
 
         return {
             "question": question,
             "expertise_level": request.expertise_level,
             "context_responses": len(request.previous_responses),
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
     except Exception as e:
@@ -157,7 +167,7 @@ async def generate_outreach_message(request: OutreachMessageRequest):
             candidate_name=request.candidate_name,
             candidate_skills=request.candidate_skills,
             role=request.role,
-            company=request.company
+            company=request.company,
         )
 
         return {
@@ -165,7 +175,7 @@ async def generate_outreach_message(request: OutreachMessageRequest):
             "candidate_name": request.candidate_name,
             "role": request.role,
             "company": request.company,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
     except Exception as e:
@@ -184,7 +194,7 @@ async def score_candidate_quality(request: QualityScoringRequest):
         scoring = await vetta.score_candidate_quality(
             candidate_profile=request.candidate_profile,
             job_requirements=request.job_requirements,
-            scoring_criteria=request.scoring_criteria
+            scoring_criteria=request.scoring_criteria,
         )
 
         return scoring
@@ -228,5 +238,5 @@ async def vetta_health_check():
         "model_loaded": info["loaded"],
         "fallback_mode": info["fallback_mode"],
         "cuda_available": info["cuda_available"],
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
     }

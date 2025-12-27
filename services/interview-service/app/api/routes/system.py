@@ -12,11 +12,15 @@ router = APIRouter()
 def db_status(session: Session = Depends(get_db)):
     try:
         # Check if we're using SQLModel's Session (has exec) or SQLAlchemy's Session (has execute)
-        if hasattr(session, 'exec'):
+        if hasattr(session, "exec"):
             version = session.exec(select(SystemVersion)).first()
         else:
             version = session.execute(select(SystemVersion)).scalar_one_or_none()
-        return {"db_status": "ok", "system_version": version.version if version else None, "detail": "No error"}
+        return {
+            "db_status": "ok",
+            "system_version": version.version if version else None,
+            "detail": "No error",
+        }
     except OperationalError as e:
         return {"db_status": "error", "detail": str(e)}
     except Exception as e:

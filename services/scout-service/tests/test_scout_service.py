@@ -40,8 +40,7 @@ class TestCandidateSearch:
     @pytest.mark.asyncio
     async def test_search_candidates(self, scout_service_url, async_client, auth_headers):
         response = await async_client.get(
-            f"{scout_service_url}/api/v1/search?skills=python&location=usa",
-            headers=auth_headers
+            f"{scout_service_url}/api/v1/search?skills=python&location=usa", headers=auth_headers
         )
         assert response.status_code in [200, 403, 400]
 
@@ -51,20 +50,17 @@ class TestCandidateSearch:
             "skills": ["python", "javascript"],
             "experience_years": 5,
             "location": "remote",
-            "salary_range": [80000, 150000]
+            "salary_range": [80000, 150000],
         }
         response = await async_client.post(
-            f"{scout_service_url}/api/v1/search/advanced",
-            json=search_query,
-            headers=auth_headers
+            f"{scout_service_url}/api/v1/search/advanced", json=search_query, headers=auth_headers
         )
         assert response.status_code in [200, 201]
 
     @pytest.mark.asyncio
     async def test_get_candidate_match_score(self, scout_service_url, async_client, auth_headers):
         response = await async_client.get(
-            f"{scout_service_url}/api/v1/candidates/candidate123/match",
-            headers=auth_headers
+            f"{scout_service_url}/api/v1/candidates/candidate123/match", headers=auth_headers
         )
         assert response.status_code in [200, 404]
 
@@ -75,23 +71,21 @@ class TestSourcedLists:
         response = await async_client.post(
             f"{scout_service_url}/api/v1/lists",
             json={"name": "Python Developers", "criteria": {"skills": ["python"]}},
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 201]
 
     @pytest.mark.asyncio
     async def test_get_sourced_list(self, scout_service_url, async_client, auth_headers):
         response = await async_client.get(
-            f"{scout_service_url}/api/v1/lists/list123",
-            headers=auth_headers
+            f"{scout_service_url}/api/v1/lists/list123", headers=auth_headers
         )
         assert response.status_code in [200, 404]
 
     @pytest.mark.asyncio
     async def test_get_list_candidates(self, scout_service_url, async_client, auth_headers):
         response = await async_client.get(
-            f"{scout_service_url}/api/v1/lists/list123/candidates",
-            headers=auth_headers
+            f"{scout_service_url}/api/v1/lists/list123/candidates", headers=auth_headers
         )
         assert response.status_code in [200, 404]
 

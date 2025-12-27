@@ -167,7 +167,6 @@ def sample_preferences_data() -> dict:
     }
 
 
-
 def create_jwt_token(
     email: str,
     user_id: str = "test-user-id",

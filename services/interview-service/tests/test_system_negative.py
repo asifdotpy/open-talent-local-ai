@@ -54,7 +54,7 @@ def test_db_status_connection_error(client: TestClient, db: Session):
         raise OperationalError(statement=None, params=None, orig=Exception(error_message))
 
     # Use the session that's passed in as a fixture
-    with patch.object(db, 'exec' if hasattr(db, 'exec') else 'execute', side_effect=mock_exec):
+    with patch.object(db, "exec" if hasattr(db, "exec") else "execute", side_effect=mock_exec):
         response = client.get(f"{settings.API_V1_STR}/system/db-status")
         assert response.status_code == 200
         data = response.json()
@@ -64,11 +64,12 @@ def test_db_status_connection_error(client: TestClient, db: Session):
 
 def test_db_status_query_error(client: TestClient, db):
     """Test the database status endpoint when a query execution fails."""
+
     # Mock the session.exec/execute to simulate a query execution error
     def mock_exec(*args, **kwargs):
         raise SQLAlchemyError("Query execution failed")
 
-    with patch.object(db, 'exec' if hasattr(db, 'exec') else 'execute', side_effect=mock_exec):
+    with patch.object(db, "exec" if hasattr(db, "exec") else "execute", side_effect=mock_exec):
         response = client.get(f"{settings.API_V1_STR}/system/db-status")
         assert response.status_code == 200  # The endpoint handles the error
         data = response.json()
@@ -82,7 +83,7 @@ def test_db_status_missing_table(client: TestClient, db):
     mock_result = MagicMock()
     mock_result.scalar_one_or_none.return_value = None
 
-    with patch.object(db, 'exec' if hasattr(db, 'exec') else 'execute', return_value=mock_result):
+    with patch.object(db, "exec" if hasattr(db, "exec") else "execute", return_value=mock_result):
         response = client.get(f"{settings.API_V1_STR}/system/db-status")
         assert response.status_code == 200
         data = response.json()

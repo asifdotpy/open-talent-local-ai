@@ -28,7 +28,9 @@ def test_node_binary_available():
     node_path = shutil.which("node")
     if not node_path:
         pytest.skip("node not in PATH")
-    proc = subprocess.run([node_path, "--version"], check=False, capture_output=True, text=True, timeout=5)
+    proc = subprocess.run(
+        [node_path, "--version"], check=False, capture_output=True, text=True, timeout=5
+    )
     assert proc.returncode == 0, "node --version failed"
     assert proc.stdout.strip(), "node version output empty"
 
@@ -39,7 +41,9 @@ def test_ffmpeg_binary_available():
     ffmpeg_path = shutil.which("ffmpeg")
     if not ffmpeg_path:
         pytest.skip("ffmpeg not in PATH")
-    proc = subprocess.run([ffmpeg_path, "-version"], check=False, capture_output=True, text=True, timeout=5)
+    proc = subprocess.run(
+        [ffmpeg_path, "-version"], check=False, capture_output=True, text=True, timeout=5
+    )
     assert proc.returncode == 0, "ffmpeg -version failed"
 
 
@@ -55,12 +59,7 @@ def test_render_script_stdin_json_parsing():
         pytest.skip("node not available")
 
     # Create minimal JSON input
-    json.dumps({
-        "phonemes": [],
-        "duration": 1.0,
-        "model": "production",
-        "text": "test"
-    })
+    json.dumps({"phonemes": [], "duration": 1.0, "model": "production", "text": "test"})
 
     # Note: Don't actually run render.js as it requires Three.js/WebGL context
     # Just verify JSON can be written to stdin without crashing parse

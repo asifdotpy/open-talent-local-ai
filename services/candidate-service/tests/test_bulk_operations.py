@@ -14,19 +14,15 @@ def test_bulk_import_happy_path():
                 "email": "alice.smith@example.com",
                 "first_name": "Alice",
                 "last_name": "Smith",
-                "phone": "+12125551234"
+                "phone": "+12125551234",
             },
             {
                 "email": "bob.jones@example.com",
                 "first_name": "Bob",
                 "last_name": "Jones",
-                "resume_url": "https://example.com/bob-resume.pdf"
+                "resume_url": "https://example.com/bob-resume.pdf",
             },
-            {
-                "email": "charlie.brown@example.com",
-                "first_name": "Charlie",
-                "last_name": "Brown"
-            }
+            {"email": "charlie.brown@example.com", "first_name": "Charlie", "last_name": "Brown"},
         ]
     }
     r = client.post("/api/v1/candidates/bulk", json=payload, headers=AUTH)
@@ -49,16 +45,8 @@ def test_bulk_import_with_partial_failure():
     # Import with candidates (email validation is strict)
     payload = {
         "candidates": [
-            {
-                "email": "valid1@example.com",
-                "first_name": "Valid",
-                "last_name": "User"
-            },
-            {
-                "email": "valid2@example.com",
-                "first_name": "Another",
-                "last_name": "User"
-            }
+            {"email": "valid1@example.com", "first_name": "Valid", "last_name": "User"},
+            {"email": "valid2@example.com", "first_name": "Another", "last_name": "User"},
         ]
     }
     r = client.post("/api/v1/candidates/bulk", json=payload, headers=AUTH)
@@ -70,13 +58,7 @@ def test_bulk_import_with_partial_failure():
 
 def test_bulk_import_unauthorized():
     payload = {
-        "candidates": [
-            {
-                "email": "test@example.com",
-                "first_name": "Test",
-                "last_name": "User"
-            }
-        ]
+        "candidates": [{"email": "test@example.com", "first_name": "Test", "last_name": "User"}]
     }
     r = client.post("/api/v1/candidates/bulk", json=payload)
     assert r.status_code == 401
@@ -84,11 +66,7 @@ def test_bulk_import_unauthorized():
 
 def test_bulk_export_happy_path():
     # Create a candidate first
-    cand = {
-        "email": "export.test@example.com",
-        "first_name": "Export",
-        "last_name": "Test"
-    }
+    cand = {"email": "export.test@example.com", "first_name": "Export", "last_name": "Test"}
     r = client.post("/api/v1/candidates", json=cand, headers=AUTH)
     assert r.status_code == 201
 

@@ -46,20 +46,22 @@ class UnifiedStreamService:
                 audio_chunk = await websocket.receive_bytes()
 
                 # Apply VAD if enabled and available
-                if use_vad and self.vad_service and hasattr(self.vad_service, 'is_speech'):
+                if use_vad and self.vad_service and hasattr(self.vad_service, "is_speech"):
                     if not self.vad_service.is_speech(audio_chunk):
                         continue  # Skip silence
 
                 # Process with STT
-                if hasattr(self.stt_service, 'transcribe_streaming'):
+                if hasattr(self.stt_service, "transcribe_streaming"):
                     result = self.stt_service.transcribe_streaming(audio_chunk)
                     if result:
-                        await websocket.send_json({
-                            "type": "partial" if result.get("partial") else "final",
-                            "text": result.get("text", ""),
-                            "confidence": result.get("confidence", 0.0),
-                            "words": result.get("words", [])
-                        })
+                        await websocket.send_json(
+                            {
+                                "type": "partial" if result.get("partial") else "final",
+                                "text": result.get("text", ""),
+                                "confidence": result.get("confidence", 0.0),
+                                "words": result.get("words", []),
+                            }
+                        )
                 # Fallback to file-based processing for large chunks
                 elif len(audio_chunk) > 16000:  # ~1 second
                     import os
@@ -71,12 +73,14 @@ class UnifiedStreamService:
 
                     try:
                         result = self.stt_service.transcribe_audio(tmp_path)
-                        await websocket.send_json({
-                            "type": "transcription",
-                            "text": result.get("text", ""),
-                            "confidence": result.get("confidence", 0.0),
-                            "words": result.get("words", [])
-                        })
+                        await websocket.send_json(
+                            {
+                                "type": "transcription",
+                                "text": result.get("text", ""),
+                                "confidence": result.get("confidence", 0.0),
+                                "words": result.get("words", []),
+                            }
+                        )
                     finally:
                         os.unlink(tmp_path)
 
@@ -125,11 +129,11 @@ class UnifiedStreamService:
                         text=text,
                         output_path=output_path,
                         voice=voice,
-                        extract_phonemes=False  # Skip for speed
+                        extract_phonemes=False,  # Skip for speed
                     )
 
                     # Read and stream audio in chunks
-                    with open(output_path, 'rb') as f:
+                    with open(output_path, "rb") as f:
                         while True:
                             chunk = f.read(4096)  # 4KB chunks
                             if not chunk:

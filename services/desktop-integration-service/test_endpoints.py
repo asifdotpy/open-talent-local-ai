@@ -12,7 +12,9 @@ import httpx
 BASE_URL = "http://localhost:8009"
 
 
-async def test_endpoint(client: httpx.AsyncClient, name: str, method: str, url: str, **kwargs) -> dict:
+async def test_endpoint(
+    client: httpx.AsyncClient, name: str, method: str, url: str, **kwargs
+) -> dict:
     """Test a single endpoint."""
     try:
         if method == "GET":
@@ -25,7 +27,9 @@ async def test_endpoint(client: httpx.AsyncClient, name: str, method: str, url: 
         return {
             "status": "success" if response.status_code < 400 else "error",
             "status_code": response.status_code,
-            "response": response.json() if response.headers.get("content-type", "").startswith("application/json") else response.text[:200]
+            "response": response.json()
+            if response.headers.get("content-type", "").startswith("application/json")
+            else response.text[:200],
         }
     except Exception as e:
         return {"status": "error", "message": str(e)}
@@ -41,13 +45,18 @@ async def main():
             ("System Status", "GET", f"{BASE_URL}/api/v1/system/status"),
             ("List Models", "GET", f"{BASE_URL}/api/v1/models"),
             ("Dashboard", "GET", f"{BASE_URL}/api/v1/dashboard"),
-            ("Start Interview", "POST", f"{BASE_URL}/api/v1/interviews/start", {
-                "json": {
-                    "role": "Software Engineer",
-                    "model": "vetta-granite-2b-gguf-v4",
-                    "totalQuestions": 3
-                }
-            }),
+            (
+                "Start Interview",
+                "POST",
+                f"{BASE_URL}/api/v1/interviews/start",
+                {
+                    "json": {
+                        "role": "Software Engineer",
+                        "model": "vetta-granite-2b-gguf-v4",
+                        "totalQuestions": 3,
+                    }
+                },
+            ),
         ]
 
         results = []
@@ -73,7 +82,6 @@ async def main():
 
         for name, result in results:
             "✅" if result["status"] == "success" else "❌"
-
 
         if passed == total:
             return 0

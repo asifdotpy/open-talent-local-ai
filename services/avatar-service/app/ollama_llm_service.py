@@ -10,6 +10,7 @@ load_dotenv()
 
 class OllamaLLMError(Exception):
     """Custom exception for Ollama LLM errors."""
+
     pass
 
 
@@ -26,10 +27,7 @@ class OllamaLLMService:
         self.model = os.environ.get("OLLAMA_MODEL", "granite4:350m-h")
 
     async def generate_interview_response(
-        self,
-        candidate_input: str,
-        system_prompt: str,
-        context: dict[str, Any] | None = None
+        self, candidate_input: str, system_prompt: str, context: dict[str, Any] | None = None
     ) -> str:
         """Generate interview response using local Ollama LLM.
 
@@ -53,8 +51,8 @@ class OllamaLLMService:
                         "model": self.model,
                         "prompt": full_prompt,
                         "stream": False,
-                        "system": system_prompt
-                    }
+                        "system": system_prompt,
+                    },
                 )
                 response.raise_for_status()
 
@@ -62,16 +60,16 @@ class OllamaLLMService:
                 return result.get("response", "").strip()
 
         except httpx.HTTPStatusError as e:
-            raise OllamaLLMError(f"Ollama API request failed: {e.response.status_code} - {e.response.text}")
+            raise OllamaLLMError(
+                f"Ollama API request failed: {e.response.status_code} - {e.response.text}"
+            )
         except httpx.TimeoutException:
             raise OllamaLLMError("Ollama API request timed out")
         except Exception as e:
             raise OllamaLLMError(f"Unexpected error in Ollama LLM service: {str(e)}")
 
     async def generate_script_text(
-        self,
-        interview_context: dict[str, Any],
-        system_prompt: str
+        self, interview_context: dict[str, Any], system_prompt: str
     ) -> str:
         """Generate script text for avatar video creation.
 
@@ -92,8 +90,8 @@ class OllamaLLMService:
                         "model": self.model,
                         "prompt": prompt,
                         "stream": False,
-                        "system": system_prompt
-                    }
+                        "system": system_prompt,
+                    },
                 )
                 response.raise_for_status()
 
@@ -107,15 +105,12 @@ class OllamaLLMService:
             raise OllamaLLMError(f"Failed to generate script text: {str(e)}")
 
     def _build_interview_prompt(
-        self,
-        candidate_input: str,
-        system_prompt: str,
-        context: dict[str, Any] | None = None
+        self, candidate_input: str, system_prompt: str, context: dict[str, Any] | None = None
     ) -> str:
         """Build complete prompt for interview response generation."""
         prompt_parts = [
             "You are conducting a professional interview. Generate a response based on the candidate's input.",
-            ""
+            "",
         ]
 
         if context:
@@ -127,11 +122,13 @@ class OllamaLLMService:
                 prompt_parts.append(f"Previous Questions Asked: {context['previous_questions']}")
             prompt_parts.append("")
 
-        prompt_parts.extend([
-            f"Candidate Response: {candidate_input}",
-            "",
-            "Generate an appropriate follow-up question or response as the interviewer:",
-        ])
+        prompt_parts.extend(
+            [
+                f"Candidate Response: {candidate_input}",
+                "",
+                "Generate an appropriate follow-up question or response as the interviewer:",
+            ]
+        )
 
         return "\n".join(prompt_parts)
 
@@ -160,7 +157,7 @@ Generate the script text only:
         cleaned = cleaned.replace("**", "").replace("*", "")
 
         # Ensure proper sentence ending
-        if not cleaned.endswith(('.', '!', '?')):
+        if not cleaned.endswith((".", "!", "?")):
             cleaned += "."
 
         return cleaned
@@ -191,24 +188,23 @@ async def main():
     context = {
         "job_title": "Software Engineer",
         "interview_stage": "technical_screening",
-        "previous_questions": ["Tell me about yourself"]
+        "previous_questions": ["Tell me about yourself"],
     }
 
-    system_prompt = "You are Interview, a professional and friendly AI interviewer for technical positions."
+    system_prompt = (
+        "You are Interview, a professional and friendly AI interviewer for technical positions."
+    )
     candidate_input = "I have 5 years of experience in Python dev and have worked on several web applications using FastAPI."
 
     try:
         response = await ollama.generate_interview_response(
-            candidate_input=candidate_input,
-            system_prompt=system_prompt,
-            context=context
+            candidate_input=candidate_input, system_prompt=system_prompt, context=context
         )
         print(f"🤖 Generated Response: {response}")
 
         # Test script generation
         script = await ollama.generate_script_text(
-            interview_context=context,
-            system_prompt=system_prompt
+            interview_context=context, system_prompt=system_prompt
         )
         print(f"📜 Generated Script: {script}")
 

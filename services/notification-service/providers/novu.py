@@ -9,20 +9,20 @@ class NovuProvider(NotificationProvider):
     def __init__(self, api_url: str | None = None, api_key: str | None = None):
         self.api_url = api_url or os.getenv("NOVU_API_URL", "https://api.novu.co")
         self.api_key = api_key or os.getenv("NOVU_API_KEY", "")
-        self.headers = {"Authorization": f"ApiKey {self.api_key}", "Content-Type": "application/json"}
+        self.headers = {
+            "Authorization": f"ApiKey {self.api_key}",
+            "Content-Type": "application/json",
+        }
 
     async def _post(self, path: str, json: dict) -> dict:
         async with aiohttp.ClientSession() as session:
-            async with session.post(f"{self.api_url}{path}", headers=self.headers, json=json) as resp:
+            async with session.post(
+                f"{self.api_url}{path}", headers=self.headers, json=json
+            ) as resp:
                 return {"status": resp.status, "data": await resp.json()}
 
     async def send_email(self, to: str, subject: str, html: str, text: str | None = None) -> dict:
-        payload = {
-            "to": {"email": to},
-            "subject": subject,
-            "html": html,
-            "text": text or ""
-        }
+        payload = {"to": {"email": to}, "subject": subject, "html": html, "text": text or ""}
         return await self._post("/v1/events/trigger", {"name": "email", "payload": payload})
 
     async def send_sms(self, to: str, text: str) -> dict:
@@ -35,7 +35,9 @@ class NovuProvider(NotificationProvider):
 
     async def get_templates(self) -> list[dict]:
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"{self.api_url}/v1/notification-templates", headers=self.headers) as resp:
+            async with session.get(
+                f"{self.api_url}/v1/notification-templates", headers=self.headers
+            ) as resp:
                 data = await resp.json()
                 return data.get("data", [])
 

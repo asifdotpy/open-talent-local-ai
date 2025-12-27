@@ -26,32 +26,19 @@ from .models import (
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from schemas import ActivityLog as UserActivityRead
+from schemas import ProfileCreate as UserProfileCreate
+from schemas import ProfileResponse as UserProfileRead
+from schemas import ProfileUpdate as UserProfileUpdate
+from schemas import SessionInfo as UserSessionRead
 from schemas import (
-    ActivityLog as UserActivityRead,
-)
-from schemas import (
-    ProfileCreate as UserProfileCreate,
-)
-from schemas import (
-    ProfileResponse as UserProfileRead,
-)
-from schemas import (
-    ProfileUpdate as UserProfileUpdate,
-)
-from schemas import (
-    SessionInfo as UserSessionRead,
-)
-from schemas import (
-    # User Core
-    UserCreate,
-    UserUpdate,
+    UserCreate,  # User Core
+    UserUpdate,  # User Core
 )
 from schemas import (
     UserPreferences as UserPreferencesRead,  # Base preferences model used for response
 )
-from schemas import (
-    UserResponse as UserRead,
-)
+from schemas import UserResponse as UserRead
 
 
 # Note: UserPreferencesCreate and UserPreferencesUpdate not in comprehensive schemas
@@ -65,6 +52,7 @@ class UserPreferencesCreate(BaseModel):
     language: str | None = "en"
     tenant_id: str | None = None
 
+
 class UserPreferencesUpdate(BaseModel):
     notification_email: bool | None = None
     notification_sms: bool | None = None
@@ -72,14 +60,18 @@ class UserPreferencesUpdate(BaseModel):
     theme: str | None = None
     language: str | None = None
 
+
 # Legacy response schemas for simple endpoints
 class RootResponse(BaseModel):
     service: str
     status: str
 
+
 class SimpleHealthResponse(BaseModel):
     service: str
     status: str
+
+
 from .utils import JWTClaims, get_jwt_claims, require_role
 
 router = APIRouter()
@@ -108,6 +100,7 @@ async def health() -> SimpleHealthResponse:
 # ============================================================================
 # USER CRUD ENDPOINTS
 # ============================================================================
+
 
 @router.get("/api/v1/users", response_model=list[UserRead])
 async def list_users(
@@ -231,7 +224,12 @@ async def get_user(
 
     # RLS: Check tenant access
     if claims.role != "admin":
-        if claims.tenant_id and user.tenant_id != claims.tenant_id or not claims.tenant_id and user.email != claims.email:
+        if (
+            claims.tenant_id
+            and user.tenant_id != claims.tenant_id
+            or not claims.tenant_id
+            and user.email != claims.email
+        ):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     return UserRead.model_validate(user)
@@ -298,7 +296,12 @@ async def update_user(
 
         # RLS: Check tenant access (only for non-'me' endpoints)
         if claims.role != "admin":
-            if claims.tenant_id and user.tenant_id != claims.tenant_id or not claims.tenant_id and user.email != claims.email:
+            if (
+                claims.tenant_id
+                and user.tenant_id != claims.tenant_id
+                or not claims.tenant_id
+                and user.email != claims.email
+            ):
                 raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     # Check email uniqueness if changed
@@ -359,6 +362,7 @@ async def delete_user(
 # USER PROFILE ENDPOINTS
 # ============================================================================
 
+
 @router.get("/api/v1/users/{user_id}/profile", response_model=UserProfileRead)
 async def get_user_profile(
     user_id: str,
@@ -378,7 +382,11 @@ async def get_user_profile(
     return UserProfileRead.model_validate(profile)
 
 
-@router.post("/api/v1/users/{user_id}/profile", response_model=UserProfileRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/api/v1/users/{user_id}/profile",
+    response_model=UserProfileRead,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_user_profile(
     user_id: str,
     payload: UserProfileCreate,
@@ -451,7 +459,9 @@ async def put_update_user_profile(
     session: AsyncSession = Depends(get_session),
     claims: JWTClaims = Depends(get_jwt_claims),
 ) -> UserProfileRead:
-    return await update_user_profile(user_id=user_id, payload=payload, session=session, claims=claims)
+    return await update_user_profile(
+        user_id=user_id, payload=payload, session=session, claims=claims
+    )
 
 
 # Current user profile endpoints
@@ -468,7 +478,9 @@ async def get_current_user_profile(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     # Get profile for this user
-    profile_result = await session.execute(select(UserProfile).where(UserProfile.user_id == user.id))
+    profile_result = await session.execute(
+        select(UserProfile).where(UserProfile.user_id == user.id)
+    )
     profile = profile_result.scalar_one_or_none()
     if not profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
@@ -489,7 +501,9 @@ async def update_current_user_profile(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     # Get profile for this user
-    profile_result = await session.execute(select(UserProfile).where(UserProfile.user_id == user.id))
+    profile_result = await session.execute(
+        select(UserProfile).where(UserProfile.user_id == user.id)
+    )
     profile = profile_result.scalar_one_or_none()
     if not profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
@@ -507,6 +521,7 @@ async def update_current_user_profile(
 # USER PREFERENCES ENDPOINTS
 # ============================================================================
 
+
 @router.get("/api/v1/users/{user_id}/preferences", response_model=UserPreferencesRead)
 async def get_user_preferences(
     user_id: str,
@@ -519,14 +534,20 @@ async def get_user_preferences(
     except ValueError:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Preferences not found")
 
-    result = await session.execute(select(UserPreferences).where(UserPreferences.user_id == user_uuid))
+    result = await session.execute(
+        select(UserPreferences).where(UserPreferences.user_id == user_uuid)
+    )
     preferences = result.scalar_one_or_none()
     if not preferences:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Preferences not found")
     return UserPreferencesRead.model_validate(preferences)
 
 
-@router.post("/api/v1/users/{user_id}/preferences", response_model=UserPreferencesRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/api/v1/users/{user_id}/preferences",
+    response_model=UserPreferencesRead,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_user_preferences(
     user_id: str,
     payload: UserPreferencesCreate,
@@ -545,9 +566,13 @@ async def create_user_preferences(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     # Check if preferences already exist
-    existing = await session.execute(select(UserPreferences).where(UserPreferences.user_id == user_uuid))
+    existing = await session.execute(
+        select(UserPreferences).where(UserPreferences.user_id == user_uuid)
+    )
     if existing.scalar_one_or_none():
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Preferences already exist")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Preferences already exist"
+        )
 
     preferences = UserPreferences(
         user_id=user_uuid,
@@ -577,7 +602,9 @@ async def update_user_preferences(
     except ValueError:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Preferences not found")
 
-    result = await session.execute(select(UserPreferences).where(UserPreferences.user_id == user_uuid))
+    result = await session.execute(
+        select(UserPreferences).where(UserPreferences.user_id == user_uuid)
+    )
     preferences = result.scalar_one_or_none()
     if not preferences:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Preferences not found")
@@ -598,7 +625,9 @@ async def put_update_user_preferences(
     session: AsyncSession = Depends(get_session),
     claims: JWTClaims = Depends(get_jwt_claims),
 ) -> UserPreferencesRead:
-    return await update_user_preferences(user_id=user_id, payload=payload, session=session, claims=claims)
+    return await update_user_preferences(
+        user_id=user_id, payload=payload, session=session, claims=claims
+    )
 
 
 # Current user preferences endpoints
@@ -615,7 +644,9 @@ async def get_current_user_preferences(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     # Get preferences for this user
-    prefs_result = await session.execute(select(UserPreferences).where(UserPreferences.user_id == user.id))
+    prefs_result = await session.execute(
+        select(UserPreferences).where(UserPreferences.user_id == user.id)
+    )
     preferences = prefs_result.scalar_one_or_none()
     if not preferences:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Preferences not found")
@@ -637,7 +668,9 @@ async def update_current_user_preferences(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     # Get preferences for this user
-    prefs_result = await session.execute(select(UserPreferences).where(UserPreferences.user_id == user.id))
+    prefs_result = await session.execute(
+        select(UserPreferences).where(UserPreferences.user_id == user.id)
+    )
     preferences = prefs_result.scalar_one_or_none()
     if not preferences:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Preferences not found")
@@ -654,6 +687,7 @@ async def update_current_user_preferences(
 # ============================================================================
 # USER ACTIVITY ENDPOINTS
 # ============================================================================
+
 
 @router.get("/api/v1/users/{user_id}/activity", response_model=list[UserActivityRead])
 async def get_user_activity(
@@ -682,7 +716,11 @@ async def get_user_activity(
     return [UserActivityRead.model_validate(activity) for activity in activities]
 
 
-@router.post("/api/v1/users/{user_id}/activity", response_model=UserActivityRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/api/v1/users/{user_id}/activity",
+    response_model=UserActivityRead,
+    status_code=status.HTTP_201_CREATED,
+)
 async def log_user_activity(
     user_id: str,
     action: str,
@@ -720,6 +758,7 @@ async def log_user_activity(
 # USER SESSIONS ENDPOINTS
 # ============================================================================
 
+
 @router.get("/api/v1/users/{user_id}/sessions", response_model=list[UserSessionRead])
 async def get_user_sessions(
     user_id: str,
@@ -745,7 +784,9 @@ async def get_user_sessions(
     return [UserSessionRead.model_validate(sess) for sess in sessions]
 
 
-@router.delete("/api/v1/users/{user_id}/sessions/{session_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/api/v1/users/{user_id}/sessions/{session_id}", status_code=status.HTTP_204_NO_CONTENT
+)
 async def revoke_user_session(
     user_id: str,
     session_id: str,
@@ -776,6 +817,7 @@ async def revoke_user_session(
 # BULK OPERATIONS
 # ============================================================================
 
+
 @router.post("/api/v1/users/bulk/import", response_model=dict)
 async def bulk_import_users(
     file: UploadFile = File(..., description="CSV file with user data"),
@@ -786,11 +828,11 @@ async def bulk_import_users(
 
     CSV format: email,first_name,last_name,role,status,phone,location,tenant_id
     """
-    if not file.filename.endswith('.csv'):
+    if not file.filename.endswith(".csv"):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File must be CSV")
 
     content = await file.read()
-    csv_text = content.decode('utf-8')
+    csv_text = content.decode("utf-8")
     csv_reader = csv.DictReader(io.StringIO(csv_text))
 
     created = 0
@@ -799,7 +841,7 @@ async def bulk_import_users(
 
     for row_num, row in enumerate(csv_reader, start=2):
         try:
-            email = row.get('email', '').strip()
+            email = row.get("email", "").strip()
             if not email:
                 errors.append(f"Row {row_num}: Missing email")
                 skipped += 1
@@ -812,17 +854,17 @@ async def bulk_import_users(
                 continue
 
             # RLS: Override tenant_id from CSV with claims tenant_id unless admin
-            csv_tenant_id = row.get('tenant_id', '').strip() or None
+            csv_tenant_id = row.get("tenant_id", "").strip() or None
             tenant_id = csv_tenant_id if claims.role == "admin" else claims.tenant_id
 
             user = User(
                 email=email,
-                first_name=row.get('first_name', '').strip() or None,
-                last_name=row.get('last_name', '').strip() or None,
-                phone=row.get('phone', '').strip() or None,
-                role=UserRole(row.get('role', 'candidate').strip()),
-                status=UserStatus(row.get('status', 'active').strip()),
-                location=row.get('location', '').strip() or None,
+                first_name=row.get("first_name", "").strip() or None,
+                last_name=row.get("last_name", "").strip() or None,
+                phone=row.get("phone", "").strip() or None,
+                role=UserRole(row.get("role", "candidate").strip()),
+                status=UserStatus(row.get("status", "active").strip()),
+                location=row.get("location", "").strip() or None,
                 tenant_id=tenant_id,
             )
             session.add(user)
@@ -876,25 +918,49 @@ async def bulk_export_users(
     # Generate CSV
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow([
-        'id', 'email', 'first_name', 'last_name', 'role', 'status',
-        'phone', 'location', 'bio', 'avatar_url', 'tenant_id',
-        'created_at', 'updated_at', 'last_login'
-    ])
+    writer.writerow(
+        [
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "role",
+            "status",
+            "phone",
+            "location",
+            "bio",
+            "avatar_url",
+            "tenant_id",
+            "created_at",
+            "updated_at",
+            "last_login",
+        ]
+    )
 
     for user in users:
-        writer.writerow([
-            str(user.id), user.email, user.first_name or '', user.last_name or '',
-            user.role.value, user.status.value, user.phone or '', user.location or '',
-            user.bio or '', user.avatar_url or '', user.tenant_id or '',
-            user.created_at.isoformat(), user.updated_at.isoformat(),
-            user.last_login.isoformat() if user.last_login else ''
-        ])
+        writer.writerow(
+            [
+                str(user.id),
+                user.email,
+                user.first_name or "",
+                user.last_name or "",
+                user.role.value,
+                user.status.value,
+                user.phone or "",
+                user.location or "",
+                user.bio or "",
+                user.avatar_url or "",
+                user.tenant_id or "",
+                user.created_at.isoformat(),
+                user.updated_at.isoformat(),
+                user.last_login.isoformat() if user.last_login else "",
+            ]
+        )
 
     output.seek(0)
 
     return StreamingResponse(
         iter([output.getvalue()]),
         media_type="text/csv",
-        headers={"Content-Disposition": "attachment; filename=users_export.csv"}
+        headers={"Content-Disposition": "attachment; filename=users_export.csv"},
     )

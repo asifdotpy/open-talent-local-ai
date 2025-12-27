@@ -8,6 +8,7 @@ from pathlib import Path
 
 try:
     from vosk import KaldiRecognizer, Model
+
     VOSK_AVAILABLE = True
 except ImportError:
     VOSK_AVAILABLE = False
@@ -15,7 +16,9 @@ except ImportError:
 
 import numpy as np
 import soundfile as sf
+
 from app.core.constants import DEFAULT_SAMPLE_RATE, DEFAULT_VOSK_MODEL_PATH
+
 
 class VoskSTTService:
     """Local Speech-to-Text service using Vosk (Kaldi-based).
@@ -113,7 +116,7 @@ class VoskSTTService:
                 "text": result.get("text", ""),
                 "words": [],
                 "duration": len(audio_data) / self.sample_rate,
-                "confidence": 0.0
+                "confidence": 0.0,
             }
 
             # Process word-level results
@@ -126,7 +129,7 @@ class VoskSTTService:
                         "word": word_info.get("word", ""),
                         "start": word_info.get("start", 0.0),
                         "end": word_info.get("end", 0.0),
-                        "confidence": word_info.get("conf", 1.0)
+                        "confidence": word_info.get("conf", 1.0),
                     }
                     transcription["words"].append(word_entry)
                     total_confidence += word_entry["confidence"]
@@ -176,20 +179,18 @@ class VoskSTTService:
 
     def _format_result(self, result: dict) -> dict:
         """Format Vosk result into standardized output."""
-        formatted = {
-            "text": result.get("text", ""),
-            "words": [],
-            "partial": False
-        }
+        formatted = {"text": result.get("text", ""), "words": [], "partial": False}
 
         if "result" in result:
             for word_info in result["result"]:
-                formatted["words"].append({
-                    "word": word_info.get("word", ""),
-                    "start": word_info.get("start", 0.0),
-                    "end": word_info.get("end", 0.0),
-                    "confidence": word_info.get("conf", 1.0)
-                })
+                formatted["words"].append(
+                    {
+                        "word": word_info.get("word", ""),
+                        "start": word_info.get("start", 0.0),
+                        "end": word_info.get("end", 0.0),
+                        "confidence": word_info.get("conf", 1.0),
+                    }
+                )
 
         return formatted
 
@@ -237,8 +238,8 @@ class VoskSTTService:
                 "streaming": True,
                 "word_timing": True,
                 "confidence_scores": True,
-                "language": "en-US"
-            }
+                "language": "en-US",
+            },
         }
 
 
@@ -259,10 +260,10 @@ class MockVoskSTTService:
                 {"word": "is", "start": 0.2, "end": 0.3, "confidence": 0.93},
                 {"word": "a", "start": 0.3, "end": 0.4, "confidence": 0.92},
                 {"word": "mock", "start": 0.4, "end": 0.6, "confidence": 0.94},
-                {"word": "transcription", "start": 0.6, "end": 1.0, "confidence": 0.91}
+                {"word": "transcription", "start": 0.6, "end": 1.0, "confidence": 0.91},
             ],
             "duration": 2.0,
-            "confidence": 0.93
+            "confidence": 0.93,
         }
 
     def health_check(self) -> bool:
@@ -272,5 +273,5 @@ class MockVoskSTTService:
         return {
             "service": "Mock Vosk STT",
             "ready": True,
-            "note": "Mock implementation for testing"
+            "note": "Mock implementation for testing",
         }

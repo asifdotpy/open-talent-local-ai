@@ -10,6 +10,7 @@ import soundfile as sf
 
 try:
     import onnxruntime as ort
+
     ONNX_AVAILABLE = True
 except ImportError:
     ONNX_AVAILABLE = False
@@ -30,7 +31,7 @@ class SileroVADService:
         self,
         model_path: str = "models/silero_vad.onnx",
         sample_rate: int = 16000,
-        threshold: float = 0.5
+        threshold: float = 0.5,
     ):
         """Initialize Silero VAD service.
 
@@ -71,9 +72,9 @@ class SileroVADService:
 
             # Load ONNX model
             import onnxruntime as ort
+
             self.model = ort.InferenceSession(
-                str(self.model_path),
-                providers=['CPUExecutionProvider']
+                str(self.model_path), providers=["CPUExecutionProvider"]
             )
 
             self.logger.info("Silero VAD model loaded successfully")
@@ -109,10 +110,7 @@ class SileroVADService:
 
             # Calculate statistics
             total_duration = len(audio_data) / self.sample_rate
-            speech_duration = sum(
-                (end - start) / self.sample_rate
-                for start, end in voice_segments
-            )
+            speech_duration = sum((end - start) / self.sample_rate for start, end in voice_segments)
             silence_duration = total_duration - speech_duration
             speech_ratio = speech_duration / total_duration if total_duration > 0 else 0
 
@@ -124,7 +122,7 @@ class SileroVADService:
                 "total_speech_duration": speech_duration,
                 "total_silence_duration": silence_duration,
                 "speech_ratio": speech_ratio,
-                "num_segments": len(voice_segments)
+                "num_segments": len(voice_segments),
             }
 
             self.logger.info(
@@ -182,7 +180,7 @@ class SileroVADService:
                 "filtered_duration": filtered_duration,
                 "silence_removed": original_duration - filtered_duration,
                 "reduction_percentage": reduction * 100,
-                "output_file": output_path
+                "output_file": output_path,
             }
 
             self.logger.info(
@@ -211,7 +209,7 @@ class SileroVADService:
             speech_probs = []
 
             for i in range(0, len(audio), self.chunk_size):
-                chunk = audio[i:i + self.chunk_size]
+                chunk = audio[i : i + self.chunk_size]
 
                 # Pad last chunk if needed
                 if len(chunk) < self.chunk_size:
@@ -267,9 +265,7 @@ class SileroVADService:
             return 0.5  # Default to uncertain
 
     def _merge_segments(
-        self,
-        segments: list[tuple[int, int]],
-        max_gap_samples: int | None = None
+        self, segments: list[tuple[int, int]], max_gap_samples: int | None = None
     ) -> list[tuple[int, int]]:
         """Merge speech segments that are close together."""
         if not segments:
@@ -321,8 +317,8 @@ class SileroVADService:
                 "voice_detection": True,
                 "silence_filtering": True,
                 "streaming": True,
-                "computational_savings": "60-70%"
-            }
+                "computational_savings": "60-70%",
+            },
         }
 
 
@@ -341,12 +337,13 @@ class MockSileroVADService:
             "total_speech_duration": 4.5,
             "total_silence_duration": 0.5,
             "speech_ratio": 0.9,
-            "num_segments": 2
+            "num_segments": 2,
         }
 
     def filter_silence(self, audio_file_path: str, output_path: str) -> dict:
         """Copy input to output (no filtering)."""
         import shutil
+
         shutil.copy(audio_file_path, output_path)
 
         return {
@@ -354,7 +351,7 @@ class MockSileroVADService:
             "filtered_duration": 4.5,
             "silence_removed": 0.5,
             "reduction_percentage": 10.0,
-            "output_file": output_path
+            "output_file": output_path,
         }
 
     def health_check(self) -> bool:
@@ -364,5 +361,5 @@ class MockSileroVADService:
         return {
             "service": "Mock Silero VAD",
             "ready": True,
-            "note": "Mock implementation for testing"
+            "note": "Mock implementation for testing",
         }

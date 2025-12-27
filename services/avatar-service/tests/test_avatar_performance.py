@@ -158,34 +158,46 @@ class TestConcurrencyAndLoad:
         avatar_id = f"avatar-mixed-{id(object())}"
 
         # Render
-        res1 = client.post("/api/v1/avatars/render", json={
-            "avatar_id": avatar_id,
-            "prompt": "test",
-            "width": 512,
-            "height": 512,
-        })
+        res1 = client.post(
+            "/api/v1/avatars/render",
+            json={
+                "avatar_id": avatar_id,
+                "prompt": "test",
+                "width": 512,
+                "height": 512,
+            },
+        )
         assert res1.status_code == 200
 
         # Lipsync
-        res2 = client.post("/api/v1/avatars/lipsync", json={
-            "avatar_id": avatar_id,
-            "text": "hello",
-            "voice_id": "piper_en_us",
-        })
+        res2 = client.post(
+            "/api/v1/avatars/lipsync",
+            json={
+                "avatar_id": avatar_id,
+                "text": "hello",
+                "voice_id": "piper_en_us",
+            },
+        )
         assert res2.status_code == 200
 
         # Emotion
-        res3 = client.post("/api/v1/avatars/emotions", json={
-            "avatar_id": avatar_id,
-            "emotion": "happy",
-            "intensity": 0.5,
-        })
+        res3 = client.post(
+            "/api/v1/avatars/emotions",
+            json={
+                "avatar_id": avatar_id,
+                "emotion": "happy",
+                "intensity": 0.5,
+            },
+        )
         assert res3.status_code == 200
 
         # State update
-        res4 = client.patch(f"/api/v1/avatars/{avatar_id}/state", json={
-            "looking_direction": "camera",
-        })
+        res4 = client.patch(
+            f"/api/v1/avatars/{avatar_id}/state",
+            json={
+                "looking_direction": "camera",
+            },
+        )
         assert res4.status_code == 200
 
 
@@ -233,11 +245,14 @@ class TestMemoryBounds:
         """Should handle listing even with many presets."""
         # Create multiple presets
         for i in range(20):
-            client.post("/api/v1/avatars/presets", json={
-                "name": f"preset-{i}",
-                "description": f"Test preset {i}",
-                "settings": {"emotion": "neutral"},
-            })
+            client.post(
+                "/api/v1/avatars/presets",
+                json={
+                    "name": f"preset-{i}",
+                    "description": f"Test preset {i}",
+                    "settings": {"emotion": "neutral"},
+                },
+            )
 
         # List should complete quickly
         start = time.perf_counter()
@@ -253,8 +268,8 @@ class TestFPSAndFrameRateBounds:
     def test_config_fps_bounds(self, client):
         """FPS config should be updatable."""
         test_cases = [
-            30,   # Should accept 30
-            60,   # Should accept 60
+            30,  # Should accept 30
+            60,  # Should accept 60
         ]
 
         for fps_in in test_cases:

@@ -23,7 +23,9 @@ def _load_app():
 async def async_client():
     app = _load_app()
     transport = ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://testserver", timeout=5.0) as client:
+    async with httpx.AsyncClient(
+        transport=transport, base_url="http://testserver", timeout=5.0
+    ) as client:
         yield client
 
 
@@ -35,6 +37,7 @@ async def test_run_status_report_flow(async_client):
 
     # Wait for background worker to complete
     import asyncio
+
     # Poll status until completed (timeout 2s)
     for _ in range(10):
         s = await async_client.get(f"/api/v1/audit/status/{job_id}")

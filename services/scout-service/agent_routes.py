@@ -18,8 +18,10 @@ logger = logging.getLogger(__name__)
 # Models
 # ============================
 
+
 class AgentRequest(BaseModel):
     """Request routed to an agent."""
+
     agent_name: str | None = Field(None, description="Specific agent to route to")
     capability: str | None = Field(None, description="Required capability")
     endpoint: str = Field(..., description="Agent endpoint to call")
@@ -27,25 +29,31 @@ class AgentRequest(BaseModel):
     payload: dict[str, Any] | None = Field(None, description="Request payload")
     params: dict[str, Any] | None = Field(None, description="Query parameters")
 
+
 class AgentResponse(BaseModel):
     """Response from an agent."""
+
     agent_name: str
     status_code: int
     data: dict[str, Any] | None = None
     error: str | None = None
     execution_time_ms: float | None = None
 
+
 class MultiAgentResponse(BaseModel):
     """Response from multiple agents."""
+
     requested_agents: list[str]
     responses: list[AgentResponse]
     total_execution_time_ms: float | None = None
     successful_count: int
     failed_count: int
 
+
 # ============================
 # Router
 # ============================
+
 
 class AgentRouter:
     """Routes requests to appropriate agents."""
@@ -64,7 +72,7 @@ class AgentRouter:
         endpoint: str,
         method: str = "POST",
         payload: dict | None = None,
-        params: dict | None = None
+        params: dict | None = None,
     ) -> AgentResponse:
         """Forward a request to a single specific agent.
 
@@ -82,26 +90,20 @@ class AgentRouter:
         if not agent:
             logger.error(f"Agent {agent_name} not found")
             return AgentResponse(
-                agent_name=agent_name,
-                status_code=404,
-                error=f"Agent {agent_name} not found"
+                agent_name=agent_name, status_code=404, error=f"Agent {agent_name} not found"
             )
 
         logger.info(f"Routing request to {agent_name}{endpoint}")
 
         status_code, response_data = await self.registry.call_agent(
-            agent_name=agent_name,
-            endpoint=endpoint,
-            method=method,
-            data=payload,
-            params=params
+            agent_name=agent_name, endpoint=endpoint, method=method, data=payload, params=params
         )
 
         return AgentResponse(
             agent_name=agent_name,
             status_code=status_code,
             data=response_data,
-            error=None if status_code in [200, 201] else f"Agent returned {status_code}"
+            error=None if status_code in [200, 201] else f"Agent returned {status_code}",
         )
 
     async def route_to_agents(
@@ -110,7 +112,7 @@ class AgentRouter:
         endpoint: str,
         method: str = "POST",
         payload: dict | None = None,
-        params: dict | None = None
+        params: dict | None = None,
     ) -> MultiAgentResponse:
         """Forward a request to multiple agents concurrently.
 
@@ -127,8 +129,7 @@ class AgentRouter:
         logger.info(f"Routing request to {len(agent_names)} agents: {agent_names}")
 
         tasks = [
-            self.route_to_agent(name, endpoint, method, payload, params)
-            for name in agent_names
+            self.route_to_agent(name, endpoint, method, payload, params) for name in agent_names
         ]
 
         responses = await asyncio.gather(*tasks)
@@ -140,7 +141,7 @@ class AgentRouter:
             requested_agents=agent_names,
             responses=responses,
             successful_count=successful,
-            failed_count=failed
+            failed_count=failed,
         )
 
     async def route_by_capability(
@@ -150,7 +151,7 @@ class AgentRouter:
         method: str = "POST",
         payload: dict | None = None,
         params: dict | None = None,
-        healthy_only: bool = True
+        healthy_only: bool = True,
     ) -> MultiAgentResponse:
         """Discover agents by capability and forward the request to all matches.
 
@@ -174,10 +175,7 @@ class AgentRouter:
         if not agents:
             logger.warning(f"No agents found with capability '{capability}'")
             return MultiAgentResponse(
-                requested_agents=[],
-                responses=[],
-                successful_count=0,
-                failed_count=0
+                requested_agents=[], responses=[], successful_count=0, failed_count=0
             )
 
         agent_names = [a.name for a in agents]
@@ -186,10 +184,7 @@ class AgentRouter:
         return await self.route_to_agents(agent_names, endpoint, method, payload, params)
 
     async def route_search_request(
-        self,
-        query: str,
-        location: str = "Ireland",
-        max_results: int = 20
+        self, query: str, location: str = "Ireland", max_results: int = 20
     ) -> dict[str, Any]:
         """Execute a distributed search across all search-capable agents.
 
@@ -217,7 +212,7 @@ class AgentRouter:
             "query": query,
             "location": location,
             "max_results": max_results,
-            "use_ai_formatting": True
+            "use_ai_formatting": True,
         }
 
         # Route to primary search endpoint
@@ -225,7 +220,7 @@ class AgentRouter:
             agent_names=[a.name for a in search_agents[:2]],  # Use top 2 search agents
             endpoint="/search",
             method="POST",
-            payload=search_payload
+            payload=search_payload,
         )
 
         # Aggregate results
@@ -234,7 +229,7 @@ class AgentRouter:
             "total_found": 0,
             "query": query,
             "location": location,
-            "agents_queried": []
+            "agents_queried": [],
         }
 
         for agent_response in response.responses:
@@ -256,14 +251,14 @@ class AgentRouter:
         aggregated["candidates"] = unique_candidates[:max_results]
         aggregated["total_found"] = len(unique_candidates)
 
-        logger.info(f"Search aggregation complete: {aggregated['total_found']} unique candidates from {len(aggregated['agents_queried'])} agents")
+        logger.info(
+            f"Search aggregation complete: {aggregated['total_found']} unique candidates from {len(aggregated['agents_queried'])} agents"
+        )
 
         return aggregated
 
     async def route_interview_handoff(
-        self,
-        search_criteria: dict[str, Any],
-        candidate_profile: dict[str, Any]
+        self, search_criteria: dict[str, Any], candidate_profile: dict[str, Any]
     ) -> dict[str, Any]:
         """Transition a candidate from the sourcing stage to the interview stage.
 
@@ -283,17 +278,14 @@ class AgentRouter:
             return {"error": "Interviewer agent not available"}
 
         # Prepare handoff payload
-        handoff_payload = {
-            "searchCriteria": search_criteria,
-            "candidateProfile": candidate_profile
-        }
+        handoff_payload = {"searchCriteria": search_criteria, "candidateProfile": candidate_profile}
 
         # Route to interviewer agent
         response = await self.route_to_agent(
             agent_name="interviewer-agent",
             endpoint="/interview/start",
             method="POST",
-            payload=handoff_payload
+            payload=handoff_payload,
         )
 
         if response.status_code == 200:
@@ -303,9 +295,9 @@ class AgentRouter:
             logger.error(f"Interview handoff failed: {response.error}")
             return {"error": response.error, "status_code": response.status_code}
 
+
 # ============================
 # Imports needed
 # ============================
 
 import asyncio
-

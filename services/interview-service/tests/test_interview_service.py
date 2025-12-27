@@ -33,7 +33,7 @@ def interview_data() -> dict[str, Any]:
         "interview_type": "technical",
         "scheduled_time": "2024-12-20T14:00:00Z",
         "interviewer_id": "interviewer123",
-        "duration_minutes": 60
+        "duration_minutes": 60,
     }
 
 
@@ -44,7 +44,7 @@ def feedback_data() -> dict[str, Any]:
         "technical_skills": 4,
         "communication": 4,
         "comments": "Excellent candidate",
-        "recommendation": "hire"
+        "recommendation": "hire",
     }
 
 
@@ -62,27 +62,25 @@ class TestInterviewServiceBasics:
 
 class TestInterviewManagement:
     @pytest.mark.asyncio
-    async def test_create_interview(self, interview_service_url, async_client, interview_data, auth_headers):
+    async def test_create_interview(
+        self, interview_service_url, async_client, interview_data, auth_headers
+    ):
         response = await async_client.post(
-            f"{interview_service_url}/api/v1/interviews",
-            json=interview_data,
-            headers=auth_headers
+            f"{interview_service_url}/api/v1/interviews", json=interview_data, headers=auth_headers
         )
         assert response.status_code in [200, 201]
 
     @pytest.mark.asyncio
     async def test_get_interview(self, interview_service_url, async_client, auth_headers):
         response = await async_client.get(
-            f"{interview_service_url}/api/v1/interviews/123",
-            headers=auth_headers
+            f"{interview_service_url}/api/v1/interviews/123", headers=auth_headers
         )
         assert response.status_code in [200, 404]
 
     @pytest.mark.asyncio
     async def test_list_interviews(self, interview_service_url, async_client, auth_headers):
         response = await async_client.get(
-            f"{interview_service_url}/api/v1/interviews",
-            headers=auth_headers
+            f"{interview_service_url}/api/v1/interviews", headers=auth_headers
         )
         assert response.status_code in [200, 403]
 
@@ -91,7 +89,7 @@ class TestInterviewManagement:
         response = await async_client.put(
             f"{interview_service_url}/api/v1/interviews/123",
             json={"scheduled_time": "2024-12-21T14:00:00Z"},
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 201, 404]
 
@@ -100,26 +98,27 @@ class TestInterviewManagement:
         response = await async_client.post(
             f"{interview_service_url}/api/v1/interviews/123/cancel",
             json={"reason": "Scheduling conflict"},
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 201, 404]
 
 
 class TestInterviewFeedback:
     @pytest.mark.asyncio
-    async def test_submit_feedback(self, interview_service_url, async_client, feedback_data, auth_headers):
+    async def test_submit_feedback(
+        self, interview_service_url, async_client, feedback_data, auth_headers
+    ):
         response = await async_client.post(
             f"{interview_service_url}/api/v1/interviews/123/feedback",
             json=feedback_data,
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 201, 404]
 
     @pytest.mark.asyncio
     async def test_get_feedback(self, interview_service_url, async_client, auth_headers):
         response = await async_client.get(
-            f"{interview_service_url}/api/v1/interviews/123/feedback",
-            headers=auth_headers
+            f"{interview_service_url}/api/v1/interviews/123/feedback", headers=auth_headers
         )
         assert response.status_code in [200, 404]
 
@@ -128,7 +127,7 @@ class TestInterviewFeedback:
         response = await async_client.put(
             f"{interview_service_url}/api/v1/interviews/123/feedback",
             json={"rating": 5},
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 201, 404]
 
@@ -137,17 +136,18 @@ class TestInterviewScheduling:
     @pytest.mark.asyncio
     async def test_get_available_slots(self, interview_service_url, async_client, auth_headers):
         response = await async_client.get(
-            f"{interview_service_url}/api/v1/interviews/available-slots",
-            headers=auth_headers
+            f"{interview_service_url}/api/v1/interviews/available-slots", headers=auth_headers
         )
         assert response.status_code in [200, 403]
 
     @pytest.mark.asyncio
-    async def test_schedule_interview(self, interview_service_url, async_client, interview_data, auth_headers):
+    async def test_schedule_interview(
+        self, interview_service_url, async_client, interview_data, auth_headers
+    ):
         response = await async_client.post(
             f"{interview_service_url}/api/v1/interviews/schedule",
             json=interview_data,
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 201]
 
@@ -156,7 +156,7 @@ class TestInterviewScheduling:
         response = await async_client.post(
             f"{interview_service_url}/api/v1/interviews/123/reschedule",
             json={"scheduled_time": "2024-12-22T14:00:00Z"},
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 201, 404]
 

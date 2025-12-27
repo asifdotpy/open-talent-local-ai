@@ -67,12 +67,14 @@ def empty_text() -> str:
 @pytest.fixture
 def long_text() -> str:
     """Long text for stress testing."""
-    return " ".join([
-        "The quick brown fox jumps over the lazy dog.",
-        "This is a longer text sample designed to test the voice service",
-        "with multiple sentences and various phonetic patterns.",
-        "It includes numbers like 123 and punctuation marks!"
-    ])
+    return " ".join(
+        [
+            "The quick brown fox jumps over the lazy dog.",
+            "This is a longer text sample designed to test the voice service",
+            "with multiple sentences and various phonetic patterns.",
+            "It includes numbers like 123 and punctuation marks!",
+        ]
+    )
 
 
 @pytest.fixture
@@ -86,7 +88,7 @@ def create_test_wav_file(
     duration: float = 1.0,
     frequency: int = 440,
     sample_rate: int = 16000,
-    channels: int = 1
+    channels: int = 1,
 ) -> str:
     """Create a test WAV file with sine wave audio.
 
@@ -104,7 +106,7 @@ def create_test_wav_file(
 
     num_samples = int(duration * sample_rate)
 
-    with wave.open(filepath, 'w') as wav_file:
+    with wave.open(filepath, "w") as wav_file:
         wav_file.setnchannels(channels)
         wav_file.setsampwidth(2)  # 16-bit audio
         wav_file.setframerate(sample_rate)
@@ -112,7 +114,7 @@ def create_test_wav_file(
         for i in range(num_samples):
             # Generate sine wave
             value = int(32767.0 * math.sin(2.0 * math.pi * frequency * i / sample_rate))
-            data = struct.pack('<h', value)
+            data = struct.pack("<h", value)
 
             # Write for each channel
             for _ in range(channels):
@@ -147,14 +149,14 @@ def silent_audio_file(test_audio_dir) -> str:
     """Create a silent audio file (1 second of silence)."""
     filepath = str(test_audio_dir / "silent_audio.wav")
 
-    with wave.open(filepath, 'w') as wav_file:
+    with wave.open(filepath, "w") as wav_file:
         wav_file.setnchannels(1)
         wav_file.setsampwidth(2)
         wav_file.setframerate(16000)
 
         # Write 1 second of silence
         for _ in range(16000):
-            wav_file.writeframes(struct.pack('<h', 0))
+            wav_file.writeframes(struct.pack("<h", 0))
 
     return filepath
 
@@ -163,7 +165,7 @@ def silent_audio_file(test_audio_dir) -> str:
 def invalid_audio_file(test_audio_dir) -> str:
     """Create an invalid audio file (not a WAV)."""
     filepath = str(test_audio_dir / "invalid.wav")
-    with open(filepath, 'w') as f:
+    with open(filepath, "w") as f:
         f.write("This is not a valid WAV file")
     return filepath
 
@@ -171,9 +173,9 @@ def invalid_audio_file(test_audio_dir) -> str:
 @pytest.fixture
 def audio_data_base64(test_audio_file) -> str:
     """Read test audio file and return as base64 string."""
-    with open(test_audio_file, 'rb') as f:
+    with open(test_audio_file, "rb") as f:
         audio_bytes = f.read()
-    return base64.b64encode(audio_bytes).decode('utf-8')
+    return base64.b64encode(audio_bytes).decode("utf-8")
 
 
 @pytest.fixture
@@ -197,39 +199,25 @@ def service_url() -> str:
 @pytest.fixture
 def available_voices() -> list:
     """List of available TTS voices for testing."""
-    return [
-        "en_US-lessac-medium",
-        "en_US-amy-medium",
-        "en_US-ryan-high",
-        "en_US-hfc_female-medium"
-    ]
+    return ["en_US-lessac-medium", "en_US-amy-medium", "en_US-ryan-high", "en_US-hfc_female-medium"]
 
 
 @pytest.fixture
 def tts_request_basic(short_text, available_voices) -> dict:
     """Basic TTS request payload."""
-    return {
-        "text": short_text,
-        "voice": available_voices[0]
-    }
+    return {"text": short_text, "voice": available_voices[0]}
 
 
 @pytest.fixture
 def tts_request_with_phonemes(sample_text, available_voices) -> dict:
     """TTS request with phoneme extraction enabled."""
-    return {
-        "text": sample_text,
-        "voice": available_voices[0],
-        "extract_phonemes": True
-    }
+    return {"text": sample_text, "voice": available_voices[0], "extract_phonemes": True}
 
 
 @pytest.fixture
 def stt_request(audio_data_base64) -> dict:
     """Basic STT request payload."""
-    return {
-        "audio_data": audio_data_base64
-    }
+    return {"audio_data": audio_data_base64}
 
 
 @pytest.fixture
@@ -263,7 +251,7 @@ class AudioFileFactory:
         duration: float = 1.0,
         sample_rate: int = 16000,
         channels: int = 1,
-        frequency: int = 440
+        frequency: int = 440,
     ) -> str:
         """Create WAV file with specified parameters."""
         return create_test_wav_file(
@@ -271,21 +259,21 @@ class AudioFileFactory:
             duration=duration,
             frequency=frequency,
             sample_rate=sample_rate,
-            channels=channels
+            channels=channels,
         )
 
     @staticmethod
     def create_corrupt_wav(output_path: str) -> str:
         """Create a corrupted WAV file."""
-        with open(output_path, 'wb') as f:
+        with open(output_path, "wb") as f:
             # Write invalid WAV header
-            f.write(b'INVALID')
+            f.write(b"INVALID")
         return output_path
 
     @staticmethod
     def create_empty_wav(output_path: str) -> str:
         """Create an empty WAV file."""
-        open(output_path, 'w').close()
+        open(output_path, "w").close()
         return output_path
 
 
@@ -307,12 +295,6 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "business: Business value tests validating user outcomes (100% critical paths)"
     )
-    config.addinivalue_line(
-        "markers", "slow: Tests that take longer to run (>5 seconds)"
-    )
-    config.addinivalue_line(
-        "markers", "requires_models: Tests requiring downloaded models"
-    )
-    config.addinivalue_line(
-        "markers", "webrtc: WebRTC-specific tests"
-    )
+    config.addinivalue_line("markers", "slow: Tests that take longer to run (>5 seconds)")
+    config.addinivalue_line("markers", "requires_models: Tests requiring downloaded models")
+    config.addinivalue_line("markers", "webrtc: WebRTC-specific tests")

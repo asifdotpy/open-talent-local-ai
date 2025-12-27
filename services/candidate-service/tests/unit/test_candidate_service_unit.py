@@ -35,7 +35,7 @@ from main import (
 class TestVectorSearch:
     """Unit tests for vector search functionality."""
 
-    @patch('main.embedding_model')
+    @patch("main.embedding_model")
     def test_create_candidate_embedding_success(self, mock_embedding_model):
         """Test successful embedding creation."""
         # Mock embedding model
@@ -49,7 +49,7 @@ class TestVectorSearch:
             education=[],
             skills=Skills(matched=["Python"], unmatched=[]),
             alignment_score=0.8,
-            initial_questions=[]
+            initial_questions=[],
         )
 
         embedding = create_candidate_embedding(profile)
@@ -58,7 +58,7 @@ class TestVectorSearch:
         assert len(embedding) == 384  # MiniLM-L6-v2 dimensions
         mock_embedding_model.embed.assert_called_once()
 
-    @patch('main.embedding_model', None)
+    @patch("main.embedding_model", None)
     def test_create_candidate_embedding_no_model(self):
         """Test embedding creation when model is not available."""
         profile = CandidateProfile(
@@ -69,16 +69,18 @@ class TestVectorSearch:
             education=[],
             skills=Skills(matched=[], unmatched=[]),
             alignment_score=0.5,
-            initial_questions=[]
+            initial_questions=[],
         )
 
         with pytest.raises(Exception):  # Should raise HTTPException
             create_candidate_embedding(profile)
 
-    @patch('main.vector_db')
-    @patch('main.create_candidate_embedding')
-    @patch('main.uuid.uuid4')
-    def test_store_candidate_profile_success(self, mock_uuid, mock_create_embedding, mock_vector_db):
+    @patch("main.vector_db")
+    @patch("main.create_candidate_embedding")
+    @patch("main.uuid.uuid4")
+    def test_store_candidate_profile_success(
+        self, mock_uuid, mock_create_embedding, mock_vector_db
+    ):
         """Test successful candidate profile storage."""
         # Mock UUID to return a mock object that converts to string as expected
         mock_uuid_obj = Mock()
@@ -98,7 +100,7 @@ class TestVectorSearch:
             education=[],
             skills=Skills(matched=["Java"], unmatched=[]),
             alignment_score=0.9,
-            initial_questions=[]
+            initial_questions=[],
         )
 
         candidate_id = store_candidate_profile(profile)
@@ -107,7 +109,7 @@ class TestVectorSearch:
         mock_table.add.assert_called_once()
         mock_create_embedding.assert_called_once_with(profile)
 
-    @patch('main.vector_db', None)
+    @patch("main.vector_db", None)
     def test_store_candidate_profile_no_db(self):
         """Test profile storage when vector DB is not available."""
         profile = CandidateProfile(
@@ -118,14 +120,14 @@ class TestVectorSearch:
             education=[],
             skills=Skills(matched=[], unmatched=[]),
             alignment_score=0.5,
-            initial_questions=[]
+            initial_questions=[],
         )
 
         with pytest.raises(Exception):  # Should raise HTTPException
             store_candidate_profile(profile)
 
-    @patch('main.vector_db')
-    @patch('main.embedding_model')
+    @patch("main.vector_db")
+    @patch("main.embedding_model")
     def test_search_similar_candidates_success(self, mock_embedding_model, mock_vector_db):
         """Test successful candidate search."""
         # Mock embedding model
@@ -138,7 +140,7 @@ class TestVectorSearch:
                 "id": "candidate-1",
                 "full_name": "John Doe",
                 "_distance": 0.2,
-                "metadata": json.dumps({"summary": "Developer"})
+                "metadata": json.dumps({"summary": "Developer"}),
             }
         ]
         mock_vector_db.open_table.return_value = mock_table
@@ -150,23 +152,23 @@ class TestVectorSearch:
         assert results[0]["full_name"] == "John Doe"
         assert results[0]["score"] == 0.2
 
-    @patch('main.vector_db', None)
+    @patch("main.vector_db", None)
     def test_search_similar_candidates_no_db(self):
         """Test search when vector DB is not available."""
         results = search_similar_candidates("test query")
 
         assert results == []
 
-    @patch('main.embedding_model', None)
-    @patch('main.vector_db')
+    @patch("main.embedding_model", None)
+    @patch("main.vector_db")
     def test_search_similar_candidates_no_model(self, mock_vector_db):
         """Test search when embedding model is not available."""
         results = search_similar_candidates("test query")
 
         assert results == []
 
-    @patch('main.vector_db')
-    @patch('main.embedding_model')
+    @patch("main.vector_db")
+    @patch("main.embedding_model")
     def test_search_similar_candidates_with_limit(self, mock_embedding_model, mock_vector_db):
         """Test search respects limit parameter."""
         mock_embedding_model.embed.return_value = [np.array([0.1] * 384)]
@@ -199,27 +201,20 @@ class TestDataModels:
                     title="Senior Developer",
                     company="Tech Inc",
                     duration="2017 - Present",
-                    responsibilities=["Led development team", "Architected microservices"]
+                    responsibilities=["Led development team", "Architected microservices"],
                 )
             ],
             education=[
-                Education(
-                    institution="State University",
-                    degree="MS Computer Science",
-                    year="2016"
-                )
+                Education(institution="State University", degree="MS Computer Science", year="2016")
             ],
-            skills=Skills(
-                matched=["Python", "JavaScript", "AWS"],
-                unmatched=["C++", "Rust"]
-            ),
+            skills=Skills(matched=["Python", "JavaScript", "AWS"], unmatched=["C++", "Rust"]),
             alignment_score=0.92,
             initial_questions=[
                 InitialQuestion(
                     question="Describe your experience with microservices",
-                    reasoning="To assess architectural skills"
+                    reasoning="To assess architectural skills",
                 )
-            ]
+            ],
         )
 
         assert profile.full_name == "Alice Johnson"
@@ -238,7 +233,7 @@ class TestDataModels:
             education=[],
             skills=Skills(matched=[], unmatched=[]),
             alignment_score=0.8,
-            initial_questions=[]
+            initial_questions=[],
         )
         assert profile.alignment_score == 0.8
 
@@ -254,8 +249,8 @@ class TestDataModels:
             responsibilities=[
                 "Developed search algorithms",
                 "Improved query performance by 40%",
-                "Mentored junior engineers"
-            ]
+                "Mentored junior engineers",
+            ],
         )
 
         assert exp.title == "Software Engineer"
@@ -264,11 +259,7 @@ class TestDataModels:
 
     def test_education_model(self):
         """Test Education model."""
-        edu = Education(
-            institution="MIT",
-            degree="PhD Computer Science",
-            year="2019"
-        )
+        edu = Education(institution="MIT", degree="PhD Computer Science", year="2019")
 
         assert edu.institution == "MIT"
         assert edu.degree == "PhD Computer Science"
@@ -277,8 +268,7 @@ class TestDataModels:
     def test_skills_model(self):
         """Test Skills model."""
         skills = Skills(
-            matched=["Python", "Machine Learning", "TensorFlow"],
-            unmatched=["Ruby", "Rails"]
+            matched=["Python", "Machine Learning", "TensorFlow"], unmatched=["Ruby", "Rails"]
         )
 
         assert len(skills.matched) == 3
@@ -290,7 +280,7 @@ class TestDataModels:
         """Test InitialQuestion model."""
         question = InitialQuestion(
             question="What is your experience with cloud platforms?",
-            reasoning="To evaluate cloud architecture knowledge"
+            reasoning="To evaluate cloud architecture knowledge",
         )
 
         assert "cloud" in question.question.lower()
@@ -300,7 +290,7 @@ class TestDataModels:
 class TestEmbeddingGeneration:
     """Unit tests for embedding generation logic."""
 
-    @patch('main.embedding_model')
+    @patch("main.embedding_model")
     def test_embedding_comprehensive_text(self, mock_embedding_model):
         """Test that embedding includes comprehensive profile text."""
         mock_embedding_model.embed.return_value = [np.array([0.1] * 384)]
@@ -314,22 +304,13 @@ class TestEmbeddingGeneration:
                     title="ML Engineer",
                     company="AI Corp",
                     duration="2021 - Present",
-                    responsibilities=["Built NLP models", "Fine-tuned transformers"]
+                    responsibilities=["Built NLP models", "Fine-tuned transformers"],
                 )
             ],
-            education=[
-                Education(
-                    institution="Stanford",
-                    degree="MS AI",
-                    year="2020"
-                )
-            ],
-            skills=Skills(
-                matched=["Python", "PyTorch", "NLP"],
-                unmatched=["Java"]
-            ),
+            education=[Education(institution="Stanford", degree="MS AI", year="2020")],
+            skills=Skills(matched=["Python", "PyTorch", "NLP"], unmatched=["Java"]),
             alignment_score=0.95,
-            initial_questions=[]
+            initial_questions=[],
         )
 
         create_candidate_embedding(profile)
@@ -346,7 +327,7 @@ class TestEmbeddingGeneration:
         assert "PyTorch" in profile_text
         assert "Stanford" in profile_text
 
-    @patch('main.embedding_model')
+    @patch("main.embedding_model")
     def test_embedding_empty_profile(self, mock_embedding_model):
         """Test embedding generation for minimal profile."""
         mock_embedding_model.embed.return_value = [np.array([0.1] * 384)]
@@ -359,7 +340,7 @@ class TestEmbeddingGeneration:
             education=[],
             skills=Skills(matched=[], unmatched=[]),
             alignment_score=0.0,
-            initial_questions=[]
+            initial_questions=[],
         )
 
         embedding = create_candidate_embedding(profile)
@@ -368,7 +349,7 @@ class TestEmbeddingGeneration:
         assert len(embedding) == 384
         mock_embedding_model.embed.assert_called_once()
 
-    @patch('main.embedding_model')
+    @patch("main.embedding_model")
     def test_embedding_special_characters(self, mock_embedding_model):
         """Test embedding generation with special characters."""
         mock_embedding_model.embed.return_value = [np.array([0.1] * 384)]
@@ -381,7 +362,7 @@ class TestEmbeddingGeneration:
             education=[],
             skills=Skills(matched=["C++", "Python"], unmatched=[]),
             alignment_score=0.8,
-            initial_questions=[]
+            initial_questions=[],
         )
 
         embedding = create_candidate_embedding(profile)
@@ -394,7 +375,7 @@ class TestEmbeddingGeneration:
 class TestErrorHandling:
     """Unit tests for error handling scenarios."""
 
-    @patch('main.vector_db')
+    @patch("main.vector_db")
     def test_store_profile_vector_db_error(self, mock_vector_db):
         """Test error handling when vector DB operations fail."""
         mock_table = Mock()
@@ -409,13 +390,13 @@ class TestErrorHandling:
             education=[],
             skills=Skills(matched=[], unmatched=[]),
             alignment_score=0.5,
-            initial_questions=[]
+            initial_questions=[],
         )
 
         with pytest.raises(Exception):  # Should raise HTTPException
             store_candidate_profile(profile)
 
-    @patch('main.embedding_model')
+    @patch("main.embedding_model")
     def test_create_embedding_model_error(self, mock_embedding_model):
         """Test error handling when embedding model fails."""
         mock_embedding_model.embed.side_effect = Exception("Model inference failed")
@@ -428,14 +409,14 @@ class TestErrorHandling:
             education=[],
             skills=Skills(matched=[], unmatched=[]),
             alignment_score=0.5,
-            initial_questions=[]
+            initial_questions=[],
         )
 
         with pytest.raises(Exception):  # Should raise HTTPException
             create_candidate_embedding(profile)
 
-    @patch('main.vector_db')
-    @patch('main.embedding_model')
+    @patch("main.vector_db")
+    @patch("main.embedding_model")
     def test_search_candidates_query_error(self, mock_embedding_model, mock_vector_db):
         """Test error handling during search query processing."""
         mock_embedding_model.embed.side_effect = Exception("Embedding failed")
@@ -445,8 +426,8 @@ class TestErrorHandling:
         # Should return empty results on error
         assert results == []
 
-    @patch('main.vector_db')
-    @patch('main.embedding_model')
+    @patch("main.vector_db")
+    @patch("main.embedding_model")
     def test_search_candidates_db_error(self, mock_embedding_model, mock_vector_db):
         """Test error handling when vector DB search fails."""
         mock_embedding_model.embed.return_value = [np.array([0.1] * 384)]

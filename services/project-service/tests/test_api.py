@@ -5,6 +5,7 @@ from app.models import JobDetails
 
 client = TestClient(app)
 
+
 def test_get_job_details():
     """Tests the GET /jobs/{project_id} endpoint."""
     project_id = "test-project-123"

@@ -31,7 +31,10 @@ class SafeVoiceServiceTester:
         try:
             response = await self.client.get(f"{self.base_url}/health")
             result = response.json()
-            result["success"] = response.status_code == 200 and result.get("status") in ["healthy", "degraded"]
+            result["success"] = response.status_code == 200 and result.get("status") in [
+                "healthy",
+                "degraded",
+            ]
             return result
         except Exception as e:
             return {"success": False, "error": str(e), "status": "unreachable"}
@@ -45,8 +48,7 @@ class SafeVoiceServiceTester:
                 tts_payload = {"text": test_text, "voice": "lessac"}
 
                 tts_response = await self.client.post(
-                    f"{self.base_url}/voice/tts",
-                    json=tts_payload
+                    f"{self.base_url}/voice/tts", json=tts_payload
                 )
 
                 if tts_response.status_code != 200:
@@ -65,10 +67,7 @@ class SafeVoiceServiceTester:
                 # Test STT with the audio
                 with open(audio_file, "rb") as f:
                     files = {"audio_file": ("test.wav", f, "audio/wav")}
-                    stt_response = await self.client.post(
-                        f"{self.base_url}/voice/stt",
-                        files=files
-                    )
+                    stt_response = await self.client.post(f"{self.base_url}/voice/stt", files=files)
 
                 if stt_response.status_code == 200:
                     result = stt_response.json()
@@ -87,13 +86,13 @@ class SafeVoiceServiceTester:
                         "confidence": confidence,
                         "duration": result.get("duration", 0),
                         "accuracy": matched_words / len(expected_words),
-                        "expected_text": test_text if audio_file is None else None
+                        "expected_text": test_text if audio_file is None else None,
                     }
                 else:
                     return {
                         "success": False,
                         "status_code": stt_response.status_code,
-                        "error": stt_response.text
+                        "error": stt_response.text,
                     }
 
             finally:
@@ -108,10 +107,7 @@ class SafeVoiceServiceTester:
         """Test basic TTS functionality."""
         try:
             payload = {"text": text, "voice": "lessac"}
-            response = await self.client.post(
-                f"{self.base_url}/voice/tts",
-                json=payload
-            )
+            response = await self.client.post(f"{self.base_url}/voice/tts", json=payload)
 
             if response.status_code == 200:
                 # Save audio for analysis
@@ -129,13 +125,13 @@ class SafeVoiceServiceTester:
                     "success": True,
                     "status_code": response.status_code,
                     "audio_size": len(response.content),
-                    **audio_info
+                    **audio_info,
                 }
             else:
                 return {
                     "success": False,
                     "status_code": response.status_code,
-                    "error": response.text
+                    "error": response.text,
                 }
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -149,7 +145,7 @@ class SafeVoiceServiceTester:
                 "success": response.status_code == 200,
                 "status_code": response.status_code,
                 "voices_count": len(result.get("voices", [])),
-                "voices": result.get("voices", [])
+                "voices": result.get("voices", []),
             }
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -162,7 +158,7 @@ class SafeVoiceServiceTester:
             return {
                 "success": response.status_code == 200,
                 "status_code": response.status_code,
-                "service_info": result
+                "service_info": result,
             }
         except Exception as e:
             return {"success": False, "error": str(e)}
@@ -177,7 +173,7 @@ class SafeVoiceServiceTester:
                 "duration": len(audio_data) / sample_rate,
                 "channels": audio_data.shape[1] if len(audio_data.shape) > 1 else 1,
                 "dtype": str(audio_data.dtype),
-                "has_audio": np.max(np.abs(audio_data)) > 0.001
+                "has_audio": np.max(np.abs(audio_data)) > 0.001,
             }
         except Exception as e:
             return {"audio_analysis_error": str(e)}

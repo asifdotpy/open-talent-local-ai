@@ -44,7 +44,9 @@ def test_bcrypt_with_pepper_changes_hash_and_verification():
     h2 = mod_peppered.hash_password(pw)
     assert h1 != h2, "Pepper should change resulting hash"
     assert mod_peppered.verify_password(pw, h2) is True
-    assert mod_peppered.verify_password(pw, h1) is False, "Hash generated without pepper should not verify with pepper"
+    assert (
+        mod_peppered.verify_password(pw, h1) is False
+    ), "Hash generated without pepper should not verify with pepper"
 
 
 def test_legacy_sha256_verification_still_supported():
@@ -76,7 +78,9 @@ def test_login_migrates_legacy_hash_to_bcrypt(tmp_path, monkeypatch):
 
     async def _login_via_client():
         transport = ASGITransport(app=mod.app)
-        async with httpx.AsyncClient(transport=transport, base_url="http://testserver", timeout=5.0) as client:
+        async with httpx.AsyncClient(
+            transport=transport, base_url="http://testserver", timeout=5.0
+        ) as client:
             return await client.post(
                 "/api/v1/auth/login",
                 json={"email": email, "password": password},

@@ -25,9 +25,7 @@ router = APIRouter()
 router = APIRouter()
 
 
-@router.post(
-    "/conversation/generate-questions", response_model=GenerateQuestionsResponse
-)
+@router.post("/conversation/generate-questions", response_model=GenerateQuestionsResponse)
 async def generate_questions(request: GenerateQuestionsRequest):
     """Generates interview questions based on a job description by calling the Ollama service."""
     try:
@@ -52,9 +50,7 @@ async def generate_questions(request: GenerateQuestionsRequest):
         )
     except Exception as e:
         # Catch-all for any other unexpected errors
-        raise HTTPException(
-            status_code=500, detail=f"An unexpected internal error occurred: {e}"
-        )
+        raise HTTPException(status_code=500, detail=f"An unexpected internal error occurred: {e}")
 
 
 @router.post("/conversation/start", response_model=StartConversationResponse)
@@ -85,21 +81,21 @@ async def start_conversation(request: StartConversationRequest):
 
         # Fetch candidate profile if candidate_id available
         candidate_profile = request.candidate_profile
-        if not candidate_profile and hasattr(request, 'candidate_id'):
-            candidate_profile = await job_description_service.get_candidate_profile(request.candidate_id)
+        if not candidate_profile and hasattr(request, "candidate_id"):
+            candidate_profile = await job_description_service.get_candidate_profile(
+                request.candidate_id
+            )
 
         result = await conversation_service.start_conversation(
             session_id=request.session_id,
             job_description=job_description,
             candidate_profile=candidate_profile,
             interview_type=request.interview_type,
-            tone=request.tone
+            tone=request.tone,
         )
         return result
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Failed to start conversation: {e}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to start conversation: {e}")
 
 
 @router.post("/conversation/message", response_model=ConversationResponse)
@@ -117,7 +113,7 @@ async def send_message(request: SendMessageRequest):
             session_id=request.session_id,
             message=request.message,
             message_type=request.message_type,
-            metadata=request.metadata
+            metadata=request.metadata,
         )
 
         if response is None:
@@ -129,9 +125,7 @@ async def send_message(request: SendMessageRequest):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Failed to process message: {e}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to process message: {e}")
 
 
 @router.get("/conversation/status/{session_id}", response_model=ConversationStatus)
@@ -149,9 +143,7 @@ async def get_conversation_status(session_id: str):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Failed to get conversation status: {e}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to get conversation status: {e}")
 
 
 @router.post("/conversation/end/{session_id}")
@@ -169,13 +161,13 @@ async def end_conversation(session_id: str):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Failed to end conversation: {e}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to end conversation: {e}")
 
 
 # --- New Adaptive Question Generation Endpoints ---
-@router.post("/api/v1/conversation/generate-adaptive-question", response_model=QuestionGenerationResponse)
+@router.post(
+    "/api/v1/conversation/generate-adaptive-question", response_model=QuestionGenerationResponse
+)
 async def generate_adaptive_question(request: AdaptiveQuestionRequest):
     """Generate the next adaptive interview question based on context."""
     try:
@@ -187,7 +179,7 @@ async def generate_adaptive_question(request: AdaptiveQuestionRequest):
             job_requirements=request.job_requirements,
             question_number=request.question_number,
             interview_phase=request.interview_phase,
-            bias_mitigation=request.bias_mitigation
+            bias_mitigation=request.bias_mitigation,
         )
         return result
     except Exception as e:
@@ -202,7 +194,7 @@ async def generate_followup_questions(request: FollowupRequest):
             response_text=request.response_text,
             question_context=request.question_context,
             sentiment=request.sentiment,
-            quality=request.quality
+            quality=request.quality,
         )
         return result
     except Exception as e:
@@ -216,7 +208,7 @@ async def adapt_interview_strategy(request: InterviewAdaptationRequest):
         result = await conversation_service.adapt_interview_strategy(
             current_phase=request.current_phase,
             time_remaining_minutes=request.time_remaining_minutes,
-            performance_indicators=request.performance_indicators
+            performance_indicators=request.performance_indicators,
         )
         return result
     except Exception as e:
@@ -227,11 +219,13 @@ async def adapt_interview_strategy(request: InterviewAdaptationRequest):
 class SwitchPersonaRequest(BaseModel):
     persona: str  # "technical", "behavioral", "hr"
 
+
 class SwitchPersonaResponse(BaseModel):
     success: bool
     previous_persona: str
     current_persona: str
     message: str
+
 
 class GetCurrentPersonaResponse(BaseModel):
     current_persona: str
@@ -248,13 +242,12 @@ async def switch_interviewer_persona(request: SwitchPersonaRequest):
         persona_models = {
             "technical": "technical-interviewer",
             "behavioral": "behavioral-interviewer",
-            "hr": "hr-interviewer"
+            "hr": "hr-interviewer",
         }
 
         if request.persona not in persona_models:
             raise HTTPException(
-                status_code=400,
-                detail=f"Invalid persona. Available: {list(persona_models.keys())}"
+                status_code=400, detail=f"Invalid persona. Available: {list(persona_models.keys())}"
             )
 
         previous_persona = modular_llm_service.get_current_persona()
@@ -266,7 +259,7 @@ async def switch_interviewer_persona(request: SwitchPersonaRequest):
             success=True,
             previous_persona=previous_persona,
             current_persona=target_model,
-            message=f"Successfully switched to {request.persona} interviewer persona"
+            message=f"Successfully switched to {request.persona} interviewer persona",
         )
     except HTTPException:
         # Re-raise explicit HTTP errors like 400 for invalid persona
@@ -284,10 +277,7 @@ async def get_current_persona():
         current = modular_llm_service.get_current_persona()
         available = ["technical-interviewer", "behavioral-interviewer", "hr-interviewer"]
 
-        return GetCurrentPersonaResponse(
-            current_persona=current,
-            available_personas=available
-        )
+        return GetCurrentPersonaResponse(current_persona=current, available_personas=available)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get current persona: {str(e)}")

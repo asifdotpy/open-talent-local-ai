@@ -41,8 +41,7 @@ class TestServiceCoordination:
     @pytest.mark.asyncio
     async def test_get_service_status(self, desktop_service_url, async_client, auth_headers):
         response = await async_client.get(
-            f"{desktop_service_url}/api/v1/services/status",
-            headers=auth_headers
+            f"{desktop_service_url}/api/v1/services/status", headers=auth_headers
         )
         assert response.status_code in [200, 403]
 
@@ -51,7 +50,7 @@ class TestServiceCoordination:
         response = await async_client.post(
             f"{desktop_service_url}/api/v1/services/start",
             json={"service_name": "notification"},
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 201]
 
@@ -60,7 +59,7 @@ class TestServiceCoordination:
         response = await async_client.post(
             f"{desktop_service_url}/api/v1/services/stop",
             json={"service_name": "notification"},
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 201]
 
@@ -69,8 +68,7 @@ class TestLocalConfiguration:
     @pytest.mark.asyncio
     async def test_get_config(self, desktop_service_url, async_client, auth_headers):
         response = await async_client.get(
-            f"{desktop_service_url}/api/v1/config",
-            headers=auth_headers
+            f"{desktop_service_url}/api/v1/config", headers=auth_headers
         )
         assert response.status_code in [200, 403]
 
@@ -79,7 +77,7 @@ class TestLocalConfiguration:
         response = await async_client.put(
             f"{desktop_service_url}/api/v1/config",
             json={"language": "en", "theme": "dark"},
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 201]
 

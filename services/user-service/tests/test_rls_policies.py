@@ -86,14 +86,12 @@ class TestUsersTableRLS:
 
         # Query users
         result = await test_db.execute(
-            text("SELECT email FROM users WHERE email = :email"),
-            {"email": "user1@tenant1.com"}
+            text("SELECT email FROM users WHERE email = :email"), {"email": "user1@tenant1.com"}
         )
         tenant1_user = result.scalar()
 
         result = await test_db.execute(
-            text("SELECT email FROM users WHERE email = :email"),
-            {"email": "user2@tenant2.com"}
+            text("SELECT email FROM users WHERE email = :email"), {"email": "user2@tenant2.com"}
         )
         tenant2_user = result.scalar()
 
@@ -134,13 +132,13 @@ class TestUsersTableRLS:
         # Query users
         result = await test_db.execute(
             text("SELECT email FROM users WHERE email = :email"),
-            {"email": "candidate1@example.com"}
+            {"email": "candidate1@example.com"},
         )
         own_user = result.scalar()
 
         result = await test_db.execute(
             text("SELECT email FROM users WHERE email = :email"),
-            {"email": "candidate2@example.com"}
+            {"email": "candidate2@example.com"},
         )
         other_user = result.scalar()
 
@@ -167,8 +165,7 @@ class TestUsersTableRLS:
 
         # Verify user was created
         result = await test_db.execute(
-            text("SELECT email FROM users WHERE email = :email"),
-            {"email": "newuser@tenant1.com"}
+            text("SELECT email FROM users WHERE email = :email"), {"email": "newuser@tenant1.com"}
         )
         assert result.scalar() == "newuser@tenant1.com"
 
@@ -214,16 +211,12 @@ class TestUsersTableRLS:
         await test_db.execute(text("SET app.user_email = 'admin@example.com'"))
 
         # Delete user
-        await test_db.execute(
-            text("DELETE FROM users WHERE id = :id"),
-            {"id": str(user_id)}
-        )
+        await test_db.execute(text("DELETE FROM users WHERE id = :id"), {"id": str(user_id)})
         await test_db.commit()
 
         # Verify user was deleted
         result = await test_db.execute(
-            text("SELECT COUNT(*) FROM users WHERE id = :id"),
-            {"id": str(user_id)}
+            text("SELECT COUNT(*) FROM users WHERE id = :id"), {"id": str(user_id)}
         )
         assert result.scalar() == 0
 
@@ -293,7 +286,7 @@ class TestUserProfilesTableRLS:
         # Query profile
         result = await test_db.execute(
             text("SELECT location FROM user_profiles WHERE user_id = :user_id"),
-            {"user_id": str(user.id)}
+            {"user_id": str(user.id)},
         )
         location = result.scalar()
         assert location == "New York"
@@ -338,7 +331,7 @@ class TestUserPreferencesTableRLS:
         # SELECT preferences
         result = await test_db.execute(
             text("SELECT language FROM user_preferences WHERE user_id = :user_id"),
-            {"user_id": str(user.id)}
+            {"user_id": str(user.id)},
         )
         language = result.scalar()
         assert language == "en"
@@ -346,13 +339,13 @@ class TestUserPreferencesTableRLS:
         # UPDATE preferences
         await test_db.execute(
             text("UPDATE user_preferences SET language = 'es' WHERE user_id = :user_id"),
-            {"user_id": str(user.id)}
+            {"user_id": str(user.id)},
         )
         await test_db.commit()
 
         result = await test_db.execute(
             text("SELECT language FROM user_preferences WHERE user_id = :user_id"),
-            {"user_id": str(user.id)}
+            {"user_id": str(user.id)},
         )
         language = result.scalar()
         assert language == "es"
@@ -395,7 +388,7 @@ class TestUserActivityTableRLS:
         # Query activity
         result = await test_db.execute(
             text("SELECT activity_type FROM user_activity WHERE user_id = :user_id"),
-            {"user_id": str(user.id)}
+            {"user_id": str(user.id)},
         )
         activity_type = result.scalar()
         assert activity_type == "login"
@@ -439,7 +432,7 @@ class TestUserSessionsTableRLS:
         # Query session
         result = await test_db.execute(
             text("SELECT session_token FROM user_sessions WHERE user_id = :user_id"),
-            {"user_id": str(user.id)}
+            {"user_id": str(user.id)},
         )
         token = result.scalar()
         assert token == "test-token-123"

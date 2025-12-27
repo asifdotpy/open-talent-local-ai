@@ -54,8 +54,7 @@ class TestUserEndpoints:
         mock_verify.return_value = {"valid": True, "email": "admin@example.com"}
 
         response = await test_client.get(
-            "/api/v1/users",
-            headers={"Authorization": f"Bearer {admin_token}"}
+            "/api/v1/users", headers={"Authorization": f"Bearer {admin_token}"}
         )
 
         assert response.status_code == 200
@@ -76,7 +75,7 @@ class TestUserEndpoints:
         response = await test_client.post(
             "/api/v1/users",
             json=sample_user_data,
-            headers={"Authorization": f"Bearer {admin_token}"}
+            headers={"Authorization": f"Bearer {admin_token}"},
         )
 
         assert response.status_code == 200
@@ -101,14 +100,13 @@ class TestUserEndpoints:
         create_response = await test_client.post(
             "/api/v1/users",
             json=sample_user_data,
-            headers={"Authorization": f"Bearer {admin_token}"}
+            headers={"Authorization": f"Bearer {admin_token}"},
         )
         user_id = create_response.json()["id"]
 
         # Get user
         response = await test_client.get(
-            f"/api/v1/users/{user_id}",
-            headers={"Authorization": f"Bearer {admin_token}"}
+            f"/api/v1/users/{user_id}", headers={"Authorization": f"Bearer {admin_token}"}
         )
 
         assert response.status_code == 200
@@ -128,8 +126,7 @@ class TestUserEndpoints:
 
         fake_id = str(uuid4())
         response = await test_client.get(
-            f"/api/v1/users/{fake_id}",
-            headers={"Authorization": f"Bearer {admin_token}"}
+            f"/api/v1/users/{fake_id}", headers={"Authorization": f"Bearer {admin_token}"}
         )
 
         assert response.status_code == 404
@@ -149,7 +146,7 @@ class TestUserEndpoints:
         create_response = await test_client.post(
             "/api/v1/users",
             json=sample_user_data,
-            headers={"Authorization": f"Bearer {admin_token}"}
+            headers={"Authorization": f"Bearer {admin_token}"},
         )
         user_id = create_response.json()["id"]
 
@@ -158,7 +155,7 @@ class TestUserEndpoints:
         response = await test_client.put(
             f"/api/v1/users/{user_id}",
             json=update_data,
-            headers={"Authorization": f"Bearer {admin_token}"}
+            headers={"Authorization": f"Bearer {admin_token}"},
         )
 
         assert response.status_code == 200
@@ -181,22 +178,20 @@ class TestUserEndpoints:
         create_response = await test_client.post(
             "/api/v1/users",
             json=sample_user_data,
-            headers={"Authorization": f"Bearer {admin_token}"}
+            headers={"Authorization": f"Bearer {admin_token}"},
         )
         user_id = create_response.json()["id"]
 
         # Delete user
         response = await test_client.delete(
-            f"/api/v1/users/{user_id}",
-            headers={"Authorization": f"Bearer {admin_token}"}
+            f"/api/v1/users/{user_id}", headers={"Authorization": f"Bearer {admin_token}"}
         )
 
         assert response.status_code == 200
 
         # Verify user is deleted
         get_response = await test_client.get(
-            f"/api/v1/users/{user_id}",
-            headers={"Authorization": f"Bearer {admin_token}"}
+            f"/api/v1/users/{user_id}", headers={"Authorization": f"Bearer {admin_token}"}
         )
         assert get_response.status_code == 404
 
@@ -212,8 +207,7 @@ class TestUserEndpoints:
         mock_verify.return_value = {"valid": True, "email": "recruiter@tenant1.com"}
 
         response = await test_client.get(
-            "/api/v1/users",
-            headers={"Authorization": f"Bearer {recruiter_token}"}
+            "/api/v1/users", headers={"Authorization": f"Bearer {recruiter_token}"}
         )
 
         assert response.status_code == 200
@@ -245,7 +239,7 @@ class TestUserProfileEndpoints:
         user_response = await test_client.post(
             "/api/v1/users",
             json=sample_user_data,
-            headers={"Authorization": f"Bearer {admin_token}"}
+            headers={"Authorization": f"Bearer {admin_token}"},
         )
         user_id = user_response.json()["id"]
 
@@ -253,7 +247,7 @@ class TestUserProfileEndpoints:
         response = await test_client.post(
             f"/api/v1/users/{user_id}/profile",
             json=sample_profile_data,
-            headers={"Authorization": f"Bearer {admin_token}"}
+            headers={"Authorization": f"Bearer {admin_token}"},
         )
 
         assert response.status_code == 200
@@ -277,20 +271,19 @@ class TestUserProfileEndpoints:
         user_response = await test_client.post(
             "/api/v1/users",
             json=sample_user_data,
-            headers={"Authorization": f"Bearer {admin_token}"}
+            headers={"Authorization": f"Bearer {admin_token}"},
         )
         user_id = user_response.json()["id"]
 
         await test_client.post(
             f"/api/v1/users/{user_id}/profile",
             json=sample_profile_data,
-            headers={"Authorization": f"Bearer {admin_token}"}
+            headers={"Authorization": f"Bearer {admin_token}"},
         )
 
         # Get profile
         response = await test_client.get(
-            f"/api/v1/users/{user_id}/profile",
-            headers={"Authorization": f"Bearer {admin_token}"}
+            f"/api/v1/users/{user_id}/profile", headers={"Authorization": f"Bearer {admin_token}"}
         )
 
         assert response.status_code == 200
@@ -320,7 +313,7 @@ class TestUserPreferencesEndpoints:
         user_response = await test_client.post(
             "/api/v1/users",
             json={**sample_user_data, "email": "candidate@example.com"},
-            headers={"Authorization": f"Bearer {admin_token}"}
+            headers={"Authorization": f"Bearer {admin_token}"},
         )
         user_id = user_response.json()["id"]
 
@@ -328,7 +321,7 @@ class TestUserPreferencesEndpoints:
         response = await test_client.post(
             f"/api/v1/users/{user_id}/preferences",
             json=sample_preferences_data,
-            headers={"Authorization": f"Bearer {candidate_token}"}
+            headers={"Authorization": f"Bearer {candidate_token}"},
         )
 
         assert response.status_code == 200
@@ -362,13 +355,12 @@ class TestSearchAndFilters:
                 "status": "active",
                 "tenant_id": "tenant1",
             },
-            headers={"Authorization": f"Bearer {admin_token}"}
+            headers={"Authorization": f"Bearer {admin_token}"},
         )
 
         # Search by email
         response = await test_client.get(
-            "/api/v1/users?search=john.doe",
-            headers={"Authorization": f"Bearer {admin_token}"}
+            "/api/v1/users?search=john.doe", headers={"Authorization": f"Bearer {admin_token}"}
         )
 
         assert response.status_code == 200
@@ -387,8 +379,7 @@ class TestSearchAndFilters:
         mock_verify.return_value = {"valid": True, "email": "admin@example.com"}
 
         response = await test_client.get(
-            "/api/v1/users?role=candidate",
-            headers={"Authorization": f"Bearer {admin_token}"}
+            "/api/v1/users?role=candidate", headers={"Authorization": f"Bearer {admin_token}"}
         )
 
         assert response.status_code == 200
@@ -409,8 +400,7 @@ class TestSearchAndFilters:
         mock_verify.return_value = {"valid": True, "email": "admin@example.com"}
 
         response = await test_client.get(
-            "/api/v1/users?skip=0&limit=5",
-            headers={"Authorization": f"Bearer {admin_token}"}
+            "/api/v1/users?skip=0&limit=5", headers={"Authorization": f"Bearer {admin_token}"}
         )
 
         assert response.status_code == 200

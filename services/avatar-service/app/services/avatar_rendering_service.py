@@ -128,9 +128,7 @@ class AvatarRenderingService:
         except Exception as e:
             logger.warning(f"Failed to cleanup temp file {file_path}: {e}")
 
-    async def _generate_mock_video(
-        self, audio_data: bytes, duration: float | None = None
-    ) -> bytes:
+    async def _generate_mock_video(self, audio_data: bytes, duration: float | None = None) -> bytes:
         """Generate a simple mock video when renderer is unavailable."""
         try:
             import numpy as np

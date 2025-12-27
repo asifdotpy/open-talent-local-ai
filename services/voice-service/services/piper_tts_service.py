@@ -78,7 +78,11 @@ class PiperTTSService:
         """Check if Piper binary is available."""
         try:
             result = subprocess.run(
-                [self.piper_binary, "--version"], capture_output=True, text=True, timeout=5, check=False
+                [self.piper_binary, "--version"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+                check=False,
             )
             if result.returncode == 0:
                 self.logger.info(f"Piper available: {result.stdout.strip()}")
@@ -151,7 +155,12 @@ class PiperTTSService:
                 # Run Piper with text file input
                 with open(tmp_text_path) as text_file:
                     result = subprocess.run(
-                        cmd, stdin=text_file, capture_output=True, text=True, timeout=30, check=False
+                        cmd,
+                        stdin=text_file,
+                        capture_output=True,
+                        text=True,
+                        timeout=30,
+                        check=False,
                     )
             finally:
                 # Clean up temporary file

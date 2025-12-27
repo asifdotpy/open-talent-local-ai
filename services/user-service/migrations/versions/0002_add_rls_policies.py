@@ -8,8 +8,8 @@ Create Date: 2025-12-14
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = '0002_add_rls_policies'
-down_revision = '0001_initial'
+revision = "0002_add_rls_policies"
+down_revision = "0001_initial"
 branch_labels = None
 depends_on = None
 
@@ -44,17 +44,20 @@ def upgrade():
     # ========================================================================
 
     # Policy 1: Admin can see all users
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY users_admin_all ON users
         FOR ALL
         TO PUBLIC
         USING (
             current_setting('app.user_role', true) = 'admin'
         );
-    """)
+    """
+    )
 
     # Policy 2: Users can see users in their tenant
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY users_tenant_select ON users
         FOR SELECT
         TO PUBLIC
@@ -63,20 +66,24 @@ def upgrade():
             AND tenant_id = current_setting('app.tenant_id', true)
             AND current_setting('app.user_role', true) IN ('recruiter', 'candidate')
         );
-    """)
+    """
+    )
 
     # Policy 3: Users can see their own record (by email)
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY users_self_select ON users
         FOR SELECT
         TO PUBLIC
         USING (
             email = current_setting('app.user_email', true)
         );
-    """)
+    """
+    )
 
     # Policy 4: Recruiters and admins can insert users in their tenant
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY users_tenant_insert ON users
         FOR INSERT
         TO PUBLIC
@@ -87,10 +94,12 @@ def upgrade():
                 OR tenant_id = current_setting('app.tenant_id', true)
             )
         );
-    """)
+    """
+    )
 
     # Policy 5: Users can update users in their tenant
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY users_tenant_update ON users
         FOR UPDATE
         TO PUBLIC
@@ -102,34 +111,40 @@ def upgrade():
             )
             OR email = current_setting('app.user_email', true)
         );
-    """)
+    """
+    )
 
     # Policy 6: Only admins can delete users
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY users_admin_delete ON users
         FOR DELETE
         TO PUBLIC
         USING (
             current_setting('app.user_role', true) = 'admin'
         );
-    """)
+    """
+    )
 
     # ========================================================================
     # USER_PROFILES TABLE POLICIES
     # ========================================================================
 
     # Policy 1: Admin can see all profiles
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY user_profiles_admin_all ON user_profiles
         FOR ALL
         TO PUBLIC
         USING (
             current_setting('app.user_role', true) = 'admin'
         );
-    """)
+    """
+    )
 
     # Policy 2: Users can see profiles in their tenant
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY user_profiles_tenant_select ON user_profiles
         FOR SELECT
         TO PUBLIC
@@ -138,10 +153,12 @@ def upgrade():
             AND tenant_id = current_setting('app.tenant_id', true)
             AND current_setting('app.user_role', true) IN ('recruiter', 'candidate')
         );
-    """)
+    """
+    )
 
     # Policy 3: Users can see their own profile
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY user_profiles_self_select ON user_profiles
         FOR SELECT
         TO PUBLIC
@@ -150,10 +167,12 @@ def upgrade():
                 SELECT id FROM users WHERE email = current_setting('app.user_email', true)
             )
         );
-    """)
+    """
+    )
 
     # Policy 4: Users can insert/update their own profile or tenant profiles
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY user_profiles_tenant_modify ON user_profiles
         FOR ALL
         TO PUBLIC
@@ -164,24 +183,28 @@ def upgrade():
                 SELECT id FROM users WHERE email = current_setting('app.user_email', true)
             )
         );
-    """)
+    """
+    )
 
     # ========================================================================
     # USER_PREFERENCES TABLE POLICIES
     # ========================================================================
 
     # Policy 1: Admin can see all preferences
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY user_preferences_admin_all ON user_preferences
         FOR ALL
         TO PUBLIC
         USING (
             current_setting('app.user_role', true) = 'admin'
         );
-    """)
+    """
+    )
 
     # Policy 2: Users can see preferences in their tenant
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY user_preferences_tenant_select ON user_preferences
         FOR SELECT
         TO PUBLIC
@@ -190,10 +213,12 @@ def upgrade():
             AND tenant_id = current_setting('app.tenant_id', true)
             AND current_setting('app.user_role', true) IN ('recruiter', 'candidate')
         );
-    """)
+    """
+    )
 
     # Policy 3: Users can manage their own preferences
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY user_preferences_self_all ON user_preferences
         FOR ALL
         TO PUBLIC
@@ -202,24 +227,28 @@ def upgrade():
                 SELECT id FROM users WHERE email = current_setting('app.user_email', true)
             )
         );
-    """)
+    """
+    )
 
     # ========================================================================
     # USER_ACTIVITY TABLE POLICIES
     # ========================================================================
 
     # Policy 1: Admin can see all activity
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY user_activity_admin_all ON user_activity
         FOR ALL
         TO PUBLIC
         USING (
             current_setting('app.user_role', true) = 'admin'
         );
-    """)
+    """
+    )
 
     # Policy 2: Users can see activity in their tenant
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY user_activity_tenant_select ON user_activity
         FOR SELECT
         TO PUBLIC
@@ -228,10 +257,12 @@ def upgrade():
             AND tenant_id = current_setting('app.tenant_id', true)
             AND current_setting('app.user_role', true) IN ('recruiter', 'candidate')
         );
-    """)
+    """
+    )
 
     # Policy 3: Users can see and create their own activity
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY user_activity_self_all ON user_activity
         FOR ALL
         TO PUBLIC
@@ -240,24 +271,28 @@ def upgrade():
                 SELECT id FROM users WHERE email = current_setting('app.user_email', true)
             )
         );
-    """)
+    """
+    )
 
     # ========================================================================
     # USER_SESSIONS TABLE POLICIES
     # ========================================================================
 
     # Policy 1: Admin can see all sessions
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY user_sessions_admin_all ON user_sessions
         FOR ALL
         TO PUBLIC
         USING (
             current_setting('app.user_role', true) = 'admin'
         );
-    """)
+    """
+    )
 
     # Policy 2: Users can see sessions in their tenant
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY user_sessions_tenant_select ON user_sessions
         FOR SELECT
         TO PUBLIC
@@ -266,10 +301,12 @@ def upgrade():
             AND tenant_id = current_setting('app.tenant_id', true)
             AND current_setting('app.user_role', true) IN ('recruiter', 'candidate')
         );
-    """)
+    """
+    )
 
     # Policy 3: Users can manage their own sessions
-    op.execute("""
+    op.execute(
+        """
         CREATE POLICY user_sessions_self_all ON user_sessions
         FOR ALL
         TO PUBLIC
@@ -278,7 +315,8 @@ def upgrade():
                 SELECT id FROM users WHERE email = current_setting('app.user_email', true)
             )
         );
-    """)
+    """
+    )
 
 
 def downgrade():

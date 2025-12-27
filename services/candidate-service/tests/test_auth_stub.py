@@ -23,7 +23,9 @@ class TestAuthStub:
     def test_no_auth_header_returns_user(self, client):
         """Verify requests without auth header use DEFAULT_USER_ID."""
         response = client.get("/api/v1/candidates")
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.json()}"
+        assert (
+            response.status_code == 200
+        ), f"Expected 200, got {response.status_code}: {response.json()}"
         data = response.json()
         assert "items" in data
         assert "total" in data
@@ -65,11 +67,7 @@ class TestAuthStub:
     def test_create_candidate_without_auth(self, client):
         """Verify POST endpoints work without explicit auth."""
         response = client.post(
-            "/api/v1/candidates",
-            json={
-                "email": "test@example.com",
-                "full_name": "Test User"
-            }
+            "/api/v1/candidates", json={"email": "test@example.com", "full_name": "Test User"}
         )
         # Should not return 401 Unauthorized
         assert response.status_code != 401
@@ -81,11 +79,8 @@ class TestAuthStub:
         headers = {"Authorization": f"Bearer {TEST_TOKEN}"}
         response = client.post(
             "/api/v1/candidates",
-            json={
-                "email": "test2@example.com",
-                "full_name": "Test User 2"
-            },
-            headers=headers
+            json={"email": "test2@example.com", "full_name": "Test User 2"},
+            headers=headers,
         )
         assert response.status_code != 401
 
@@ -98,8 +93,9 @@ class TestAuthStub:
 
         for endpoint in endpoints:
             response = client.get(endpoint)
-            assert response.status_code == 200, \
-                f"{endpoint} returned {response.status_code}, expected 200"
+            assert (
+                response.status_code == 200
+            ), f"{endpoint} returned {response.status_code}, expected 200"
 
     def test_auth_header_variations(self, client):
         """Verify different auth header formats are handled gracefully."""
@@ -116,8 +112,9 @@ class TestAuthStub:
                 headers["Authorization"] = auth_value
 
             response = client.get("/api/v1/candidates", headers=headers)
-            assert response.status_code == expected_status, \
-                f"Auth: '{auth_value}' returned {response.status_code}, expected {expected_status}"
+            assert (
+                response.status_code == expected_status
+            ), f"Auth: '{auth_value}' returned {response.status_code}, expected {expected_status}"
 
 
 class TestAuthStubIntegration:
@@ -128,10 +125,7 @@ class TestAuthStubIntegration:
         # Create a candidate
         create_response = client.post(
             "/api/v1/candidates",
-            json={
-                "email": "workflow@example.com",
-                "full_name": "Workflow Test User"
-            }
+            json={"email": "workflow@example.com", "full_name": "Workflow Test User"},
         )
         assert create_response.status_code in [201, 422]
 
@@ -149,11 +143,8 @@ class TestAuthStubIntegration:
         # Create
         create_response = client.post(
             "/api/v1/candidates",
-            json={
-                "email": "token-workflow@example.com",
-                "full_name": "Token Workflow Test"
-            },
-            headers=headers
+            json={"email": "token-workflow@example.com", "full_name": "Token Workflow Test"},
+            headers=headers,
         )
         assert create_response.status_code in [201, 422]
 

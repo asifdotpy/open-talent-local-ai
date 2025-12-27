@@ -18,8 +18,7 @@ class VoiceService:
     async def generate_us_voice(self, request: VoiceRequest) -> VoiceResponse:
         """Mock voice generation - local implementation planned."""
         return VoiceResponse(
-            success=False,
-            error="Local voice generation not yet implemented. Research in progress."
+            success=False, error="Local voice generation not yet implemented. Research in progress."
         )
 
     async def list_available_voices(self) -> VoiceListResponse:
@@ -28,7 +27,7 @@ class VoiceService:
             primary_us_voice="Local TTS (planned)",
             us_voices=[],
             total_voices=0,
-            note="Local voice synthesis research in progress"
+            note="Local voice synthesis research in progress",
         )
 
 

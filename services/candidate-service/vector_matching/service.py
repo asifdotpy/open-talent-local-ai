@@ -9,7 +9,13 @@ import time
 from neo4j import Driver, GraphDatabase
 
 from .embeddings import EmbeddingGenerator
-from .models import CandidateEmbedding, JobEmbedding, MatchRequest, MatchResponse, MatchResult
+from .models import (
+    CandidateEmbedding,
+    JobEmbedding,
+    MatchRequest,
+    MatchResponse,
+    MatchResult,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +30,7 @@ class VectorMatchingService:
         neo4j_uri: str = None,
         neo4j_username: str = None,
         neo4j_password: str = None,
-        neo4j_database: str = "neo4j"
+        neo4j_database: str = "neo4j",
     ):
         """Initialize the vector matching service.
 
@@ -48,10 +54,7 @@ class VectorMatchingService:
     def _connect(self):
         """Establish connection to Neo4j."""
         try:
-            self.driver = GraphDatabase.driver(
-                self.uri,
-                auth=(self.username, self.password)
-            )
+            self.driver = GraphDatabase.driver(self.uri, auth=(self.username, self.password))
             # Verify connection
             self.driver.verify_connectivity()
             logger.info("Successfully connected to Neo4j")
@@ -67,7 +70,8 @@ class VectorMatchingService:
         with self.driver.session(database=self.database) as session:
             try:
                 # Create vector index for candidates
-                session.run("""
+                session.run(
+                    """
                     CREATE VECTOR INDEX candidate_embeddings IF NOT EXISTS
                     FOR (c:Candidate)
                     ON c.embedding
@@ -75,10 +79,12 @@ class VectorMatchingService:
                         `vector.dimensions`: 384,
                         `vector.similarity_function`: 'cosine'
                     }}
-                """)
+                """
+                )
 
                 # Create vector index for jobs
-                session.run("""
+                session.run(
+                    """
                     CREATE VECTOR INDEX job_embeddings IF NOT EXISTS
                     FOR (j:Job)
                     ON j.embedding
@@ -86,7 +92,8 @@ class VectorMatchingService:
                         `vector.dimensions`: 384,
                         `vector.similarity_function`: 'cosine'
                     }}
-                """)
+                """
+                )
 
                 logger.info("Vector indexes created/verified successfully")
             except Exception as e:
@@ -107,7 +114,8 @@ class VectorMatchingService:
 
         with self.driver.session(database=self.database) as session:
             try:
-                session.run("""
+                session.run(
+                    """
                     MERGE (c:Candidate {candidate_id: $candidate_id})
                     SET c.full_name = $full_name,
                         c.email = $email,
@@ -116,15 +124,17 @@ class VectorMatchingService:
                         c.skills = $skills,
                         c.experience_years = $experience_years,
                         c.updated_at = datetime()
-                """, {
-                    "candidate_id": candidate.candidate_id,
-                    "full_name": candidate.full_name,
-                    "email": candidate.email,
-                    "profile_text": candidate.profile_text,
-                    "embedding": candidate.embedding,
-                    "skills": candidate.skills,
-                    "experience_years": candidate.experience_years
-                })
+                """,
+                    {
+                        "candidate_id": candidate.candidate_id,
+                        "full_name": candidate.full_name,
+                        "email": candidate.email,
+                        "profile_text": candidate.profile_text,
+                        "embedding": candidate.embedding,
+                        "skills": candidate.skills,
+                        "experience_years": candidate.experience_years,
+                    },
+                )
 
                 logger.info(f"Stored embedding for candidate {candidate.candidate_id}")
                 return True
@@ -147,7 +157,8 @@ class VectorMatchingService:
 
         with self.driver.session(database=self.database) as session:
             try:
-                session.run("""
+                session.run(
+                    """
                     MERGE (j:Job {job_id: $job_id})
                     SET j.title = $title,
                         j.description = $description,
@@ -155,14 +166,16 @@ class VectorMatchingService:
                         j.required_skills = $required_skills,
                         j.experience_required = $experience_required,
                         j.updated_at = datetime()
-                """, {
-                    "job_id": job.job_id,
-                    "title": job.title,
-                    "description": job.description,
-                    "embedding": job.embedding,
-                    "required_skills": job.required_skills,
-                    "experience_required": job.experience_required
-                })
+                """,
+                    {
+                        "job_id": job.job_id,
+                        "title": job.title,
+                        "description": job.description,
+                        "embedding": job.embedding,
+                        "required_skills": job.required_skills,
+                        "experience_required": job.experience_required,
+                    },
+                )
 
                 logger.info(f"Stored embedding for job {job.job_id}")
                 return True
@@ -186,15 +199,13 @@ class VectorMatchingService:
         if not job or not job.embedding:
             logger.error(f"Job {request.job_id} not found or has no embedding")
             return MatchResponse(
-                job_id=request.job_id,
-                total_candidates_searched=0,
-                matches=[],
-                search_time_ms=0
+                job_id=request.job_id, total_candidates_searched=0, matches=[], search_time_ms=0
             )
 
         # Perform vector search
         with self.driver.session(database=self.database) as session:
-            result = session.run("""
+            result = session.run(
+                """
                 CALL db.index.vector.queryNodes('candidate_embeddings', $top_k, $job_embedding)
                 YIELD node, score
                 WHERE score >= $min_similarity
@@ -204,11 +215,13 @@ class VectorMatchingService:
                        node.experience_years as experience_years,
                        score
                 ORDER BY score DESC
-            """, {
-                "top_k": request.top_k,
-                "job_embedding": job.embedding,
-                "min_similarity": request.min_similarity
-            })
+            """,
+                {
+                    "top_k": request.top_k,
+                    "job_embedding": job.embedding,
+                    "min_similarity": request.min_similarity,
+                },
+            )
 
             matches = []
             for record in result:
@@ -219,8 +232,7 @@ class VectorMatchingService:
                 missing_skills = list(required_skills - candidate_skills)
 
                 skill_match_score = (
-                    len(matched_skills) / len(required_skills)
-                    if required_skills else 1.0
+                    len(matched_skills) / len(required_skills) if required_skills else 1.0
                 )
 
                 # Check experience requirement
@@ -235,9 +247,9 @@ class VectorMatchingService:
                 # Calculate overall score (weighted combination)
                 similarity_score = record["score"]
                 overall_score = (
-                    similarity_score * 60 +  # 60% semantic similarity
-                    skill_match_score * 30 +  # 30% skill match
-                    (10 if experience_match else 0)  # 10% experience
+                    similarity_score * 60
+                    + skill_match_score * 30  # 60% semantic similarity
+                    + (10 if experience_match else 0)  # 30% skill match  # 10% experience
                 )
 
                 match = MatchResult(
@@ -248,7 +260,7 @@ class VectorMatchingService:
                     experience_match=experience_match,
                     overall_score=overall_score,
                     matched_skills=matched_skills,
-                    missing_skills=missing_skills
+                    missing_skills=missing_skills,
                 )
                 matches.append(match)
 
@@ -258,13 +270,14 @@ class VectorMatchingService:
             job_id=request.job_id,
             total_candidates_searched=len(matches),
             matches=matches,
-            search_time_ms=round(search_time, 2)
+            search_time_ms=round(search_time, 2),
         )
 
     def _get_job_embedding(self, job_id: str) -> JobEmbedding | None:
         """Retrieve job embedding from Neo4j."""
         with self.driver.session(database=self.database) as session:
-            result = session.run("""
+            result = session.run(
+                """
                 MATCH (j:Job {job_id: $job_id})
                 RETURN j.job_id as job_id,
                        j.title as title,
@@ -272,7 +285,9 @@ class VectorMatchingService:
                        j.embedding as embedding,
                        j.required_skills as required_skills,
                        j.experience_required as experience_required
-            """, {"job_id": job_id})
+            """,
+                {"job_id": job_id},
+            )
 
             record = result.single()
             if not record:
@@ -284,7 +299,7 @@ class VectorMatchingService:
                 description=record["description"],
                 embedding=record["embedding"],
                 required_skills=record["required_skills"] or [],
-                experience_required=record["experience_required"]
+                experience_required=record["experience_required"],
             )
 
     def close(self):

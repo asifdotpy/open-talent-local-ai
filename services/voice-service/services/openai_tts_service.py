@@ -28,7 +28,7 @@ class OpenAITTSService:
         api_key: str,
         model: str = "gpt-4o-mini-tts",
         voice: str = "alloy",
-        base_url: str | None = None
+        base_url: str | None = None,
     ):
         """Initialize OpenAI TTS service.
 
@@ -44,10 +44,7 @@ class OpenAITTSService:
         self.logger = logging.getLogger(__name__)
 
         # Initialize OpenAI client
-        self.client = OpenAI(
-            api_key=api_key,
-            base_url=base_url
-        )
+        self.client = OpenAI(api_key=api_key, base_url=base_url)
 
         # Initialize phoneme extractor for lip-sync
         self.phoneme_extractor = PhonemeExtractor(self.logger)
@@ -59,7 +56,7 @@ class OpenAITTSService:
             "fable": {"gender": "female", "description": "Expressive female voice"},
             "onyx": {"gender": "male", "description": "Deep, authoritative male voice"},
             "nova": {"gender": "female", "description": "Youthful, energetic female voice"},
-            "shimmer": {"gender": "female", "description": "Bright, confident female voice"}
+            "shimmer": {"gender": "female", "description": "Bright, confident female voice"},
         }
 
         # Test connection
@@ -81,7 +78,7 @@ class OpenAITTSService:
         output_path: str,
         voice: str = "alloy",
         speed: float = 1.0,
-        extract_phonemes: bool = True
+        extract_phonemes: bool = True,
     ) -> dict:
         """Synthesize high-quality speech from text using the OpenAI TTS API.
 
@@ -104,13 +101,17 @@ class OpenAITTSService:
         try:
             # Validate voice
             if voice not in self.voices:
-                self.logger.warning(f"Unknown voice '{voice}', using default '{self.default_voice}'")
+                self.logger.warning(
+                    f"Unknown voice '{voice}', using default '{self.default_voice}'"
+                )
                 voice = self.default_voice
 
             # Validate speed
             speed = max(0.25, min(4.0, speed))
 
-            self.logger.info(f"Synthesizing with OpenAI TTS: '{text[:50]}...' (voice: {voice}, speed: {speed})")
+            self.logger.info(
+                f"Synthesizing with OpenAI TTS: '{text[:50]}...' (voice: {voice}, speed: {speed})"
+            )
 
             # Call OpenAI TTS API
             response = self.client.audio.speech.create(
@@ -118,7 +119,7 @@ class OpenAITTSService:
                 voice=voice,
                 input=text,
                 speed=speed,
-                response_format="wav"  # WAV format for compatibility
+                response_format="wav",  # WAV format for compatibility
             )
 
             # Save audio to file
@@ -126,7 +127,7 @@ class OpenAITTSService:
             for chunk in response.iter_bytes():
                 audio_bytes += chunk
 
-            with open(output_path, 'wb') as f:
+            with open(output_path, "wb") as f:
                 f.write(audio_bytes)
 
             # Load audio to get metadata
@@ -155,7 +156,7 @@ class OpenAITTSService:
                 "voice": voice,
                 "speed": speed,
                 "cost_estimate": round(cost_estimate, 4),
-                "model": self.model
+                "model": self.model,
             }
 
             processing_time = time.time() - start_time
@@ -172,10 +173,7 @@ class OpenAITTSService:
             raise
 
     def synthesize_streaming(
-        self,
-        text: str,
-        chunk_size: int = 4096,
-        voice: str = "alloy"
+        self, text: str, chunk_size: int = 4096, voice: str = "alloy"
     ) -> list[bytes]:
         """Synthesize speech in chunks for streaming.
 
@@ -190,13 +188,9 @@ class OpenAITTSService:
         try:
             # Generate full audio first
             import tempfile
-            with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as tmp:
-                result = self.synthesize_speech(
-                    text,
-                    tmp.name,
-                    voice=voice,
-                    extract_phonemes=False
-                )
+
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
+                result = self.synthesize_speech(text, tmp.name, voice=voice, extract_phonemes=False)
 
                 # Read audio and split into chunks
                 audio_data, sample_rate = sf.read(result["audio_file"])
@@ -205,8 +199,7 @@ class OpenAITTSService:
 
                 # Split into chunks
                 chunks = [
-                    audio_bytes[i:i + chunk_size]
-                    for i in range(0, len(audio_bytes), chunk_size)
+                    audio_bytes[i : i + chunk_size] for i in range(0, len(audio_bytes), chunk_size)
                 ]
 
                 self.logger.info(f"Generated {len(chunks)} audio chunks")
@@ -223,7 +216,7 @@ class OpenAITTSService:
                 "name": name,
                 "gender": info["gender"],
                 "description": info["description"],
-                "provider": "OpenAI"
+                "provider": "OpenAI",
             }
             for name, info in self.voices.items()
         ]
@@ -246,17 +239,14 @@ class OpenAITTSService:
             "default_voice": self.default_voice,
             "ready": self.health_check(),
             "voices": self.get_available_voices(),
-            "pricing": {
-                "per_minute": 0.015,
-                "currency": "USD"
-            },
+            "pricing": {"per_minute": 0.015, "currency": "USD"},
             "features": {
                 "streaming": True,
                 "phoneme_extraction": True,
                 "word_timing": True,
                 "language": "en-US",
-                "speed_control": True
-            }
+                "speed_control": True,
+            },
         }
 
 
@@ -275,7 +265,7 @@ class MockOpenAITTSService:
         output_path: str,
         voice: str = "alloy",
         speed: float = 1.0,
-        extract_phonemes: bool = True
+        extract_phonemes: bool = True,
     ) -> dict:
         """Return mock synthesis result and create WAV file with audio content."""
         # Create WAV file with actual audio content (20-30 seconds)
@@ -287,6 +277,7 @@ class MockOpenAITTSService:
 
         # Generate a simple sine wave instead of silence for testing
         import numpy as np
+
         t = np.linspace(0, duration, int(sample_rate * duration), False)
         # Create a 440Hz sine wave (A note) with some amplitude variation
         frequency = 440.0
@@ -310,13 +301,18 @@ class MockOpenAITTSService:
             "voice": voice,
             "speed": speed,
             "cost_estimate": round(cost_estimate, 4),
-            "model": "gpt-4o-mini-tts"
+            "model": "gpt-4o-mini-tts",
         }
 
     def get_available_voices(self) -> list[dict]:
         """Return mock voices."""
         return [
-            {"name": "alloy", "gender": "neutral", "description": "Balanced voice", "provider": "OpenAI"}
+            {
+                "name": "alloy",
+                "gender": "neutral",
+                "description": "Balanced voice",
+                "provider": "OpenAI",
+            }
         ]
 
     def health_check(self) -> bool:
@@ -326,5 +322,5 @@ class MockOpenAITTSService:
         return {
             "service": "Mock OpenAI TTS",
             "ready": True,
-            "note": "Mock implementation for testing"
+            "note": "Mock implementation for testing",
         }

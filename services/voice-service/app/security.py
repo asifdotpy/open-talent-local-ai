@@ -10,7 +10,7 @@ SECURITY_HEADERS = {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "no-referrer",
     "X-XSS-Protection": "1; mode=block",
-    "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'"
+    "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'",
 }
 
 
@@ -52,7 +52,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     Keys: client IP + path. Allowlist skips health/docs endpoints.
     """
 
-    def __init__(self, app, burst: int = 10, rate_per_sec: int = 5, allowlist: tuple[str, ...] | None = None):
+    def __init__(
+        self, app, burst: int = 10, rate_per_sec: int = 5, allowlist: tuple[str, ...] | None = None
+    ):
         super().__init__(app)
         self.burst = max(1, burst)
         self.rate = max(1, rate_per_sec)

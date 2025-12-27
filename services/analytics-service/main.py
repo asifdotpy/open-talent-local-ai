@@ -253,7 +253,9 @@ async def analyze_expertise(request: ExpertiseAssessmentRequest):
 
         # Determine expertise level
         max_score = max(expertise_scores.values())
-        level = "intermediate" if max_score == 0 else max(expertise_scores, key=expertise_scores.get)
+        level = (
+            "intermediate" if max_score == 0 else max(expertise_scores, key=expertise_scores.get)
+        )
 
         # Estimate years of experience
         years_estimate = {"beginner": 1, "intermediate": 3, "advanced": 5, "expert": 8}.get(

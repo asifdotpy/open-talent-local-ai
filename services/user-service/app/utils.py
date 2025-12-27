@@ -11,6 +11,7 @@ from .config import settings
 
 class JWTClaims(BaseModel):
     """JWT claims extracted from verified token."""
+
     email: str
     user_id: str | None = None
     role: str | None = None
@@ -142,6 +143,7 @@ async def get_current_user(authorization: str | None = Header(None)) -> str:
 
 def require_role(*allowed_roles: str):
     """Dependency to enforce role-based access control."""
+
     async def role_checker(claims: JWTClaims = Depends(get_jwt_claims)):
         if not claims.role or claims.role not in allowed_roles:
             raise HTTPException(
@@ -149,6 +151,7 @@ def require_role(*allowed_roles: str):
                 detail=f"Access denied. Required roles: {', '.join(allowed_roles)}",
             )
         return claims
+
     return role_checker
 
 

@@ -34,8 +34,8 @@ class TestConversationService:
     def test_initialization(self):
         """Test service initialization."""
         assert self.service.active_conversations == {}
-        assert hasattr(self.service, 'conversation_timeout')
-        assert hasattr(self.service, 'ollama_client')
+        assert hasattr(self.service, "conversation_timeout")
+        assert hasattr(self.service, "ollama_client")
 
     @pytest.mark.asyncio
     async def test_start_conversation_success(self):
@@ -44,15 +44,15 @@ class TestConversationService:
             session_id="test-123",
             job_description="Python Developer",
             interview_type="technical",
-            tone="professional"
+            tone="professional",
         )
 
-        with patch.object(self.service, '_generate_initial_message', return_value="Welcome!"):
+        with patch.object(self.service, "_generate_initial_message", return_value="Welcome!"):
             result = await self.service.start_conversation(
                 session_id=request.session_id,
                 job_description=request.job_description,
                 interview_type=request.interview_type,
-                tone=request.tone
+                tone=request.tone,
             )
 
             assert "conversation_id" in result
@@ -74,22 +74,22 @@ class TestConversationService:
             "messages": [],
             "question_count": 0,
             "current_topic": None,
-            "last_activity": datetime.now()
+            "last_activity": datetime.now(),
         }
 
-        with patch.object(self.service, '_process_transcript') as mock_process:
+        with patch.object(self.service, "_process_transcript") as mock_process:
             mock_process.return_value = {
                 "conversation_id": conv_id,
                 "session_id": "session-123",
                 "response_text": "Good answer!",
                 "response_type": "feedback",
-                "should_speak": True
+                "should_speak": True,
             }
 
             result = await self.service.process_message(
                 session_id="session-123",
                 message="I have 3 years experience",
-                message_type="transcript"
+                message_type="transcript",
             )
 
             assert result["response_text"] == "Good answer!"
@@ -99,9 +99,7 @@ class TestConversationService:
     async def test_process_message_no_conversation(self):
         """Test processing message when no conversation exists."""
         result = await self.service.process_message(
-            session_id="nonexistent",
-            message="Hello",
-            message_type="transcript"
+            session_id="nonexistent", message="Hello", message_type="transcript"
         )
 
         assert result is None
@@ -116,7 +114,7 @@ class TestConversationService:
             "status": "active",
             "messages": [{"type": "test"}],
             "last_activity": datetime.now(),
-            "current_topic": "experience"
+            "current_topic": "experience",
         }
 
         result = await self.service.get_conversation_status("session-status")
@@ -140,7 +138,7 @@ class TestConversationService:
         self.service.active_conversations[conv_id] = {
             "conversation_id": conv_id,
             "session_id": "session-end",
-            "status": "active"
+            "status": "active",
         }
 
         result = await self.service.end_conversation("session-end")
@@ -171,7 +169,7 @@ class TestConversationService:
             "conversation_id": "conv-test",
             "session_id": "session-test",
             "messages": [],
-            "question_count": 0
+            "question_count": 0,
         }
 
         result = self.service._generate_mock_transcript_response(
@@ -200,7 +198,7 @@ class TestConversationService:
             "job_description": "Python Developer",
             "interview_type": "technical",
             "tone": "professional",
-            "question_count": 2
+            "question_count": 2,
         }
 
         prompt = self.service._build_system_prompt(context)
@@ -241,38 +239,44 @@ class TestOllamaService:
 
     def test_generate_questions_success_mock(self):
         """Test successful question generation with mock responses."""
-        request = GenerateQuestionsRequest(
-            job_description="Software Engineer",
-            num_questions=2
-        )
+        request = GenerateQuestionsRequest(job_description="Software Engineer", num_questions=2)
 
         result = generate_questions_from_ollama(
             job_description=request.job_description,
             num_questions=request.num_questions,
-            difficulty=request.difficulty
+            difficulty=request.difficulty,
         )
 
         assert isinstance(result, dict)
         assert "questions" in result
         assert len(result["questions"]) == 2
-        assert all("id" in q and "text" in q and "category" in q and "expected_duration_seconds" in q
-                  for q in result["questions"])
+        assert all(
+            "id" in q and "text" in q and "category" in q and "expected_duration_seconds" in q
+            for q in result["questions"]
+        )
 
     def test_generate_questions_success_real(self):
         """Test successful question generation with real Ollama."""
-        expected = {"questions": [{"id": 1, "text": "Tell me about yourself", "category": "behavioral", "expected_duration_seconds": 60}]}
+        expected = {
+            "questions": [
+                {
+                    "id": 1,
+                    "text": "Tell me about yourself",
+                    "category": "behavioral",
+                    "expected_duration_seconds": 60,
+                }
+            ]
+        }
 
         def fake_run(coro):
             coro.close()
             return expected
 
-        with patch('app.services.ollama_service.USE_MOCK', False), \
-             patch('app.services.ollama_service.asyncio.run', side_effect=fake_run) as mock_run:
-
+        with patch("app.services.ollama_service.USE_MOCK", False), patch(
+            "app.services.ollama_service.asyncio.run", side_effect=fake_run
+        ) as mock_run:
             result = generate_questions_from_ollama(
-                job_description="Software Engineer",
-                num_questions=1,
-                difficulty="easy"
+                job_description="Software Engineer", num_questions=1, difficulty="easy"
             )
 
             assert result == expected
@@ -280,17 +284,16 @@ class TestOllamaService:
 
     def test_generate_questions_ollama_error(self):
         """Test question generation with Ollama error."""
+
         def fake_run_error(coro):
             coro.close()
             raise Exception("Ollama connection failed")
 
-        with patch('app.services.ollama_service.USE_MOCK', False), \
-             patch('app.services.ollama_service.asyncio.run', side_effect=fake_run_error):
-
+        with patch("app.services.ollama_service.USE_MOCK", False), patch(
+            "app.services.ollama_service.asyncio.run", side_effect=fake_run_error
+        ):
             result = generate_questions_from_ollama(
-                job_description="Test job",
-                num_questions=1,
-                difficulty="easy"
+                job_description="Test job", num_questions=1, difficulty="easy"
             )
 
             assert "questions" in result
@@ -303,9 +306,7 @@ class TestDataValidation:
     def test_generate_questions_request_valid(self):
         """Test valid GenerateQuestionsRequest creation."""
         request = GenerateQuestionsRequest(
-            job_description="Python Developer",
-            num_questions=5,
-            difficulty="medium"
+            job_description="Python Developer", num_questions=5, difficulty="medium"
         )
 
         assert request.job_description == "Python Developer"
@@ -315,25 +316,16 @@ class TestDataValidation:
     def test_generate_questions_request_validation(self):
         """Test GenerateQuestionsRequest validation."""
         # Valid request
-        request = GenerateQuestionsRequest(
-            job_description="Developer",
-            num_questions=10
-        )
+        request = GenerateQuestionsRequest(job_description="Developer", num_questions=10)
         assert request.num_questions == 10
 
         # Invalid num_questions (too high)
         with pytest.raises(ValueError):
-            GenerateQuestionsRequest(
-                job_description="Developer",
-                num_questions=25  # Above max
-            )
+            GenerateQuestionsRequest(job_description="Developer", num_questions=25)  # Above max
 
         # Invalid num_questions (too low)
         with pytest.raises(ValueError):
-            GenerateQuestionsRequest(
-                job_description="Developer",
-                num_questions=0  # Below min
-            )
+            GenerateQuestionsRequest(job_description="Developer", num_questions=0)  # Below min
 
     def test_conversation_response_model(self):
         """Test ConversationResponse model creation."""
@@ -343,7 +335,7 @@ class TestDataValidation:
             response_text="That's a good answer!",
             response_type="feedback",
             should_speak=True,
-            metadata={"confidence": 0.9}
+            metadata={"confidence": 0.9},
         )
 
         assert response.conversation_id == "conv-123"

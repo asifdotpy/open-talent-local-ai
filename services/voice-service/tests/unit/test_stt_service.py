@@ -16,9 +16,9 @@ from unittest.mock import Mock, patch
 import pytest
 
 # Mock torch and whisper before importing the service
-sys.modules['torch'] = Mock()
-sys.modules['torch.cuda'] = Mock()
-sys.modules['whisper'] = Mock()
+sys.modules["torch"] = Mock()
+sys.modules["torch.cuda"] = Mock()
+sys.modules["whisper"] = Mock()
 
 from services.stt_service import WhisperSTTService
 
@@ -40,6 +40,7 @@ def mock_whisper_model():
 class TestWhisperSTTServiceInitialization:
     """Test service initialization and configuration."""
 
+
 class TestWhisperSTTServiceInitialization:
     """Test service initialization and configuration."""
 
@@ -59,14 +60,14 @@ class TestWhisperSTTServiceInitialization:
         """Test that model is None until explicitly loaded."""
         assert stt_service.model is None
 
-    @patch('torch.cuda.is_available', return_value=True)
+    @patch("torch.cuda.is_available", return_value=True)
     def test_initialization_selects_cuda_when_available(self, mock_cuda):
         """Test that service uses CUDA when available."""
         service = WhisperSTTService()
 
         assert service.device == "cuda"
 
-    @patch('torch.cuda.is_available', return_value=False)
+    @patch("torch.cuda.is_available", return_value=False)
     def test_initialization_falls_back_to_cpu(self, mock_cuda):
         """Test that service falls back to CPU when CUDA unavailable."""
         service = WhisperSTTService()
@@ -91,7 +92,7 @@ class TestWhisperSTTServiceInitialization:
 class TestModelLoading:
     """Test Whisper model loading functionality."""
 
-    @patch('whisper.load_model')
+    @patch("whisper.load_model")
     def test_load_model_succeeds_with_valid_configuration(
         self, mock_load, stt_service, mock_whisper_model
     ):
@@ -107,10 +108,8 @@ class TestModelLoading:
         assert stt_service.model == mock_whisper_model
         mock_load.assert_called_once_with("base", device=stt_service.device)
 
-    @patch('whisper.load_model')
-    def test_load_model_fails_when_model_not_found(
-        self, mock_load, stt_service
-    ):
+    @patch("whisper.load_model")
+    def test_load_model_fails_when_model_not_found(self, mock_load, stt_service):
         """Test that model loading fails gracefully when model not found."""
         # Arrange
         mock_load.side_effect = FileNotFoundError("Model not found")
@@ -122,10 +121,8 @@ class TestModelLoading:
         assert result is False
         assert stt_service.model is None
 
-    @patch('whisper.load_model')
-    def test_load_model_fails_on_exception(
-        self, mock_load, stt_service
-    ):
+    @patch("whisper.load_model")
+    def test_load_model_fails_on_exception(self, mock_load, stt_service):
         """Test that model loading handles exceptions gracefully."""
         # Arrange
         mock_load.side_effect = Exception("Model load failed")
@@ -137,7 +134,7 @@ class TestModelLoading:
         assert result is False
         assert stt_service.model is None
 
-    @patch('whisper.load_model')
+    @patch("whisper.load_model")
     def test_load_model_with_different_model_sizes(self, mock_load, mock_whisper_model):
         """Test that different model sizes load correctly."""
         # Arrange
@@ -153,7 +150,7 @@ class TestModelLoading:
             assert result is True
             mock_load.assert_called_with(size, device=service.device)
 
-    @patch('whisper.load_model')
+    @patch("whisper.load_model")
     def test_load_model_multiple_times_replaces_old_model(
         self, mock_load, stt_service, mock_whisper_model
     ):
@@ -182,7 +179,7 @@ class TestAudioTranscription:
         # Assert
         assert result is None
 
-    @patch('whisper.load_model')
+    @patch("whisper.load_model")
     def test_transcribe_succeeds_with_valid_audio(
         self, mock_load, stt_service, test_audio_file, mock_whisper_model
     ):
@@ -198,13 +195,10 @@ class TestAudioTranscription:
         # Assert
         assert result == "Hello world"
         mock_whisper_model.transcribe.assert_called_once_with(
-            test_audio_file,
-            language="en",
-            fp16=False,
-            verbose=False
+            test_audio_file, language="en", fp16=False, verbose=False
         )
 
-    @patch('whisper.load_model')
+    @patch("whisper.load_model")
     def test_transcribe_strips_whitespace_from_result(
         self, mock_load, stt_service, test_audio_file, mock_whisper_model
     ):
@@ -220,7 +214,7 @@ class TestAudioTranscription:
         # Assert
         assert result == "Hello world"
 
-    @patch('whisper.load_model')
+    @patch("whisper.load_model")
     def test_transcribe_with_different_languages(
         self, mock_load, stt_service, test_audio_file, mock_whisper_model
     ):
@@ -236,13 +230,10 @@ class TestAudioTranscription:
         # Assert
         assert result == "Hola mundo"
         mock_whisper_model.transcribe.assert_called_once_with(
-            test_audio_file,
-            language="es",
-            fp16=False,
-            verbose=False
+            test_audio_file, language="es", fp16=False, verbose=False
         )
 
-    @patch('whisper.load_model')
+    @patch("whisper.load_model")
     def test_transcribe_fails_gracefully_on_exception(
         self, mock_load, stt_service, test_audio_file, mock_whisper_model
     ):
@@ -258,10 +249,8 @@ class TestAudioTranscription:
         # Assert
         assert result is None
 
-    @patch('whisper.load_model')
-    def test_transcribe_with_nonexistent_file(
-        self, mock_load, stt_service, mock_whisper_model
-    ):
+    @patch("whisper.load_model")
+    def test_transcribe_with_nonexistent_file(self, mock_load, stt_service, mock_whisper_model):
         """Test that transcription handles nonexistent files gracefully."""
         # Arrange
         mock_whisper_model.transcribe.side_effect = FileNotFoundError("File not found")
@@ -274,7 +263,7 @@ class TestAudioTranscription:
         # Assert
         assert result is None
 
-    @patch('whisper.load_model')
+    @patch("whisper.load_model")
     def test_transcribe_with_empty_result(
         self, mock_load, stt_service, test_audio_file, mock_whisper_model
     ):
@@ -290,7 +279,7 @@ class TestAudioTranscription:
         # Assert
         assert result == ""
 
-    @patch('whisper.load_model')
+    @patch("whisper.load_model")
     def test_transcribe_multiple_files_sequentially(
         self, mock_load, stt_service, test_audio_file, short_audio_file, mock_whisper_model
     ):
@@ -298,7 +287,7 @@ class TestAudioTranscription:
         # Arrange
         mock_whisper_model.transcribe.side_effect = [
             {"text": "First transcription"},
-            {"text": "Second transcription"}
+            {"text": "Second transcription"},
         ]
         mock_load.return_value = mock_whisper_model
         stt_service.load_model()
@@ -316,7 +305,7 @@ class TestAudioTranscription:
 class TestEdgeCasesAndErrorHandling:
     """Test edge cases and error handling."""
 
-    @patch('whisper.load_model')
+    @patch("whisper.load_model")
     def test_transcribe_with_corrupted_audio_file(
         self, mock_load, stt_service, invalid_audio_file, mock_whisper_model
     ):
@@ -332,7 +321,7 @@ class TestEdgeCasesAndErrorHandling:
         # Assert
         assert result is None
 
-    @patch('whisper.load_model')
+    @patch("whisper.load_model")
     def test_transcribe_with_very_long_audio(
         self, mock_load, stt_service, long_audio_file, mock_whisper_model
     ):
@@ -349,7 +338,7 @@ class TestEdgeCasesAndErrorHandling:
         # Assert
         assert result == long_transcription.strip()
 
-    @patch('whisper.load_model')
+    @patch("whisper.load_model")
     def test_transcribe_with_silent_audio(
         self, mock_load, stt_service, silent_audio_file, mock_whisper_model
     ):
@@ -369,7 +358,7 @@ class TestEdgeCasesAndErrorHandling:
         """Test that transcription handles invalid language codes."""
         # Note: Whisper may accept or reject invalid codes
         # This test ensures the service doesn't crash
-        with patch('whisper.load_model') as mock_load:
+        with patch("whisper.load_model") as mock_load:
             mock_model = Mock()
             mock_model.transcribe.side_effect = ValueError("Invalid language")
             mock_load.return_value = mock_model
@@ -379,7 +368,7 @@ class TestEdgeCasesAndErrorHandling:
 
             assert result is None
 
-    @patch('whisper.load_model')
+    @patch("whisper.load_model")
     def test_transcribe_preserves_punctuation(
         self, mock_load, stt_service, test_audio_file, mock_whisper_model
     ):
@@ -396,7 +385,7 @@ class TestEdgeCasesAndErrorHandling:
         # Assert
         assert result == text_with_punctuation
 
-    @patch('whisper.load_model')
+    @patch("whisper.load_model")
     def test_transcribe_handles_numbers_in_text(
         self, mock_load, stt_service, test_audio_file, mock_whisper_model
     ):
@@ -417,8 +406,8 @@ class TestEdgeCasesAndErrorHandling:
 class TestDeviceManagement:
     """Test device selection and management."""
 
-    @patch('torch.cuda.is_available', return_value=False)
-    @patch('whisper.load_model')
+    @patch("torch.cuda.is_available", return_value=False)
+    @patch("whisper.load_model")
     def test_model_loads_on_cpu_when_cuda_unavailable(
         self, mock_load, mock_cuda, mock_whisper_model
     ):
@@ -434,11 +423,9 @@ class TestDeviceManagement:
         assert result is True
         mock_load.assert_called_once_with("base", device="cpu")
 
-    @patch('torch.cuda.is_available', return_value=True)
-    @patch('whisper.load_model')
-    def test_model_loads_on_cuda_when_available(
-        self, mock_load, mock_cuda, mock_whisper_model
-    ):
+    @patch("torch.cuda.is_available", return_value=True)
+    @patch("whisper.load_model")
+    def test_model_loads_on_cuda_when_available(self, mock_load, mock_cuda, mock_whisper_model):
         """Test that model loads on CUDA when available."""
         # Arrange
         mock_load.return_value = mock_whisper_model
@@ -451,10 +438,8 @@ class TestDeviceManagement:
         assert result is True
         mock_load.assert_called_once_with("base", device="cuda")
 
-    @patch('whisper.load_model')
-    def test_custom_device_is_respected(
-        self, mock_load, mock_whisper_model
-    ):
+    @patch("whisper.load_model")
+    def test_custom_device_is_respected(self, mock_load, mock_whisper_model):
         """Test that custom device specification is respected."""
         # Arrange
         mock_load.return_value = mock_whisper_model

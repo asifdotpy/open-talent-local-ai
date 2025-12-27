@@ -32,17 +32,13 @@ def interview_session_data() -> dict[str, Any]:
         "candidate_id": "candidate123",
         "job_id": "job123",
         "interview_type": "behavioral",
-        "difficulty": "intermediate"
+        "difficulty": "intermediate",
     }
 
 
 @pytest.fixture
 def answer_data() -> dict[str, Any]:
-    return {
-        "question_id": "q123",
-        "answer_text": "I would approach this by...",
-        "confidence": 0.85
-    }
+    return {"question_id": "q123", "answer_text": "I would approach this by...", "confidence": 0.85}
 
 
 class TestGraniteInterviewServiceBasics:
@@ -59,12 +55,13 @@ class TestGraniteInterviewServiceBasics:
 
 class TestQuestionGeneration:
     @pytest.mark.asyncio
-    async def test_generate_questions(self, granite_interview_service_url, async_client,
-                                     interview_session_data, auth_headers):
+    async def test_generate_questions(
+        self, granite_interview_service_url, async_client, interview_session_data, auth_headers
+    ):
         response = await async_client.post(
             f"{granite_interview_service_url}/api/v1/questions/generate",
             json=interview_session_data,
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 201]
         if response.status_code == 200:
@@ -74,38 +71,41 @@ class TestQuestionGeneration:
     @pytest.mark.asyncio
     async def test_get_question(self, granite_interview_service_url, async_client, auth_headers):
         response = await async_client.get(
-            f"{granite_interview_service_url}/api/v1/questions/q123",
-            headers=auth_headers
+            f"{granite_interview_service_url}/api/v1/questions/q123", headers=auth_headers
         )
         assert response.status_code in [200, 404]
 
     @pytest.mark.asyncio
-    async def test_get_next_question(self, granite_interview_service_url, async_client, auth_headers):
+    async def test_get_next_question(
+        self, granite_interview_service_url, async_client, auth_headers
+    ):
         response = await async_client.get(
             f"{granite_interview_service_url}/api/v1/interviews/int123/next-question",
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 404]
 
 
 class TestAnswerAnalysis:
     @pytest.mark.asyncio
-    async def test_submit_answer(self, granite_interview_service_url, async_client,
-                                answer_data, auth_headers):
+    async def test_submit_answer(
+        self, granite_interview_service_url, async_client, answer_data, auth_headers
+    ):
         response = await async_client.post(
             f"{granite_interview_service_url}/api/v1/interviews/int123/answers",
             json=answer_data,
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 201]
 
     @pytest.mark.asyncio
-    async def test_analyze_answer(self, granite_interview_service_url, async_client,
-                                 answer_data, auth_headers):
+    async def test_analyze_answer(
+        self, granite_interview_service_url, async_client, answer_data, auth_headers
+    ):
         response = await async_client.post(
             f"{granite_interview_service_url}/api/v1/interviews/int123/analyze",
             json=answer_data,
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 201]
         if response.status_code == 200:
@@ -116,53 +116,59 @@ class TestAnswerAnalysis:
     async def test_get_answer(self, granite_interview_service_url, async_client, auth_headers):
         response = await async_client.get(
             f"{granite_interview_service_url}/api/v1/interviews/int123/answers/ans123",
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 404]
 
 
 class TestInterviewSession:
     @pytest.mark.asyncio
-    async def test_create_interview_session(self, granite_interview_service_url, async_client,
-                                           interview_session_data, auth_headers):
+    async def test_create_interview_session(
+        self, granite_interview_service_url, async_client, interview_session_data, auth_headers
+    ):
         response = await async_client.post(
             f"{granite_interview_service_url}/api/v1/interviews",
             json=interview_session_data,
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 201]
 
     @pytest.mark.asyncio
-    async def test_get_interview_session(self, granite_interview_service_url, async_client, auth_headers):
+    async def test_get_interview_session(
+        self, granite_interview_service_url, async_client, auth_headers
+    ):
         response = await async_client.get(
-            f"{granite_interview_service_url}/api/v1/interviews/int123",
-            headers=auth_headers
+            f"{granite_interview_service_url}/api/v1/interviews/int123", headers=auth_headers
         )
         assert response.status_code in [200, 404]
 
     @pytest.mark.asyncio
-    async def test_end_interview_session(self, granite_interview_service_url, async_client, auth_headers):
+    async def test_end_interview_session(
+        self, granite_interview_service_url, async_client, auth_headers
+    ):
         response = await async_client.post(
-            f"{granite_interview_service_url}/api/v1/interviews/int123/end",
-            headers=auth_headers
+            f"{granite_interview_service_url}/api/v1/interviews/int123/end", headers=auth_headers
         )
         assert response.status_code in [200, 201, 404]
 
 
 class TestScoringAndAssessment:
     @pytest.mark.asyncio
-    async def test_get_interview_score(self, granite_interview_service_url, async_client, auth_headers):
+    async def test_get_interview_score(
+        self, granite_interview_service_url, async_client, auth_headers
+    ):
         response = await async_client.get(
-            f"{granite_interview_service_url}/api/v1/interviews/int123/score",
-            headers=auth_headers
+            f"{granite_interview_service_url}/api/v1/interviews/int123/score", headers=auth_headers
         )
         assert response.status_code in [200, 404]
 
     @pytest.mark.asyncio
-    async def test_get_assessment_report(self, granite_interview_service_url, async_client, auth_headers):
+    async def test_get_assessment_report(
+        self, granite_interview_service_url, async_client, auth_headers
+    ):
         response = await async_client.get(
             f"{granite_interview_service_url}/api/v1/interviews/int123/assessment",
-            headers=auth_headers
+            headers=auth_headers,
         )
         assert response.status_code in [200, 404]
 

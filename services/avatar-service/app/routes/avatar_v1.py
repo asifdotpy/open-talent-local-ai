@@ -90,7 +90,11 @@ async def lipsync(payload: LipsyncRequest):
 async def set_emotion(payload: EmotionRequest):
     avatar = _ensure_avatar(payload.avatar_id)
     avatar["state"].update({"emotion": payload.emotion, "emotion_intensity": payload.intensity})
-    return {"avatar_id": payload.avatar_id, "emotion": payload.emotion, "intensity": payload.intensity}
+    return {
+        "avatar_id": payload.avatar_id,
+        "emotion": payload.emotion,
+        "intensity": payload.intensity,
+    }
 
 
 @router.get("/presets")
@@ -169,7 +173,10 @@ async def phonemes(payload: PhonemeRequest):
 
 @router.post("/phonemes/timing")
 async def phoneme_timing(payload: PhonemeTimingRequest):
-    aligned = [{"phoneme": p, "start": i * 0.05, "end": i * 0.05 + 0.04} for i, p in enumerate(payload.phonemes)]
+    aligned = [
+        {"phoneme": p, "start": i * 0.05, "end": i * 0.05 + 0.04}
+        for i, p in enumerate(payload.phonemes)
+    ]
     return {"duration": payload.audio_duration, "alignment": aligned}
 
 
@@ -273,7 +280,11 @@ async def select_model(payload: ModelSelectRequest):
 @router.post("/session")
 async def create_session(payload: SessionCreateRequest):
     session_id = str(uuid.uuid4())
-    sessions[session_id] = {"session_id": session_id, "avatar_id": payload.avatar_id, "metadata": payload.metadata or {}}
+    sessions[session_id] = {
+        "session_id": session_id,
+        "avatar_id": payload.avatar_id,
+        "metadata": payload.metadata or {},
+    }
     return sessions[session_id]
 
 
@@ -312,7 +323,11 @@ async def version():
 async def render_avatar_id(avatar_id: str, payload: RenderRequest):
     _ensure_avatar(avatar_id)
     frame_id = str(uuid.uuid4())
-    return {"avatar_id": avatar_id, "frame_id": frame_id, "frame_url": f"/renders/{frame_id}.{payload.format}"}
+    return {
+        "avatar_id": avatar_id,
+        "frame_id": frame_id,
+        "frame_url": f"/renders/{frame_id}.{payload.format}",
+    }
 
 
 @router.post("/{avatar_id}/voice/attach")
@@ -349,7 +364,13 @@ async def stream_avatar(websocket: WebSocket, avatar_id: str):
         await websocket.send_json({"avatar_id": avatar_id, "event": "connected"})
         # send a heartbeat then close
         await asyncio.sleep(0.01)
-        await websocket.send_json({"avatar_id": avatar_id, "event": "heartbeat", "state": avatars[avatar_id].get("state", {})})
+        await websocket.send_json(
+            {
+                "avatar_id": avatar_id,
+                "event": "heartbeat",
+                "state": avatars[avatar_id].get("state", {}),
+            }
+        )
     except WebSocketDisconnect:
         return
     finally:

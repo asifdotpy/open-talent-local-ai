@@ -7,8 +7,6 @@ from typing import Any
 
 import httpx
 
-from .database_service import database_service
-from .modular_sentiment_service import modular_sentiment_service
 from ..core.constants import (
     CONVERSATION_TOPICS,
     INTERVIEW_PHASES,
@@ -18,6 +16,8 @@ from ..core.constants import (
     TECH_KEYWORDS,
     USER_MESSAGE_TEMPLATE,
 )
+from .database_service import database_service
+from .modular_sentiment_service import modular_sentiment_service
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -34,6 +34,7 @@ OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 OLLAMA_TIMEOUT = int(os.getenv("OLLAMA_TIMEOUT", "300"))
 ENABLE_STREAMING = os.getenv("ENABLE_STREAMING_LLM", "true").lower() == "true"
 
+
 class ConversationService:
     """Service for managing real-time interview conversations with adaptive questioning."""
 
@@ -41,8 +42,7 @@ class ConversationService:
         self.active_conversations: dict[str, dict[str, Any]] = {}
         self.conversation_timeout = timedelta(minutes=60)  # Auto-cleanup after 1 hour
         self.ollama_client = httpx.AsyncClient(
-            base_url=OLLAMA_HOST,
-            timeout=httpx.Timeout(OLLAMA_TIMEOUT)
+            base_url=OLLAMA_HOST, timeout=httpx.Timeout(OLLAMA_TIMEOUT)
         )
 
     async def start_conversation(
@@ -51,7 +51,7 @@ class ConversationService:
         job_description: str,
         candidate_profile: dict[str, Any] | None = None,
         interview_type: str = "technical",
-        tone: str = "professional"
+        tone: str = "professional",
     ) -> dict[str, Any]:
         """Initialize a new interview conversation session.
 
@@ -83,7 +83,7 @@ class ConversationService:
             "current_topic": None,
             "question_count": 0,
             "start_time": datetime.now(),
-            "last_activity": datetime.now()
+            "last_activity": datetime.now(),
         }
 
         self.active_conversations[conversation_id] = context
@@ -100,7 +100,7 @@ class ConversationService:
             "conversation_id": conversation_id,
             "session_id": session_id,
             "initial_message": initial_message,
-            "status": "started"
+            "status": "started",
         }
 
     async def process_message(
@@ -108,7 +108,7 @@ class ConversationService:
         session_id: str,
         message: str,
         message_type: str = "transcript",
-        metadata: dict[str, Any] | None = None
+        metadata: dict[str, Any] | None = None,
     ) -> dict[str, Any] | None:
         """Process an incoming message from the candidate and generate an AI response.
 
@@ -137,12 +137,14 @@ class ConversationService:
 
         # Update conversation
         conversation["last_activity"] = datetime.now()
-        conversation["messages"].append({
-            "type": message_type,
-            "content": message,
-            "timestamp": datetime.now(),
-            "metadata": metadata or {}
-        })
+        conversation["messages"].append(
+            {
+                "type": message_type,
+                "content": message,
+                "timestamp": datetime.now(),
+                "metadata": metadata or {},
+            }
+        )
 
         # Save message to database
         database_service.save_message(
@@ -151,7 +153,7 @@ class ConversationService:
             content=message,
             speaker="candidate",
             confidence=metadata.get("confidence") if metadata else None,
-            metadata=metadata
+            metadata=metadata,
         )
 
         # Perform sentiment analysis on candidate responses
@@ -159,26 +161,32 @@ class ConversationService:
         if message_type == "transcript" and message.strip():
             try:
                 sentiment_result = await modular_sentiment_service.analyze_sentiment(message)
-                logger.info(f"Sentiment analysis: {sentiment_result.sentiment} (confidence: {sentiment_result.confidence:.2f})")
+                logger.info(
+                    f"Sentiment analysis: {sentiment_result.sentiment} (confidence: {sentiment_result.confidence:.2f})"
+                )
             except Exception as e:
                 logger.warning(f"Sentiment analysis failed: {e}")
                 # Continue without sentiment analysis
 
         # Generate response based on message type
         if message_type == "transcript":
-            response = await self._process_transcript(conversation, message, metadata, sentiment_result)
+            response = await self._process_transcript(
+                conversation, message, metadata, sentiment_result
+            )
         elif message_type == "user_input":
             response = await self._process_user_input(conversation, message)
         else:
             response = await self._process_system_message(conversation, message)
 
         if response:
-            conversation["messages"].append({
-                "type": "response",
-                "content": response["response_text"],
-                "timestamp": datetime.now(),
-                "metadata": response.get("metadata", {})
-            })
+            conversation["messages"].append(
+                {
+                    "type": "response",
+                    "content": response["response_text"],
+                    "timestamp": datetime.now(),
+                    "metadata": response.get("metadata", {}),
+                }
+            )
 
             # Save AI response to database
             database_service.save_message(
@@ -186,7 +194,7 @@ class ConversationService:
                 message_type="response",
                 content=response["response_text"],
                 speaker="ai",
-                metadata=response.get("metadata")
+                metadata=response.get("metadata"),
             )
 
             # Update conversation state in database
@@ -204,7 +212,7 @@ class ConversationService:
                     "status": conv["status"],
                     "message_count": len(conv["messages"]),
                     "last_activity": conv["last_activity"],
-                    "current_topic": conv["current_topic"]
+                    "current_topic": conv["current_topic"],
                 }
 
         return None
@@ -235,7 +243,7 @@ class ConversationService:
             response = await self._call_ollama(
                 system_prompt=system_prompt,
                 user_message="Generate a warm, professional opening message to start the interview.",
-                context=context
+                context=context,
             )
             return response
         except Exception as e:
@@ -248,11 +256,13 @@ class ConversationService:
         conversation: dict[str, Any],
         transcript: str,
         metadata: dict[str, Any] | None = None,
-        sentiment_result: Any | None = None
+        sentiment_result: Any | None = None,
     ) -> dict[str, Any]:
         """Process a speech transcript and generate an adaptive response."""
         if USE_MOCK:
-            return self._generate_mock_transcript_response(conversation, transcript, metadata, sentiment_result)
+            return self._generate_mock_transcript_response(
+                conversation, transcript, metadata, sentiment_result
+            )
 
         # Real LLM processing with adaptive questioning
         try:
@@ -265,21 +275,19 @@ class ConversationService:
                 sentiment_context = SENTIMENT_CONTEXT_TEMPLATE.format(
                     sentiment=sentiment_result.sentiment,
                     confidence=sentiment_result.confidence,
-                    scores=sentiment_result.scores
+                    scores=sentiment_result.scores,
                 )
 
             user_message = USER_MESSAGE_TEMPLATE.format(
                 transcript=transcript,
                 sentiment_context=sentiment_context,
                 conversation_history=conversation_history,
-                current_topic=conversation.get('current_topic', 'general'),
-                question_count=conversation['question_count']
+                current_topic=conversation.get("current_topic", "general"),
+                question_count=conversation["question_count"],
             )
 
             response_text = await self._call_ollama(
-                system_prompt=system_prompt,
-                user_message=user_message,
-                context=conversation
+                system_prompt=system_prompt, user_message=user_message, context=conversation
             )
 
             # Determine response type and topic
@@ -294,7 +302,7 @@ class ConversationService:
                 "topic": topic,
                 "question_number": conversation["question_count"],
                 "confidence": 0.9,
-                "llm_model": MODEL
+                "llm_model": MODEL,
             }
 
             if sentiment_result:
@@ -302,7 +310,7 @@ class ConversationService:
                     "sentiment": sentiment_result.sentiment,
                     "confidence": sentiment_result.confidence,
                     "scores": sentiment_result.scores,
-                    "model_used": sentiment_result.model_used
+                    "model_used": sentiment_result.model_used,
                 }
 
             return {
@@ -311,7 +319,7 @@ class ConversationService:
                 "response_text": response_text,
                 "response_type": response_type,
                 "should_speak": True,
-                "metadata": response_metadata
+                "metadata": response_metadata,
             }
 
         except Exception as e:
@@ -319,29 +327,33 @@ class ConversationService:
             # Fallback to mock response on error
             return self._generate_mock_transcript_response(conversation, transcript, metadata)
 
-    async def _process_user_input(self, conversation: dict[str, Any], message: str) -> dict[str, Any]:
+    async def _process_user_input(
+        self, conversation: dict[str, Any], message: str
+    ) -> dict[str, Any]:
         """Process direct user input (not from speech)."""
         return {
             "conversation_id": conversation["conversation_id"],
             "session_id": conversation["session_id"],
             "response_text": f"I understand you said: {message}. How does that relate to the role?",
             "response_type": "clarification",
-            "should_speak": True
+            "should_speak": True,
         }
 
-    async def _process_system_message(self, conversation: dict[str, Any], message: str) -> dict[str, Any]:
+    async def _process_system_message(
+        self, conversation: dict[str, Any], message: str
+    ) -> dict[str, Any]:
         """Process system-level messages."""
         return {
             "conversation_id": conversation["conversation_id"],
             "session_id": conversation["session_id"],
             "response_text": "System message acknowledged.",
             "response_type": "acknowledgment",
-            "should_speak": False
+            "should_speak": False,
         }
 
     def _generate_mock_initial_message(self, context: dict[str, Any]) -> str:
         """Generate a mock initial greeting."""
-        greetings = [g.format(interview_type=context['interview_type']) for g in MOCK_GREETINGS]
+        greetings = [g.format(interview_type=context["interview_type"]) for g in MOCK_GREETINGS]
         return greetings[hash(context["session_id"]) % len(greetings)]
 
     def _generate_mock_transcript_response(
@@ -349,7 +361,7 @@ class ConversationService:
         conversation: dict[str, Any],
         transcript: str,
         metadata: dict[str, Any] | None = None,
-        sentiment_result: Any | None = None
+        sentiment_result: Any | None = None,
     ) -> dict[str, Any]:
         """Generate mock responses based on transcript content."""
         transcript_lower = transcript.lower()
@@ -388,7 +400,9 @@ class ConversationService:
                 response_text = f"You mentioned {tech_keywords[0]}. Can you elaborate on your proficiency level and how you've used it professionally?"
                 topic = "technical_depth"
             else:
-                response_text = "That's helpful context. What motivated you to pursue this type of work?"
+                response_text = (
+                    "That's helpful context. What motivated you to pursue this type of work?"
+                )
                 topic = "motivation"
 
             response_type = "question"
@@ -399,7 +413,7 @@ class ConversationService:
         response_metadata = {
             "topic": topic,
             "question_number": conversation["question_count"],
-            "confidence": 0.85
+            "confidence": 0.85,
         }
 
         if sentiment_result:
@@ -407,7 +421,7 @@ class ConversationService:
                 "sentiment": sentiment_result.sentiment,
                 "confidence": sentiment_result.confidence,
                 "scores": sentiment_result.scores,
-                "model_used": sentiment_result.model_used
+                "model_used": sentiment_result.model_used,
             }
 
         return {
@@ -416,7 +430,7 @@ class ConversationService:
             "response_text": response_text,
             "response_type": response_type,
             "should_speak": True,
-            "metadata": response_metadata
+            "metadata": response_metadata,
         }
 
     def _extract_tech_keywords(self, text: str) -> list[str]:
@@ -441,7 +455,7 @@ class ConversationService:
             job_description=job_desc,
             tone=tone,
             question_number=question_count + 1,
-            interview_stage=self._get_interview_stage(question_count)
+            interview_stage=self._get_interview_stage(question_count),
         )
 
     def _get_interview_stage(self, question_count: int) -> str:
@@ -495,10 +509,7 @@ class ConversationService:
         return "general"
 
     async def _call_ollama(
-        self,
-        system_prompt: str,
-        user_message: str,
-        context: dict[str, Any]
+        self, system_prompt: str, user_message: str, context: dict[str, Any]
     ) -> str:
         """Call Ollama API for LLM response with error handling."""
         try:
@@ -518,24 +529,21 @@ class ConversationService:
             raise
 
     async def _call_ollama_non_streaming(
-        self,
-        system_prompt: str,
-        user_message: str,
-        context: dict[str, Any]
+        self, system_prompt: str, user_message: str, context: dict[str, Any]
     ) -> str:
         """Non-streaming Ollama API call."""
         payload = {
             "model": MODEL,
             "messages": [
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message}
+                {"role": "user", "content": user_message},
             ],
             "stream": False,
             "options": {
                 "temperature": 0.7,
                 "top_p": 0.9,
-                "max_tokens": 150  # Keep responses concise
-            }
+                "max_tokens": 150,  # Keep responses concise
+            },
         }
 
         logger.info(f"Calling Ollama API (non-streaming) with model {MODEL}")
@@ -546,24 +554,17 @@ class ConversationService:
         return result["message"]["content"].strip()
 
     async def _call_ollama_streaming(
-        self,
-        system_prompt: str,
-        user_message: str,
-        context: dict[str, Any]
+        self, system_prompt: str, user_message: str, context: dict[str, Any]
     ) -> str:
         """Streaming Ollama API call - collects full response."""
         payload = {
             "model": MODEL,
             "messages": [
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message}
+                {"role": "user", "content": user_message},
             ],
             "stream": True,
-            "options": {
-                "temperature": 0.7,
-                "top_p": 0.9,
-                "max_tokens": 150
-            }
+            "options": {"temperature": 0.7, "top_p": 0.9, "max_tokens": 150},
         }
 
         logger.info(f"Calling Ollama API (streaming) with model {MODEL}")
@@ -612,17 +613,20 @@ class ConversationService:
         job_requirements: str = "",
         question_number: int = 1,
         interview_phase: str = "technical",
-        bias_mitigation: bool = True
+        bias_mitigation: bool = True,
     ) -> dict[str, Any]:
         """Generate the next adaptive interview question based on context."""
         if previous_responses is None:
             previous_responses = []
         try:
             # Generate question based on phase and expertise
-            question_text = self._generate_question_for_phase(expertise_level, interview_phase, question_number)
+            question_text = self._generate_question_for_phase(
+                expertise_level, interview_phase, question_number
+            )
 
             # Create question object
             from datetime import datetime
+
             question = {
                 "id": f"q-{room_id}-{question_number}",
                 "text": question_text,
@@ -633,8 +637,8 @@ class ConversationService:
                     "bias_score": 0.1,  # Placeholder
                     "sentiment_context": "neutral",
                     "difficulty": self._determine_difficulty(expertise_level),
-                    "phase": interview_phase
-                }
+                    "phase": interview_phase,
+                },
             }
 
             return {
@@ -642,7 +646,7 @@ class ConversationService:
                 "question_number": question_number,
                 "ai_metadata": question["ai_metadata"],
                 "estimated_difficulty": question["ai_metadata"]["difficulty"],
-                "bias_mitigation_applied": bias_mitigation
+                "bias_mitigation_applied": bias_mitigation,
             }
         except Exception as e:
             logger.error(f"Error generating adaptive question: {e}")
@@ -653,7 +657,7 @@ class ConversationService:
         response_text: str,
         question_context: str,
         sentiment: dict[str, Any] = None,
-        quality: dict[str, Any] = None
+        quality: dict[str, Any] = None,
     ) -> dict[str, Any]:
         """Generate follow-up questions based on response analysis."""
         if quality is None:
@@ -665,38 +669,46 @@ class ConversationService:
 
             # If response was too brief, ask for elaboration
             if quality.get("completeness", 0.5) < 0.6:
-                questions.append({
-                    "question": "Can you elaborate on that point with a specific example?",
-                    "priority": 5,
-                    "reasoning": "Response was brief and needs more detail",
-                    "expected_outcome": "Better understanding of candidate's experience"
-                })
+                questions.append(
+                    {
+                        "question": "Can you elaborate on that point with a specific example?",
+                        "priority": 5,
+                        "reasoning": "Response was brief and needs more detail",
+                        "expected_outcome": "Better understanding of candidate's experience",
+                    }
+                )
 
             # If technical accuracy was low, probe deeper
             if quality.get("technical_accuracy", 0.5) < 0.6:
-                questions.append({
-                    "question": "Can you walk me through the technical details of how you would implement this?",
-                    "priority": 4,
-                    "reasoning": "Technical understanding needs clarification",
-                    "expected_outcome": "Assessment of technical competence"
-                })
+                questions.append(
+                    {
+                        "question": "Can you walk me through the technical details of how you would implement this?",
+                        "priority": 4,
+                        "reasoning": "Technical understanding needs clarification",
+                        "expected_outcome": "Assessment of technical competence",
+                    }
+                )
 
             # If sentiment was negative, explore concerns
             if sentiment.get("polarity", 0) < -0.2:
-                questions.append({
-                    "question": "What challenges did you face with this approach, and how did you overcome them?",
-                    "priority": 3,
-                    "reasoning": "Negative sentiment indicates potential learning opportunity",
-                    "expected_outcome": "Understanding of problem-solving approach"
-                })
+                questions.append(
+                    {
+                        "question": "What challenges did you face with this approach, and how did you overcome them?",
+                        "priority": 3,
+                        "reasoning": "Negative sentiment indicates potential learning opportunity",
+                        "expected_outcome": "Understanding of problem-solving approach",
+                    }
+                )
 
             # Always have a general follow-up
-            questions.append({
-                "question": "How does this experience relate to the requirements of this role?",
-                "priority": 2,
-                "reasoning": "Connect candidate experience to job requirements",
-                "expected_outcome": "Assessment of role fit"
-            })
+            questions.append(
+                {
+                    "question": "How does this experience relate to the requirements of this role?",
+                    "priority": 2,
+                    "reasoning": "Connect candidate experience to job requirements",
+                    "expected_outcome": "Assessment of role fit",
+                }
+            )
 
             return {"questions": questions[:3]}
         except Exception as e:
@@ -707,7 +719,7 @@ class ConversationService:
         self,
         current_phase: str,
         time_remaining_minutes: int,
-        performance_indicators: dict[str, Any] = None
+        performance_indicators: dict[str, Any] = None,
     ) -> dict[str, Any]:
         """Generate interview adaptation recommendations."""
         if performance_indicators is None:
@@ -718,7 +730,7 @@ class ConversationService:
                 "focus_areas": ["technical_skills", "problem_solving"],
                 "time_adjustments": {},
                 "immediate_actions": [],
-                "strategy_changes": []
+                "strategy_changes": [],
             }
 
             # Mock performance analysis (would come from analytics service)
@@ -735,7 +747,9 @@ class ConversationService:
             # Time adjustments
             if time_remaining_minutes < 15 and overall_score > 7:
                 adaptations["time_adjustments"]["early_termination"] = True
-                adaptations["immediate_actions"].append("Consider concluding interview early - strong candidate")
+                adaptations["immediate_actions"].append(
+                    "Consider concluding interview early - strong candidate"
+                )
             elif time_remaining_minutes < 10:
                 adaptations["immediate_actions"].append("Focus on key remaining questions")
 
@@ -745,38 +759,37 @@ class ConversationService:
                 adaptations["strategy_changes"].append("Incorporate more positive reinforcement")
                 adaptations["immediate_actions"].append("Address any concerns raised by candidate")
 
-            return {
-                "adaptations": adaptations,
-                "recommendations": adaptations["immediate_actions"]
-            }
+            return {"adaptations": adaptations, "recommendations": adaptations["immediate_actions"]}
         except Exception as e:
             logger.error(f"Error adapting interview strategy: {e}")
             raise
 
-    def _generate_question_for_phase(self, expertise_level: str, phase: str, question_number: int) -> str:
+    def _generate_question_for_phase(
+        self, expertise_level: str, phase: str, question_number: int
+    ) -> str:
         """Generate a question appropriate for the interview phase and expertise level."""
         # Base questions by phase
         phase_questions = {
             "introduction": [
                 "Can you tell me about your background and experience in software development?",
                 "What initially drew you to programming and technology?",
-                "Can you walk me through your typical development workflow?"
+                "Can you walk me through your typical development workflow?",
             ],
             "technical": [
                 "Can you describe a challenging technical problem you've solved recently?",
                 "How do you approach debugging and troubleshooting code issues?",
-                "What are your thoughts on code quality and best practices?"
+                "What are your thoughts on code quality and best practices?",
             ],
             "behavioral": [
                 "Can you describe a situation where you had to work with a difficult team member?",
                 "How do you handle tight deadlines and competing priorities?",
-                "Tell me about a time when you received constructive criticism."
+                "Tell me about a time when you received constructive criticism.",
             ],
             "closing": [
                 "What are your career goals for the next few years?",
                 "Do you have any questions about the role or our team?",
-                "Is there anything else you'd like to share about your experience?"
-            ]
+                "Is there anything else you'd like to share about your experience?",
+            ],
         }
 
         # Adjust for expertise level
@@ -789,7 +802,7 @@ class ConversationService:
                 phase_questions[phase] = [
                     "Can you discuss your experience with system architecture and scalability?",
                     "How do you approach performance optimization in large-scale applications?",
-                    "What are your thoughts on emerging technologies and their impact on software development?"
+                    "What are your thoughts on emerging technologies and their impact on software development?",
                 ]
 
         # Get questions for phase
@@ -804,13 +817,14 @@ class ConversationService:
             "beginner": "basic",
             "intermediate": "medium",
             "advanced": "advanced",
-            "expert": "advanced"
+            "expert": "advanced",
         }
         return difficulty_map.get(expertise_level, "medium")
 
     async def close(self):
         """Cleanup resources on shutdown."""
         await self.ollama_client.aclose()
+
 
 # Global conversation service instance
 conversation_service = ConversationService()

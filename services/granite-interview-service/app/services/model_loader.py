@@ -18,6 +18,7 @@ from .constants import HG_REPO_MAP
 
 logger = logging.getLogger(__name__)
 
+
 class ModelLoader:
     """Service for loading and managing AI models."""
 
@@ -49,8 +50,10 @@ class ModelLoader:
 
         # Check hardware compatibility before downloading
         compatibility = settings.validate_model_compatibility(model_name)
-        if not compatibility['compatible']:
-            logger.error(f"Model {model_name} not compatible with current hardware: {compatibility['reason']}")
+        if not compatibility["compatible"]:
+            logger.error(
+                f"Model {model_name} not compatible with current hardware: {compatibility['reason']}"
+            )
             return False
 
         try:
@@ -91,7 +94,7 @@ class ModelLoader:
                 revision=config.revision,
                 local_dir=str(model_path),
                 local_dir_use_symlinks=False,
-                ignore_patterns=["*.md", "*.txt", "*.json"]  # Skip documentation
+                ignore_patterns=["*.md", "*.txt", "*.json"],  # Skip documentation
             )
 
             return True
@@ -129,9 +132,9 @@ class ModelLoader:
         if model_name in self.download_tasks:
             task = self.download_tasks[model_name]
             return {
-                'status': 'downloading' if not task.done() else 'completed',
-                'done': task.done(),
-                'exception': str(task.exception()) if task.done() and task.exception() else None
+                "status": "downloading" if not task.done() else "completed",
+                "done": task.done(),
+                "exception": str(task.exception()) if task.done() and task.exception() else None,
             }
         return None
 
@@ -155,32 +158,36 @@ class ModelLoader:
             return None
 
         info = {
-            'name': model_name,
-            'architecture': config.architecture,
-            'size': config.size,
-            'quantization': config.quantization,
-            'max_context': config.max_context,
-            'fine_tuning_supported': config.fine_tuning_supported,
-            'min_memory': config.min_memory,
-            'disk_space': config.disk_space,
-            'base_model': config.base_model,
-            'cached': model_name in self.get_cached_models(),
-            'loaded': model_name in self.get_loaded_models(),
-            'huggingface_repo': self._get_huggingface_repo_id(model_name),
-            'training_config': config.get_training_config() if config.fine_tuning_supported else None,
-            'data_requirements': config.get_data_requirements() if config.fine_tuning_supported else None
+            "name": model_name,
+            "architecture": config.architecture,
+            "size": config.size,
+            "quantization": config.quantization,
+            "max_context": config.max_context,
+            "fine_tuning_supported": config.fine_tuning_supported,
+            "min_memory": config.min_memory,
+            "disk_space": config.disk_space,
+            "base_model": config.base_model,
+            "cached": model_name in self.get_cached_models(),
+            "loaded": model_name in self.get_loaded_models(),
+            "huggingface_repo": self._get_huggingface_repo_id(model_name),
+            "training_config": config.get_training_config()
+            if config.fine_tuning_supported
+            else None,
+            "data_requirements": config.get_data_requirements()
+            if config.fine_tuning_supported
+            else None,
         }
 
         # Add hardware compatibility
         compatibility = settings.validate_model_compatibility(model_name)
-        info['hardware_compatible'] = compatibility['compatible']
-        if not compatibility['compatible']:
-            info['compatibility_reason'] = compatibility['reason']
+        info["hardware_compatible"] = compatibility["compatible"]
+        if not compatibility["compatible"]:
+            info["compatibility_reason"] = compatibility["reason"]
 
         # Add download progress if downloading
         progress = self.get_download_progress(model_name)
         if progress:
-            info['download_progress'] = progress
+            info["download_progress"] = progress
 
         return info
 
@@ -214,6 +221,7 @@ class ModelLoader:
             if item.is_dir() and item.name not in keep_models:
                 try:
                     import shutil
+
                     shutil.rmtree(item)
                     removed_count += 1
                     logger.info(f"Removed cached model: {item.name}")
@@ -221,6 +229,7 @@ class ModelLoader:
                     logger.error(f"Failed to remove {item.name}: {e}")
 
         logger.info(f"Cache cleanup completed. Removed {removed_count} models.")
+
 
 # Global loader instance
 model_loader = ModelLoader()

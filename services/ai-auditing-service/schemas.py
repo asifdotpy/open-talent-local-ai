@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field, constr, validator
 
 try:
     from rules import RULES  # when loaded as a module without package context
+
     KNOWN_RULE_IDS: ClassVar[set[str]] = set(RULES.keys())
 except Exception:
     # Fallback for import contexts where rules cannot be imported
@@ -64,6 +65,7 @@ class AuditReportResponse(BaseModel):
 
 
 # Known rule IDs for validation, sourced from central registry or fallback
+
 
 class AuditConfig(BaseModel):
     default_ruleset: list[str] = Field(default_factory=list)

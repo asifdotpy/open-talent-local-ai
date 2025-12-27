@@ -19,7 +19,7 @@ def setup_test_data():
             "first_name": f"User{i}",
             "last_name": f"Test{i}",
             "phone": "+12345678900",
-            "resume_url": "https://example.com/resume.pdf"
+            "resume_url": "https://example.com/resume.pdf",
         }
         r = client.post("/api/v1/candidates", json=payload, headers=AUTH)
         if r.status_code == 201:
@@ -32,7 +32,7 @@ def setup_test_data():
                 "candidate_id": candidates[i % len(candidates)]["id"],
                 "job_id": f"job-{i}",
                 "cover_letter": f"I am interested in job {i}",
-                "status": "applied"
+                "status": "applied",
             }
             client.post("/api/v1/applications", json=payload, headers=AUTH)
 
@@ -145,22 +145,25 @@ def test_list_interviews_pagination():
         "first_name": "Interview",
         "last_name": "Test",
         "phone": "+12345678900",
-        "resume_url": "https://example.com/resume.pdf"
+        "resume_url": "https://example.com/resume.pdf",
     }
     r = client.post("/api/v1/candidates", json=payload, headers=AUTH)
     candidate_id = r.json()["id"]
 
     # Create some interviews
     from datetime import datetime, timedelta
+
     for i in range(5):
         interview_payload = {
             "title": f"Interview {i}",
             "scheduled_at": (datetime.now() + timedelta(days=i)).isoformat(),
             "interviewer": f"Interviewer {i}",
             "location": "Remote",
-            "status": "scheduled"
+            "status": "scheduled",
         }
-        client.post(f"/api/v1/candidates/{candidate_id}/interviews", json=interview_payload, headers=AUTH)
+        client.post(
+            f"/api/v1/candidates/{candidate_id}/interviews", json=interview_payload, headers=AUTH
+        )
 
     # Test pagination
     r = client.get(f"/api/v1/candidates/{candidate_id}/interviews?offset=0&limit=2", headers=AUTH)
@@ -179,7 +182,7 @@ def test_list_assessments_pagination():
         "first_name": "Assessment",
         "last_name": "Test",
         "phone": "+12345678900",
-        "resume_url": "https://example.com/resume.pdf"
+        "resume_url": "https://example.com/resume.pdf",
     }
     r = client.post("/api/v1/candidates", json=payload, headers=AUTH)
     candidate_id = r.json()["id"]
@@ -190,9 +193,11 @@ def test_list_assessments_pagination():
             "title": f"Assessment {i}",
             "description": f"Description {i}",
             "assessment_type": "coding",
-            "status": "pending"
+            "status": "pending",
         }
-        client.post(f"/api/v1/candidates/{candidate_id}/assessments", json=assess_payload, headers=AUTH)
+        client.post(
+            f"/api/v1/candidates/{candidate_id}/assessments", json=assess_payload, headers=AUTH
+        )
 
     # Test pagination
     r = client.get(f"/api/v1/candidates/{candidate_id}/assessments?offset=0&limit=2", headers=AUTH)
@@ -211,21 +216,24 @@ def test_list_availability_pagination():
         "first_name": "Availability",
         "last_name": "Test",
         "phone": "+12345678900",
-        "resume_url": "https://example.com/resume.pdf"
+        "resume_url": "https://example.com/resume.pdf",
     }
     r = client.post("/api/v1/candidates", json=payload, headers=AUTH)
     candidate_id = r.json()["id"]
 
     # Create some availability slots
     from datetime import datetime, timedelta
+
     for i in range(5):
         avail_payload = {
             "start_time": (datetime.now() + timedelta(days=i)).isoformat(),
             "end_time": (datetime.now() + timedelta(days=i, hours=1)).isoformat(),
             "timezone": "UTC",
-            "is_available": True
+            "is_available": True,
         }
-        client.post(f"/api/v1/candidates/{candidate_id}/availability", json=avail_payload, headers=AUTH)
+        client.post(
+            f"/api/v1/candidates/{candidate_id}/availability", json=avail_payload, headers=AUTH
+        )
 
     # Test pagination
     r = client.get(f"/api/v1/candidates/{candidate_id}/availability?offset=0&limit=2", headers=AUTH)
@@ -244,7 +252,7 @@ def test_list_skills_pagination():
         "first_name": "Skills",
         "last_name": "Test",
         "phone": "+12345678900",
-        "resume_url": "https://example.com/resume.pdf"
+        "resume_url": "https://example.com/resume.pdf",
     }
     r = client.post("/api/v1/candidates", json=payload, headers=AUTH)
     candidate_id = r.json()["id"]
@@ -252,10 +260,7 @@ def test_list_skills_pagination():
     # Add some skills
     skills = ["Python", "FastAPI", "PostgreSQL", "React", "Docker"]
     for skill in skills:
-        skill_payload = {
-            "skill": skill,
-            "proficiency": "advanced"
-        }
+        skill_payload = {"skill": skill, "proficiency": "advanced"}
         client.post(f"/api/v1/candidates/{candidate_id}/skills", json=skill_payload, headers=AUTH)
 
     # Test pagination

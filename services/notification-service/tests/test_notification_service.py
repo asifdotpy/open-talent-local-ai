@@ -30,6 +30,7 @@ def _load_app():
 # FIXTURES
 # ============================================================================
 
+
 @pytest.fixture
 def notification_service_url():
     """Base URL for notification service"""
@@ -41,7 +42,9 @@ async def async_client():
     """Async HTTP client wired to the app via ASGI transport (no external server)."""
     app = _load_app()
     transport = ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://testserver", timeout=5.0) as client:
+    async with httpx.AsyncClient(
+        transport=transport, base_url="http://testserver", timeout=5.0
+    ) as client:
         yield client
 
 
@@ -52,17 +55,14 @@ def sample_email_data() -> dict[str, Any]:
         "to": "user@example.com",
         "subject": "Interview Invitation",
         "html": "<h1>You are invited to an interview</h1>",
-        "text": "You are invited to an interview"
+        "text": "You are invited to an interview",
     }
 
 
 @pytest.fixture
 def sample_sms_data() -> dict[str, Any]:
     """Sample SMS data for testing"""
-    return {
-        "to": "+1234567890",
-        "text": "Your interview is scheduled for tomorrow"
-    }
+    return {"to": "+1234567890", "text": "Your interview is scheduled for tomorrow"}
 
 
 @pytest.fixture
@@ -72,13 +72,14 @@ def sample_push_data() -> dict[str, Any]:
         "to": "device_token_123",
         "title": "Interview Scheduled",
         "body": "Your interview is confirmed",
-        "data": {"interview_id": "123"}
+        "data": {"interview_id": "123"},
     }
 
 
 # ============================================================================
 # ROOT & HEALTH ENDPOINT TESTS
 # ============================================================================
+
 
 class TestNotificationServiceBasics:
     """Test basic service health and root endpoints"""
@@ -114,15 +115,17 @@ class TestNotificationServiceBasics:
 # EMAIL NOTIFICATION TESTS
 # ============================================================================
 
+
 class TestEmailNotifications:
     """Test email notification functionality"""
 
     @pytest.mark.asyncio
-    async def test_send_email_success(self, notification_service_url, async_client, sample_email_data):
+    async def test_send_email_success(
+        self, notification_service_url, async_client, sample_email_data
+    ):
         """Test sending a valid email notification"""
         response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/email",
-            json=sample_email_data
+            f"{notification_service_url}/api/v1/notify/email", json=sample_email_data
         )
         assert response.status_code == 200
         data = response.json()
@@ -131,35 +134,28 @@ class TestEmailNotifications:
     @pytest.mark.asyncio
     async def test_send_email_missing_to(self, notification_service_url, async_client):
         """Test sending email without recipient should fail"""
-        invalid_data = {
-            "subject": "Test",
-            "html": "Test"
-        }
+        invalid_data = {"subject": "Test", "html": "Test"}
         response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/email",
-            json=invalid_data
+            f"{notification_service_url}/api/v1/notify/email", json=invalid_data
         )
         assert response.status_code in [400, 422]  # Validation error
 
     @pytest.mark.asyncio
     async def test_send_email_missing_subject(self, notification_service_url, async_client):
         """Test sending email without subject should fail"""
-        invalid_data = {
-            "to": "user@example.com",
-            "html": "Test"
-        }
+        invalid_data = {"to": "user@example.com", "html": "Test"}
         response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/email",
-            json=invalid_data
+            f"{notification_service_url}/api/v1/notify/email", json=invalid_data
         )
         assert response.status_code in [400, 422]
 
     @pytest.mark.asyncio
-    async def test_email_content_preservation(self, notification_service_url, async_client, sample_email_data):
+    async def test_email_content_preservation(
+        self, notification_service_url, async_client, sample_email_data
+    ):
         """Test that email content is preserved when sent"""
         response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/email",
-            json=sample_email_data
+            f"{notification_service_url}/api/v1/notify/email", json=sample_email_data
         )
         assert response.status_code == 200
         # Verify that response contains confirmation
@@ -171,6 +167,7 @@ class TestEmailNotifications:
 # SMS NOTIFICATION TESTS
 # ============================================================================
 
+
 class TestSMSNotifications:
     """Test SMS notification functionality"""
 
@@ -178,8 +175,7 @@ class TestSMSNotifications:
     async def test_send_sms_success(self, notification_service_url, async_client, sample_sms_data):
         """Test sending a valid SMS"""
         response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/sms",
-            json=sample_sms_data
+            f"{notification_service_url}/api/v1/notify/sms", json=sample_sms_data
         )
         assert response.status_code == 200
         data = response.json()
@@ -190,8 +186,7 @@ class TestSMSNotifications:
         """Test sending SMS without phone number should fail"""
         invalid_data = {"text": "Test message"}
         response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/sms",
-            json=invalid_data
+            f"{notification_service_url}/api/v1/notify/sms", json=invalid_data
         )
         assert response.status_code in [400, 422]
 
@@ -200,21 +195,16 @@ class TestSMSNotifications:
         """Test sending SMS without text should fail"""
         invalid_data = {"to": "+1234567890"}
         response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/sms",
-            json=invalid_data
+            f"{notification_service_url}/api/v1/notify/sms", json=invalid_data
         )
         assert response.status_code in [400, 422]
 
     @pytest.mark.asyncio
     async def test_sms_phone_number_validation(self, notification_service_url, async_client):
         """Test that invalid phone numbers are rejected (E.164 pattern)"""
-        invalid_data = {
-            "to": "invalid-phone",
-            "text": "Test message"
-        }
+        invalid_data = {"to": "invalid-phone", "text": "Test message"}
         response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/sms",
-            json=invalid_data
+            f"{notification_service_url}/api/v1/notify/sms", json=invalid_data
         )
         # Should be rejected due to E.164 validation
         assert response.status_code in [400, 422]
@@ -224,15 +214,17 @@ class TestSMSNotifications:
 # PUSH NOTIFICATION TESTS
 # ============================================================================
 
+
 class TestPushNotifications:
     """Test push notification functionality"""
 
     @pytest.mark.asyncio
-    async def test_send_push_success(self, notification_service_url, async_client, sample_push_data):
+    async def test_send_push_success(
+        self, notification_service_url, async_client, sample_push_data
+    ):
         """Test sending a valid push notification"""
         response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/push",
-            json=sample_push_data
+            f"{notification_service_url}/api/v1/notify/push", json=sample_push_data
         )
         assert response.status_code == 200
         data = response.json()
@@ -241,35 +233,28 @@ class TestPushNotifications:
     @pytest.mark.asyncio
     async def test_send_push_missing_to(self, notification_service_url, async_client):
         """Test sending push without device token should fail"""
-        invalid_data = {
-            "title": "Test",
-            "body": "Test message"
-        }
+        invalid_data = {"title": "Test", "body": "Test message"}
         response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/push",
-            json=invalid_data
+            f"{notification_service_url}/api/v1/notify/push", json=invalid_data
         )
         assert response.status_code in [400, 422]
 
     @pytest.mark.asyncio
     async def test_send_push_missing_title(self, notification_service_url, async_client):
         """Test sending push without title should fail"""
-        invalid_data = {
-            "to": "device_token",
-            "body": "Test message"
-        }
+        invalid_data = {"to": "device_token", "body": "Test message"}
         response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/push",
-            json=invalid_data
+            f"{notification_service_url}/api/v1/notify/push", json=invalid_data
         )
         assert response.status_code in [400, 422]
 
     @pytest.mark.asyncio
-    async def test_push_data_payload(self, notification_service_url, async_client, sample_push_data):
+    async def test_push_data_payload(
+        self, notification_service_url, async_client, sample_push_data
+    ):
         """Test that push notification data payload is preserved"""
         response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/push",
-            json=sample_push_data
+            f"{notification_service_url}/api/v1/notify/push", json=sample_push_data
         )
         assert response.status_code == 200
         data = response.json()
@@ -281,15 +266,14 @@ class TestPushNotifications:
 # TEMPLATES TESTS
 # ============================================================================
 
+
 class TestNotificationTemplates:
     """Test notification template functionality"""
 
     @pytest.mark.asyncio
     async def test_get_templates_endpoint(self, notification_service_url, async_client):
         """Test that templates endpoint returns list"""
-        response = await async_client.get(
-            f"{notification_service_url}/api/v1/notify/templates"
-        )
+        response = await async_client.get(f"{notification_service_url}/api/v1/notify/templates")
         assert response.status_code == 200
         data = response.json()
         # Should return either templates dict or list
@@ -298,9 +282,7 @@ class TestNotificationTemplates:
     @pytest.mark.asyncio
     async def test_templates_response_structure(self, notification_service_url, async_client):
         """Test that templates response has expected structure"""
-        response = await async_client.get(
-            f"{notification_service_url}/api/v1/notify/templates"
-        )
+        response = await async_client.get(f"{notification_service_url}/api/v1/notify/templates")
         assert response.status_code == 200
         data = response.json()
         # Response should contain templates
@@ -311,15 +293,17 @@ class TestNotificationTemplates:
 # PROVIDER FALLBACK TESTS
 # ============================================================================
 
+
 class TestProviderFallback:
     """Test provider fallback and resilience"""
 
     @pytest.mark.asyncio
-    async def test_fallback_annotation(self, notification_service_url, async_client, sample_email_data):
+    async def test_fallback_annotation(
+        self, notification_service_url, async_client, sample_email_data
+    ):
         """Test that fallback provider is annotated in response"""
         response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/email",
-            json=sample_email_data
+            f"{notification_service_url}/api/v1/notify/email", json=sample_email_data
         )
         assert response.status_code == 200
         data = response.json()
@@ -331,9 +315,7 @@ class TestProviderFallback:
     @pytest.mark.asyncio
     async def test_provider_health_status(self, notification_service_url, async_client):
         """Test that provider health status is reported"""
-        response = await async_client.get(
-            f"{notification_service_url}/health"
-        )
+        response = await async_client.get(f"{notification_service_url}/health")
         assert response.status_code == 200
         data = response.json()
         # Should indicate which provider is active
@@ -345,6 +327,7 @@ class TestProviderFallback:
 # ERROR HANDLING TESTS
 # ============================================================================
 
+
 class TestErrorHandling:
     """Test error handling and edge cases"""
 
@@ -354,7 +337,7 @@ class TestErrorHandling:
         response = await async_client.post(
             f"{notification_service_url}/api/v1/notify/email",
             content="invalid json",
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"},
         )
         assert response.status_code in [400, 422]
 
@@ -362,26 +345,21 @@ class TestErrorHandling:
     async def test_empty_email_data(self, notification_service_url, async_client):
         """Test handling of empty email data"""
         response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/email",
-            json={}
+            f"{notification_service_url}/api/v1/notify/email", json={}
         )
         assert response.status_code in [400, 422]
 
     @pytest.mark.asyncio
     async def test_empty_sms_data(self, notification_service_url, async_client):
         """Test handling of empty SMS data"""
-        response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/sms",
-            json={}
-        )
+        response = await async_client.post(f"{notification_service_url}/api/v1/notify/sms", json={})
         assert response.status_code in [400, 422]
 
     @pytest.mark.asyncio
     async def test_empty_push_data(self, notification_service_url, async_client):
         """Test handling of empty push data"""
         response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/push",
-            json={}
+            f"{notification_service_url}/api/v1/notify/push", json={}
         )
         assert response.status_code in [400, 422]
 
@@ -393,11 +371,10 @@ class TestErrorHandling:
             "to": "user@example.com",
             "subject": "Test",
             "html": long_content,
-            "text": long_content
+            "text": long_content,
         }
         response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/email",
-            json=data
+            f"{notification_service_url}/api/v1/notify/email", json=data
         )
         # Should either accept or reject gracefully
         assert response.status_code in [200, 413, 422]
@@ -407,47 +384,50 @@ class TestErrorHandling:
 # INTEGRATION TESTS
 # ============================================================================
 
+
 class TestNotificationIntegration:
     """Test notification service integration scenarios"""
 
     @pytest.mark.asyncio
-    async def test_multiple_notifications_sequence(self, notification_service_url, async_client,
-                                                   sample_email_data, sample_sms_data, sample_push_data):
+    async def test_multiple_notifications_sequence(
+        self,
+        notification_service_url,
+        async_client,
+        sample_email_data,
+        sample_sms_data,
+        sample_push_data,
+    ):
         """Test sending multiple notifications in sequence"""
         # Send email
         email_response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/email",
-            json=sample_email_data
+            f"{notification_service_url}/api/v1/notify/email", json=sample_email_data
         )
         assert email_response.status_code == 200
 
         # Send SMS
         sms_response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/sms",
-            json=sample_sms_data
+            f"{notification_service_url}/api/v1/notify/sms", json=sample_sms_data
         )
         assert sms_response.status_code == 200
 
         # Send push
         push_response = await async_client.post(
-            f"{notification_service_url}/api/v1/notify/push",
-            json=sample_push_data
+            f"{notification_service_url}/api/v1/notify/push", json=sample_push_data
         )
         assert push_response.status_code == 200
 
     @pytest.mark.asyncio
-    async def test_service_remains_healthy_after_notifications(self, notification_service_url, async_client, sample_email_data):
+    async def test_service_remains_healthy_after_notifications(
+        self, notification_service_url, async_client, sample_email_data
+    ):
         """Test that service remains healthy after sending notifications"""
         # Send notification
         await async_client.post(
-            f"{notification_service_url}/api/v1/notify/email",
-            json=sample_email_data
+            f"{notification_service_url}/api/v1/notify/email", json=sample_email_data
         )
 
         # Check health
-        health_response = await async_client.get(
-            f"{notification_service_url}/health"
-        )
+        health_response = await async_client.get(f"{notification_service_url}/health")
         assert health_response.status_code == 200
 
 

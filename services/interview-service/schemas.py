@@ -13,8 +13,10 @@ from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 # ENUMS - Type-Safe Status Fields
 # ============================================================================
 
+
 class InterviewStatus(str, Enum):
     """Interview status."""
+
     SCHEDULED = "scheduled"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
@@ -25,6 +27,7 @@ class InterviewStatus(str, Enum):
 
 class InterviewType(str, Enum):
     """Interview type."""
+
     TECHNICAL = "technical"
     BEHAVIORAL = "behavioral"
     SYSTEM_DESIGN = "system_design"
@@ -36,6 +39,7 @@ class InterviewType(str, Enum):
 
 class InterviewMode(str, Enum):
     """Interview mode."""
+
     VIDEO = "video"
     PHONE = "phone"
     IN_PERSON = "in_person"
@@ -44,6 +48,7 @@ class InterviewMode(str, Enum):
 
 class RoomStatus(str, Enum):
     """Interview room status."""
+
     ACTIVE = "active"
     WAITING = "waiting"
     CLOSED = "closed"
@@ -53,6 +58,7 @@ class RoomStatus(str, Enum):
 
 class ParticipantRole(str, Enum):
     """Participant role."""
+
     CANDIDATE = "candidate"
     INTERVIEWER = "interviewer"
     OBSERVER = "observer"
@@ -61,6 +67,7 @@ class ParticipantRole(str, Enum):
 
 class QuestionDifficulty(str, Enum):
     """Question difficulty level."""
+
     EASY = "easy"
     MEDIUM = "medium"
     HARD = "hard"
@@ -69,6 +76,7 @@ class QuestionDifficulty(str, Enum):
 
 class QuestionType(str, Enum):
     """Question type."""
+
     CODING = "coding"
     ALGORITHM = "algorithm"
     SYSTEM_DESIGN = "system_design"
@@ -79,6 +87,7 @@ class QuestionType(str, Enum):
 
 class FeedbackSentiment(str, Enum):
     """Feedback sentiment."""
+
     POSITIVE = "positive"
     NEUTRAL = "neutral"
     NEGATIVE = "negative"
@@ -88,8 +97,10 @@ class FeedbackSentiment(str, Enum):
 # INTERVIEW ROOM SCHEMAS
 # ============================================================================
 
+
 class RoomBase(BaseModel):
     """Base room model."""
+
     interview_id: str | None = None
     candidate_id: str
     title: str = Field(..., min_length=1, max_length=200)
@@ -102,12 +113,14 @@ class RoomBase(BaseModel):
 
 class RoomCreate(RoomBase):
     """Create room request."""
+
     interviewer_ids: list[str] | None = None
     question_ids: list[str] | None = None
 
 
 class RoomUpdate(BaseModel):
     """Update room request."""
+
     title: str | None = Field(None, min_length=1, max_length=200)
     description: str | None = Field(None, max_length=1000)
     scheduled_start: datetime | None = None
@@ -117,6 +130,7 @@ class RoomUpdate(BaseModel):
 
 class RoomResponse(RoomBase):
     """Room response with metadata."""
+
     id: str
     room_id: str  # External room ID (WebRTC/video platform)
     created_at: datetime
@@ -131,6 +145,7 @@ class RoomResponse(RoomBase):
 
 class RoomListResponse(BaseModel):
     """Paginated room list."""
+
     items: list[RoomResponse]
     total: int
     page: int
@@ -140,6 +155,7 @@ class RoomListResponse(BaseModel):
 
 class RoomJoinRequest(BaseModel):
     """Join room request."""
+
     room_id: str
     participant_id: str
     role: ParticipantRole
@@ -147,6 +163,7 @@ class RoomJoinRequest(BaseModel):
 
 class RoomJoinResponse(BaseModel):
     """Join room response."""
+
     room_id: str
     join_token: str
     webrtc_config: dict[str, Any]
@@ -157,8 +174,10 @@ class RoomJoinResponse(BaseModel):
 # PARTICIPANT SCHEMAS
 # ============================================================================
 
+
 class ParticipantBase(BaseModel):
     """Base participant model."""
+
     user_id: str
     role: ParticipantRole
     joined_at: datetime | None = None
@@ -167,11 +186,13 @@ class ParticipantBase(BaseModel):
 
 class ParticipantCreate(ParticipantBase):
     """Create participant request."""
+
     room_id: str
 
 
 class ParticipantResponse(ParticipantBase):
     """Participant response with metadata."""
+
     id: str
     room_id: str
     is_connected: bool
@@ -182,6 +203,7 @@ class ParticipantResponse(ParticipantBase):
 
 class ParticipantListResponse(BaseModel):
     """Participant list."""
+
     items: list[ParticipantResponse]
     total: int
 
@@ -190,8 +212,10 @@ class ParticipantListResponse(BaseModel):
 # QUESTION SCHEMAS
 # ============================================================================
 
+
 class QuestionBase(BaseModel):
     """Base question model."""
+
     title: str = Field(..., min_length=1, max_length=300)
     description: str = Field(..., min_length=1)
     question_type: QuestionType
@@ -202,6 +226,7 @@ class QuestionBase(BaseModel):
 
 class QuestionCreate(QuestionBase):
     """Create question request."""
+
     correct_answer: str | None = None
     test_cases: list[dict[str, Any]] | None = None
     hints: list[str] | None = None
@@ -209,6 +234,7 @@ class QuestionCreate(QuestionBase):
 
 class QuestionUpdate(BaseModel):
     """Update question request."""
+
     title: str | None = Field(None, min_length=1, max_length=300)
     description: str | None = None
     question_type: QuestionType | None = None
@@ -219,6 +245,7 @@ class QuestionUpdate(BaseModel):
 
 class QuestionResponse(QuestionBase):
     """Question response with metadata."""
+
     id: str
     created_by: str
     created_at: datetime
@@ -231,6 +258,7 @@ class QuestionResponse(QuestionBase):
 
 class QuestionListResponse(BaseModel):
     """Paginated question list."""
+
     items: list[QuestionResponse]
     total: int
     page: int
@@ -242,8 +270,10 @@ class QuestionListResponse(BaseModel):
 # ANSWER/RESPONSE SCHEMAS
 # ============================================================================
 
+
 class CandidateAnswerBase(BaseModel):
     """Base candidate answer model."""
+
     question_id: str
     answer_text: str | None = None
     code_submission: str | None = None
@@ -252,12 +282,14 @@ class CandidateAnswerBase(BaseModel):
 
 class CandidateAnswerCreate(CandidateAnswerBase):
     """Create candidate answer request."""
+
     room_id: str
     candidate_id: str
 
 
 class CandidateAnswerResponse(CandidateAnswerBase):
     """Candidate answer response with metadata."""
+
     id: str
     room_id: str
     candidate_id: str
@@ -273,8 +305,10 @@ class CandidateAnswerResponse(CandidateAnswerBase):
 # FEEDBACK SCHEMAS
 # ============================================================================
 
+
 class FeedbackBase(BaseModel):
     """Base feedback model."""
+
     rating: int = Field(..., ge=1, le=5)
     technical_skills: int | None = Field(None, ge=1, le=5)
     communication_skills: int | None = Field(None, ge=1, le=5)
@@ -289,6 +323,7 @@ class FeedbackBase(BaseModel):
 
 class FeedbackCreate(FeedbackBase):
     """Create feedback request."""
+
     room_id: str
     candidate_id: str
     interviewer_id: str
@@ -296,6 +331,7 @@ class FeedbackCreate(FeedbackBase):
 
 class FeedbackResponse(FeedbackBase):
     """Feedback response with metadata."""
+
     id: str
     room_id: str
     candidate_id: str
@@ -308,6 +344,7 @@ class FeedbackResponse(FeedbackBase):
 
 class FeedbackListResponse(BaseModel):
     """Paginated feedback list."""
+
     items: list[FeedbackResponse]
     total: int
     page: int
@@ -319,8 +356,10 @@ class FeedbackListResponse(BaseModel):
 # SCHEDULING SCHEMAS
 # ============================================================================
 
+
 class ScheduleSlotRequest(BaseModel):
     """Schedule slot request."""
+
     interviewer_id: str
     start_time: datetime
     end_time: datetime
@@ -328,6 +367,7 @@ class ScheduleSlotRequest(BaseModel):
 
 class ScheduleSlotResponse(BaseModel):
     """Available schedule slot."""
+
     interviewer_id: str
     start_time: datetime
     end_time: datetime
@@ -336,6 +376,7 @@ class ScheduleSlotResponse(BaseModel):
 
 class AvailabilityCheckRequest(BaseModel):
     """Check availability request."""
+
     interviewer_ids: list[str] = Field(..., min_length=1, max_length=10)
     start_date: datetime
     end_date: datetime
@@ -344,12 +385,14 @@ class AvailabilityCheckRequest(BaseModel):
 
 class AvailabilityCheckResponse(BaseModel):
     """Availability check response."""
+
     available_slots: list[ScheduleSlotResponse]
     total_slots: int
 
 
 class RescheduleRequest(BaseModel):
     """Reschedule interview request."""
+
     room_id: str
     new_start_time: datetime
     new_end_time: datetime
@@ -358,6 +401,7 @@ class RescheduleRequest(BaseModel):
 
 class RescheduleResponse(BaseModel):
     """Reschedule response."""
+
     room_id: str
     old_start_time: datetime
     new_start_time: datetime
@@ -368,22 +412,26 @@ class RescheduleResponse(BaseModel):
 # RECORDING SCHEMAS
 # ============================================================================
 
+
 class RecordingBase(BaseModel):
     """Base recording model."""
+
     room_id: str
     file_url: HttpUrl
     file_size_bytes: int = Field(..., ge=0)
     duration_seconds: int = Field(..., ge=0)
-    format: str = Field(..., pattern=r'^(mp4|webm|mkv)$')
+    format: str = Field(..., pattern=r"^(mp4|webm|mkv)$")
 
 
 class RecordingCreate(RecordingBase):
     """Create recording request."""
+
     pass
 
 
 class RecordingResponse(RecordingBase):
     """Recording response with metadata."""
+
     id: str
     created_at: datetime
     transcript_url: HttpUrl | None = None
@@ -394,6 +442,7 @@ class RecordingResponse(RecordingBase):
 
 class RecordingListResponse(BaseModel):
     """Paginated recording list."""
+
     items: list[RecordingResponse]
     total: int
 
@@ -402,8 +451,10 @@ class RecordingListResponse(BaseModel):
 # ANALYTICS SCHEMAS
 # ============================================================================
 
+
 class InterviewAnalyticsRequest(BaseModel):
     """Interview analytics request."""
+
     start_date: datetime
     end_date: datetime
     interviewer_ids: list[str] | None = None
@@ -412,6 +463,7 @@ class InterviewAnalyticsRequest(BaseModel):
 
 class InterviewAnalyticsResponse(BaseModel):
     """Interview analytics response."""
+
     total_interviews: int
     completed_interviews: int
     cancelled_interviews: int
@@ -425,6 +477,7 @@ class InterviewAnalyticsResponse(BaseModel):
 
 class CandidatePerformanceRequest(BaseModel):
     """Candidate performance request."""
+
     candidate_id: str
     include_answers: bool = False
     include_feedback: bool = False
@@ -432,6 +485,7 @@ class CandidatePerformanceRequest(BaseModel):
 
 class CandidatePerformanceResponse(BaseModel):
     """Candidate performance response."""
+
     candidate_id: str
     total_interviews: int
     average_rating: float | None = None
@@ -446,16 +500,21 @@ class CandidatePerformanceResponse(BaseModel):
 # NOTIFICATION SCHEMAS
 # ============================================================================
 
+
 class InterviewNotificationRequest(BaseModel):
     """Interview notification request."""
+
     room_id: str
     recipient_ids: list[str] = Field(..., min_length=1)
-    notification_type: str = Field(..., pattern=r'^(scheduled|reminder|cancelled|rescheduled|feedback)$')
+    notification_type: str = Field(
+        ..., pattern=r"^(scheduled|reminder|cancelled|rescheduled|feedback)$"
+    )
     message: str | None = Field(None, max_length=500)
 
 
 class InterviewNotificationResponse(BaseModel):
     """Notification response."""
+
     room_id: str
     sent_count: int
     failed_count: int
@@ -466,8 +525,10 @@ class InterviewNotificationResponse(BaseModel):
 # SEARCH & FILTER SCHEMAS
 # ============================================================================
 
+
 class InterviewSearchRequest(BaseModel):
     """Interview search request."""
+
     query: str | None = Field(None, max_length=200)
     status: list[InterviewStatus] | None = None
     interview_type: list[InterviewType] | None = None
@@ -477,16 +538,20 @@ class InterviewSearchRequest(BaseModel):
     scheduled_before: datetime | None = None
     page: int = Field(1, ge=1)
     page_size: int = Field(20, ge=1, le=100)
-    sort_by: str | None = Field(None, pattern=r'^(created_at|scheduled_start|actual_start|duration_minutes)$')
-    sort_order: str | None = Field("desc", pattern=r'^(asc|desc)$')
+    sort_by: str | None = Field(
+        None, pattern=r"^(created_at|scheduled_start|actual_start|duration_minutes)$"
+    )
+    sort_order: str | None = Field("desc", pattern=r"^(asc|desc)$")
 
 
 # ============================================================================
 # HEALTH & SERVICE INFO
 # ============================================================================
 
+
 class HealthCheckResponse(BaseModel):
     """Service health check."""
+
     status: str
     timestamp: datetime
     version: str
@@ -496,6 +561,7 @@ class HealthCheckResponse(BaseModel):
 
 class ErrorResponse(BaseModel):
     """Error response."""
+
     error: str
     detail: str | None = None
     timestamp: datetime
@@ -503,6 +569,7 @@ class ErrorResponse(BaseModel):
 
 class InterviewServiceInfo(BaseModel):
     """Service information."""
+
     name: str = "Interview Service"
     version: str
     endpoints_count: int

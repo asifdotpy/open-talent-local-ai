@@ -10,8 +10,8 @@ from collections.abc import Sequence
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = 'f6de77eb2e44'
-down_revision: str | Sequence[str] | None = 'dbc9b50dd47a'
+revision: str = "f6de77eb2e44"
+down_revision: str | Sequence[str] | None = "dbc9b50dd47a"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

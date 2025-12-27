@@ -85,9 +85,7 @@ class NaturalLanguagePrompt(BaseModel):
 
     prompt: str = Field(..., description="Natural language description of what to assess")
     job_title: str | None = Field(default=None, description="Job title for context")
-    required_skills: list[str] | None = Field(
-        default=None, description="Required skills to assess"
-    )
+    required_skills: list[str] | None = Field(default=None, description="Required skills to assess")
     company_culture: list[str] | None = Field(default=None, description="Company culture values")
     num_questions: int = Field(
         default=5, description="Number of questions to generate", ge=1, le=20

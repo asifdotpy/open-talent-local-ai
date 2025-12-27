@@ -5,6 +5,7 @@
 ## 🔥 TODAY (Dec 27) - CRITICAL PRIORITIES
 
 ### Morning (4-6 hours)
+
 - [ ] **Demo Video Recording** ⚠️ URGENT
   - [ ] Install OBS Studio
   - [ ] Test screen recording setup
@@ -20,6 +21,7 @@
   - [ ] Test playback
 
 ### Afternoon (4-6 hours)
+
 - [ ] **Market Research** - Create `MARKET_RESEARCH.md`
   - [ ] US HR tech market: $30B (global), $10B (US)
   - [ ] Interview segment: $1-5B
@@ -170,6 +172,7 @@ Create these files in project root:
 ## 🆘 IF RUNNING SHORT ON TIME
 
 **Priority Order:**
+
 1. Demo video (MUST HAVE)
 2. Application responses (MUST HAVE)
 3. Pitch deck (SHOULD HAVE)
@@ -177,6 +180,7 @@ Create these files in project root:
 5. Business model (NICE TO HAVE - can use simple assumptions)
 
 **Minimum Viable Submission:**
+
 - Demo video (3-5 min)
 - Application responses (all 5 sections, even if shorter)
 - Pitch deck (10 slides, even if basic)
@@ -185,4 +189,3 @@ Create these files in project root:
 ---
 
 **Remember: Done is better than perfect. Submit by Dec 31 is the goal!** 🚀
-

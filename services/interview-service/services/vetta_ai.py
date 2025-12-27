@@ -14,12 +14,15 @@ logger = logging.getLogger(__name__)
 # Ollama configuration
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434")
 OLLAMA_MODEL_NAME = os.getenv("OLLAMA_MODEL_NAME", "vetta-granite-2b")
-OLLAMA_TIMEOUT = float(os.getenv("OLLAMA_TIMEOUT", "90.0"))  # Increased to 90s for first-time model loading
+OLLAMA_TIMEOUT = float(
+    os.getenv("OLLAMA_TIMEOUT", "90.0")
+)  # Increased to 90s for first-time model loading
 
 # Legacy Unsloth support (fallback)
 try:
     import torch
     from unsloth import FastLanguageModel
+
     UNSLOTH_AVAILABLE = True
 except ImportError:
     UNSLOTH_AVAILABLE = False
@@ -56,7 +59,7 @@ class VettaAI:
         # Ollama client
         self.http_client = httpx.AsyncClient(
             timeout=httpx.Timeout(OLLAMA_TIMEOUT, connect=5.0),
-            limits=httpx.Limits(max_connections=10, max_keepalive_connections=5)
+            limits=httpx.Limits(max_connections=10, max_keepalive_connections=5),
         )
 
         if use_ollama:
@@ -72,6 +75,7 @@ class VettaAI:
         """Check Ollama service connection synchronously."""
         try:
             import requests
+
             response = requests.get(f"{self.ollama_url}/api/tags", timeout=3)
             if response.status_code == 200:
                 models = response.json().get("models", [])
@@ -81,7 +85,9 @@ class VettaAI:
                     self.loaded = True
                     logger.info(f"✅ Vetta AI v4 connected to Ollama: {self.model_name}")
                 else:
-                    logger.warning(f"Model {self.model_name} not found in Ollama. Available: {model_names}")
+                    logger.warning(
+                        f"Model {self.model_name} not found in Ollama. Available: {model_names}"
+                    )
                     self.fallback_mode = True
             else:
                 logger.warning(f"Ollama API returned {response.status_code}")
@@ -177,15 +183,12 @@ class VettaAI:
                     "temperature": temperature,
                     "top_p": top_p,
                     "num_predict": max_tokens,
-                }
+                },
             }
 
             logger.info(f"Sending request to Ollama ({len(prompt)} chars prompt)")
 
-            response = await self.http_client.post(
-                f"{self.ollama_url}/api/generate",
-                json=payload
-            )
+            response = await self.http_client.post(f"{self.ollama_url}/api/generate", json=payload)
 
             response.raise_for_status()
             result = response.json()
@@ -222,7 +225,6 @@ class VettaAI:
     ) -> str:
         """Generate response using Unsloth (legacy)."""
         try:
-
             # Tokenize
             inputs = self.tokenizer([prompt], return_tensors="pt").to("cuda")
 
@@ -309,10 +311,7 @@ class VettaAI:
             return "Thank you for your response. I appreciate the insight you've provided."
 
     async def assess_candidate(
-        self,
-        candidate_info: str,
-        job_description: str,
-        role: str = "Senior Python Developer"
+        self, candidate_info: str, job_description: str, role: str = "Senior Python Developer"
     ) -> dict[str, Any]:
         """Assess candidate's technical skills for a role.
 
@@ -334,14 +333,14 @@ class VettaAI:
             "assessment": response,
             "timestamp": datetime.now().isoformat(),
             "model": self.model_name,
-            "role": role
+            "role": role,
         }
 
     async def generate_interview_question(
         self,
         previous_responses: list[str],
         job_requirements: str,
-        expertise_level: str = "intermediate"
+        expertise_level: str = "intermediate",
     ) -> str:
         """Generate next interview question based on context.
 
@@ -355,7 +354,9 @@ class VettaAI:
         """
         context_text = "\n".join([f"- {resp[:100]}..." for resp in previous_responses[-3:]])
 
-        instruction = f"Generate the next interview question for a {expertise_level} level candidate."
+        instruction = (
+            f"Generate the next interview question for a {expertise_level} level candidate."
+        )
         context = f"Job Requirements: {job_requirements}\n\nPrevious Responses:\n{context_text}"
 
         question = await self.generate(instruction, context, max_tokens=150, temperature=0.8)
@@ -367,11 +368,7 @@ class VettaAI:
         return question
 
     async def generate_outreach_message(
-        self,
-        candidate_name: str,
-        candidate_skills: str,
-        role: str,
-        company: str
+        self, candidate_name: str, candidate_skills: str, role: str, company: str
     ) -> str:
         """Generate personalized outreach message.
 
@@ -395,7 +392,7 @@ class VettaAI:
         self,
         candidate_profile: str,
         job_requirements: str,
-        scoring_criteria: list[str] | None = None
+        scoring_criteria: list[str] | None = None,
     ) -> dict[str, Any]:
         """Score candidate quality against job requirements.
 
@@ -418,7 +415,7 @@ class VettaAI:
         return {
             "score_analysis": response,
             "criteria": criteria,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
     async def analyze_response_sentiment(self, response_text: str) -> dict[str, Any]:
@@ -435,10 +432,7 @@ class VettaAI:
 
         analysis = await self.generate(instruction, context, max_tokens=150, temperature=0.5)
 
-        return {
-            "sentiment_analysis": analysis,
-            "timestamp": datetime.now().isoformat()
-        }
+        return {"sentiment_analysis": analysis, "timestamp": datetime.now().isoformat()}
 
     def get_model_info(self) -> dict[str, Any]:
         """Get model information and status."""
@@ -447,6 +441,7 @@ class VettaAI:
 
         if not self.use_ollama and UNSLOTH_AVAILABLE:
             import torch
+
             cuda_available = torch.cuda.is_available()
             if cuda_available:
                 gpu_memory_gb = torch.cuda.memory_allocated() / 1024**3
@@ -468,7 +463,7 @@ class VettaAI:
                 "discovery",
                 "quality",
                 "market",
-                "integration"
+                "integration",
             ],
             "version": "v4",
             "model_format": "GGUF (q4_k_m quantized)" if self.use_ollama else "LoRA",
@@ -478,8 +473,8 @@ class VettaAI:
                 "domains": 8,
                 "final_loss": 0.1260,
                 "training_time_minutes": 28,
-                "base_model": "ibm-granite/granite-3.0-2b-instruct"
-            }
+                "base_model": "ibm-granite/granite-3.0-2b-instruct",
+            },
         }
 
 
@@ -510,7 +505,7 @@ if __name__ == "__main__":
     assessment = vetta.assess_candidate(
         candidate_info="5 years Python, Django expert, built scalable APIs, open source contributor",
         job_description="Senior Python Developer - Python, AWS, System Design",
-        role="Senior Python Developer"
+        role="Senior Python Developer",
     )
 
     print("\nAssessment:", assessment["assessment"])

@@ -22,7 +22,9 @@ from services.question_builder import (
 @pytest.fixture
 def question_builder():
     """Create question builder instance for testing."""
-    return NaturalLanguageQuestionBuilder(ollama_base_url="http://localhost:11434", model="smollm:135m")
+    return NaturalLanguageQuestionBuilder(
+        ollama_base_url="http://localhost:11434", model="smollm:135m"
+    )
 
 
 @pytest.fixture
@@ -35,7 +37,7 @@ def sample_prompt():
         company_culture=["Remote-first", "Fast-paced"],
         num_questions=5,
         difficulty=QuestionDifficulty.SENIOR,
-        interview_duration=45
+        interview_duration=45,
     )
 
 
@@ -84,7 +86,7 @@ async def test_generate_questions_with_ollama(question_builder, sample_prompt):
     mock_response.json.return_value = {"response": mock_ollama_response}
     mock_response.raise_for_status.return_value = None
 
-    with patch('httpx.AsyncClient.post', return_value=mock_response) as mock_post:
+    with patch("httpx.AsyncClient.post", return_value=mock_response) as mock_post:
         questions = await question_builder.generate_questions(sample_prompt)
 
     # Verify API call was made correctly
@@ -115,7 +117,7 @@ async def test_generate_questions_with_ollama(question_builder, sample_prompt):
 async def test_generate_questions_fallback_to_template(question_builder, sample_prompt):
     """Test fallback to template when Ollama fails."""
     # Mock Ollama API failure
-    with patch('httpx.AsyncClient.post', side_effect=Exception("API Error")):
+    with patch("httpx.AsyncClient.post", side_effect=Exception("API Error")):
         questions = await question_builder.generate_questions(sample_prompt)
 
     # Should fall back to template
@@ -176,7 +178,7 @@ def test_pin_question(question_builder):
         priority=QuestionPriority.NICE_TO_ASK,
         expected_duration=5,
         evaluation_criteria=["Test criteria"],
-        skill_assessed=["Python"]
+        skill_assessed=["Python"],
     )
 
     # Initially nice-to-ask
@@ -197,7 +199,7 @@ def test_unpin_question(question_builder):
         priority=QuestionPriority.MUST_ASK,
         expected_duration=5,
         evaluation_criteria=["Test criteria"],
-        skill_assessed=["Python"]
+        skill_assessed=["Python"],
     )
 
     # Initially must-ask
@@ -219,7 +221,7 @@ def test_create_custom_template(question_builder):
             priority=QuestionPriority.MUST_ASK,
             expected_duration=5,
             evaluation_criteria=["Criteria 1"],
-            skill_assessed=["Leadership"]
+            skill_assessed=["Leadership"],
         ),
         InterviewQuestion(
             question_text="Custom question 2",
@@ -228,8 +230,8 @@ def test_create_custom_template(question_builder):
             priority=QuestionPriority.NICE_TO_ASK,
             expected_duration=8,
             evaluation_criteria=["Criteria 2"],
-            skill_assessed=["Python"]
-        )
+            skill_assessed=["Python"],
+        ),
     ]
 
     template = question_builder.create_custom_template(
@@ -238,7 +240,7 @@ def test_create_custom_template(question_builder):
         questions=questions,
         job_roles=["Software Engineer", "DevOps Engineer"],
         created_by="test-user-123",
-        is_public=False
+        is_public=False,
     )
 
     assert template.template_id == "custom-engineering-template"
@@ -257,8 +259,7 @@ def test_backend_template_content(question_builder):
 
     # Check system design question exists
     system_design_questions = [
-        q for q in template.questions
-        if q.question_type == QuestionType.SYSTEM_DESIGN
+        q for q in template.questions if q.question_type == QuestionType.SYSTEM_DESIGN
     ]
     assert len(system_design_questions) > 0
 
@@ -266,10 +267,7 @@ def test_backend_template_content(question_builder):
     assert all(q.difficulty == QuestionDifficulty.SENIOR for q in template.questions)
 
     # Check at least one must-ask question
-    must_ask_questions = [
-        q for q in template.questions
-        if q.priority == QuestionPriority.MUST_ASK
-    ]
+    must_ask_questions = [q for q in template.questions if q.priority == QuestionPriority.MUST_ASK]
     assert len(must_ask_questions) > 0
 
 
@@ -281,15 +279,13 @@ def test_product_manager_template_content(question_builder):
 
     # Check behavioral question exists
     behavioral_questions = [
-        q for q in template.questions
-        if q.question_type == QuestionType.BEHAVIORAL
+        q for q in template.questions if q.question_type == QuestionType.BEHAVIORAL
     ]
     assert len(behavioral_questions) > 0
 
     # Check prioritization skill is assessed
     prioritization_questions = [
-        q for q in template.questions
-        if "Prioritization" in q.skill_assessed
+        q for q in template.questions if "Prioritization" in q.skill_assessed
     ]
     assert len(prioritization_questions) > 0
 
@@ -302,7 +298,8 @@ def test_data_scientist_template_content(question_builder):
 
     # Check for ML/technical questions
     ml_questions = [
-        q for q in template.questions
+        q
+        for q in template.questions
         if "Machine Learning" in q.skill_assessed or q.question_type == QuestionType.TECHNICAL
     ]
     assert len(ml_questions) > 0
@@ -329,7 +326,7 @@ async def test_ollama_response_parsing(question_builder, sample_prompt):
     mock_response.json.return_value = {"response": mock_ollama_response}
     mock_response.raise_for_status.return_value = None
 
-    with patch('httpx.AsyncClient.post', return_value=mock_response):
+    with patch("httpx.AsyncClient.post", return_value=mock_response):
         questions = await question_builder.generate_questions(sample_prompt)
 
     assert len(questions) == 1
@@ -345,7 +342,7 @@ def test_prompt_validation():
             job_title="Test Engineer",
             required_skills=["Python"],
             company_culture=["Remote"],
-            num_questions=-1
+            num_questions=-1,
         )
 
     # Test excessive num_questions
@@ -355,7 +352,7 @@ def test_prompt_validation():
             job_title="Test Engineer",
             required_skills=["Python"],
             company_culture=["Remote"],
-            num_questions=100  # Max is 20
+            num_questions=100,  # Max is 20
         )
 
 
@@ -369,7 +366,7 @@ def test_question_metadata():
         expected_duration=5,
         evaluation_criteria=["Criteria 1"],
         skill_assessed=["Python"],
-        ai_generated=True
+        ai_generated=True,
     )
 
     assert question.ai_generated is True

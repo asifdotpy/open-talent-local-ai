@@ -27,7 +27,9 @@ def _load_app():
 async def async_client():
     app = _load_app()
     transport = ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://testserver", timeout=5.0) as client:
+    async with httpx.AsyncClient(
+        transport=transport, base_url="http://testserver", timeout=5.0
+    ) as client:
         yield client
 
 
@@ -47,7 +49,9 @@ class TestAuditFlow:
     @pytest.mark.asyncio
     async def test_run_status_report(self, async_client):
         # Run
-        run = await async_client.post("/api/v1/audit/run", json={"target": "services/security-service"})
+        run = await async_client.post(
+            "/api/v1/audit/run", json={"target": "services/security-service"}
+        )
         assert run.status_code == 200
         job_id = run.json()["job_id"]
 
@@ -59,6 +63,7 @@ class TestAuditFlow:
 
         # Report
         import asyncio
+
         # Poll status until completed (timeout 2s)
         for _ in range(10):
             s = await async_client.get(f"/api/v1/audit/status/{job_id}")

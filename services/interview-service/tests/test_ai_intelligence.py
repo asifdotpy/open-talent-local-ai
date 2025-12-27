@@ -23,7 +23,9 @@ class TestSentimentAnalysis:
     @pytest.mark.asyncio
     async def test_positive_sentiment(self):
         """Test analysis of positive sentiment text."""
-        text = "I'm very excited about this opportunity and I think I'd be a great fit for the team."
+        text = (
+            "I'm very excited about this opportunity and I think I'd be a great fit for the team."
+        )
         sentiment = await analyze_response_sentiment(text)
 
         assert sentiment.polarity > 0.5
@@ -75,7 +77,9 @@ class TestBiasDetection:
     @pytest.mark.asyncio
     async def test_gender_bias_detection(self):
         """Test detection of gender-related bias."""
-        text = "She would be perfect for this role because women are naturally more detail-oriented."
+        text = (
+            "She would be perfect for this role because women are naturally more detail-oriented."
+        )
         participants = []  # Mock participants
         bias = await detect_response_bias(text, participants)
 
@@ -109,7 +113,9 @@ class TestBiasDetection:
     @pytest.mark.asyncio
     async def test_multiple_bias_types(self):
         """Test detection of multiple bias types."""
-        text = "As a young woman, she brings fresh perspectives but might lack the experience needed."
+        text = (
+            "As a young woman, she brings fresh perspectives but might lack the experience needed."
+        )
         participants = []
         bias = await detect_response_bias(text, participants)
 

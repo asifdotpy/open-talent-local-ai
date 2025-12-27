@@ -46,26 +46,22 @@ async def async_client():
     """Async HTTP client wired to the app via ASGI transport (no external server)."""
     app = _load_app()
     transport = ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://testserver", timeout=5.0) as client:
+    async with httpx.AsyncClient(
+        transport=transport, base_url="http://testserver", timeout=5.0
+    ) as client:
         yield client
 
 
 @pytest.fixture
 def valid_credentials() -> dict[str, Any]:
     """Valid login credentials"""
-    return {
-        "email": "user@example.com",
-        "password": "SecurePassword123!"
-    }
+    return {"email": "user@example.com", "password": "SecurePassword123!"}
 
 
 @pytest.fixture
 def invalid_credentials() -> dict[str, Any]:
     """Invalid login credentials"""
-    return {
-        "email": "user@example.com",
-        "password": "wrongpassword"
-    }
+    return {"email": "user@example.com", "password": "wrongpassword"}
 
 
 @pytest.fixture
@@ -76,13 +72,14 @@ def new_user_data() -> dict[str, Any]:
         "email": f"newuser+{timestamp}@example.com",
         "password": "SecurePassword123!",
         "first_name": "John",
-        "last_name": "Doe"
+        "last_name": "Doe",
     }
 
 
 # ============================================================================
 # SERVICE HEALTH & BASIC TESTS
 # ============================================================================
+
 
 class TestSecurityServiceBasics:
     """Test basic service health and root endpoints"""
@@ -106,26 +103,29 @@ class TestSecurityServiceBasics:
 # AUTHENTICATION TESTS
 # ============================================================================
 
+
 class TestAuthentication:
     """Test user authentication functionality"""
 
     @pytest.mark.asyncio
-    async def test_login_with_valid_credentials(self, security_service_url, async_client, valid_credentials):
+    async def test_login_with_valid_credentials(
+        self, security_service_url, async_client, valid_credentials
+    ):
         """Test login with valid credentials returns token"""
         response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/login",
-            json=valid_credentials
+            f"{security_service_url}/api/v1/auth/login", json=valid_credentials
         )
         assert response.status_code in [200, 201]
         data = response.json()
         assert "token" in data or "access_token" in data
 
     @pytest.mark.asyncio
-    async def test_login_with_invalid_credentials(self, security_service_url, async_client, invalid_credentials):
+    async def test_login_with_invalid_credentials(
+        self, security_service_url, async_client, invalid_credentials
+    ):
         """Test login with invalid credentials fails"""
         response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/login",
-            json=invalid_credentials
+            f"{security_service_url}/api/v1/auth/login", json=invalid_credentials
         )
         assert response.status_code in [401, 403, 400]
 
@@ -133,8 +133,7 @@ class TestAuthentication:
     async def test_login_missing_email(self, security_service_url, async_client):
         """Test login without email fails"""
         response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/login",
-            json={"password": "test123"}
+            f"{security_service_url}/api/v1/auth/login", json={"password": "test123"}
         )
         assert response.status_code in [400, 422]
 
@@ -142,8 +141,7 @@ class TestAuthentication:
     async def test_login_missing_password(self, security_service_url, async_client):
         """Test login without password fails"""
         response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/login",
-            json={"email": "user@example.com"}
+            f"{security_service_url}/api/v1/auth/login", json={"email": "user@example.com"}
         )
         assert response.status_code in [400, 422]
 
@@ -152,8 +150,7 @@ class TestAuthentication:
         """Test logout endpoint removes session"""
         # First login
         login_response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/login",
-            json=valid_credentials
+            f"{security_service_url}/api/v1/auth/login", json=valid_credentials
         )
 
         if login_response.status_code == 200:
@@ -162,8 +159,7 @@ class TestAuthentication:
             # Then logout
             headers = {"Authorization": f"Bearer {token}"}
             logout_response = await async_client.post(
-                f"{security_service_url}/api/v1/auth/logout",
-                headers=headers
+                f"{security_service_url}/api/v1/auth/logout", headers=headers
             )
             assert logout_response.status_code in [200, 201, 204]
 
@@ -172,6 +168,7 @@ class TestAuthentication:
 # REGISTRATION TESTS
 # ============================================================================
 
+
 class TestUserRegistration:
     """Test user registration functionality"""
 
@@ -179,80 +176,59 @@ class TestUserRegistration:
     async def test_register_new_user(self, security_service_url, async_client, new_user_data):
         """Test registering a new user"""
         response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/register",
-            json=new_user_data
+            f"{security_service_url}/api/v1/auth/register", json=new_user_data
         )
         assert response.status_code in [200, 201]
         data = response.json()
         assert "user" in data or "id" in data or "email" in data
 
     @pytest.mark.asyncio
-    async def test_register_duplicate_email(self, security_service_url, async_client, new_user_data):
+    async def test_register_duplicate_email(
+        self, security_service_url, async_client, new_user_data
+    ):
         """Test that duplicate email registration fails"""
         # First registration
-        await async_client.post(
-            f"{security_service_url}/api/v1/auth/register",
-            json=new_user_data
-        )
+        await async_client.post(f"{security_service_url}/api/v1/auth/register", json=new_user_data)
 
         # Second registration with same email
         response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/register",
-            json=new_user_data
+            f"{security_service_url}/api/v1/auth/register", json=new_user_data
         )
         assert response.status_code in [400, 409]
 
     @pytest.mark.asyncio
     async def test_register_missing_email(self, security_service_url, async_client):
         """Test registration without email fails"""
-        data = {
-            "password": "SecurePassword123!",
-            "first_name": "John"
-        }
+        data = {"password": "SecurePassword123!", "first_name": "John"}
         response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/register",
-            json=data
+            f"{security_service_url}/api/v1/auth/register", json=data
         )
         assert response.status_code in [400, 422]
 
     @pytest.mark.asyncio
     async def test_register_missing_password(self, security_service_url, async_client):
         """Test registration without password fails"""
-        data = {
-            "email": "user@example.com",
-            "first_name": "John"
-        }
+        data = {"email": "user@example.com", "first_name": "John"}
         response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/register",
-            json=data
+            f"{security_service_url}/api/v1/auth/register", json=data
         )
         assert response.status_code in [400, 422]
 
     @pytest.mark.asyncio
     async def test_register_invalid_email(self, security_service_url, async_client):
         """Test registration with invalid email fails"""
-        data = {
-            "email": "not-an-email",
-            "password": "SecurePassword123!",
-            "first_name": "John"
-        }
+        data = {"email": "not-an-email", "password": "SecurePassword123!", "first_name": "John"}
         response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/register",
-            json=data
+            f"{security_service_url}/api/v1/auth/register", json=data
         )
         assert response.status_code in [400, 422]
 
     @pytest.mark.asyncio
     async def test_register_weak_password(self, security_service_url, async_client):
         """Test registration with weak password fails"""
-        data = {
-            "email": "user@example.com",
-            "password": "123",  # Too weak
-            "first_name": "John"
-        }
+        data = {"email": "user@example.com", "password": "123", "first_name": "John"}  # Too weak
         response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/register",
-            json=data
+            f"{security_service_url}/api/v1/auth/register", json=data
         )
         assert response.status_code in [400, 422]
 
@@ -260,6 +236,7 @@ class TestUserRegistration:
 # ============================================================================
 # TOKEN & SESSION TESTS
 # ============================================================================
+
 
 class TestTokenManagement:
     """Test token and session management"""
@@ -269,8 +246,7 @@ class TestTokenManagement:
         """Test token verification"""
         # Get token
         login_response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/login",
-            json=valid_credentials
+            f"{security_service_url}/api/v1/auth/login", json=valid_credentials
         )
 
         if login_response.status_code == 200:
@@ -278,8 +254,7 @@ class TestTokenManagement:
 
             # Verify token
             response = await async_client.post(
-                f"{security_service_url}/api/v1/auth/verify",
-                json={"token": token}
+                f"{security_service_url}/api/v1/auth/verify", json={"token": token}
             )
             assert response.status_code in [200, 201]
 
@@ -288,8 +263,7 @@ class TestTokenManagement:
         """Test token refresh"""
         # Get token
         login_response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/login",
-            json=valid_credentials
+            f"{security_service_url}/api/v1/auth/login", json=valid_credentials
         )
 
         if login_response.status_code == 200:
@@ -299,7 +273,7 @@ class TestTokenManagement:
                 # Refresh token
                 response = await async_client.post(
                     f"{security_service_url}/api/v1/auth/refresh",
-                    json={"refresh_token": refresh_token}
+                    json={"refresh_token": refresh_token},
                 )
                 assert response.status_code in [200, 201]
                 assert "token" in response.json() or "access_token" in response.json()
@@ -309,8 +283,7 @@ class TestTokenManagement:
         """Test that invalid token is rejected"""
         headers = {"Authorization": "Bearer invalid_token_xyz"}
         response = await async_client.get(
-            f"{security_service_url}/api/v1/auth/profile",
-            headers=headers
+            f"{security_service_url}/api/v1/auth/profile", headers=headers
         )
         assert response.status_code in [401, 403]
 
@@ -318,6 +291,7 @@ class TestTokenManagement:
 # ============================================================================
 # MFA (MULTI-FACTOR AUTHENTICATION) TESTS
 # ============================================================================
+
 
 class TestMultiFactorAuth:
     """Test MFA setup and verification"""
@@ -327,8 +301,7 @@ class TestMultiFactorAuth:
         """Test setting up MFA"""
         # Login first
         login_response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/login",
-            json=valid_credentials
+            f"{security_service_url}/api/v1/auth/login", json=valid_credentials
         )
 
         if login_response.status_code == 200:
@@ -337,8 +310,7 @@ class TestMultiFactorAuth:
 
             # Setup MFA
             response = await async_client.post(
-                f"{security_service_url}/api/v1/auth/mfa/setup",
-                headers=headers
+                f"{security_service_url}/api/v1/auth/mfa/setup", headers=headers
             )
             assert response.status_code in [200, 201]
             data = response.json()
@@ -349,8 +321,7 @@ class TestMultiFactorAuth:
         """Test verifying MFA code"""
         # Login first
         login_response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/login",
-            json=valid_credentials
+            f"{security_service_url}/api/v1/auth/login", json=valid_credentials
         )
 
         if login_response.status_code == 200:
@@ -361,7 +332,7 @@ class TestMultiFactorAuth:
             response = await async_client.post(
                 f"{security_service_url}/api/v1/auth/mfa/verify",
                 json={"code": "123456"},
-                headers=headers
+                headers=headers,
             )
             # Should either succeed or return 400/422 for invalid code
             assert response.status_code in [200, 201, 400, 422]
@@ -371,8 +342,7 @@ class TestMultiFactorAuth:
         """Test disabling MFA"""
         # Login first
         login_response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/login",
-            json=valid_credentials
+            f"{security_service_url}/api/v1/auth/login", json=valid_credentials
         )
 
         if login_response.status_code == 200:
@@ -381,8 +351,7 @@ class TestMultiFactorAuth:
 
             # Disable MFA
             response = await async_client.delete(
-                f"{security_service_url}/api/v1/auth/mfa",
-                headers=headers
+                f"{security_service_url}/api/v1/auth/mfa", headers=headers
             )
             assert response.status_code in [200, 201, 204]
 
@@ -391,16 +360,18 @@ class TestMultiFactorAuth:
 # PERMISSION & AUTHORIZATION TESTS
 # ============================================================================
 
+
 class TestPermissions:
     """Test permission and authorization"""
 
     @pytest.mark.asyncio
-    async def test_get_user_permissions(self, security_service_url, async_client, valid_credentials):
+    async def test_get_user_permissions(
+        self, security_service_url, async_client, valid_credentials
+    ):
         """Test getting user permissions"""
         # Login first
         login_response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/login",
-            json=valid_credentials
+            f"{security_service_url}/api/v1/auth/login", json=valid_credentials
         )
 
         if login_response.status_code == 200:
@@ -409,8 +380,7 @@ class TestPermissions:
 
             # Get permissions
             response = await async_client.get(
-                f"{security_service_url}/api/v1/auth/permissions",
-                headers=headers
+                f"{security_service_url}/api/v1/auth/permissions", headers=headers
             )
             assert response.status_code == 200
             assert isinstance(response.json(), (dict, list))
@@ -420,8 +390,7 @@ class TestPermissions:
         """Test checking if user has specific permission"""
         # Login first
         login_response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/login",
-            json=valid_credentials
+            f"{security_service_url}/api/v1/auth/login", json=valid_credentials
         )
 
         if login_response.status_code == 200:
@@ -432,7 +401,7 @@ class TestPermissions:
             response = await async_client.post(
                 f"{security_service_url}/api/v1/auth/permissions/check",
                 json={"permission": "view_interviews"},
-                headers=headers
+                headers=headers,
             )
             assert response.status_code in [200, 201, 400, 403]
 
@@ -441,19 +410,15 @@ class TestPermissions:
 # ENCRYPTION & DATA SECURITY TESTS
 # ============================================================================
 
+
 class TestEncryption:
     """Test encryption functionality"""
 
     @pytest.mark.asyncio
     async def test_encrypt_data(self, security_service_url, async_client):
         """Test encrypting data"""
-        data = {
-            "data": "sensitive information"
-        }
-        response = await async_client.post(
-            f"{security_service_url}/api/v1/encrypt",
-            json=data
-        )
+        data = {"data": "sensitive information"}
+        response = await async_client.post(f"{security_service_url}/api/v1/encrypt", json=data)
         assert response.status_code in [200, 201]
         encrypted = response.json()
         assert "encrypted" in encrypted or "ciphertext" in encrypted
@@ -464,17 +429,17 @@ class TestEncryption:
         # First encrypt
         data = {"data": "sensitive information"}
         encrypt_response = await async_client.post(
-            f"{security_service_url}/api/v1/encrypt",
-            json=data
+            f"{security_service_url}/api/v1/encrypt", json=data
         )
 
         if encrypt_response.status_code == 200:
-            encrypted_data = encrypt_response.json().get("encrypted") or encrypt_response.json().get("ciphertext")
+            encrypted_data = encrypt_response.json().get(
+                "encrypted"
+            ) or encrypt_response.json().get("ciphertext")
 
             # Then decrypt
             response = await async_client.post(
-                f"{security_service_url}/api/v1/decrypt",
-                json={"encrypted": encrypted_data}
+                f"{security_service_url}/api/v1/decrypt", json={"encrypted": encrypted_data}
             )
             assert response.status_code in [200, 201]
             assert "data" in response.json() or "plaintext" in response.json()
@@ -484,6 +449,7 @@ class TestEncryption:
 # PASSWORD MANAGEMENT TESTS
 # ============================================================================
 
+
 class TestPasswordManagement:
     """Test password change and recovery"""
 
@@ -492,8 +458,7 @@ class TestPasswordManagement:
         """Test changing password"""
         # Login first
         login_response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/login",
-            json=valid_credentials
+            f"{security_service_url}/api/v1/auth/login", json=valid_credentials
         )
 
         if login_response.status_code == 200:
@@ -505,9 +470,9 @@ class TestPasswordManagement:
                 f"{security_service_url}/api/v1/auth/password/change",
                 json={
                     "current_password": valid_credentials["password"],
-                    "new_password": "NewSecurePassword123!"
+                    "new_password": "NewSecurePassword123!",
                 },
-                headers=headers
+                headers=headers,
             )
             assert response.status_code in [200, 201]
 
@@ -516,7 +481,7 @@ class TestPasswordManagement:
         """Test requesting password reset"""
         response = await async_client.post(
             f"{security_service_url}/api/v1/auth/password/reset-request",
-            json={"email": "user@example.com"}
+            json={"email": "user@example.com"},
         )
         assert response.status_code in [200, 201]
 
@@ -525,10 +490,7 @@ class TestPasswordManagement:
         """Test resetting password with reset token"""
         response = await async_client.post(
             f"{security_service_url}/api/v1/auth/password/reset",
-            json={
-                "token": "reset_token_xyz",
-                "new_password": "NewSecurePassword123!"
-            }
+            json={"token": "reset_token_xyz", "new_password": "NewSecurePassword123!"},
         )
         # Should either succeed or return 400 for invalid token
         assert response.status_code in [200, 201, 400, 422]
@@ -538,6 +500,7 @@ class TestPasswordManagement:
 # ROLE MANAGEMENT TESTS
 # ============================================================================
 
+
 class TestRoleManagement:
     """Test role management"""
 
@@ -546,8 +509,7 @@ class TestRoleManagement:
         """Test getting user roles"""
         # Login first
         login_response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/login",
-            json=valid_credentials
+            f"{security_service_url}/api/v1/auth/login", json=valid_credentials
         )
 
         if login_response.status_code == 200:
@@ -556,8 +518,7 @@ class TestRoleManagement:
 
             # Get roles
             response = await async_client.get(
-                f"{security_service_url}/api/v1/roles",
-                headers=headers
+                f"{security_service_url}/api/v1/roles", headers=headers
             )
             assert response.status_code == 200
             assert isinstance(response.json(), (dict, list))
@@ -567,8 +528,7 @@ class TestRoleManagement:
         """Test assigning role to user"""
         # Login first
         login_response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/login",
-            json=valid_credentials
+            f"{security_service_url}/api/v1/auth/login", json=valid_credentials
         )
 
         if login_response.status_code == 200:
@@ -579,7 +539,7 @@ class TestRoleManagement:
             response = await async_client.post(
                 f"{security_service_url}/api/v1/roles/assign",
                 json={"user_id": "user123", "role": "admin"},
-                headers=headers
+                headers=headers,
             )
             assert response.status_code in [200, 201, 400, 403]
 
@@ -588,8 +548,7 @@ class TestRoleManagement:
         """Test revoking role from user"""
         # Login first
         login_response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/login",
-            json=valid_credentials
+            f"{security_service_url}/api/v1/auth/login", json=valid_credentials
         )
 
         if login_response.status_code == 200:
@@ -610,6 +569,7 @@ class TestRoleManagement:
 # INTEGRATION TESTS
 # ============================================================================
 
+
 class TestSecurityIntegration:
     """Test security service integration scenarios"""
 
@@ -618,18 +578,14 @@ class TestSecurityIntegration:
         """Test complete authentication flow: register -> login -> access"""
         # Register
         register_response = await async_client.post(
-            f"{security_service_url}/api/v1/auth/register",
-            json=new_user_data
+            f"{security_service_url}/api/v1/auth/register", json=new_user_data
         )
         assert register_response.status_code in [200, 201]
 
         # Login with same credentials
         login_response = await async_client.post(
             f"{security_service_url}/api/v1/auth/login",
-            json={
-                "email": new_user_data["email"],
-                "password": new_user_data["password"]
-            }
+            json={"email": new_user_data["email"], "password": new_user_data["password"]},
         )
         assert login_response.status_code == 200
         assert "token" in login_response.json() or "access_token" in login_response.json()

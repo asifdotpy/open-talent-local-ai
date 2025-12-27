@@ -11,6 +11,7 @@ import torch
 
 class RecruitingTask(Enum):
     """Recruiting task types"""
+
     INTERVIEW = "interview"
     ASSESSMENT = "quality"
     SOURCING = "sourcing"
@@ -50,7 +51,7 @@ class VettaService:
         instruction: str,
         context: str | None = None,
         max_tokens: int = 512,
-        temperature: float = 0.7
+        temperature: float = 0.7,
     ) -> str:
         """
         Generate AI response

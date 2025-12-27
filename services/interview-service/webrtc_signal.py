@@ -13,10 +13,12 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
+
 class PeerType(str, Enum):
-    CLIENT = "client"          # Browser client
-    VOICE_SERVICE = "voice"    # Voice processing service
+    CLIENT = "client"  # Browser client
+    VOICE_SERVICE = "voice"  # Voice processing service
     AVATAR_SERVICE = "avatar"  # Avatar rendering service (future)
+
 
 @dataclass
 class Peer:
@@ -25,20 +27,19 @@ class Peer:
     session_id: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
+
 # Session registry: session_id -> {client, voice_service, avatar_service}
 sessions: dict[str, dict[PeerType, Peer]] = {}
 
 # Peer lookup: ws object -> Peer
 peers_by_ws: dict[WebSocket, Peer] = {}
 
+
 @app.get("/webrtc/info")
 def info():
     """Return signaling server status and session count."""
-    return {
-        "status": "ok",
-        "sessions": len(sessions),
-        "total_peers": len(peers_by_ws)
-    }
+    return {"status": "ok", "sessions": len(sessions), "total_peers": len(peers_by_ws)}
+
 
 @app.websocket("/webrtc/signal")
 async def websocket_endpoint(ws: WebSocket):
@@ -76,10 +77,7 @@ async def websocket_endpoint(ws: WebSocket):
 
         # Create peer and register
         peer = Peer(
-            ws=ws,
-            peer_type=peer_type,
-            session_id=session_id,
-            metadata=reg_msg.get("metadata", {})
+            ws=ws, peer_type=peer_type, session_id=session_id, metadata=reg_msg.get("metadata", {})
         )
 
         if session_id not in sessions:
@@ -91,11 +89,9 @@ async def websocket_endpoint(ws: WebSocket):
         logger.info(f"Peer registered: session={session_id}, type={peer_type}")
 
         # Acknowledge registration
-        await ws.send_json({
-            "type": "registered",
-            "session_id": session_id,
-            "peer_type": peer_type.value
-        })
+        await ws.send_json(
+            {"type": "registered", "session_id": session_id, "peer_type": peer_type.value}
+        )
 
         # Main signaling loop
         while True:
@@ -114,6 +110,7 @@ async def websocket_endpoint(ws: WebSocket):
                 sessions[peer.session_id].pop(peer.peer_type, None)
                 if not sessions[peer.session_id]:
                     sessions.pop(peer.session_id)
+
 
 async def route_message(sender: Peer, message: dict[str, Any]):
     """Route signaling messages between peers in the same session.
@@ -150,6 +147,7 @@ async def route_message(sender: Peer, message: dict[str, Any]):
         except Exception as e:
             logger.error(f"Failed to route message: {e}")
 
+
 # Production notes:
 # - Add authentication/authorization before registration
 # - Implement session timeout and cleanup
@@ -159,6 +157,8 @@ async def route_message(sender: Peer, message: dict[str, Any]):
 
 if __name__ == "__main__":
     import os
+
     import uvicorn
+
     host = os.environ.get("HOST", "127.0.0.1")
     uvicorn.run(app, host=host, port=8005)

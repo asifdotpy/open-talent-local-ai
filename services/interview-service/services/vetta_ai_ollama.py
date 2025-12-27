@@ -22,6 +22,7 @@ from typing import Any
 # Check if ollama is available
 try:
     import ollama
+
     OLLAMA_AVAILABLE = True
 except ImportError:
     OLLAMA_AVAILABLE = False
@@ -57,9 +58,11 @@ class VettaAIOllama:
             models = ollama.list()
 
             # Check if our model exists
-            model_names = [m['name'] for m in models.get('models', [])]
+            model_names = [m["name"] for m in models.get("models", [])]
             if self.model_name not in model_names:
-                logger.warning(f"Model '{self.model_name}' not found in Ollama. Available: {model_names}")
+                logger.warning(
+                    f"Model '{self.model_name}' not found in Ollama. Available: {model_names}"
+                )
                 logger.info(f"Create model with: ollama create {self.model_name} -f Modelfile")
                 return False
 
@@ -129,13 +132,13 @@ class VettaAIOllama:
                 model=self.model_name,
                 prompt=prompt,
                 options={
-                    'temperature': temperature,
-                    'top_p': top_p,
-                    'num_predict': max_tokens,
-                }
+                    "temperature": temperature,
+                    "top_p": top_p,
+                    "num_predict": max_tokens,
+                },
             )
 
-            return response['response'].strip()
+            return response["response"].strip()
 
         except Exception as e:
             logger.error(f"Ollama generation failed: {e}")
@@ -181,7 +184,7 @@ Job Requirements: {job_description}"""
             "assessment": assessment_text,
             "candidate_info": candidate_info,
             "role": role,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     def generate_interview_question(
@@ -279,7 +282,7 @@ Requirements: {job_requirements}"""
         return {
             "scoring": scoring_text,
             "criteria": scoring_criteria,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     def analyze_response_sentiment(
@@ -308,7 +311,7 @@ Provide:
         return {
             "sentiment_analysis": sentiment_text,
             "response_text": response_text,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
     def get_model_info(self) -> dict[str, Any]:
@@ -339,10 +342,10 @@ Provide:
             try:
                 # Get model details from Ollama
                 models = ollama.list()
-                for model in models.get('models', []):
-                    if model['name'] == self.model_name:
-                        info["model_size"] = model.get('size', 'unknown')
-                        info["model_modified"] = model.get('modified_at', 'unknown')
+                for model in models.get("models", []):
+                    if model["name"] == self.model_name:
+                        info["model_size"] = model.get("size", "unknown")
+                        info["model_modified"] = model.get("modified_at", "unknown")
                         break
             except:
                 pass
@@ -388,7 +391,7 @@ if __name__ == "__main__":
     assessment = vetta.assess_candidate(
         candidate_info="5 years Python, Django expert, built scalable APIs",
         job_description="Senior Python Developer - Python, AWS, System Design",
-        role="Senior Python Developer"
+        role="Senior Python Developer",
     )
     print(f"Assessment: {assessment['assessment'][:200]}...")
 
@@ -397,7 +400,7 @@ if __name__ == "__main__":
     question = vetta.generate_interview_question(
         previous_responses=["I have 5 years of Python experience"],
         job_requirements="Python, AWS, System Design",
-        expertise_level="intermediate"
+        expertise_level="intermediate",
     )
     print(f"Question: {question}")
 

@@ -1,10 +1,10 @@
-
 from .base import NotificationProvider
 
 try:
     import apprise
 except Exception:  # Apprise optional
     apprise = None
+
 
 class AppriseProvider(NotificationProvider):
     def __init__(self, services: str = ""):

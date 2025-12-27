@@ -17,7 +17,7 @@ from datetime import datetime
 import pytest
 from fastapi.testclient import TestClient
 
-sys.path.insert(0, '/home/asif1/open-talent/microservices/desktop-integration-service')
+sys.path.insert(0, "/home/asif1/open-talent/microservices/desktop-integration-service")
 
 from app.config.settings import settings
 from app.core.service_discovery import ServiceDiscovery, ServiceHealthCache
@@ -33,6 +33,7 @@ from app.models.schemas import (
 # ============================================================================
 # Settings Tests
 # ============================================================================
+
 
 def test_settings_loaded():
     """Test that settings load correctly from environment."""
@@ -56,6 +57,7 @@ def test_settings_service_urls():
 # ============================================================================
 # Service Discovery Tests
 # ============================================================================
+
 
 def test_service_health_cache():
     """Test service health caching mechanism."""
@@ -86,6 +88,7 @@ async def test_service_discovery_initialization():
 # Pydantic Model Tests
 # ============================================================================
 
+
 def test_message_model():
     """Test Message pydantic model."""
     msg = Message(role="user", content="Hello")
@@ -99,33 +102,22 @@ def test_message_model():
 
 def test_interview_config_model():
     """Test InterviewConfig model."""
-    config = InterviewConfig(
-        role="Software Engineer",
-        model="granite-2b",
-        totalQuestions=5
-    )
+    config = InterviewConfig(role="Software Engineer", model="granite-2b", totalQuestions=5)
     assert config.role == "Software Engineer"
     assert config.totalQuestions == 5
 
 
 def test_interview_session_model():
     """Test InterviewSession model - CRITICAL for desktop app contract."""
-    config = InterviewConfig(
-        role="Software Engineer",
-        model="granite-2b",
-        totalQuestions=5
-    )
+    config = InterviewConfig(role="Software Engineer", model="granite-2b", totalQuestions=5)
 
     messages = [
         Message(role="system", content="You are an interviewer"),
-        Message(role="assistant", content="Hello, let's begin!")
+        Message(role="assistant", content="Hello, let's begin!"),
     ]
 
     session = InterviewSession(
-        config=config,
-        messages=messages,
-        currentQuestion=1,
-        isComplete=False
+        config=config, messages=messages, currentQuestion=1, isComplete=False
     )
 
     # Verify contract matches desktop app expectations
@@ -143,11 +135,7 @@ def test_interview_session_model():
 
 def test_start_interview_request_model():
     """Test StartInterviewRequest model."""
-    request = StartInterviewRequest(
-        role="Software Engineer",
-        model="granite-2b",
-        totalQuestions=5
-    )
+    request = StartInterviewRequest(role="Software Engineer", model="granite-2b", totalQuestions=5)
     assert request.role == "Software Engineer"
 
 
@@ -161,7 +149,7 @@ def test_model_info_model():
         downloadSize="1.2GB",
         description="Trained model",
         dataset="interviews",
-        source="granite-interview-service"
+        source="granite-interview-service",
     )
     assert model.id == "granite-2b"
     assert model.paramCount == "2B"
@@ -173,7 +161,7 @@ def test_health_response_model():
         status="online",
         timestamp=datetime.now(),
         services={},
-        summary={"online": 7, "total": 7, "percentage": 100}
+        summary={"online": 7, "total": 7, "percentage": 100},
     )
     assert health.status == "online"
     assert health.summary["total"] == 7
@@ -183,10 +171,12 @@ def test_health_response_model():
 # Main App Structure Tests
 # ============================================================================
 
+
 def test_app_imports():
     """Test that main app can be imported without errors."""
     try:
         from app.main import app
+
         assert app is not None
     except Exception as e:
         pytest.fail(f"Failed to import main app: {e}")
@@ -209,19 +199,19 @@ def test_app_endpoints_exist():
     assert "/api/v1/dashboard" in routes, "Dashboard endpoint missing"
 
 
-
 def test_app_cors_configured():
     """Test that CORS is configured."""
     from app.main import app
 
     # Check for CORS middleware
-    cors_middleware = [m for m in app.user_middleware if 'CORSMiddleware' in str(m)]
+    cors_middleware = [m for m in app.user_middleware if "CORSMiddleware" in str(m)]
     assert len(cors_middleware) > 0, "CORS middleware not configured"
 
 
 # ============================================================================
 # Integration Tests
 # ============================================================================
+
 
 def test_client_can_connect():
     """Test that TestClient can connect to app."""
@@ -254,7 +244,6 @@ def test_root_endpoint():
 # ============================================================================
 
 if __name__ == "__main__":
-
     try:
         # Settings Tests
         test_settings_loaded()
@@ -281,8 +270,8 @@ if __name__ == "__main__":
         test_client_can_connect()
         test_root_endpoint()
 
-
     except Exception:
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

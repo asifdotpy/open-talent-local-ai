@@ -27,7 +27,9 @@ class Settings(BaseModel):
     jwt_algorithm: str = "HS256"
 
     # Testing convenience: allow insecure tokens for external black-box tests
-    allow_unsafe_test_tokens: bool = os.getenv("ALLOW_UNSAFE_TEST_TOKENS", "false").lower() == "true"
+    allow_unsafe_test_tokens: bool = (
+        os.getenv("ALLOW_UNSAFE_TEST_TOKENS", "false").lower() == "true"
+    )
 
 
 settings = Settings()

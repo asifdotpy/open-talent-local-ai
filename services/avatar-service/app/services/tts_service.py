@@ -39,16 +39,12 @@ class PiperTTSService:
         """Verify piper CLI is installed and accessible."""
         try:
             result = subprocess.run(
-                ["piper", "--version"],
-                check=False, capture_output=True,
-                timeout=5
+                ["piper", "--version"], check=False, capture_output=True, timeout=5
             )
             if result.returncode != 0:
                 raise RuntimeError("Piper CLI not found")
         except (FileNotFoundError, subprocess.TimeoutExpired) as e:
-            raise RuntimeError(
-                "Piper TTS not installed. Run: pip install piper-tts"
-            ) from e
+            raise RuntimeError("Piper TTS not installed. Run: pip install piper-tts") from e
 
     def synthesize(self, text: str) -> tuple[bytes, int]:
         """Synthesize text to speech.
@@ -75,18 +71,17 @@ class PiperTTSService:
             # Call piper CLI
             cmd = [
                 "piper",
-                "--model", self.model_id,
-                "--output_file", output_path,
+                "--model",
+                self.model_id,
+                "--output_file",
+                output_path,
             ]
 
             if self.use_gpu:
                 cmd.append("--cuda")
 
             result = subprocess.run(
-                cmd,
-                check=False, input=text.encode("utf-8"),
-                capture_output=True,
-                timeout=30
+                cmd, check=False, input=text.encode("utf-8"), capture_output=True, timeout=30
             )
 
             if result.returncode != 0:
@@ -113,34 +108,27 @@ class PiperTTSService:
         # Simple phoneme extraction using character-level approximation
         # For production, integrate proper G2P model
         phoneme_map = {
-            'a': ('AE', 80),
-            'e': ('EH', 80),
-            'i': ('IH', 80),
-            'o': ('AO', 80),
-            'u': ('UH', 80),
-            's': ('S', 60),
-            't': ('T', 50),
-            'n': ('N', 70),
-            'r': ('R', 80),
-            'l': ('L', 80),
+            "a": ("AE", 80),
+            "e": ("EH", 80),
+            "i": ("IH", 80),
+            "o": ("AO", 80),
+            "u": ("UH", 80),
+            "s": ("S", 60),
+            "t": ("T", 50),
+            "n": ("N", 70),
+            "r": ("R", 80),
+            "l": ("L", 80),
         }
 
         phonemes = []
         for char in text.lower():
             if char in phoneme_map:
                 phoneme, duration = phoneme_map[char]
-                phonemes.append({
-                    "phoneme": phoneme,
-                    "duration_ms": duration
-                })
+                phonemes.append({"phoneme": phoneme, "duration_ms": duration})
 
         return phonemes if phonemes else [{"phoneme": "SILENCE", "duration_ms": 100}]
 
-    def align_phonemes_with_audio(
-        self,
-        wav_bytes: bytes,
-        text: str
-    ) -> list[dict[str, any]]:
+    def align_phonemes_with_audio(self, wav_bytes: bytes, text: str) -> list[dict[str, any]]:
         """Align phonemes with audio duration.
 
         Args:
@@ -168,13 +156,15 @@ class PiperTTSService:
 
         for phoneme_data in phonemes:
             duration = phoneme_data["duration_ms"] * time_scale
-            aligned.append({
-                "phoneme": phoneme_data["phoneme"],
-                "start_ms": int(current_time),
-                "end_ms": int(current_time + duration),
-                "start_s": current_time / 1000,
-                "end_s": (current_time + duration) / 1000,
-            })
+            aligned.append(
+                {
+                    "phoneme": phoneme_data["phoneme"],
+                    "start_ms": int(current_time),
+                    "end_ms": int(current_time + duration),
+                    "start_s": current_time / 1000,
+                    "end_s": (current_time + duration) / 1000,
+                }
+            )
             current_time += duration
 
         return aligned
@@ -187,15 +177,15 @@ class PiperTTSService:
         """
         try:
             # Read sample rate from WAV header (bytes 24-27, little-endian)
-            struct.unpack('<I', wav_bytes[24:28])[0]
+            struct.unpack("<I", wav_bytes[24:28])[0]
 
             # Read byte rate (bytes 28-31)
-            byte_rate = struct.unpack('<I', wav_bytes[28:32])[0]
+            byte_rate = struct.unpack("<I", wav_bytes[28:32])[0]
 
             # Read data chunk size (bytes 40-43, after "data" marker)
             # Find "data" chunk
-            data_idx = wav_bytes.find(b'data') + 8
-            data_size = struct.unpack('<I', wav_bytes[data_idx:data_idx+4])[0]
+            data_idx = wav_bytes.find(b"data") + 8
+            data_size = struct.unpack("<I", wav_bytes[data_idx : data_idx + 4])[0]
 
             # Duration in seconds
             duration_s = data_size / byte_rate
@@ -213,10 +203,7 @@ class PhonemeService:
     def __init__(self, tts_service: PiperTTSService | None = None):
         self.tts = tts_service or PiperTTSService()
 
-    def synthesize_and_extract_phonemes(
-        self,
-        text: str
-    ) -> tuple[bytes, list[dict]]:
+    def synthesize_and_extract_phonemes(self, text: str) -> tuple[bytes, list[dict]]:
         """Synthesize text and extract aligned phonemes.
 
         Returns:
@@ -248,43 +235,35 @@ class PhonemeService:
             "IY": "viseme_I",  # /i/ as in "beet"
             "OW": "viseme_O",  # /oʊ/ as in "go"
             "UW": "viseme_U",  # /u/ as in "boot"
-
             # Bilabial (both lips)
-            "P": "viseme_P",   # /p/
-            "B": "viseme_B",   # /b/
-            "M": "viseme_M",   # /m/
-
+            "P": "viseme_P",  # /p/
+            "B": "viseme_B",  # /b/
+            "M": "viseme_M",  # /m/
             # Labiodental (lower lip + upper teeth)
-            "F": "viseme_F",   # /f/
-            "V": "viseme_V",   # /v/
-
+            "F": "viseme_F",  # /f/
+            "V": "viseme_V",  # /v/
             # Alveolar
-            "T": "viseme_T",   # /t/
-            "D": "viseme_D",   # /d/
-            "N": "viseme_N",   # /n/
-            "S": "viseme_S",   # /s/
-            "Z": "viseme_Z",   # /z/
-            "L": "viseme_L",   # /l/
-
+            "T": "viseme_T",  # /t/
+            "D": "viseme_D",  # /d/
+            "N": "viseme_N",  # /n/
+            "S": "viseme_S",  # /s/
+            "Z": "viseme_Z",  # /z/
+            "L": "viseme_L",  # /l/
             # Postalveolar
             "SH": "viseme_S",  # /ʃ/
             "ZH": "viseme_Z",  # /ʒ/
             "CH": "viseme_T",  # /tʃ/
             "JH": "viseme_D",  # /dʒ/
-
             # Velar
-            "K": "viseme_K",   # /k/
-            "G": "viseme_G",   # /ɡ/
+            "K": "viseme_K",  # /k/
+            "G": "viseme_G",  # /ɡ/
             "NG": "viseme_N",  # /ŋ/
-
             # Glottals
             "HH": "viseme_A",  # /h/
-
             # Other
-            "R": "viseme_R",   # /ɹ/
-            "W": "viseme_U",   # /w/
-            "Y": "viseme_I",   # /j/
-
+            "R": "viseme_R",  # /ɹ/
+            "W": "viseme_U",  # /w/
+            "Y": "viseme_I",  # /j/
             # Silence
             "SILENCE": "viseme_rest",
         }

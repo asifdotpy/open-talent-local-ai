@@ -30,7 +30,9 @@ try:
 except ImportError:
     from .rules import RULES  # fallback if package context is available
 
-CONFIG: AuditConfig = AuditConfig(default_ruleset=list(RULES.keys()), fail_on_severity=Severity.HIGH, max_findings=1000)
+CONFIG: AuditConfig = AuditConfig(
+    default_ruleset=list(RULES.keys()), fail_on_severity=Severity.HIGH, max_findings=1000
+)
 JOBS: dict[str, dict[str, Any]] = {}
 HISTORY: dict[str, AuditHistoryItem] = {}
 
@@ -38,6 +40,7 @@ HISTORY: dict[str, AuditHistoryItem] = {}
 import json as _json
 
 _STATE_FILE = os.path.join(os.path.dirname(__file__), "state.json")
+
 
 def _load_state():
     global JOBS, HISTORY
@@ -55,6 +58,7 @@ def _load_state():
         # Ignore corrupt state
         pass
 
+
 def _save_state():
     try:
         data = {
@@ -66,6 +70,7 @@ def _save_state():
     except Exception:
         # Best-effort persistence; ignore write errors
         pass
+
 
 _load_state()
 
@@ -158,13 +163,16 @@ async def _job_worker():
             pass
         await _asyncio.sleep(0.5)
 
+
 _WORKER_STARTED = False
+
 
 async def _ensure_worker():
     global _WORKER_STARTED
     if not _WORKER_STARTED:
         _asyncio.create_task(_job_worker())
         _WORKER_STARTED = True
+
 
 @app.on_event("startup")
 async def _start_worker():
@@ -192,8 +200,22 @@ async def audit_report(job_id: str):
     if not job or job.get("status") != AuditJobStatus.COMPLETED:
         return JSONResponse(status_code=400, content={"error": "Job not completed or not found"})
     findings = [
-        AuditFinding(rule_id="enum_validation", message="Loose string enum detected.", severity=Severity.HIGH, file="services/security-service/schemas.py", line=100, remediation="Use Python Enum types for roles/permissions."),
-        AuditFinding(rule_id="secret_detection", message="Potential hardcoded secret found.", severity=Severity.CRITICAL, file="services/security-service/main.py", line=50, remediation="Load secrets from environment variables."),
+        AuditFinding(
+            rule_id="enum_validation",
+            message="Loose string enum detected.",
+            severity=Severity.HIGH,
+            file="services/security-service/schemas.py",
+            line=100,
+            remediation="Use Python Enum types for roles/permissions.",
+        ),
+        AuditFinding(
+            rule_id="secret_detection",
+            message="Potential hardcoded secret found.",
+            severity=Severity.CRITICAL,
+            file="services/security-service/main.py",
+            line=50,
+            remediation="Load secrets from environment variables.",
+        ),
     ]
     summary = {
         "target": job["target"],
@@ -201,7 +223,9 @@ async def audit_report(job_id: str):
         "files_scanned": 25,
         "duration_sec": 2,
     }
-    return AuditReportResponse(job_id=job_id, target=job["target"], findings=findings, summary=summary)
+    return AuditReportResponse(
+        job_id=job_id, target=job["target"], findings=findings, summary=summary
+    )
 
 
 @app.get("/api/v1/audit/rules")

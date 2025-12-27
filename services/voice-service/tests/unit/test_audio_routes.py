@@ -131,7 +131,12 @@ def test_phonemes():
 
 
 def test_batch_tts():
-    payload = {"requests": [{"text": "Hi", "voice": "lessac", "speed": 1.0, "extract_phonemes": False}, {"text": "Bye", "voice": "lessac", "speed": 1.0, "extract_phonemes": False}]}
+    payload = {
+        "requests": [
+            {"text": "Hi", "voice": "lessac", "speed": 1.0, "extract_phonemes": False},
+            {"text": "Bye", "voice": "lessac", "speed": 1.0, "extract_phonemes": False},
+        ]
+    }
     resp = client.post("/voice/batch-tts", json=payload["requests"])
     assert resp.status_code == 200
     data = resp.json()

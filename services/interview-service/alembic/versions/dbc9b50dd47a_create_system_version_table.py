@@ -12,8 +12,8 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = 'dbc9b50dd47a'
-down_revision: str | Sequence[str] | None = '1f2b8ae492b8'
+revision: str = "dbc9b50dd47a"
+down_revision: str | Sequence[str] | None = "1f2b8ae492b8"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
@@ -21,11 +21,11 @@ depends_on: str | Sequence[str] | None = None
 def upgrade() -> None:
     """Upgrade schema."""
     op.create_table(
-        'system_version',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('version', sa.String(), nullable=False),
-        sa.Column('description', sa.String(), nullable=True),
-        sa.PrimaryKeyConstraint('id')
+        "system_version",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("version", sa.String(), nullable=False),
+        sa.Column("description", sa.String(), nullable=True),
+        sa.PrimaryKeyConstraint("id"),
     )
     pass
 

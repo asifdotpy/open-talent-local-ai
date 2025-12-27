@@ -18,16 +18,20 @@ logger = logging.getLogger(__name__)
 # Models
 # ============================
 
+
 class HealthCheckResult(BaseModel):
     """Result of a single health check."""
+
     timestamp: datetime
     agent_name: str
     status: AgentStatus
     response_time_ms: float | None = None
     error_message: str | None = None
 
+
 class HealthReport(BaseModel):
     """Overall health report for all agents."""
+
     timestamp: datetime
     total_agents: int
     healthy_agents: int
@@ -44,9 +48,11 @@ class HealthReport(BaseModel):
             return 0.0
         return (self.healthy_agents / self.total_agents) * 100
 
+
 # ============================
 # Health Monitoring
 # ============================
+
 
 class HealthMonitor:
     """Monitors agent health and provides reports."""
@@ -96,12 +102,14 @@ class HealthMonitor:
             unreachable_agents=unreachable_count,
             unknown_agents=unknown_count,
             agents=agents,
-            recent_checks=self._get_recent_checks(limit=10)
+            recent_checks=self._get_recent_checks(limit=10),
         )
 
         # Log summary
-        logger.info(f"Health check complete: {healthy_count}/{len(agents)} agents healthy "
-                   f"({report.health_percentage:.1f}%)")
+        logger.info(
+            f"Health check complete: {healthy_count}/{len(agents)} agents healthy "
+            f"({report.health_percentage:.1f}%)"
+        )
 
         return report
 
@@ -123,8 +131,9 @@ class HealthMonitor:
             return
 
         cutoff_time = datetime.now() - timedelta(hours=self.retention_hours)
-        self.health_history = [check for check in self.health_history
-                              if check.timestamp > cutoff_time]
+        self.health_history = [
+            check for check in self.health_history if check.timestamp > cutoff_time
+        ]
 
     def get_agent_status(self, agent_name: str) -> AgentStatus | None:
         """Retrieve the current health status of a specific agent.
@@ -162,6 +171,5 @@ class HealthMonitor:
             "healthy": sum(1 for a in agents if a.status == AgentStatus.HEALTHY),
             "unhealthy": sum(1 for a in agents if a.status == AgentStatus.UNHEALTHY),
             "unreachable": sum(1 for a in agents if a.status == AgentStatus.UNREACHABLE),
-            "unknown": sum(1 for a in agents if a.status == AgentStatus.UNKNOWN)
+            "unknown": sum(1 for a in agents if a.status == AgentStatus.UNKNOWN),
         }
-

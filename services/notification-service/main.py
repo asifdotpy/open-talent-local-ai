@@ -23,12 +23,15 @@ from schemas import (
 
 app = FastAPI(title="Notification Service", version="1.0.0")
 
+
 def provider_dep():
     return get_provider()
+
 
 @app.get("/")
 async def root():
     return {"service": "notification", "status": "ok"}
+
 
 @app.get("/health")
 async def health(p=Depends(provider_dep)):
@@ -40,10 +43,12 @@ async def health(p=Depends(provider_dep)):
         top_ok = None
     return {"service": "notification", "provider": status, "ok": top_ok}
 
+
 @app.get("/api/v1/provider")
 async def provider_info(p=Depends(provider_dep)):
     status = await p.health()
     return status
+
 
 @app.post("/api/v1/notify/email")
 async def notify_email(payload: EmailNotificationRequest = Body(...), p=Depends(provider_dep)):
@@ -55,6 +60,7 @@ async def notify_email(payload: EmailNotificationRequest = Body(...), p=Depends(
         result.setdefault("status", "sent")
     return result
 
+
 @app.post("/api/v1/notify/sms")
 async def notify_sms(payload: SMSNotificationRequest = Body(...), p=Depends(provider_dep)):
     if not payload.to or not payload.text:
@@ -64,6 +70,7 @@ async def notify_sms(payload: SMSNotificationRequest = Body(...), p=Depends(prov
         result.setdefault("status", "sent")
     return result
 
+
 @app.post("/api/v1/notify/push")
 async def notify_push(payload: PushNotificationRequest = Body(...), p=Depends(provider_dep)):
     if not payload.to or not payload.title or not payload.body:
@@ -72,6 +79,7 @@ async def notify_push(payload: PushNotificationRequest = Body(...), p=Depends(pr
     if isinstance(result, dict):
         result.setdefault("status", "sent")
     return result
+
 
 @app.get("/api/v1/notify/templates")
 async def list_templates(p=Depends(provider_dep)):

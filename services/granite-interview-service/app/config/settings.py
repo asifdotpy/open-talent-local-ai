@@ -10,7 +10,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import yaml
-from .constants import MEMORY_REQUIREMENT_MAP, DISK_REQUIREMENT_MAP
+
+from .constants import DISK_REQUIREMENT_MAP, MEMORY_REQUIREMENT_MAP
 
 
 class ModelConfig:

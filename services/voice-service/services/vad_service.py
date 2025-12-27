@@ -40,10 +40,13 @@ class VoiceActivityDetector:
         """Initialize webrtcvad library."""
         try:
             import webrtcvad
+
             self.vad = webrtcvad.Vad(self.aggressiveness)
-            logger.info(f"VAD initialized: aggressiveness={self.aggressiveness}, "
-                       f"frame_duration={self.frame_duration_ms}ms, "
-                       f"sample_rate={self.sample_rate}Hz")
+            logger.info(
+                f"VAD initialized: aggressiveness={self.aggressiveness}, "
+                f"frame_duration={self.frame_duration_ms}ms, "
+                f"sample_rate={self.sample_rate}Hz"
+            )
         except ImportError:
             logger.warning("webrtcvad not installed. Install with: pip install webrtcvad")
             logger.warning("Falling back to processing all audio (no VAD filtering)")
@@ -72,7 +75,7 @@ class VoiceActivityDetector:
 
             # Pad or truncate to expected size
             if len(audio_chunk) < expected_bytes:
-                audio_chunk = audio_chunk + b'\x00' * (expected_bytes - len(audio_chunk))
+                audio_chunk = audio_chunk + b"\x00" * (expected_bytes - len(audio_chunk))
             elif len(audio_chunk) > expected_bytes:
                 audio_chunk = audio_chunk[:expected_bytes]
 
@@ -134,7 +137,7 @@ class VoiceActivityDetector:
                 "enabled": self.use_vad,
                 "aggressiveness": self.aggressiveness,
                 "frames_analyzed": 0,
-                "speech_ratio": 0.0
+                "speech_ratio": 0.0,
             }
 
         speech_count = sum(self.speech_frames_buffer)
@@ -147,7 +150,7 @@ class VoiceActivityDetector:
             "speech_frames": speech_count,
             "speech_ratio": speech_count / total_count if total_count > 0 else 0.0,
             "sample_rate": self.sample_rate,
-            "frame_duration_ms": self.frame_duration_ms
+            "frame_duration_ms": self.frame_duration_ms,
         }
 
     def set_aggressiveness(self, level: int):
@@ -164,6 +167,7 @@ class VoiceActivityDetector:
         if self.vad:
             try:
                 import webrtcvad
+
                 self.vad = webrtcvad.Vad(level)
                 logger.info(f"VAD aggressiveness updated to {level}")
             except Exception as e:

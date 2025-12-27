@@ -26,11 +26,7 @@ class TestUserCreation:
     def test_create_user(self, test_client: TestClient, sample_user_data, admin_token):
         """Test creating a new user"""
         headers = {"Authorization": f"Bearer {admin_token}"}
-        response = test_client.post(
-            "/api/v1/users",
-            json=sample_user_data,
-            headers=headers
-        )
+        response = test_client.post("/api/v1/users", json=sample_user_data, headers=headers)
         assert response.status_code in [200, 201]
         data = response.json()
         assert "id" in data or "user_id" in data or "email" in data
@@ -42,11 +38,7 @@ class TestUserCreation:
             "full_name": "John Doe",
             "role": "candidate",
         }
-        response = test_client.post(
-            "/api/v1/users",
-            json=invalid_data,
-            headers=headers
-        )
+        response = test_client.post("/api/v1/users", json=invalid_data, headers=headers)
         assert response.status_code in [400, 422]
 
 
@@ -65,10 +57,7 @@ class TestUserRetrieval:
     def test_get_current_user(self, test_client: TestClient, admin_token):
         """Test retrieving current logged-in user"""
         headers = {"Authorization": f"Bearer {admin_token}"}
-        response = test_client.get(
-            "/api/v1/users/me",
-            headers=headers
-        )
+        response = test_client.get("/api/v1/users/me", headers=headers)
         assert response.status_code in [200, 401, 404]
 
 
@@ -86,9 +75,7 @@ class TestUserPreferences:
             "theme": "dark",
         }
         response = test_client.post(
-            "/api/v1/users/me/preferences",
-            json=valid_prefs,
-            headers=headers
+            "/api/v1/users/me/preferences", json=valid_prefs, headers=headers
         )
         assert response.status_code in [200, 201, 401, 404, 422]
 
@@ -100,9 +87,7 @@ class TestUserPreferences:
             "theme": "light",
         }
         response = test_client.patch(
-            "/api/v1/users/me/preferences",
-            json=prefs_update,
-            headers=headers
+            "/api/v1/users/me/preferences", json=prefs_update, headers=headers
         )
         assert response.status_code in [200, 401, 404, 422]
 
@@ -119,9 +104,5 @@ class TestUserProfile:
             "bio": "Experienced engineer",
             "skills": ["Python", "FastAPI"],
         }
-        response = test_client.post(
-            "/api/v1/users/me/profile",
-            json=valid_profile,
-            headers=headers
-        )
+        response = test_client.post("/api/v1/users/me/profile", json=valid_profile, headers=headers)
         assert response.status_code in [200, 201, 401, 404, 422]

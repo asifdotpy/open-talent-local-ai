@@ -59,7 +59,9 @@ class TestAssetEndpoints:
 
     def test_model_select(self, client):
         """POST /models/select should select a model."""
-        res = client.post("/api/v1/avatars/models/select", json={"avatar_id": "avatar-1", "model_id": "model-1"})
+        res = client.post(
+            "/api/v1/avatars/models/select", json={"avatar_id": "avatar-1", "model_id": "model-1"}
+        )
         assert res.status_code == 200
         assert res.json()["model_id"] == "model-1"
 
@@ -70,10 +72,7 @@ class TestAssetPathTraversalSafety:
     @pytest.mark.assets
     def test_download_path_traversal_parent_dir(self, client):
         """../../../etc/passwd should be rejected."""
-        res = client.get(
-            "/api/v1/avatars/assets/download",
-            params={"name": "../../../etc/passwd"}
-        )
+        res = client.get("/api/v1/avatars/assets/download", params={"name": "../../../etc/passwd"})
         # Should either reject (404/403) or normalize path safely
         assert res.status_code in [400, 403, 404]
 
@@ -81,35 +80,27 @@ class TestAssetPathTraversalSafety:
     def test_download_path_traversal_backslash(self, client):
         r"""..\\..\\windows\\system32 should be rejected."""
         res = client.get(
-            "/api/v1/avatars/assets/download",
-            params={"name": "..\\..\\windows\\system32"}
+            "/api/v1/avatars/assets/download", params={"name": "..\\..\\windows\\system32"}
         )
         assert res.status_code in [400, 403, 404]
 
     @pytest.mark.assets
     def test_download_absolute_path(self, client):
         """Absolute paths /etc/passwd should be rejected."""
-        res = client.get(
-            "/api/v1/avatars/assets/download",
-            params={"name": "/etc/passwd"}
-        )
+        res = client.get("/api/v1/avatars/assets/download", params={"name": "/etc/passwd"})
         assert res.status_code in [400, 403, 404]
 
     @pytest.mark.assets
     def test_download_null_byte_injection(self, client):
         r"""Null bytes avatar.fbx\x00.txt should be rejected."""
-        res = client.get(
-            "/api/v1/avatars/assets/download",
-            params={"name": "avatar.fbx\x00.txt"}
-        )
+        res = client.get("/api/v1/avatars/assets/download", params={"name": "avatar.fbx\x00.txt"})
         assert res.status_code in [400, 403, 404]
 
     @pytest.mark.assets
     def test_download_double_encoding(self, client):
         """URL-encoded traversal ..%2F..%2Fetc%2Fpasswd should be rejected."""
         res = client.get(
-            "/api/v1/avatars/assets/download",
-            params={"name": "..%2F..%2Fetc%2Fpasswd"}
+            "/api/v1/avatars/assets/download", params={"name": "..%2F..%2Fetc%2Fpasswd"}
         )
         # TestClient auto-decodes; should still be safe
         assert res.status_code in [400, 403, 404]
@@ -121,10 +112,7 @@ class TestAssetMimeTypes:
     @pytest.mark.assets
     def test_fbx_asset_content_type(self, client):
         """FBX assets should have correct Content-Type."""
-        res = client.get(
-            "/api/v1/avatars/assets/download",
-            params={"name": "avatar.fbx"}
-        )
+        res = client.get("/api/v1/avatars/assets/download", params={"name": "avatar.fbx"})
         if res.status_code == 200:
             # Should have FBX or binary content type
             ct = res.headers.get("content-type", "")
@@ -133,10 +121,7 @@ class TestAssetMimeTypes:
     @pytest.mark.assets
     def test_animation_asset_content_type(self, client):
         """Animation assets should have correct Content-Type."""
-        res = client.get(
-            "/api/v1/avatars/assets/download",
-            params={"name": "animation.anim"}
-        )
+        res = client.get("/api/v1/avatars/assets/download", params={"name": "animation.anim"})
         if res.status_code == 200:
             ct = res.headers.get("content-type", "")
             assert "octet-stream" in ct or "animation" in ct
@@ -144,10 +129,7 @@ class TestAssetMimeTypes:
     @pytest.mark.assets
     def test_texture_asset_content_type(self, client):
         """Texture assets should have image/* Content-Type."""
-        res = client.get(
-            "/api/v1/avatars/assets/download",
-            params={"name": "texture.png"}
-        )
+        res = client.get("/api/v1/avatars/assets/download", params={"name": "texture.png"})
         if res.status_code == 200:
             ct = res.headers.get("content-type", "")
             assert "image" in ct or "png" in ct
@@ -184,10 +166,7 @@ class TestAssetSizeAndCaching:
     @pytest.mark.assets
     def test_download_caching_headers(self, client):
         """Asset downloads should include caching headers."""
-        res = client.get(
-            "/api/v1/avatars/assets/download",
-            params={"name": "avatar.fbx"}
-        )
+        res = client.get("/api/v1/avatars/assets/download", params={"name": "avatar.fbx"})
         if res.status_code == 200:
             # Should have cache control or ETag
             pass
@@ -225,9 +204,9 @@ class TestAssetMetadata:
         body = res.json()
         # May have version at top level or per-asset
         (
-            "version" in body or
-            "api_version" in body or
-            ("assets" in body and body["assets"] and "version" in body["assets"][0])
+            "version" in body
+            or "api_version" in body
+            or ("assets" in body and body["assets"] and "version" in body["assets"][0])
         )
         # Not required in stub implementation
 
@@ -239,14 +218,8 @@ class TestAssetConcurrentAccess:
     def test_concurrent_asset_downloads(self, client):
         """Multiple concurrent downloads should not interfere."""
         # Simulate concurrent requests
-        res1 = client.get(
-            "/api/v1/avatars/assets/download",
-            params={"name": "asset1.fbx"}
-        )
-        res2 = client.get(
-            "/api/v1/avatars/assets/download",
-            params={"name": "asset2.fbx"}
-        )
+        res1 = client.get("/api/v1/avatars/assets/download", params={"name": "asset1.fbx"})
+        res2 = client.get("/api/v1/avatars/assets/download", params={"name": "asset2.fbx"})
         # Both should complete without error or conflict
         assert res1.status_code in [200, 404]
         assert res2.status_code in [200, 404]
@@ -257,10 +230,7 @@ class TestAssetConcurrentAccess:
         # List
         res1 = client.get("/api/v1/avatars/assets")
         # Download
-        res2 = client.get(
-            "/api/v1/avatars/assets/download",
-            params={"name": "avatar.fbx"}
-        )
+        res2 = client.get("/api/v1/avatars/assets/download", params={"name": "avatar.fbx"})
         # Both should succeed
         assert res1.status_code == 200
         assert res2.status_code in [200, 404]

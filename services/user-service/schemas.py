@@ -13,8 +13,10 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, HttpUrl, field_vali
 # ENUMS
 # ============================================================================
 
+
 class UserStatus(str, Enum):
     """User account status"""
+
     ACTIVE = "active"
     INACTIVE = "inactive"
     SUSPENDED = "suspended"
@@ -24,6 +26,7 @@ class UserStatus(str, Enum):
 
 class UserRole(str, Enum):
     """User roles"""
+
     ADMIN = "admin"
     RECRUITER = "recruiter"
     INTERVIEWER = "interviewer"
@@ -34,6 +37,7 @@ class UserRole(str, Enum):
 
 class ActivityType(str, Enum):
     """User activity types"""
+
     LOGIN = "login"
     LOGOUT = "logout"
     PROFILE_UPDATE = "profile_update"
@@ -48,6 +52,7 @@ class ActivityType(str, Enum):
 
 class NotificationPreference(str, Enum):
     """Notification preferences"""
+
     EMAIL = "email"
     SMS = "sms"
     PUSH = "push"
@@ -57,6 +62,7 @@ class NotificationPreference(str, Enum):
 
 class PrivacyLevel(str, Enum):
     """Profile privacy levels"""
+
     PUBLIC = "public"
     PRIVATE = "private"
     CONTACTS_ONLY = "contacts_only"
@@ -64,6 +70,7 @@ class PrivacyLevel(str, Enum):
 
 class Gender(str, Enum):
     """Gender options"""
+
     MALE = "male"
     FEMALE = "female"
     NON_BINARY = "non_binary"
@@ -75,12 +82,14 @@ class Gender(str, Enum):
 # USER CORE
 # ============================================================================
 
+
 class UserBase(BaseModel):
     """Base user model"""
+
     email: EmailStr
     first_name: str = Field(..., min_length=1, max_length=50)
     last_name: str = Field(..., min_length=1, max_length=50)
-    phone: str | None = Field(None, pattern=r'^\+?[1-9]\d{1,14}$')  # E.164 format
+    phone: str | None = Field(None, pattern=r"^\+?[1-9]\d{1,14}$")  # E.164 format
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -88,7 +97,7 @@ class UserBase(BaseModel):
                 "email": "john.doe@example.com",
                 "first_name": "John",
                 "last_name": "Doe",
-                "phone": "+14155552671"
+                "phone": "+14155552671",
             }
         }
     )
@@ -96,33 +105,36 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     """Create new user"""
+
     password: str = Field(..., min_length=8, max_length=100)
     role: UserRole = UserRole.CANDIDATE
 
-    @field_validator('password')
+    @field_validator("password")
     @classmethod
     def validate_password(cls, v):
         if not any(c.isupper() for c in v):
-            raise ValueError('Password must contain at least one uppercase letter')
+            raise ValueError("Password must contain at least one uppercase letter")
         if not any(c.islower() for c in v):
-            raise ValueError('Password must contain at least one lowercase letter')
+            raise ValueError("Password must contain at least one lowercase letter")
         if not any(c.isdigit() for c in v):
-            raise ValueError('Password must contain at least one digit')
+            raise ValueError("Password must contain at least one digit")
         return v
 
 
 class UserUpdate(BaseModel):
     """Update user (all fields optional)"""
+
     email: EmailStr | None = None
     first_name: str | None = Field(None, min_length=1, max_length=50)
     last_name: str | None = Field(None, min_length=1, max_length=50)
-    phone: str | None = Field(None, pattern=r'^\+?[1-9]\d{1,14}$')
+    phone: str | None = Field(None, pattern=r"^\+?[1-9]\d{1,14}$")
     status: UserStatus | None = None
     role: UserRole | None = None
 
 
 class UserResponse(UserBase):
     """User response model"""
+
     user_id: str
     status: UserStatus
     role: UserRole
@@ -136,6 +148,7 @@ class UserResponse(UserBase):
 
 class UserListResponse(BaseModel):
     """List of users with pagination"""
+
     users: list[UserResponse]
     total: int
     page: int
@@ -147,8 +160,10 @@ class UserListResponse(BaseModel):
 # USER PROFILE
 # ============================================================================
 
+
 class ProfileBase(BaseModel):
     """Base profile information"""
+
     bio: str | None = Field(None, max_length=500)
     avatar_url: HttpUrl | None = None
     location: str | None = Field(None, max_length=100)
@@ -163,16 +178,19 @@ class ProfileBase(BaseModel):
 
 class ProfileCreate(ProfileBase):
     """Create user profile"""
+
     pass
 
 
 class ProfileUpdate(ProfileBase):
     """Update user profile (all fields optional)"""
+
     pass
 
 
 class ProfileResponse(ProfileBase):
     """Profile response"""
+
     user_id: str
     profile_id: str
     privacy_level: PrivacyLevel = PrivacyLevel.PRIVATE
@@ -185,19 +203,22 @@ class ProfileResponse(ProfileBase):
 
 class ProfilePhotoUpload(BaseModel):
     """Profile photo upload"""
+
     photo_base64: str = Field(..., description="Base64-encoded image data")
     filename: str
-    content_type: str = Field(..., pattern=r'^image/(jpeg|png|gif|webp)$')
+    content_type: str = Field(..., pattern=r"^image/(jpeg|png|gif|webp)$")
 
 
 # ============================================================================
 # USER PREFERENCES
 # ============================================================================
 
+
 class UserPreferences(BaseModel):
     """User preferences"""
+
     language: str = Field("en", max_length=10)
-    theme: str = Field("light", pattern=r'^(light|dark|auto)$')
+    theme: str = Field("light", pattern=r"^(light|dark|auto)$")
     notifications_enabled: bool = True
     notification_channels: list[NotificationPreference] = [NotificationPreference.EMAIL]
     email_notifications: bool = True
@@ -208,7 +229,7 @@ class UserPreferences(BaseModel):
     reminder_minutes_before: int = Field(30, ge=5, le=1440)
     timezone: str = "UTC"
     date_format: str = Field("YYYY-MM-DD", max_length=20)
-    time_format: str = Field("HH:mm", pattern=r'^(12h|24h|HH:mm|hh:mm A)$')
+    time_format: str = Field("HH:mm", pattern=r"^(12h|24h|HH:mm|hh:mm A)$")
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -219,7 +240,7 @@ class UserPreferences(BaseModel):
                 "notification_channels": ["email", "push"],
                 "interview_reminders": True,
                 "reminder_minutes_before": 30,
-                "timezone": "America/New_York"
+                "timezone": "America/New_York",
             }
         }
     )
@@ -227,6 +248,7 @@ class UserPreferences(BaseModel):
 
 class UserSettings(BaseModel):
     """User application settings"""
+
     auto_save: bool = True
     show_tutorials: bool = True
     compact_mode: bool = False
@@ -241,8 +263,10 @@ class UserSettings(BaseModel):
 # ACTIVITY TRACKING
 # ============================================================================
 
+
 class ActivityLog(BaseModel):
     """User activity log entry"""
+
     activity_id: str
     user_id: str
     activity_type: ActivityType
@@ -260,7 +284,7 @@ class ActivityLog(BaseModel):
                 "activity_type": "login",
                 "description": "User logged in successfully",
                 "ip_address": "192.168.1.1",
-                "timestamp": "2025-12-17T10:30:00Z"
+                "timestamp": "2025-12-17T10:30:00Z",
             }
         }
     )
@@ -268,6 +292,7 @@ class ActivityLog(BaseModel):
 
 class ActivityLogRequest(BaseModel):
     """Create activity log entry"""
+
     activity_type: ActivityType
     description: str
     metadata: dict[str, Any] | None = None
@@ -275,6 +300,7 @@ class ActivityLogRequest(BaseModel):
 
 class SessionInfo(BaseModel):
     """User session information"""
+
     session_id: str
     user_id: str
     created_at: datetime
@@ -287,6 +313,7 @@ class SessionInfo(BaseModel):
 
 class LoginHistoryEntry(BaseModel):
     """Login history entry"""
+
     login_id: str
     user_id: str
     timestamp: datetime
@@ -301,8 +328,10 @@ class LoginHistoryEntry(BaseModel):
 # SEARCH & FILTERING
 # ============================================================================
 
+
 class UserSearchRequest(BaseModel):
     """User search request"""
+
     query: str | None = Field(None, min_length=1, max_length=200)
     roles: list[UserRole] | None = None
     statuses: list[UserStatus] | None = None
@@ -312,12 +341,15 @@ class UserSearchRequest(BaseModel):
     verified_only: bool = False
     page: int = Field(1, ge=1)
     page_size: int = Field(25, ge=1, le=100)
-    sort_by: str = Field("created_at", pattern=r'^(created_at|updated_at|last_login|email|first_name|last_name)$')
-    sort_order: str = Field("desc", pattern=r'^(asc|desc)$')
+    sort_by: str = Field(
+        "created_at", pattern=r"^(created_at|updated_at|last_login|email|first_name|last_name)$"
+    )
+    sort_order: str = Field("desc", pattern=r"^(asc|desc)$")
 
 
 class UserFilterRequest(BaseModel):
     """User filter request"""
+
     filters: dict[str, Any]
     page: int = Field(1, ge=1)
     page_size: int = Field(25, ge=1, le=100)
@@ -325,6 +357,7 @@ class UserFilterRequest(BaseModel):
 
 class UserBulkLookupRequest(BaseModel):
     """Bulk user lookup request"""
+
     user_ids: list[str] = Field(..., min_length=1, max_length=100)
     include_profiles: bool = False
     include_preferences: bool = False
@@ -334,8 +367,10 @@ class UserBulkLookupRequest(BaseModel):
 # STATISTICS
 # ============================================================================
 
+
 class UserStatistics(BaseModel):
     """User statistics"""
+
     total_users: int
     active_users: int
     inactive_users: int
@@ -355,18 +390,21 @@ class UserStatistics(BaseModel):
 # NOTIFICATIONS
 # ============================================================================
 
+
 class NotificationRequest(BaseModel):
     """Send notification to user"""
+
     title: str = Field(..., min_length=1, max_length=200)
     message: str = Field(..., min_length=1, max_length=1000)
     channels: list[NotificationPreference]
-    priority: str = Field("normal", pattern=r'^(low|normal|high|urgent)$')
+    priority: str = Field("normal", pattern=r"^(low|normal|high|urgent)$")
     action_url: HttpUrl | None = None
     metadata: dict[str, Any] | None = None
 
 
 class NotificationResponse(BaseModel):
     """Notification"""
+
     notification_id: str
     user_id: str
     title: str
@@ -381,8 +419,10 @@ class NotificationResponse(BaseModel):
 # INTEGRATION
 # ============================================================================
 
+
 class UserInviteRequest(BaseModel):
     """Invite user to platform"""
+
     email: EmailStr
     role: UserRole
     first_name: str | None = None
@@ -392,6 +432,7 @@ class UserInviteRequest(BaseModel):
 
 class UserInviteResponse(BaseModel):
     """User invite response"""
+
     invite_id: str
     email: str
     role: UserRole
@@ -403,15 +444,17 @@ class UserInviteResponse(BaseModel):
 
 class UserExportRequest(BaseModel):
     """Export user data"""
+
     user_id: str
     include_profile: bool = True
     include_activity: bool = True
     include_preferences: bool = True
-    format: str = Field("json", pattern=r'^(json|csv|pdf)$')
+    format: str = Field("json", pattern=r"^(json|csv|pdf)$")
 
 
 class UserImportRequest(BaseModel):
     """Import users"""
+
     users: list[UserCreate] = Field(..., min_items=1, max_items=1000)
     skip_duplicates: bool = True
     send_invites: bool = False
@@ -421,15 +464,18 @@ class UserImportRequest(BaseModel):
 # STATUS & HEALTH
 # ============================================================================
 
+
 class UserStatusUpdate(BaseModel):
     """Update user status"""
+
     status: UserStatus
     reason: str | None = Field(None, max_length=200)
 
 
 class HealthCheckResponse(BaseModel):
     """Health check response"""
-    status: str = Field(..., pattern=r'^(healthy|degraded|unhealthy)$')
+
+    status: str = Field(..., pattern=r"^(healthy|degraded|unhealthy)$")
     timestamp: datetime
     database_connected: bool
     cache_connected: bool
@@ -442,8 +488,10 @@ class HealthCheckResponse(BaseModel):
 # ERROR RESPONSES
 # ============================================================================
 
+
 class ErrorResponse(BaseModel):
     """Standard error response"""
+
     error: str
     detail: str | None = None
     code: str | None = None
@@ -452,6 +500,7 @@ class ErrorResponse(BaseModel):
 
 class ValidationErrorDetail(BaseModel):
     """Validation error detail"""
+
     field: str
     message: str
     value: Any | None = None
@@ -459,6 +508,7 @@ class ValidationErrorDetail(BaseModel):
 
 class ValidationErrorResponse(BaseModel):
     """Validation error response"""
+
     error: str = "Validation Error"
     details: list[ValidationErrorDetail]
     timestamp: datetime = Field(default_factory=datetime.utcnow)

@@ -12,7 +12,16 @@ from sqlalchemy import create_engine, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
 
-from app.models.database import Asset, Audio, Avatar, Base, Config, Phoneme, Preset, Render
+from app.models.database import (
+    Asset,
+    Audio,
+    Avatar,
+    Base,
+    Config,
+    Phoneme,
+    Preset,
+    Render,
+)
 from app.models.database import Session as DBSession
 
 
@@ -32,7 +41,7 @@ class DatabaseService:
         self.database_url = database_url
         self.engine = create_engine(
             database_url,
-            connect_args={"check_same_thread": False} if "sqlite" in database_url else {}
+            connect_args={"check_same_thread": False} if "sqlite" in database_url else {},
         )
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
 
@@ -123,11 +132,7 @@ class DatabaseService:
     def create_session(self, session_id: str, avatar_id: str, metadata: dict = None) -> DBSession:
         """Create new session."""
         with self.get_db() as db:
-            session = DBSession(
-                session_id=session_id,
-                avatar_id=avatar_id,
-                metadata=metadata or {}
-            )
+            session = DBSession(session_id=session_id, avatar_id=avatar_id, metadata=metadata or {})
             db.add(session)
             db.commit()
             return session
@@ -146,10 +151,12 @@ class DatabaseService:
     def list_sessions(self, avatar_id: str, limit: int = 100) -> list[DBSession]:
         """List sessions for avatar (excluding deleted)."""
         with self.get_db() as db:
-            return db.query(DBSession).filter_by(
-                avatar_id=avatar_id,
-                deleted_at=None
-            ).limit(limit).all()
+            return (
+                db.query(DBSession)
+                .filter_by(avatar_id=avatar_id, deleted_at=None)
+                .limit(limit)
+                .all()
+            )
 
     # ============= PRESET OPERATIONS =============
 
@@ -199,13 +206,7 @@ class DatabaseService:
     # ============= RENDER OPERATIONS =============
 
     def create_render(
-        self,
-        frame_id: str,
-        avatar_id: str,
-        width: int,
-        height: int,
-        file_path: str,
-        **kwargs
+        self, frame_id: str, avatar_id: str, width: int, height: int, file_path: str, **kwargs
     ) -> Render:
         """Create render record."""
         with self.get_db() as db:
@@ -215,7 +216,7 @@ class DatabaseService:
                 width=width,
                 height=height,
                 file_path=file_path,
-                **kwargs
+                **kwargs,
             )
             db.add(render)
             db.commit()
@@ -229,9 +230,13 @@ class DatabaseService:
     def list_renders(self, avatar_id: str, limit: int = 50) -> list[Render]:
         """List renders for avatar (most recent first)."""
         with self.get_db() as db:
-            return db.query(Render).filter_by(avatar_id=avatar_id).order_by(
-                Render.created_at.desc()
-            ).limit(limit).all()
+            return (
+                db.query(Render)
+                .filter_by(avatar_id=avatar_id)
+                .order_by(Render.created_at.desc())
+                .limit(limit)
+                .all()
+            )
 
     # ============= AUDIO OPERATIONS =============
 
@@ -242,7 +247,7 @@ class DatabaseService:
         text: str,
         file_path: str,
         duration_ms: int = 0,
-        **kwargs
+        **kwargs,
     ) -> Audio:
         """Create audio record."""
         with self.get_db() as db:
@@ -252,7 +257,7 @@ class DatabaseService:
                 text=text,
                 file_path=file_path,
                 duration_ms=duration_ms,
-                **kwargs
+                **kwargs,
             )
             db.add(audio)
             db.commit()
@@ -266,21 +271,23 @@ class DatabaseService:
     def list_audios(self, avatar_id: str, limit: int = 50) -> list[Audio]:
         """List audios for avatar (most recent first)."""
         with self.get_db() as db:
-            return db.query(Audio).filter_by(avatar_id=avatar_id).order_by(
-                Audio.created_at.desc()
-            ).limit(limit).all()
+            return (
+                db.query(Audio)
+                .filter_by(avatar_id=avatar_id)
+                .order_by(Audio.created_at.desc())
+                .limit(limit)
+                .all()
+            )
 
     # ============= PHONEME OPERATIONS =============
 
-    def create_phoneme(self, audio_id: str, phoneme: str, start_ms: int, end_ms: int, **kwargs) -> Phoneme:
+    def create_phoneme(
+        self, audio_id: str, phoneme: str, start_ms: int, end_ms: int, **kwargs
+    ) -> Phoneme:
         """Create phoneme record."""
         with self.get_db() as db:
             ph = Phoneme(
-                audio_id=audio_id,
-                phoneme=phoneme,
-                start_ms=start_ms,
-                end_ms=end_ms,
-                **kwargs
+                audio_id=audio_id, phoneme=phoneme, start_ms=start_ms, end_ms=end_ms, **kwargs
             )
             db.add(ph)
             db.commit()
@@ -289,9 +296,7 @@ class DatabaseService:
     def get_phonemes(self, audio_id: str) -> list[Phoneme]:
         """Get all phonemes for audio."""
         with self.get_db() as db:
-            return db.query(Phoneme).filter_by(audio_id=audio_id).order_by(
-                Phoneme.start_ms
-            ).all()
+            return db.query(Phoneme).filter_by(audio_id=audio_id).order_by(Phoneme.start_ms).all()
 
     def create_phonemes_batch(self, audio_id: str, phonemes: list[dict]) -> list[Phoneme]:
         """Create multiple phonemes in one transaction."""
@@ -306,15 +311,13 @@ class DatabaseService:
 
     # ============= ASSET OPERATIONS =============
 
-    def create_asset(self, asset_id: str, name: str, asset_type: str, file_path: str, **kwargs) -> Asset:
+    def create_asset(
+        self, asset_id: str, name: str, asset_type: str, file_path: str, **kwargs
+    ) -> Asset:
         """Create asset record."""
         with self.get_db() as db:
             asset = Asset(
-                asset_id=asset_id,
-                name=name,
-                asset_type=asset_type,
-                file_path=file_path,
-                **kwargs
+                asset_id=asset_id, name=name, asset_type=asset_type, file_path=file_path, **kwargs
             )
             db.add(asset)
             db.commit()
@@ -375,7 +378,8 @@ class DatabaseService:
         with self.get_db() as db:
             return {
                 "avatars": db.query(func.count(Avatar.id)).scalar() or 0,
-                "sessions": db.query(func.count(DBSession.id)).filter_by(deleted_at=None).scalar() or 0,
+                "sessions": db.query(func.count(DBSession.id)).filter_by(deleted_at=None).scalar()
+                or 0,
                 "presets": db.query(func.count(Preset.id)).scalar() or 0,
                 "renders": db.query(func.count(Render.id)).scalar() or 0,
                 "audios": db.query(func.count(Audio.id)).scalar() or 0,

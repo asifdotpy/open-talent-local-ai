@@ -53,7 +53,9 @@ def test_render_and_sequence(client, avatar_id):
     assert r1.status_code == 200
     assert "frame_url" in r1.json()
 
-    seq = client.post("/api/v1/avatars/render/sequence", json={"avatar_id": avatar_id, "format": "png"})
+    seq = client.post(
+        "/api/v1/avatars/render/sequence", json={"avatar_id": avatar_id, "format": "png"}
+    )
     assert seq.status_code == 200
     assert len(seq.json()["frames"]) == 3
 
@@ -67,7 +69,9 @@ def test_lipsync_and_phonemes(client, avatar_id):
     assert ph.status_code == 200
     assert len(ph.json()["phonemes"]) > 0
 
-    timing = client.post("/api/v1/avatars/phonemes/timing", json={"phonemes": ["A", "B"], "audio_duration": 0.2})
+    timing = client.post(
+        "/api/v1/avatars/phonemes/timing", json={"phonemes": ["A", "B"], "audio_duration": 0.2}
+    )
     assert timing.status_code == 200
     assert len(timing.json()["alignment"]) == 2
 
@@ -83,7 +87,9 @@ def test_emotion_and_state(client, avatar_id):
     assert get_emotion.status_code == 200
     assert get_emotion.json()["emotion"] == "happy"
 
-    patch_state = client.patch(f"/api/v1/avatars/{avatar_id}/state", json={"state": {"pose": "wave"}})
+    patch_state = client.patch(
+        f"/api/v1/avatars/{avatar_id}/state", json={"state": {"pose": "wave"}}
+    )
     assert patch_state.status_code == 200
     state = client.get(f"/api/v1/avatars/{avatar_id}/state")
     assert state.status_code == 200
@@ -91,7 +97,9 @@ def test_emotion_and_state(client, avatar_id):
 
 
 def test_presets_crud(client):
-    created = client.post("/api/v1/avatars/presets", json={"name": "Hero", "values": {"style": "hero"}})
+    created = client.post(
+        "/api/v1/avatars/presets", json={"name": "Hero", "values": {"style": "hero"}}
+    )
     assert created.status_code == 200
     preset_id = created.json()["preset_id"]
 
@@ -99,7 +107,9 @@ def test_presets_crud(client):
     assert fetched.status_code == 200
     assert fetched.json()["name"] == "Hero"
 
-    updated = client.patch(f"/api/v1/avatars/presets/{preset_id}", json={"values": {"style": "heroic"}})
+    updated = client.patch(
+        f"/api/v1/avatars/presets/{preset_id}", json={"values": {"style": "heroic"}}
+    )
     assert updated.status_code == 200
     assert updated.json()["values"]["style"] == "heroic"
 
@@ -135,7 +145,10 @@ def test_assets_and_models(client, avatar_id):
 
     models = client.get("/api/v1/avatars/models")
     assert models.status_code == 200
-    select = client.post("/api/v1/avatars/models/select", json={"avatar_id": avatar_id, "model_id": "granite-avatar-pro"})
+    select = client.post(
+        "/api/v1/avatars/models/select",
+        json={"avatar_id": avatar_id, "model_id": "granite-avatar-pro"},
+    )
     assert select.status_code == 200
     assert select.json()["model_id"] == "granite-avatar-pro"
 
@@ -158,7 +171,9 @@ def test_sessions_and_streams(client, session_id, avatar_id):
 def test_config_performance_status_version(client):
     cfg = client.get("/api/v1/avatars/config")
     assert cfg.status_code == 200
-    upd = client.put("/api/v1/avatars/config", json={"quality": "high", "fps": 60, "shading": "toon"})
+    upd = client.put(
+        "/api/v1/avatars/config", json={"quality": "high", "fps": 60, "shading": "toon"}
+    )
     assert upd.status_code == 200
     perf = client.get("/api/v1/avatars/performance")
     assert perf.status_code == 200

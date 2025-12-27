@@ -1,4 +1,3 @@
-
 import os
 import subprocess
 
@@ -28,9 +27,10 @@ class PiperTTSService:
             # Check if piper executable exists
             result = subprocess.run(
                 [self.piper_path, "--version"],
-                check=False, capture_output=True,
+                check=False,
+                capture_output=True,
                 text=True,
-                timeout=5
+                timeout=5,
             )
 
             if result.returncode != 0:
@@ -75,15 +75,11 @@ class PiperTTSService:
 
             # Run Piper TTS
             process = subprocess.Popen(
-                [
-                    self.piper_path,
-                    "--model", self.model_path,
-                    "--output_file", output_file
-                ],
+                [self.piper_path, "--model", self.model_path, "--output_file", output_file],
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                text=True
+                text=True,
             )
 
             # Send text to Piper

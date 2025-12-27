@@ -9,6 +9,7 @@ def test_health_check(client: TestClient):
     assert response.status_code == 200
     assert response.json() == {"status": "healthy"}
 
+
 def test_db_status(client: TestClient):
     """Test the database status endpoint."""
     response = client.get(f"{settings.API_V1_STR}/system/db-status")

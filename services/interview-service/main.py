@@ -1,7 +1,5 @@
 import asyncio
-import logging
 import os
-import sys
 import time
 import uuid
 from datetime import datetime, timedelta
@@ -9,20 +7,14 @@ from enum import Enum
 from typing import Any, Optional
 
 import httpx
-from fastapi import (
-    FastAPI,
-    HTTPException,
-    Request,
-    WebSocket,
-    WebSocketDisconnect,
-)
+from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
 
-from config import ALLOWED_ORIGINS, TIMEOUT_CONFIG, logger, setup_logging
-from routes.vetta_routes import router as vetta_router
+from config import ALLOWED_ORIGINS, logger, setup_logging
 from routes.interview_routes import router as interview_router
+from routes.vetta_routes import router as vetta_router
 
 # Configure logging
 setup_logging()
@@ -1249,9 +1241,7 @@ async def broadcast_transcription_update(room_id: str, update: LiveTranscription
 
 
 @app.get("/api/v1/rooms/{room_id}/transcription", tags=["transcription"])
-async def get_transcription_history(
-    room_id: str, limit: int | None = None, offset: int | None = 0
-):
+async def get_transcription_history(room_id: str, limit: int | None = None, offset: int | None = 0):
     """Get transcription history for a room.
 
     Returns stored transcription segments with optional pagination.
@@ -2128,7 +2118,9 @@ async def get_interview_intelligence_report(room_id: str):
 
 if __name__ == "__main__":
     import os
+
     import uvicorn
+
     port = int(os.environ.get("PORT", 8004))
     host = os.environ.get("HOST", "127.0.0.1")
     uvicorn.run(app, host=host, port=port)

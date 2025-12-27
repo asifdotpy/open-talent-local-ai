@@ -32,7 +32,7 @@ class EmbeddingGenerator:
         skills: list[str],
         experience: list[str],
         education: list[str],
-        summary: str = ""
+        summary: str = "",
     ) -> list[float]:
         """Generate embedding for a candidate profile.
 
@@ -51,7 +51,7 @@ class EmbeddingGenerator:
             f"Name: {full_name}",
             f"Skills: {', '.join(skills)}",
             f"Experience: {' | '.join(experience)}",
-            f"Education: {' | '.join(education)}"
+            f"Education: {' | '.join(education)}",
         ]
 
         if summary:
@@ -69,7 +69,7 @@ class EmbeddingGenerator:
         title: str,
         description: str,
         required_skills: list[str],
-        responsibilities: list[str] = None
+        responsibilities: list[str] = None,
     ) -> list[float]:
         """Generate embedding for a job description.
 
@@ -86,7 +86,7 @@ class EmbeddingGenerator:
         job_parts = [
             f"Title: {title}",
             f"Description: {description}",
-            f"Required Skills: {', '.join(required_skills)}"
+            f"Required Skills: {', '.join(required_skills)}",
         ]
 
         if responsibilities:
@@ -112,9 +112,7 @@ class EmbeddingGenerator:
         return embedding.tolist()
 
     def calculate_similarity(
-        self,
-        embedding1: list[float] | np.ndarray,
-        embedding2: list[float] | np.ndarray
+        self, embedding1: list[float] | np.ndarray, embedding2: list[float] | np.ndarray
     ) -> float:
         """Calculate cosine similarity between two embeddings.
 

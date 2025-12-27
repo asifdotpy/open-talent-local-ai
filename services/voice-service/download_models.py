@@ -6,13 +6,15 @@ Downloads Vosk, Piper, and Silero models with progress tracking.
 import hashlib
 import sys
 import tarfile
-import httpx
 import zipfile
 from pathlib import Path
+
+import httpx
 
 # Progress bar support
 try:
     from tqdm import tqdm
+
     TQDM_AVAILABLE = True
 except ImportError:
     TQDM_AVAILABLE = False
@@ -29,7 +31,7 @@ class ModelDownloader:
             "url": "https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip",
             "size": "40 MB",
             "checksum": None,  # Optional: add MD5 checksum if available
-            "type": "zip"
+            "type": "zip",
         },
         "piper_lessac": {
             "name": "en_US-lessac-medium",
@@ -37,7 +39,7 @@ class ModelDownloader:
             "config_url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json",
             "size": "45 MB",
             "checksum": None,
-            "type": "file"
+            "type": "file",
         },
         "piper_amy": {
             "name": "en_US-amy-medium",
@@ -45,15 +47,15 @@ class ModelDownloader:
             "config_url": "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/amy/medium/en_US-amy-medium.onnx.json",
             "size": "43 MB",
             "checksum": None,
-            "type": "file"
+            "type": "file",
         },
         "silero_vad": {
             "name": "silero_vad",
             "url": "https://github.com/snakers4/silero-vad/raw/master/src/silero_vad/data/silero_vad.onnx",
             "size": "2 MB",
             "checksum": None,
-            "type": "file"
-        }
+            "type": "file",
+        },
     }
 
     def __init__(self, models_dir: str = "models"):
@@ -79,11 +81,13 @@ class ModelDownloader:
             async with httpx.AsyncClient(follow_redirects=True, timeout=30.0) as client:
                 async with client.stream("GET", url) as response:
                     response.raise_for_status()
-                    file_size = int(response.headers.get('Content-Length', 0))
+                    file_size = int(response.headers.get("Content-Length", 0))
 
                     with open(output_path, "wb") as f:
                         if TQDM_AVAILABLE and file_size > 0:
-                            with tqdm(total=file_size, unit='B', unit_scale=True, desc=desc) as pbar:
+                            with tqdm(
+                                total=file_size, unit="B", unit_scale=True, desc=desc
+                            ) as pbar:
                                 async for chunk in response.aiter_bytes():
                                     f.write(chunk)
                                     pbar.update(len(chunk))
@@ -134,7 +138,7 @@ class ModelDownloader:
                 return abs_target.is_relative_to(abs_directory)
 
             if archive_path.suffix == ".zip":
-                with zipfile.ZipFile(archive_path, 'r') as zip_ref:
+                with zipfile.ZipFile(archive_path, "r") as zip_ref:
                     # Security check: Validate and extract all members individually
                     for member in zip_ref.namelist():
                         member_path = extract_to / member
@@ -142,7 +146,7 @@ class ModelDownloader:
                             raise Exception(f"Unsafe ZIP member detected: {member}")
                         zip_ref.extract(member, extract_to)
             elif archive_path.suffix in [".tar", ".gz", ".tgz"]:
-                with tarfile.open(archive_path, 'r:*') as tar_ref:
+                with tarfile.open(archive_path, "r:*") as tar_ref:
                     # Security check: Validate and extract all members individually
                     for member in tar_ref.getmembers():
                         member_path = extract_to / member.name
@@ -178,11 +182,15 @@ class ModelDownloader:
 
         # Download archive
         archive_path = self.models_dir / f"{model_name}.zip"
-        if not await self.download_file(model_info["url"], archive_path, f"Vosk Model ({model_info['size']})"):
+        if not await self.download_file(
+            model_info["url"], archive_path, f"Vosk Model ({model_info['size']})"
+        ):
             return False
 
         # Verify checksum if available
-        if model_info["checksum"] and not self.verify_checksum(archive_path, model_info["checksum"]):
+        if model_info["checksum"] and not self.verify_checksum(
+            archive_path, model_info["checksum"]
+        ):
             archive_path.unlink()
             return False
 
@@ -210,7 +218,9 @@ class ModelDownloader:
         model_path = self.models_dir / f"{model_name}.onnx"
         if model_path.exists():
             print(f"✓ Model already exists: {model_path}")
-        elif not await self.download_file(model_info["url"], model_path, f"Piper Voice ({model_info['size']})"):
+        elif not await self.download_file(
+            model_info["url"], model_path, f"Piper Voice ({model_info['size']})"
+        ):
             return False
 
         # Download config JSON
@@ -238,7 +248,9 @@ class ModelDownloader:
             print(f"✓ Model already exists: {model_path}")
             return True
 
-        if not await self.download_file(model_info["url"], model_path, f"Silero VAD ({model_info['size']})"):
+        if not await self.download_file(
+            model_info["url"], model_path, f"Silero VAD ({model_info['size']})"
+        ):
             return False
 
         print(f"✓ Silero VAD ready: {model_path}")
@@ -246,20 +258,20 @@ class ModelDownloader:
 
     async def download_all(self) -> bool:
         """Download all required models."""
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("Voice Service Model Downloader")
-        print("="*60)
+        print("=" * 60)
         print(f"Models directory: {self.models_dir.absolute()}")
         print("\nThis will download:")
         print("  1. Vosk STT model (40 MB - small model)")
         print("  2. Piper TTS voices (45 MB each)")
         print("  3. Silero VAD model (2 MB)")
         print("\nTotal download: ~135 MB")
-        print("="*60)
+        print("=" * 60)
 
         # Confirm download
         response = input("\nProceed with download? [y/N]: ").strip().lower()
-        if response not in ['y', 'yes']:
+        if response not in ["y", "yes"]:
             print("Download cancelled.")
             return False
 
@@ -278,7 +290,7 @@ class ModelDownloader:
         if not await self.download_silero_vad():
             success = False
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         if success:
             print("✓ All models downloaded successfully!")
             print(f"\nModels location: {self.models_dir.absolute()}")
@@ -286,7 +298,7 @@ class ModelDownloader:
             print("  python main.py")
         else:
             print("✗ Some downloads failed. Please check errors above.")
-        print("="*60)
+        print("=" * 60)
 
         return success
 
@@ -302,23 +314,13 @@ def main():
         "--models-dir",
         type=str,
         default="models",
-        help="Directory to store models (default: models)"
+        help="Directory to store models (default: models)",
     )
     parser.add_argument(
-        "--vosk-only",
-        action="store_true",
-        help="Download only Vosk STT model (40MB small model)"
+        "--vosk-only", action="store_true", help="Download only Vosk STT model (40MB small model)"
     )
-    parser.add_argument(
-        "--piper-only",
-        action="store_true",
-        help="Download only Piper TTS voices"
-    )
-    parser.add_argument(
-        "--vad-only",
-        action="store_true",
-        help="Download only Silero VAD model"
-    )
+    parser.add_argument("--piper-only", action="store_true", help="Download only Piper TTS voices")
+    parser.add_argument("--vad-only", action="store_true", help="Download only Silero VAD model")
 
     args = parser.parse_args()
 
@@ -328,10 +330,9 @@ def main():
         if args.vosk_only:
             success = await downloader.download_vosk_model()
         elif args.piper_only:
-            success = (
-                await downloader.download_piper_voice("piper_lessac") and
-                await downloader.download_piper_voice("piper_amy")
-            )
+            success = await downloader.download_piper_voice(
+                "piper_lessac"
+            ) and await downloader.download_piper_voice("piper_amy")
         elif args.vad_only:
             success = await downloader.download_silero_vad()
         else:
@@ -339,6 +340,7 @@ def main():
         return success
 
     import asyncio
+
     success = asyncio.run(run())
 
     sys.exit(0 if success else 1)
