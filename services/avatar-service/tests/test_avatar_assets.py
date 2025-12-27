@@ -1,5 +1,4 @@
-"""
-Asset route tests for avatar API.
+"""Asset route tests for avatar API.
 Validates asset serving, path traversal safety, MIME types, and caching.
 Marked with @pytest.mark.assets for conditional execution.
 """
@@ -80,7 +79,7 @@ class TestAssetPathTraversalSafety:
 
     @pytest.mark.assets
     def test_download_path_traversal_backslash(self, client):
-        """..\\..\\windows\\system32 should be rejected."""
+        r"""..\\..\\windows\\system32 should be rejected."""
         res = client.get(
             "/api/v1/avatars/assets/download",
             params={"name": "..\\..\\windows\\system32"}
@@ -98,7 +97,7 @@ class TestAssetPathTraversalSafety:
 
     @pytest.mark.assets
     def test_download_null_byte_injection(self, client):
-        """Null bytes avatar.fbx\x00.txt should be rejected."""
+        r"""Null bytes avatar.fbx\x00.txt should be rejected."""
         res = client.get(
             "/api/v1/avatars/assets/download",
             params={"name": "avatar.fbx\x00.txt"}
@@ -179,7 +178,7 @@ class TestAssetSizeAndCaching:
             if "assets" in body and isinstance(body["assets"], list):
                 for asset in body["assets"]:
                     # May have checksum, sha256, md5, or hash
-                    has_hash = any(k in asset for k in ["checksum", "sha256", "md5", "hash"])
+                    any(k in asset for k in ["checksum", "sha256", "md5", "hash"])
                     # Not required in stub, but nice to have
 
     @pytest.mark.assets
@@ -191,11 +190,7 @@ class TestAssetSizeAndCaching:
         )
         if res.status_code == 200:
             # Should have cache control or ETag
-            has_cache = (
-                "cache-control" in res.headers or
-                "etag" in res.headers or
-                "last-modified" in res.headers
-            )
+            pass
             # Not strictly required, but good practice
 
 
@@ -229,7 +224,7 @@ class TestAssetMetadata:
         res = client.get("/api/v1/avatars/assets")
         body = res.json()
         # May have version at top level or per-asset
-        has_version = (
+        (
             "version" in body or
             "api_version" in body or
             ("assets" in body and body["assets"] and "version" in body["assets"][0])

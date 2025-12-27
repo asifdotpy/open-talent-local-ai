@@ -1,12 +1,12 @@
-"""
-Tests for AI Auditing Service (aligned to singular 'audit' endpoints)
-Runs in-process via ASGITransport (no external server required)
+"""Tests for AI Auditing Service (aligned to singular 'audit' endpoints)
+Runs in-process via ASGITransport (no external server required).
 """
 
 import importlib
 import os
-import pytest
+
 import httpx
+import pytest
 from httpx import ASGITransport
 
 

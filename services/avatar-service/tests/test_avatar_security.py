@@ -1,5 +1,4 @@
-"""
-Security and robustness tests for avatar API endpoints.
+"""Security and robustness tests for avatar API endpoints.
 Validates CORS, content-type checks, path traversal protection, and request limits.
 """
 
@@ -66,7 +65,7 @@ class TestPathTraversalProtection:
         assert res.status_code in [404, 422]
 
     def test_src_backslash_traversal(self, client):
-        """GET /src/..\\..\\config.json should be rejected."""
+        r"""GET /src/..\\..\\config.json should be rejected."""
         res = client.get("/src/..\\../config.json")
         assert res.status_code in [404, 422]
 
@@ -93,7 +92,7 @@ class TestRequestLimiting:
 
     def test_lipsync_endpoint_accepts_large_phoneme_list(self, client):
         """Large phoneme lists should be handled."""
-        large_phonemes = [{"phoneme": "A", "t": float(i) * 0.01} for i in range(1000)]
+        [{"phoneme": "A", "t": float(i) * 0.01} for i in range(1000)]
         res = client.post(
             "/api/v1/avatars/lipsync",
             json={"avatar_id": "test", "text": "test"},

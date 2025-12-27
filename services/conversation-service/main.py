@@ -30,7 +30,11 @@ app = FastAPI(
 
 @app.get("/")
 async def root():
-    """Root endpoint for the Conversation Service."""
+    """Service identification endpoint for the Conversation Service.
+
+    Returns:
+        A dictionary confirming the service name, version, and documentation links.
+    """
     return {
         "message": "Conversation Service is running!",
         "service": "OpenTalent Conversation Service",
@@ -47,13 +51,21 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint for the Conversation Service."""
+    """Standard health check endpoint for system monitoring and orchestration.
+
+    Returns:
+        A dictionary confirming the service health status.
+    """
     return {"status": "healthy"}
 
 
 @app.get("/doc", include_in_schema=False)
 async def doc_redirect():
-    """Alternative redirect to API documentation."""
+    """Redirect alternative documentation path to the standard Swagger UI.
+
+    Returns:
+        A RedirectResponse to the /docs endpoint.
+    """
     return RedirectResponse(url="/docs")
 
 
@@ -88,6 +100,8 @@ async def api_docs_info():
 app.include_router(interview.router)
 
 if __name__ == "__main__":
+    import os
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8003)
+    host = os.getenv("HOST", "127.0.0.1")
+    uvicorn.run(app, host=host, port=8003)

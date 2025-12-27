@@ -1,3 +1,3 @@
-"""Candidate Service Package"""
+"""Candidate Service Package."""
 
 __version__ = "1.0.0"

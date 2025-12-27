@@ -1,6 +1,7 @@
+from unittest.mock import Mock, patch
+
 import pytest
-import numpy as np
-from unittest.mock import Mock, patch, MagicMock
+
 from services.vad_service import VoiceActivityDetector
 
 
@@ -27,8 +28,8 @@ class TestVoiceActivityDetector:
         """Test custom initialization parameters."""
         # Note: VAD service reads environment variables at module level
         # We need to reload the module to test different env values
-        import os
         import importlib
+        import os
 
         old_aggressiveness = os.environ.get("VAD_AGGRESSIVENESS")
         old_sample_rate = os.environ.get("VAD_SAMPLE_RATE")

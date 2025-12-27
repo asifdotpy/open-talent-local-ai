@@ -37,7 +37,7 @@ def test_bulk_import_happy_path():
     assert result["failed"] == 0
     assert len(result["candidate_ids"]) == 3
     assert len(result["errors"]) == 0
-    
+
     # Verify candidates were created
     for cand_id in result["candidate_ids"]:
         r2 = client.get(f"/api/v1/candidates/{cand_id}", headers=AUTH)

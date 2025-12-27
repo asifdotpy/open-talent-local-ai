@@ -1,14 +1,23 @@
 import json
-from typing import Dict, Any, Optional, List, AsyncIterator
 import logging
 import os
 import uuid
 from datetime import datetime, timedelta
-import asyncio
+from typing import Any
+
 import httpx
 
 from .database_service import database_service
 from .modular_sentiment_service import modular_sentiment_service
+from ..core.constants import (
+    CONVERSATION_TOPICS,
+    INTERVIEW_PHASES,
+    INTERVIEWER_SYSTEM_PROMPT,
+    MOCK_GREETINGS,
+    SENTIMENT_CONTEXT_TEMPLATE,
+    TECH_KEYWORDS,
+    USER_MESSAGE_TEMPLATE,
+)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -29,7 +38,7 @@ class ConversationService:
     """Service for managing real-time interview conversations with adaptive questioning."""
 
     def __init__(self):
-        self.active_conversations: Dict[str, Dict[str, Any]] = {}
+        self.active_conversations: dict[str, dict[str, Any]] = {}
         self.conversation_timeout = timedelta(minutes=60)  # Auto-cleanup after 1 hour
         self.ollama_client = httpx.AsyncClient(
             base_url=OLLAMA_HOST,
@@ -40,12 +49,25 @@ class ConversationService:
         self,
         session_id: str,
         job_description: str,
-        candidate_profile: Optional[Dict[str, Any]] = None,
+        candidate_profile: dict[str, Any] | None = None,
         interview_type: str = "technical",
         tone: str = "professional"
-    ) -> Dict[str, Any]:
-        """Start a new interview conversation session."""
+    ) -> dict[str, Any]:
+        """Initialize a new interview conversation session.
 
+        Creates a unique conversation context, persists it to the database,
+        and generates an initial greeting message for the candidate.
+
+        Args:
+            session_id: The interview session identifier.
+            job_description: Structured job requirements or text description.
+            candidate_profile: Optional dictionary containing candidate details.
+            interview_type: The focus of the interview (e.g., 'technical', 'behavioral').
+            tone: The desired conversational tone (e.g., 'professional', 'casual').
+
+        Returns:
+            A dictionary containing the new conversation_id and initial greeting.
+        """
         conversation_id = f"conv_{uuid.uuid4().hex[:12]}"
 
         # Create conversation context
@@ -86,10 +108,22 @@ class ConversationService:
         session_id: str,
         message: str,
         message_type: str = "transcript",
-        metadata: Optional[Dict[str, Any]] = None
-    ) -> Optional[Dict[str, Any]]:
-        """Process an incoming message and generate an adaptive response."""
+        metadata: dict[str, Any] | None = None
+    ) -> dict[str, Any] | None:
+        """Process an incoming message from the candidate and generate an AI response.
 
+        Updates the conversation history, performs sentiment analysis on candidate
+        transcripts, and uses the LLM to generate an adaptive follow-up.
+
+        Args:
+            session_id: The interview session identifier.
+            message: The content of the incoming message.
+            message_type: Type of message ('transcript', 'user_input', 'system').
+            metadata: Optional dictionary with additional message data.
+
+        Returns:
+            A dictionary containing the AI response and metadata, or None if session not found.
+        """
         # Find conversation by session_id
         conversation = None
         for conv in self.active_conversations.values():
@@ -145,7 +179,7 @@ class ConversationService:
                 "timestamp": datetime.now(),
                 "metadata": response.get("metadata", {})
             })
-            
+
             # Save AI response to database
             database_service.save_message(
                 conversation_id=conversation["conversation_id"],
@@ -154,15 +188,14 @@ class ConversationService:
                 speaker="ai",
                 metadata=response.get("metadata")
             )
-            
+
             # Update conversation state in database
             database_service.save_conversation(conversation)
 
         return response
 
-    async def get_conversation_status(self, session_id: str) -> Optional[Dict[str, Any]]:
+    async def get_conversation_status(self, session_id: str) -> dict[str, Any] | None:
         """Get the status of a conversation by session_id."""
-
         for conv in self.active_conversations.values():
             if conv["session_id"] == session_id:
                 return {
@@ -178,23 +211,21 @@ class ConversationService:
 
     async def end_conversation(self, session_id: str) -> bool:
         """End a conversation session."""
-
         for conv_id, conv in list(self.active_conversations.items()):
             if conv["session_id"] == session_id:
                 conv["status"] = "completed"
                 conv["end_time"] = datetime.now()
-                
+
                 # Persist final state to database
                 database_service.save_conversation(conv)
-                
+
                 logger.info(f"Ended conversation {conv_id} for session {session_id}")
                 return True
 
         return False
 
-    async def _generate_initial_message(self, context: Dict[str, Any]) -> str:
+    async def _generate_initial_message(self, context: dict[str, Any]) -> str:
         """Generate the initial greeting message for the interview."""
-
         if USE_MOCK:
             return self._generate_mock_initial_message(context)
 
@@ -214,13 +245,12 @@ class ConversationService:
 
     async def _process_transcript(
         self,
-        conversation: Dict[str, Any],
+        conversation: dict[str, Any],
         transcript: str,
-        metadata: Optional[Dict[str, Any]] = None,
-        sentiment_result: Optional[Any] = None
-    ) -> Dict[str, Any]:
+        metadata: dict[str, Any] | None = None,
+        sentiment_result: Any | None = None
+    ) -> dict[str, Any]:
         """Process a speech transcript and generate an adaptive response."""
-
         if USE_MOCK:
             return self._generate_mock_transcript_response(conversation, transcript, metadata, sentiment_result)
 
@@ -232,31 +262,19 @@ class ConversationService:
             # Include sentiment context in the prompt if available
             sentiment_context = ""
             if sentiment_result:
-                sentiment_context = f"""
-Candidate's response sentiment: {sentiment_result.sentiment} (confidence: {sentiment_result.confidence:.2f})
-Sentiment scores: {sentiment_result.scores}
+                sentiment_context = SENTIMENT_CONTEXT_TEMPLATE.format(
+                    sentiment=sentiment_result.sentiment,
+                    confidence=sentiment_result.confidence,
+                    scores=sentiment_result.scores
+                )
 
-Use this sentiment information to adapt your response:
-- If negative sentiment: Be more encouraging and understanding
-- If positive sentiment: Build on their enthusiasm
-- If neutral sentiment: Continue with standard questioning
-"""
-
-            user_message = f"""Candidate's response: "{transcript}"
-
-{sentiment_context}
-
-Conversation context:
-{conversation_history}
-
-Generate an appropriate follow-up question or response based on:
-1. The candidate's answer quality and depth
-2. Current interview topic: {conversation.get('current_topic', 'general')}
-3. Number of questions asked: {conversation['question_count']}
-4. Job requirements from the description
-5. Candidate's sentiment and emotional state
-
-Provide a natural, conversational follow-up that advances the interview while being sensitive to the candidate's emotional state."""
+            user_message = USER_MESSAGE_TEMPLATE.format(
+                transcript=transcript,
+                sentiment_context=sentiment_context,
+                conversation_history=conversation_history,
+                current_topic=conversation.get('current_topic', 'general'),
+                question_count=conversation['question_count']
+            )
 
             response_text = await self._call_ollama(
                 system_prompt=system_prompt,
@@ -301,9 +319,8 @@ Provide a natural, conversational follow-up that advances the interview while be
             # Fallback to mock response on error
             return self._generate_mock_transcript_response(conversation, transcript, metadata)
 
-    async def _process_user_input(self, conversation: Dict[str, Any], message: str) -> Dict[str, Any]:
+    async def _process_user_input(self, conversation: dict[str, Any], message: str) -> dict[str, Any]:
         """Process direct user input (not from speech)."""
-
         return {
             "conversation_id": conversation["conversation_id"],
             "session_id": conversation["session_id"],
@@ -312,9 +329,8 @@ Provide a natural, conversational follow-up that advances the interview while be
             "should_speak": True
         }
 
-    async def _process_system_message(self, conversation: Dict[str, Any], message: str) -> Dict[str, Any]:
+    async def _process_system_message(self, conversation: dict[str, Any], message: str) -> dict[str, Any]:
         """Process system-level messages."""
-
         return {
             "conversation_id": conversation["conversation_id"],
             "session_id": conversation["session_id"],
@@ -323,26 +339,19 @@ Provide a natural, conversational follow-up that advances the interview while be
             "should_speak": False
         }
 
-    def _generate_mock_initial_message(self, context: Dict[str, Any]) -> str:
+    def _generate_mock_initial_message(self, context: dict[str, Any]) -> str:
         """Generate a mock initial greeting."""
-
-        greetings = [
-            f"Hello! Welcome to your {context['interview_type']} interview. I'm here to learn about your background and experience.",
-            f"Hi there! Thanks for joining this {context['interview_type']} interview. Let's start with your professional journey.",
-            f"Good day! I'm looking forward to our {context['interview_type']} conversation. Could you begin by telling me about yourself?"
-        ]
-
+        greetings = [g.format(interview_type=context['interview_type']) for g in MOCK_GREETINGS]
         return greetings[hash(context["session_id"]) % len(greetings)]
 
     def _generate_mock_transcript_response(
         self,
-        conversation: Dict[str, Any],
+        conversation: dict[str, Any],
         transcript: str,
-        metadata: Optional[Dict[str, Any]] = None,
-        sentiment_result: Optional[Any] = None
-    ) -> Dict[str, Any]:
+        metadata: dict[str, Any] | None = None,
+        sentiment_result: Any | None = None
+    ) -> dict[str, Any]:
         """Generate mock responses based on transcript content."""
-
         transcript_lower = transcript.lower()
         conversation["question_count"] += 1
 
@@ -410,86 +419,62 @@ Provide a natural, conversational follow-up that advances the interview while be
             "metadata": response_metadata
         }
 
-    def _extract_tech_keywords(self, text: str) -> List[str]:
+    def _extract_tech_keywords(self, text: str) -> list[str]:
         """Extract technical keywords from text."""
-
-        tech_keywords = [
-            "python", "javascript", "react", "node.js", "django", "flask",
-            "postgresql", "mysql", "mongodb", "redis", "docker", "kubernetes",
-            "aws", "azure", "gcp", "linux", "git", "api", "rest", "graphql",
-            "machine learning", "ai", "data science", "frontend", "backend"
-        ]
-
         found = []
         text_lower = text.lower()
-        for keyword in tech_keywords:
+        for keyword in TECH_KEYWORDS:
             if keyword in text_lower:
                 found.append(keyword)
 
         return found[:3]  # Return up to 3 keywords
 
-    def _build_system_prompt(self, context: Dict[str, Any]) -> str:
+    def _build_system_prompt(self, context: dict[str, Any]) -> str:
         """Build comprehensive system prompt for the LLM based on interview context."""
-        
         job_desc = context.get("job_description", "software engineering position")
         interview_type = context.get("interview_type", "technical")
         tone = context.get("tone", "professional")
-        
-        return f"""You are an expert technical interviewer conducting a {interview_type} interview.
+        question_count = context.get("question_count", 0)
 
-Interview Context:
-- Position: {job_desc}
-- Tone: {tone} and conversational
-- Current question: {context.get('question_count', 0) + 1}
-
-Your responsibilities:
-1. Ask insightful, relevant questions about the candidate's experience and skills
-2. Listen carefully to responses and ask adaptive follow-up questions
-3. Assess technical depth, problem-solving ability, and communication skills
-4. Keep questions focused and interview flowing naturally
-5. Be encouraging while maintaining professional standards
-
-Guidelines:
-- Ask ONE question at a time
-- Keep questions concise (2-3 sentences max)
-- Build on previous answers naturally
-- Vary question types (technical, behavioral, situational)
-- Don't repeat topics already covered
-- Conclude gracefully after 8-10 questions
-
-Current interview stage: {self._get_interview_stage(context.get('question_count', 0))}"""
+        return INTERVIEWER_SYSTEM_PROMPT.format(
+            interview_type=interview_type,
+            job_description=job_desc,
+            tone=tone,
+            question_number=question_count + 1,
+            interview_stage=self._get_interview_stage(question_count)
+        )
 
     def _get_interview_stage(self, question_count: int) -> str:
         """Determine current interview stage based on question count."""
         if question_count == 0:
-            return "Opening - Build rapport, understand background"
+            return INTERVIEW_PHASES["introduction"]
         elif question_count < 3:
-            return "Early - Explore recent experience and skills"
+            return INTERVIEW_PHASES["early"]
         elif question_count < 6:
-            return "Middle - Deep dive into technical abilities and projects"
+            return INTERVIEW_PHASES["middle"]
         elif question_count < 9:
-            return "Late - Assess problem-solving and team collaboration"
+            return INTERVIEW_PHASES["late"]
         else:
-            return "Closing - Wrap up, invite candidate questions"
+            return INTERVIEW_PHASES["closing"]
 
-    def _format_conversation_history(self, conversation: Dict[str, Any]) -> str:
+    def _format_conversation_history(self, conversation: dict[str, Any]) -> str:
         """Format recent conversation history for context."""
         messages = conversation.get("messages", [])
         history = []
-        
+
         # Include last 4 exchanges for context
         for msg in messages[-8:]:
             if msg["type"] == "transcript":
                 history.append(f"Candidate: {msg['content']}")
             elif msg["type"] == "response":
                 history.append(f"Interviewer: {msg['content']}")
-        
+
         return "\n".join(history) if history else "No prior conversation"
 
     def _classify_response_type(self, response_text: str) -> str:
         """Classify the type of response generated."""
         text_lower = response_text.lower()
-        
+
         if "?" in response_text:
             return "question"
         elif any(word in text_lower for word in ["thank", "appreciate", "great", "excellent"]):
@@ -502,37 +487,26 @@ Current interview stage: {self._get_interview_stage(context.get('question_count'
     def _determine_topic(self, transcript: str, response: str) -> str:
         """Determine conversation topic from transcript and response."""
         combined = (transcript + " " + response).lower()
-        
-        topics = {
-            "experience": ["experience", "worked", "years", "background"],
-            "projects": ["project", "built", "developed", "created"],
-            "technical": ["technical", "code", "algorithm", "design", "architecture"],
-            "challenges": ["challenge", "problem", "difficult", "overcome"],
-            "teamwork": ["team", "collaborate", "communication", "leadership"],
-            "motivation": ["why", "motivated", "interested", "passion"],
-            "wrap_up": ["questions", "anything else", "conclude", "final"]
-        }
-        
-        for topic, keywords in topics.items():
+
+        for topic, keywords in CONVERSATION_TOPICS.items():
             if any(keyword in combined for keyword in keywords):
                 return topic
-        
+
         return "general"
 
     async def _call_ollama(
         self,
         system_prompt: str,
         user_message: str,
-        context: Dict[str, Any]
+        context: dict[str, Any]
     ) -> str:
         """Call Ollama API for LLM response with error handling."""
-        
         try:
             if ENABLE_STREAMING:
                 return await self._call_ollama_streaming(system_prompt, user_message, context)
             else:
                 return await self._call_ollama_non_streaming(system_prompt, user_message, context)
-        
+
         except httpx.TimeoutException:
             logger.error(f"Ollama API timeout after {OLLAMA_TIMEOUT}s")
             raise
@@ -547,10 +521,9 @@ Current interview stage: {self._get_interview_stage(context.get('question_count'
         self,
         system_prompt: str,
         user_message: str,
-        context: Dict[str, Any]
+        context: dict[str, Any]
     ) -> str:
         """Non-streaming Ollama API call."""
-        
         payload = {
             "model": MODEL,
             "messages": [
@@ -564,11 +537,11 @@ Current interview stage: {self._get_interview_stage(context.get('question_count'
                 "max_tokens": 150  # Keep responses concise
             }
         }
-        
+
         logger.info(f"Calling Ollama API (non-streaming) with model {MODEL}")
         response = await self.ollama_client.post("/api/chat", json=payload)
         response.raise_for_status()
-        
+
         result = response.json()
         return result["message"]["content"].strip()
 
@@ -576,10 +549,9 @@ Current interview stage: {self._get_interview_stage(context.get('question_count'
         self,
         system_prompt: str,
         user_message: str,
-        context: Dict[str, Any]
+        context: dict[str, Any]
     ) -> str:
         """Streaming Ollama API call - collects full response."""
-        
         payload = {
             "model": MODEL,
             "messages": [
@@ -593,10 +565,10 @@ Current interview stage: {self._get_interview_stage(context.get('question_count'
                 "max_tokens": 150
             }
         }
-        
+
         logger.info(f"Calling Ollama API (streaming) with model {MODEL}")
         full_response = []
-        
+
         async with self.ollama_client.stream("POST", "/api/chat", json=payload) as response:
             response.raise_for_status()
             async for line in response.aiter_lines():
@@ -606,21 +578,20 @@ Current interview stage: {self._get_interview_stage(context.get('question_count'
                         if "message" in chunk and "content" in chunk["message"]:
                             content = chunk["message"]["content"]
                             full_response.append(content)
-                            
+
                             # Log progress for long responses
                             if len(full_response) % 10 == 0:
                                 logger.debug(f"Streaming progress: {len(full_response)} chunks")
                     except json.JSONDecodeError:
                         logger.warning(f"Failed to parse streaming chunk: {line}")
                         continue
-        
+
         result = "".join(full_response).strip()
         logger.info(f"Streaming complete: {len(result)} characters")
         return result
 
     async def cleanup_expired_conversations(self):
         """Clean up conversations that have been inactive too long."""
-
         now = datetime.now()
         expired = []
 
@@ -631,19 +602,21 @@ Current interview stage: {self._get_interview_stage(context.get('question_count'
         for conv_id in expired:
             del self.active_conversations[conv_id]
             logger.info(f"Cleaned up expired conversation {conv_id}")
-    
+
     async def generate_adaptive_question(
         self,
         room_id: str,
         session_id: str,
-        previous_responses: List[Dict[str, Any]] = [],
+        previous_responses: list[dict[str, Any]] = None,
         expertise_level: str = "intermediate",
         job_requirements: str = "",
         question_number: int = 1,
         interview_phase: str = "technical",
         bias_mitigation: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate the next adaptive interview question based on context."""
+        if previous_responses is None:
+            previous_responses = []
         try:
             # Generate question based on phase and expertise
             question_text = self._generate_question_for_phase(expertise_level, interview_phase, question_number)
@@ -679,10 +652,14 @@ Current interview stage: {self._get_interview_stage(context.get('question_count'
         self,
         response_text: str,
         question_context: str,
-        sentiment: Dict[str, Any] = {},
-        quality: Dict[str, Any] = {}
-    ) -> Dict[str, Any]:
+        sentiment: dict[str, Any] = None,
+        quality: dict[str, Any] = None
+    ) -> dict[str, Any]:
         """Generate follow-up questions based on response analysis."""
+        if quality is None:
+            quality = {}
+        if sentiment is None:
+            sentiment = {}
         try:
             questions = []
 
@@ -730,9 +707,11 @@ Current interview stage: {self._get_interview_stage(context.get('question_count'
         self,
         current_phase: str,
         time_remaining_minutes: int,
-        performance_indicators: Dict[str, Any] = {}
-    ) -> Dict[str, Any]:
+        performance_indicators: dict[str, Any] = None
+    ) -> dict[str, Any]:
         """Generate interview adaptation recommendations."""
+        if performance_indicators is None:
+            performance_indicators = {}
         try:
             adaptations = {
                 "question_difficulty": "medium",
@@ -776,7 +755,6 @@ Current interview stage: {self._get_interview_stage(context.get('question_count'
 
     def _generate_question_for_phase(self, expertise_level: str, phase: str, question_number: int) -> str:
         """Generate a question appropriate for the interview phase and expertise level."""
-
         # Base questions by phase
         phase_questions = {
             "introduction": [

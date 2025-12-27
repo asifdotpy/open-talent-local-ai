@@ -14,14 +14,14 @@ Fixtures:
 Pytest configuration and shared fixtures for User Service tests.
 """
 
-import pytest
-from fastapi.testclient import TestClient
 from datetime import datetime, timedelta
-import jwt
 
-from app.main import app
+import jwt
+import pytest
 from app.config import settings
+from app.main import app
 from app.utils import JWTClaims
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture

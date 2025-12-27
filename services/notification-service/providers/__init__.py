@@ -1,8 +1,9 @@
-import os
 import asyncio
-from .novu import NovuProvider
+import os
+
 from .apprise import AppriseProvider
 from .base import NotificationProvider
+from .novu import NovuProvider
 
 RETRY_ATTEMPTS = int(os.getenv("NOTIFY_RETRY_ATTEMPTS", "2"))
 RETRY_BACKOFF_SEC = float(os.getenv("NOTIFY_RETRY_BACKOFF_SEC", "0.3"))
@@ -14,7 +15,7 @@ class FallbackProvider(NotificationProvider):
 
     async def _try(self, func_name: str, *args, **kwargs):
         last_error = None
-        for attempt in range(RETRY_ATTEMPTS):
+        for _attempt in range(RETRY_ATTEMPTS):
             try:
                 func = getattr(self.primary, func_name)
                 return await func(*args, **kwargs)

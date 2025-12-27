@@ -5,10 +5,22 @@ on:
     branches: [main, dev]
     paths:
       - 'microservices/voice-service/**'
+      - 'services/voice-service/**'
+    paths-ignore:
+      - '**.md'
+      - 'internal/**'
+      - 'specs/**'
+      - 'docs/**'
   pull_request:
     branches: [main, dev]
     paths:
       - 'microservices/voice-service/**'
+      - 'services/voice-service/**'
+    paths-ignore:
+      - '**.md'
+      - 'internal/**'
+      - 'specs/**'
+      - 'docs/**'
 
 jobs:
   test-voice-service:

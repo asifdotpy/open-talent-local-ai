@@ -5,9 +5,9 @@ Port: 8009
 Purpose: Desktop app integration, local services coordination
 """
 
-import pytest
+
 import httpx
-from typing import Dict, Any
+import pytest
 
 
 @pytest.fixture

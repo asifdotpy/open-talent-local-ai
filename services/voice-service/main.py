@@ -1,5 +1,5 @@
 """Voice Service - Local Speech Processing
-Powered by Vosk (STT), Piper (TTS), and Silero (VAD)
+Powered by Vosk (STT), Piper (TTS), and Silero (VAD).
 """
 
 import asyncio
@@ -8,7 +8,6 @@ import logging
 import os
 import tempfile
 from datetime import datetime
-from typing import Optional
 
 from fastapi import (
     Body,
@@ -56,49 +55,18 @@ except ImportError:
     start_webrtc_worker = None
     logger.warning("WebRTC worker not available. Install aiortc for WebRTC support.")
 
+from app.core.constants import (
+    DEFAULT_OPENAI_TTS_MODEL,
+    DEFAULT_OPENAI_TTS_VOICE,
+    SERVICE_DESCRIPTION,
+    SERVICE_NAME,
+    SERVICE_VERSION,
+)
+
 app = FastAPI(
-    title="Voice Service API",
-    description="""
-    Local Speech Processing Service for OpenTalent Platform
-
-    **Capabilities:**
-    - **Speech-to-Text (STT)**: Real-time transcription using Vosk
-    - **Text-to-Speech (TTS)**: High-quality synthesis using Piper (local) or OpenAI API
-    - **Voice Activity Detection (VAD)**: Silence filtering using Silero
-    - **WebRTC Integration**: Real-time audio streaming for interviews
-    - **WebSocket Streaming**: Bidirectional audio streaming
-
-    **API Documentation:**
-    - Interactive Swagger UI: `/docs`
-    - Alternative docs URL: `/doc`
-    - ReDoc documentation: `/redoc`
-    - OpenAPI schema: `/openapi.json`
-    - API endpoints summary: `/api-docs`
-
-    **Service Stack:** Vosk + Modular TTS (Piper/OpenAI) + Silero + WebRTC + FastAPI
-
-    **Quick Start with Docker:**
-    ```bash
-    # Build image
-    docker build -t voice-service:latest .
-
-    # Run container
-    docker run -d -p 8002:8002 \
-      -e OPENAI_API_KEY=your_key_here \
-      --name voice-service \
-      voice-service:latest
-
-    # Or use docker-compose
-    docker-compose up -d
-    ```
-
-    **Environment Variables:**
-    - `USE_MOCK_SERVICES`: Use mock services for testing (default: false)
-    - `OPENAI_API_KEY`: OpenAI API key for TTS (required for production)
-    - `OPENAI_TTS_MODEL`: TTS model (default: gpt-4o-mini-tts)
-    - `OPENAI_TTS_VOICE`: Default voice (default: alloy)
-    """,
-    version="2.1.0",
+    title=f"{SERVICE_NAME} API",
+    description=SERVICE_DESCRIPTION,
+    version=SERVICE_VERSION,
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
@@ -206,8 +174,8 @@ else:
         tts_service = ModularTTSService(
             provider="openai",
             openai_api_key=os.getenv("OPENAI_API_KEY"),
-            openai_model=os.getenv("OPENAI_TTS_MODEL", "gpt-4o-mini-tts"),
-            openai_voice=os.getenv("OPENAI_TTS_VOICE", "alloy"),
+            openai_model=os.getenv("OPENAI_TTS_MODEL", DEFAULT_OPENAI_TTS_MODEL),
+            openai_voice=os.getenv("OPENAI_TTS_VOICE", DEFAULT_OPENAI_TTS_VOICE),
         )
     else:
         logger.info("Using local Piper TTS for production")
@@ -242,13 +210,12 @@ webrtc_task = None
 
 if WEBRTC_AVAILABLE and ENABLE_WEBRTC and not USE_MOCK:
     logger.info("WebRTC support enabled - will start worker on app startup")
+elif not WEBRTC_AVAILABLE:
+    logger.warning("WebRTC support disabled - aiortc not installed")
+elif USE_MOCK:
+    logger.info("WebRTC support disabled in mock mode")
 else:
-    if not WEBRTC_AVAILABLE:
-        logger.warning("WebRTC support disabled - aiortc not installed")
-    elif USE_MOCK:
-        logger.info("WebRTC support disabled in mock mode")
-    else:
-        logger.info("WebRTC support disabled via ENABLE_WEBRTC=false")
+    logger.info("WebRTC support disabled via ENABLE_WEBRTC=false")
 
 
 @app.on_event("startup")
@@ -300,7 +267,11 @@ from schemas import (  # TTS Schemas; STT Schemas; VAD Schemas (using base model
 # --- API Endpoints ---
 @app.get("/", tags=["health"], summary="Service root endpoint")
 async def root():
-    """Root endpoint for the Voice Service."""
+    """Service identification endpoint for the Voice Service.
+
+    Returns:
+        A dictionary confirming the service name, version, and documentation links.
+    """
     return {
         "service": "Voice Service",
         "version": "2.1.0",
@@ -349,8 +320,10 @@ def _export_audiosegment(seg: AudioSegment, format_: str = "wav") -> str:
 
 @app.get("/docs", include_in_schema=False)
 async def docs_redirect():
-    """Redirect to FastAPI interactive API documentation.
-    This endpoint provides Swagger UI documentation for all API routes.
+    """Redirect to the principal Swagger UI documentation.
+
+    Returns:
+        A RedirectResponse to the /docs endpoint.
     """
     from fastapi.responses import RedirectResponse
 
@@ -359,8 +332,10 @@ async def docs_redirect():
 
 @app.get("/doc", include_in_schema=False)
 async def doc_redirect():
-    """Alternative redirect to API documentation.
-    Same as /docs but shorter URL for convenience.
+    """Alternative redirect path for principal Swagger UI documentation.
+
+    Returns:
+        A RedirectResponse to the /docs endpoint.
     """
     from fastapi.responses import RedirectResponse
 
@@ -446,10 +421,16 @@ async def api_docs_info():
     "/health", tags=["health"], summary="Health check endpoint", response_model=HealthCheckResponse
 )
 async def health_check() -> HealthCheckResponse:
-    """Health check endpoint with service status."""
+    """Comprehensive health check endpoint for the Voice Service.
+
+    Verifies the operational status of STT, TTS, and VAD components.
+
+    Returns:
+        A HealthCheckResponse containing granular status and availability flags.
+    """
     stt_health = stt_service.health_check()
     tts_health = tts_service.health_check()
-    vad_health = vad_service.health_check()
+    vad_service.health_check()
 
     # Core services (STT/TTS) must be healthy, VAD is optional
     core_healthy = stt_health and tts_health
@@ -756,7 +737,7 @@ async def extract_phonemes_api(text: str = Body(..., embed=True), duration: floa
 
 @app.post("/voice/trim", tags=["voice-processing"], summary="Trim audio by start/end")
 async def trim_audio(
-    audio_file: UploadFile = File(...), start_ms: int = 0, end_ms: Optional[int] = None
+    audio_file: UploadFile = File(...), start_ms: int = 0, end_ms: int | None = None
 ):
     seg = _audiosegment_from_upload(audio_file)
     if end_ms is None or end_ms <= 0 or end_ms > len(seg):
@@ -855,6 +836,18 @@ async def websocket_stt_stream(websocket: WebSocket, use_vad: bool = True):
     await stream_service.handle_stt_stream(websocket, use_vad)
 
 
+@app.websocket("/ws/audio")
+async def websocket_endpoint(websocket: WebSocket):
+    """Bidirectional WebSocket endpoint for real-time audio streaming.
+
+    Handles audio chunks (PCM16), performs real-time transcription using Vosk,
+    and returns text responses or status updates.
+
+    Args:
+        websocket: The active WebSocket connection.
+    """
+
+
 @app.websocket("/voice/ws/tts")
 async def websocket_tts_stream(websocket: WebSocket):
     """Real-time TTS streaming via WebSocket.
@@ -873,7 +866,7 @@ if WEBRTC_AVAILABLE:
         Called by interview-service when a new interview begins.
         """
         session_id = payload.get("session_id")
-        job_description = payload.get("job_description", "General software engineering position")
+        payload.get("job_description", "General software engineering position")
 
         if not session_id:
             return {"error": "Missing session_id"}, 400
@@ -892,7 +885,7 @@ if WEBRTC_AVAILABLE:
 
     @app.post("/webrtc/stop", tags=["webrtc"], summary="Stop WebRTC session")
     async def stop_webrtc_session(payload: dict = Body(...)):
-        """Stop an active WebRTC session"""
+        """Stop an active WebRTC session."""
         session_id = payload.get("session_id")
 
         if not session_id:
@@ -904,7 +897,7 @@ if WEBRTC_AVAILABLE:
 
     @app.post("/webrtc/tts", tags=["webrtc"], summary="Send TTS to WebRTC session")
     async def send_webrtc_tts(payload: dict = Body(...)):
-        """Generate and send TTS audio to active WebRTC session
+        """Generate and send TTS audio to active WebRTC session.
 
         Args:
             session_id: Active session ID
@@ -922,7 +915,7 @@ if WEBRTC_AVAILABLE:
 
     @app.get("/webrtc/status", tags=["webrtc"], summary="Get WebRTC status")
     async def get_webrtc_status():
-        """Get status of WebRTC functionality"""
+        """Get status of WebRTC functionality."""
         return {
             "webrtc_enabled": ENABLE_WEBRTC,
             "webrtc_available": WEBRTC_AVAILABLE,
@@ -931,6 +924,5 @@ if WEBRTC_AVAILABLE:
 
 
 if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8015)
+    host = os.getenv("HOST", "127.0.0.1")
+    uvicorn.run(app, host=host, port=8015)

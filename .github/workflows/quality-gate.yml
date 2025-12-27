@@ -1,6 +1,20 @@
 name: Quality Gate
 
-on: [pull_request]
+on:
+  push:
+    branches: [main, master, develop]
+    paths-ignore:
+      - '**.md'
+      - 'internal/**'
+      - 'specs/**'
+      - 'docs/**'
+  pull_request:
+    branches: [main, master, develop]
+    paths-ignore:
+      - '**.md'
+      - 'internal/**'
+      - 'specs/**'
+      - 'docs/**'
 
 jobs:
   quality:

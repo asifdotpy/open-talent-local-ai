@@ -405,7 +405,7 @@ OpenTalent/models/**
 ~/.cache/huggingface/
 .cache/huggingface/
 huggingface_cache/
-models/
+/models/
 transformers_cache/
 
 # Specific Hugging Face model components (keep config files)

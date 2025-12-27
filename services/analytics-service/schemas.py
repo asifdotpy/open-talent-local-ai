@@ -1,13 +1,13 @@
-"""
-Analytics Service - Pydantic V2 Schemas
+"""Analytics Service - Pydantic V2 Schemas
 Generated: December 17, 2025
 Coverage: ~14 request/response models for sentiment, quality, bias, expertise, performance, metrics, and reports.
 """
 
-from typing import Optional, List, Dict, Any
 from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel, Field, ConfigDict
+from typing import Any
+
+from pydantic import BaseModel, Field
 
 
 class SeverityLevel(str, Enum):
@@ -27,7 +27,7 @@ class SentimentAnalysis(BaseModel):
     confidence: float
     emotion: str
     intensity: float
-    keywords: List[str] = []
+    keywords: list[str] = []
 
 
 class ResponseQualityRequest(BaseModel):
@@ -41,21 +41,21 @@ class ResponseQuality(BaseModel):
     relevance: float
     clarity: float
     technical_accuracy: float
-    strengths: List[str] = []
-    improvements: List[str] = []
+    strengths: list[str] = []
+    improvements: list[str] = []
 
 
 class BiasDetectionRequest(BaseModel):
     text: str = Field(..., min_length=1)
-    participants: Optional[List[Dict[str, Any]]] = None
+    participants: list[dict[str, Any]] | None = None
 
 
 class BiasDetection(BaseModel):
     bias_score: float
-    flags: List[str]
+    flags: list[str]
     severity: SeverityLevel = SeverityLevel.low
-    categories: List[str]
-    recommendations: List[str]
+    categories: list[str]
+    recommendations: list[str]
 
 
 class ExpertiseAssessmentRequest(BaseModel):
@@ -66,14 +66,14 @@ class ExpertiseAssessmentRequest(BaseModel):
 class ExpertiseAssessment(BaseModel):
     level: str = "intermediate"
     confidence: float = Field(..., ge=0.0, le=1.0)
-    technical_skills: List[str] = []
-    knowledge_gaps: List[str] = []
-    experience_years: Optional[int] = None
+    technical_skills: list[str] = []
+    knowledge_gaps: list[str] = []
+    experience_years: int | None = None
 
 
 class InterviewPerformanceRequest(BaseModel):
     room_id: str
-    response_analyses: List[Dict[str, Any]] = []
+    response_analyses: list[dict[str, Any]] = []
 
 
 class InterviewPerformance(BaseModel):
@@ -82,23 +82,23 @@ class InterviewPerformance(BaseModel):
     expertise_level: str
     bias_incidents: int
     quality_trend: str
-    recommendations: List[str] = []
+    recommendations: list[str] = []
 
 
 class IntelligenceReportRequest(BaseModel):
     room_id: str
-    analyses: List[Dict[str, Any]] = []
-    responses: List[Dict[str, Any]] = []
+    analyses: list[dict[str, Any]] = []
+    responses: list[dict[str, Any]] = []
     room_created_at: str
 
 
 class IntelligenceReport(BaseModel):
-    summary: Dict[str, Any]
-    sentiment_analysis: Dict[str, Any]
-    bias_report: Dict[str, Any]
-    expertise_evaluation: Dict[str, Any]
-    quality_metrics: Dict[str, Any]
-    recommendations: List[str] = []
+    summary: dict[str, Any]
+    sentiment_analysis: dict[str, Any]
+    bias_report: dict[str, Any]
+    expertise_evaluation: dict[str, Any]
+    quality_metrics: dict[str, Any]
+    recommendations: list[str] = []
     interview_effectiveness: float
 
 
@@ -117,27 +117,27 @@ class MetricsResponse(BaseModel):
 
 class MetricsTimeSeriesResponse(BaseModel):
     metric: str
-    points: List[MetricPoint]
+    points: list[MetricPoint]
 
 
 class ReportCreateRequest(BaseModel):
     type: str = Field(..., pattern=r"^(interview_summary|candidate_summary|daily|weekly|monthly)$")
     date_range: str = Field(..., pattern=r"^(day|week|month|quarter|year)$")
-    filters: Optional[Dict[str, Any]] = None
+    filters: dict[str, Any] | None = None
 
 
 class ReportResponse(BaseModel):
     report_id: str
     status: str
     created_at: datetime
-    url: Optional[str] = None
+    url: str | None = None
 
 
 class ReportExportResponse(BaseModel):
     report_id: str
     format: str
-    url: Optional[str] = None
-    expires_at: Optional[datetime] = None
+    url: str | None = None
+    expires_at: datetime | None = None
 
 
 class HealthResponse(BaseModel):

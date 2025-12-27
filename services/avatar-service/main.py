@@ -66,7 +66,6 @@ logger = logging.getLogger("avatar-service")
 # Local voice models and service (fallback endpoints)
 # Add current directory to path for 'app' imports
 import sys
-from pathlib import Path
 
 _service_dir = Path(__file__).parent
 if str(_service_dir) not in sys.path:
@@ -84,7 +83,14 @@ except ImportError as e:
 
 
 def create_app() -> FastAPI:
-    """Create and configure the FastAPI application."""
+    """Create and configure the FastAPI application instance for the Avatar Service.
+
+    Includes middleware configuration, router setup, and setting the app title/version.
+    Uses centralized settings if available, otherwise falls back to defaults.
+
+    Returns:
+        The configured FastAPI application instance.
+    """
     app = FastAPI(
         title=SERVICE_TITLE,
         description=f"""{SERVICE_DESCRIPTION}
@@ -181,7 +187,11 @@ class RenderRequest(BaseModel):
 
 @app.get("/")
 async def root():
-    """Root endpoint for Avatar Service."""
+    """Service identification endpoint for the Avatar Service.
+
+    Returns:
+        A dictionary confirming the service status, version, and documentation links.
+    """
     logger.info("Root endpoint accessed")
     return {
         "message": "OpenTalent Avatar Service",
@@ -200,19 +210,31 @@ async def root():
 
 @app.get("/ping")
 async def ping():
-    """Simple ping endpoint for load balancer health checks."""
+    """Simple health check endpoint for internal heartbeat monitoring.
+
+    Returns:
+        A dictionary confirming basic availability.
+    """
     return {"status": "ok"}
 
 
 @app.get("/doc", include_in_schema=False)
 async def doc_redirect():
-    """Alternative redirect to API documentation."""
+    """Redirect alternative documentation path to the standard Swagger UI.
+
+    Returns:
+        A RedirectResponse to the /docs endpoint.
+    """
     return RedirectResponse(url="/docs")
 
 
 @app.get("/api-docs", include_in_schema=False)
 async def api_docs_info():
-    """Get API documentation information and available endpoints."""
+    """Return an interactive summary of all registered API endpoints.
+
+    Returns:
+        A dictionary containing the service version and a list of all routes.
+    """
     routes_info = []
     for route in app.routes:
         if hasattr(route, "methods") and hasattr(route, "path"):
@@ -239,7 +261,14 @@ async def api_docs_info():
 
 @app.get("/health")
 async def health_check():
-    """Comprehensive health check endpoint for Avatar Service."""
+    """Comprehensive health check endpoint for the Avatar Service.
+
+    Monitors API availability and the status of voice/rendering integration
+    components.
+
+    Returns:
+        A dictionary containing granular health status and metrics.
+    """
     logger.info("Health check requested")
     try:
         status = {
@@ -274,7 +303,7 @@ async def health_check():
 @app.post("/render/lipsync")
 async def render_lipsync(request: RenderRequest):
     """Render avatar video with lip-sync
-    Uses face.glb in production, allows model override in dev
+    Uses face.glb in production, allows model override in dev.
     """
     # Call Node.js renderer
     renderer_script = os.path.join(os.path.dirname(__file__), "renderer", "render.js")
@@ -335,6 +364,5 @@ async def render_lipsync(request: RenderRequest):
 
 
 if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    host = os.getenv("HOST", "127.0.0.1")
+    uvicorn.run(app, host=host, port=8001)

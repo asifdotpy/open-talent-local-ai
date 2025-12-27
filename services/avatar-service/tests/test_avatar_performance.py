@@ -1,15 +1,12 @@
-"""
-Performance tests for avatar API.
+"""Performance tests for avatar API.
 Validates SLA compliance, FPS bounds, and resource constraints.
 """
 
 from __future__ import annotations
 
-import asyncio
 import importlib.util
 import time
 from pathlib import Path
-from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
@@ -111,7 +108,7 @@ class TestConcurrencyAndLoad:
             "height": 512,
         }
         times = []
-        for i in range(5):
+        for _i in range(5):
             start = time.perf_counter()
             res = client.post("/api/v1/avatars/render", json=payload)
             elapsed = (time.perf_counter() - start) * 1000
@@ -284,7 +281,7 @@ class TestFPSAndFrameRateBounds:
         }
         start = time.perf_counter()
         res = client.post("/api/v1/avatars/render", json=payload)
-        low_time = (time.perf_counter() - start) * 1000
+        (time.perf_counter() - start) * 1000
         assert res.status_code == 200
 
         # Switch to high quality
@@ -292,7 +289,7 @@ class TestFPSAndFrameRateBounds:
         assert res2.status_code == 200
         start = time.perf_counter()
         res = client.post("/api/v1/avatars/render", json=payload)
-        high_time = (time.perf_counter() - start) * 1000
+        (time.perf_counter() - start) * 1000
         assert res.status_code == 200
 
 
@@ -318,7 +315,7 @@ class TestTimeoutSLAs:
         """Concurrent streams should not timeout."""
         # Create sessions
         sids = []
-        for i in range(3):
+        for _i in range(3):
             res = client.post("/api/v1/avatars/session", json={})
             sids.append(res.json()["session_id"])
 

@@ -1,5 +1,5 @@
 """Piper Text-to-Speech Service
-High-quality, local TTS with phoneme extraction for lip-sync
+High-quality, local TTS with phoneme extraction for lip-sync.
 """
 
 import json
@@ -14,7 +14,7 @@ from .phoneme_extractor import PhonemeExtractor
 
 
 class PiperTTSService:
-    """Local Text-to-Speech service using Piper (VITS-based)
+    """Local Text-to-Speech service using Piper (VITS-based).
 
     Features:
     - MOS 4.1-4.3 quality (human-like speech)
@@ -100,24 +100,21 @@ class PiperTTSService:
         speed: float = 1.0,
         extract_phonemes: bool = True,
     ) -> dict:
-        """Synthesize speech from text and save to file.
+        """Synthesize high-quality speech from text using the local Piper TTS engine.
+
+        Saves the results to a WAV file and optionally extracts phoneme-level and
+        word-level timing data for lip-sync animation.
 
         Args:
-            text: Text to synthesize
-            output_path: Path to save WAV file
-            voice: Voice name (default: lessac)
-            speed: Speech speed multiplier (default: 1.0)
-            extract_phonemes: Extract phoneme timing for lip-sync
+            text: The source text to be synthesized into speech.
+            output_path: Absolute file path where the synthesized WAV audio will be saved.
+            voice: The identifier for the desired voice model (defaults to "lessac").
+            speed: Speaking rate multiplier (defaults to 1.0).
+            extract_phonemes: Whether to extract phoneme and word timing (defaults to True).
 
         Returns:
-            Dictionary with synthesis results:
-            {
-                "audio_file": "output.wav",
-                "duration": 3.5,
-                "phonemes": [{"phoneme": "HH", "start": 0.0, "end": 0.1}, ...],
-                "words": [{"word": "hello", "start": 0.0, "end": 0.5}, ...],
-                "sample_rate": 22050
-            }
+            A dictionary containing the generated audio file path, duration, word/phoneme timing,
+            and other synthesis metadata.
         """
         try:
             # Prepare output paths

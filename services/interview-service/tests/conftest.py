@@ -1,14 +1,14 @@
-"""
-Test configuration for the current Interview Service implementation.
+"""Test configuration for the current Interview Service implementation.
 
 Provides fixtures and setup for testing the standalone FastAPI application.
 """
 
+import asyncio
+from typing import Any
+from unittest.mock import AsyncMock, patch
+
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import AsyncMock, patch
-import asyncio
-from typing import Dict, Any
 
 
 @pytest.fixture(scope="session")
@@ -66,7 +66,7 @@ def mock_avatar_service():
 
 
 @pytest.fixture
-def sample_interview_session() -> Dict[str, Any]:
+def sample_interview_session() -> dict[str, Any]:
     """Sample interview session data."""
     return {
         "interview_session_id": "session-123",
@@ -91,7 +91,7 @@ def sample_interview_session() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def sample_transcription_segment() -> Dict[str, Any]:
+def sample_transcription_segment() -> dict[str, Any]:
     """Sample transcription segment data."""
     return {
         "text": "I have extensive experience with Python and Django.",
@@ -109,7 +109,7 @@ def sample_transcription_segment() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def sample_response_analysis() -> Dict[str, Any]:
+def sample_response_analysis() -> dict[str, Any]:
     """Sample response analysis data."""
     return {
         "question_id": "q-123",
@@ -120,7 +120,7 @@ def sample_response_analysis() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def sample_webrtc_offer() -> Dict[str, Any]:
+def sample_webrtc_offer() -> dict[str, Any]:
     """Sample WebRTC offer data."""
     return {
         "type": "offer",
@@ -134,7 +134,7 @@ def sample_webrtc_offer() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def sample_webrtc_answer() -> Dict[str, Any]:
+def sample_webrtc_answer() -> dict[str, Any]:
     """Sample WebRTC answer data."""
     return {
         "type": "answer",
@@ -148,7 +148,7 @@ def sample_webrtc_answer() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def sample_candidate_response() -> Dict[str, Any]:
+def sample_candidate_response() -> dict[str, Any]:
     """Sample candidate response for AI analysis."""
     return {
         "question_id": "q-123",
@@ -159,7 +159,7 @@ def sample_candidate_response() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def sample_interview_adaptation() -> Dict[str, Any]:
+def sample_interview_adaptation() -> dict[str, Any]:
     """Sample interview adaptation data."""
     return {
         "current_phase": "technical",

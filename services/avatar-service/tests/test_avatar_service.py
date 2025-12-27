@@ -1,5 +1,4 @@
-"""
-Tests for Avatar Service
+"""Tests for Avatar Service
 These legacy async-httpx tests target endpoints no longer present; module is skipped to avoid false failures.
 """
 
@@ -7,8 +6,9 @@ import pytest
 
 pytest.skip("Legacy avatar-service tests are deprecated; replaced by plan-aligned TestClient suite.", allow_module_level=True)
 
+from typing import Any
+
 import httpx
-from typing import Dict, Any
 
 
 @pytest.fixture
@@ -27,7 +27,7 @@ def auth_headers():
 
 
 @pytest.fixture
-def avatar_data() -> Dict[str, Any]:
+def avatar_data() -> dict[str, Any]:
     return {
         "name": "Avatar1",
         "model": "default_humanoid",

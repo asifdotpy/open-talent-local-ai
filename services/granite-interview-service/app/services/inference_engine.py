@@ -5,14 +5,13 @@ Provides high-level APIs for question generation, response analysis,
 candidate assessment, and interview flow management.
 """
 
-import logging
 import json
-from typing import Dict, Any, List, Optional
+import logging
 from dataclasses import dataclass
 from enum import Enum
 
-from ..models import model_registry
 from ..config import settings
+from ..models import model_registry
 
 logger = logging.getLogger(__name__)
 
@@ -39,8 +38,8 @@ class InterviewQuestion:
     type: QuestionType
     phase: InterviewPhase
     difficulty: str  # easy, medium, hard
-    skills_assessed: List[str]
-    follow_up_questions: List[str] = None
+    skills_assessed: list[str]
+    follow_up_questions: list[str] = None
 
 @dataclass
 class CandidateResponse:
@@ -48,9 +47,9 @@ class CandidateResponse:
     response_text: str
     sentiment_score: float  # -1 to 1
     confidence_score: float  # 0 to 1
-    key_points: List[str]
-    strengths: List[str]
-    weaknesses: List[str]
+    key_points: list[str]
+    strengths: list[str]
+    weaknesses: list[str]
     technical_accuracy: float  # 0 to 1
     communication_score: float  # 0 to 1
 
@@ -61,7 +60,7 @@ class InterviewAssessment:
     technical_score: float
     communication_score: float
     culture_fit_score: float
-    recommendations: List[str]
+    recommendations: list[str]
     hire_recommendation: str  # "Strong Hire", "Hire", "Maybe", "No Hire"
     feedback_summary: str
 
@@ -77,9 +76,20 @@ class InferenceEngine:
         candidate_experience: str,
         num_questions: int = 5,
         phase: InterviewPhase = InterviewPhase.TECHNICAL,
-        model_name: Optional[str] = None
-    ) -> List[InterviewQuestion]:
-        """Generate interview questions based on job requirements."""
+        model_name: str | None = None
+    ) -> list[InterviewQuestion]:
+        """Generate tailored interview questions based on a job description and candidate experience.
+
+        Args:
+            job_description: The text of the job description.
+            candidate_experience: Description of the candidate's background.
+            num_questions: Number of questions to generate.
+            phase: The part of the interview to focus on.
+            model_name: Optional specific model to use for generation.
+
+        Returns:
+            A list of InterviewQuestion objects.
+        """
 
         model = model_name or self.default_model
         if model not in model_registry.get_loaded_models():
@@ -100,8 +110,8 @@ class InferenceEngine:
         self,
         question: str,
         response: str,
-        expected_skills: List[str],
-        model_name: Optional[str] = None
+        expected_skills: list[str],
+        model_name: str | None = None
     ) -> CandidateResponse:
         """Analyze a candidate's response to a question."""
 
@@ -132,9 +142,19 @@ class InferenceEngine:
         original_question: str,
         candidate_response: str,
         num_questions: int = 2,
-        model_name: Optional[str] = None
-    ) -> List[str]:
-        """Generate follow-up questions based on candidate response."""
+        model_name: str | None = None
+    ) -> list[str]:
+        """Generate relevant follow-up questions based on a candidate's previous response.
+
+        Args:
+            original_question: The question that was just answered.
+            candidate_response: The text of the candidate's response.
+            num_questions: Number of follow-ups to generate.
+            model_name: Optional specific model to use.
+
+        Returns:
+            A list of follow-up question strings.
+        """
 
         model = model_name or self.default_model
         if model not in model_registry.get_loaded_models():
@@ -151,11 +171,20 @@ class InferenceEngine:
 
     def assess_interview_overall(
         self,
-        questions_and_responses: List[Dict[str, str]],
+        questions_and_responses: list[dict[str, str]],
         job_requirements: str,
-        model_name: Optional[str] = None
+        model_name: str | None = None
     ) -> InterviewAssessment:
-        """Provide overall interview assessment."""
+        """Provide a comprehensive overall assessment of a candidate's entire interview performance.
+
+        Args:
+            questions_and_responses: A list of Q&A pairs from the interview.
+            job_requirements: The skills and qualifications needed for the role.
+            model_name: Optional specific model to use for assessment.
+
+        Returns:
+            An InterviewAssessment object summarizing scores and recommendations.
+        """
 
         model = model_name or self.default_model
         if model not in model_registry.get_loaded_models():
@@ -185,7 +214,17 @@ class InferenceEngine:
         num_questions: int,
         phase: InterviewPhase
     ) -> str:
-        """Build prompt for question generation."""
+        """Construct the prompt for generating tailored interview questions.
+
+        Args:
+            job_description: The job description text.
+            candidate_experience: Candidate background summary.
+            num_questions: Target number of questions.
+            phase: Current interview phase (Technical, Behavioral, etc.).
+
+        Returns:
+            The raw prompt string for the LLM.
+        """
 
         return f"""You are an expert technical interviewer. Generate {num_questions} interview questions for the {phase.value} phase.
 
@@ -218,7 +257,7 @@ Generate exactly {num_questions} questions."""
         self,
         question: str,
         response: str,
-        expected_skills: List[str]
+        expected_skills: list[str]
     ) -> str:
         """Build prompt for response analysis."""
 
@@ -268,7 +307,7 @@ Format as a JSON array of strings:
 
     def _build_assessment_prompt(
         self,
-        questions_and_responses: List[Dict[str, str]],
+        questions_and_responses: list[dict[str, str]],
         job_requirements: str
     ) -> str:
         """Build prompt for overall interview assessment."""
@@ -299,7 +338,7 @@ Provide assessment in this JSON format:
 
 Be thorough and objective in your assessment."""
 
-    def _parse_question_response(self, response: str, phase: InterviewPhase) -> List[InterviewQuestion]:
+    def _parse_question_response(self, response: str, phase: InterviewPhase) -> list[InterviewQuestion]:
         """Parse question generation response."""
         try:
             questions_data = json.loads(response)
@@ -348,7 +387,7 @@ Be thorough and objective in your assessment."""
                 communication_score=0.0
             )
 
-    def _parse_follow_up_response(self, response: str) -> List[str]:
+    def _parse_follow_up_response(self, response: str) -> list[str]:
         """Parse follow-up questions response."""
         try:
             questions = json.loads(response)

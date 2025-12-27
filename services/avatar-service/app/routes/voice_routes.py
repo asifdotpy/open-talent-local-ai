@@ -1,10 +1,8 @@
-"""
-Voice generation API routes.
-"""
+"""Voice generation API routes."""
 
 from fastapi import APIRouter
 
-from app.models.voice import VoiceRequest, VoiceResponse, HealthResponse, VoiceListResponse
+from app.models.voice import VoiceListResponse, VoiceRequest, VoiceResponse
 from app.services.voice_service import voice_service
 
 router = APIRouter()

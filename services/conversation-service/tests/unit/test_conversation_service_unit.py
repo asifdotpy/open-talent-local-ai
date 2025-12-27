@@ -1,5 +1,4 @@
-"""
-Conversation Service Unit Tests
+"""Conversation Service Unit Tests.
 
 Unit tests for individual components of the conversation service.
 Focus on service logic, models, and utilities without external dependencies.
@@ -11,18 +10,18 @@ Test Coverage:
 - Data validation
 """
 
-import pytest
-from unittest.mock import patch, MagicMock, AsyncMock
-import sys
 from datetime import datetime
+from unittest.mock import patch
 
-from app.services.conversation_service import ConversationService
-from app.services.ollama_service import generate_questions_from_ollama
+import pytest
+
 from app.models.interview_models import (
+    ConversationResponse,
     GenerateQuestionsRequest,
     StartConversationRequest,
-    ConversationResponse,
 )
+from app.services.conversation_service import ConversationService
+from app.services.ollama_service import generate_questions_from_ollama
 
 
 class TestConversationService:

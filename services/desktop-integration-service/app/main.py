@@ -6,27 +6,25 @@ Lightweight, demo-focused implementation (Phase 0).
 """
 
 import logging
-import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Dict, Optional, List
 
+import httpx
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-import httpx
 
 from app.config.settings import settings
 from app.core.service_discovery import ServiceDiscovery
 from app.models.schemas import (
-    StartInterviewRequest,
+    HealthResponse,
+    InterviewConfig,
     InterviewResponseRequest,
     InterviewSession,
-    InterviewConfig,
     Message,
-    ModelsResponse,
     ModelInfo,
-    HealthResponse,
+    ModelsResponse,
+    StartInterviewRequest,
 )
 
 # Configure logging
@@ -37,8 +35,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Global service discovery
-service_discovery: Optional[ServiceDiscovery] = None
-http_client: Optional[httpx.AsyncClient] = None
+service_discovery: ServiceDiscovery | None = None
+http_client: httpx.AsyncClient | None = None
 
 
 
@@ -65,14 +63,14 @@ async def lifespan(app: FastAPI):
     total_count = health["summary"]["total"]
     logger.info(f"📊 Services Status: {online_count}/{total_count} services online")
     logger.info("=" * 70)
-    
+
     # List all services
     for name, status in health["services"].items():
         icon = "✅" if status["status"] == "online" else "❌"
         visibility = "(hidden)" if name.startswith("_") else ""
         latency = f"{status.get('latencyMs', 'N/A')}ms" if status.get('latencyMs') else "N/A"
         logger.info(f"{icon} {name:30s} {status['status']:10s} {latency:>10s} {visibility}")
-    
+
     logger.info("=" * 70)
     logger.info("✨ Gateway ready to serve requests!")
 
@@ -131,7 +129,7 @@ async def health_check() -> HealthResponse:
 
 
 @app.get("/api/v1/system/status")
-async def system_status() -> Dict:
+async def system_status() -> dict:
     """Get comprehensive system status."""
     if not service_discovery:
         raise HTTPException(status_code=503, detail="Service discovery not initialized")
@@ -159,17 +157,17 @@ async def system_status() -> Dict:
 
 
 @app.get("/api/v1/services")
-async def list_services() -> Dict:
+async def list_services() -> dict:
     """
     List all 14 registered OpenTalent microservices.
-    
+
     Returns registry with URLs and current status for each service.
     """
     if not service_discovery:
         raise HTTPException(status_code=503, detail="Service discovery not initialized")
 
     health = await service_discovery.check_all_services()
-    
+
     # Organize services by category
     service_registry = {
         "core_services": {
@@ -270,7 +268,7 @@ async def list_services() -> Dict:
             }
         }
     }
-    
+
     return {
         "total_services": len(service_discovery.services),
         "gateway": {
@@ -319,7 +317,7 @@ async def list_models() -> ModelsResponse:
     Merges models from granite-interview-service and ollama.
     Returns fallback if backends unavailable.
     """
-    models: List[ModelInfo] = []
+    models: list[ModelInfo] = []
 
     if not service_discovery or not http_client:
         logger.warning("Service discovery or HTTP client not initialized")
@@ -382,7 +380,7 @@ async def list_models() -> ModelsResponse:
 
 
 @app.post("/api/v1/models/select")
-async def select_model(model_id: str) -> Dict:
+async def select_model(model_id: str) -> dict:
     """
     Select a specific model for interviews.
 
@@ -403,7 +401,7 @@ async def select_model(model_id: str) -> Dict:
 
 
 @app.post("/api/v1/voice/synthesize")
-async def synthesize_speech(payload: Dict) -> Dict:
+async def synthesize_speech(payload: dict) -> dict:
     """Proxy text-to-speech to voice-service when enabled."""
     if not settings.enable_voice:
         raise HTTPException(status_code=503, detail="Voice service disabled")
@@ -436,7 +434,7 @@ async def synthesize_speech(payload: Dict) -> Dict:
 
 
 @app.post("/api/v1/analytics/sentiment")
-async def analyze_sentiment(payload: Dict) -> Dict:
+async def analyze_sentiment(payload: dict) -> dict:
     """Proxy sentiment analysis to analytics-service when enabled."""
     if not settings.enable_analytics:
         raise HTTPException(status_code=503, detail="Analytics service disabled")
@@ -456,7 +454,7 @@ async def analyze_sentiment(payload: Dict) -> Dict:
         request_payload = {"text": text}
         if "context" in payload:
             request_payload["context"] = payload["context"]
-        
+
         response = await http_client.post(
             f"{url}/api/v1/analyze/sentiment",
             json=request_payload
@@ -473,7 +471,7 @@ async def analyze_sentiment(payload: Dict) -> Dict:
 
 
 @app.post("/api/v1/agents/execute")
-async def execute_agent(payload: Dict) -> Dict:
+async def execute_agent(payload: dict) -> dict:
     """Proxy agent execution to agents-service when enabled."""
     if not settings.enable_agents or not settings.agents_url:
         raise HTTPException(status_code=503, detail="Agents service disabled")
@@ -752,7 +750,7 @@ async def respond_to_interview(request: InterviewResponseRequest) -> InterviewSe
     if session.currentQuestion > total_questions:
         # Interview complete
         session.isComplete = True
-        next_question = f"Thank you for completing the interview. We appreciate your time!"
+        next_question = "Thank you for completing the interview. We appreciate your time!"
     else:
         # Get next templated question
         question_idx = min(
@@ -768,7 +766,7 @@ async def respond_to_interview(request: InterviewResponseRequest) -> InterviewSe
 
 
 @app.post("/api/v1/interviews/summary")
-async def get_interview_summary(session: InterviewSession) -> Dict:
+async def get_interview_summary(session: InterviewSession) -> dict:
     """
     Get interview summary and assessment.
 
@@ -798,7 +796,7 @@ Thank you for participating in this OpenTalent interview.""",
 
 
 @app.get("/api/v1/dashboard")
-async def get_dashboard() -> Dict:
+async def get_dashboard() -> dict:
     """
     Get complete dashboard data in one request.
 
@@ -829,7 +827,7 @@ async def get_dashboard() -> Dict:
 
 
 @app.get("/")
-async def root() -> Dict:
+async def root() -> dict:
     """Root endpoint with API info."""
     return {
         "service": "OpenTalent Desktop Integration Service",

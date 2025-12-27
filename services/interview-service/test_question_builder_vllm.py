@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Test script for vLLM + Qdrant integration
-Tests the Natural Language Question Builder with vector database
+Tests the Natural Language Question Builder with vector database.
 """
 
 import asyncio
@@ -16,7 +16,7 @@ from services.question_builder import (
 
 
 async def test_vllm_qdrant_integration():
-    """Test the complete vLLM + Qdrant integration"""
+    """Test the complete vLLM + Qdrant integration."""
     print("🧪 Testing vLLM + Qdrant Integration")
     print("=" * 50)
 
@@ -87,7 +87,7 @@ async def test_vllm_qdrant_integration():
 
 
 async def test_basic_vllm_connection():
-    """Test basic vLLM connection without Qdrant"""
+    """Test basic vLLM connection without Qdrant."""
     print("🔗 Testing Basic vLLM Connection")
     print("=" * 40)
 

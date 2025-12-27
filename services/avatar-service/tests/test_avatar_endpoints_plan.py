@@ -1,5 +1,4 @@
-"""
-Comprehensive endpoint coverage for avatar-service scaffold (ai-orchestra-simulation base).
+"""Comprehensive endpoint coverage for avatar-service scaffold (ai-orchestra-simulation base).
 Tests exercise planned critical and complementary endpoints using the in-process app from main.py.
 """
 

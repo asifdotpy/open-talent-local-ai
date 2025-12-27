@@ -1,7 +1,7 @@
-from typing import Optional
+
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
-from sqlalchemy import text
 
 from .config import settings
 
@@ -16,18 +16,18 @@ async def get_session() -> AsyncSession:
 
 
 async def get_session_with_rls(
-    user_email: Optional[str] = None,
-    user_role: Optional[str] = None,
-    tenant_id: Optional[str] = None,
+    user_email: str | None = None,
+    user_role: str | None = None,
+    tenant_id: str | None = None,
 ) -> AsyncSession:
     """
     Get database session with RLS (Row-Level Security) context.
-    
+
     Sets PostgreSQL session variables for RLS policies:
     - app.user_email: Current user's email
     - app.user_role: Current user's role (admin, recruiter, candidate)
     - app.tenant_id: Current user's tenant ID
-    
+
     These variables are used by RLS policies to filter rows.
     """
     async with AsyncSessionLocal() as session:
@@ -38,7 +38,7 @@ async def get_session_with_rls(
             await session.execute(text(f"SET LOCAL app.user_role = '{user_role}';"))
         if tenant_id:
             await session.execute(text(f"SET LOCAL app.tenant_id = '{tenant_id}';"))
-        
+
         yield session
 
 

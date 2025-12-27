@@ -1,5 +1,4 @@
-"""
-Renderer integration tests. Marked @pytest.mark.renderer for optional execution.
+"""Renderer integration tests. Marked @pytest.mark.renderer for optional execution.
 Tests interaction with Node.js render.js process and ffmpeg video generation.
 Skipped if renderer infrastructure unavailable.
 """
@@ -9,7 +8,6 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
-import time
 from pathlib import Path
 
 import pytest
@@ -30,7 +28,7 @@ def test_node_binary_available():
     node_path = shutil.which("node")
     if not node_path:
         pytest.skip("node not in PATH")
-    proc = subprocess.run([node_path, "--version"], capture_output=True, text=True, timeout=5)
+    proc = subprocess.run([node_path, "--version"], check=False, capture_output=True, text=True, timeout=5)
     assert proc.returncode == 0, "node --version failed"
     assert proc.stdout.strip(), "node version output empty"
 
@@ -41,7 +39,7 @@ def test_ffmpeg_binary_available():
     ffmpeg_path = shutil.which("ffmpeg")
     if not ffmpeg_path:
         pytest.skip("ffmpeg not in PATH")
-    proc = subprocess.run([ffmpeg_path, "-version"], capture_output=True, text=True, timeout=5)
+    proc = subprocess.run([ffmpeg_path, "-version"], check=False, capture_output=True, text=True, timeout=5)
     assert proc.returncode == 0, "ffmpeg -version failed"
 
 
@@ -51,13 +49,13 @@ def test_render_script_stdin_json_parsing():
     render_js = Path(__file__).resolve().parents[1] / "renderer" / "render.js"
     if not render_js.exists():
         pytest.skip("render.js not found")
-    
+
     node_path = shutil.which("node")
     if not node_path:
         pytest.skip("node not available")
 
     # Create minimal JSON input
-    input_json = json.dumps({
+    json.dumps({
         "phonemes": [],
         "duration": 1.0,
         "model": "production",

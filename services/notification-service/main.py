@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Depends, Body
-from fastapi.responses import JSONResponse
 import os
 import sys as _sys
+
+from fastapi import Body, Depends, FastAPI
+from fastapi.responses import JSONResponse
 
 # Ensure local imports work in various loaders
 _this_dir = os.path.dirname(__file__)
@@ -16,8 +17,8 @@ except ImportError:
 
 from schemas import (
     EmailNotificationRequest,
-    SMSNotificationRequest,
     PushNotificationRequest,
+    SMSNotificationRequest,
 )
 
 app = FastAPI(title="Notification Service", version="1.0.0")

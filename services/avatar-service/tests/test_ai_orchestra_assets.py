@@ -1,5 +1,4 @@
-"""
-Sanity checks for ai-orchestra-simulation dependency files.
+"""Sanity checks for ai-orchestra-simulation dependency files.
 Does not start the service; ensures required assets are present.
 """
 

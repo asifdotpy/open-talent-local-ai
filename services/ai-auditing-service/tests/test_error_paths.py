@@ -1,7 +1,8 @@
 import importlib
 import os
-import pytest
+
 import httpx
+import pytest
 from httpx import ASGITransport
 
 
@@ -86,7 +87,7 @@ async def test_config_valid_ruleset_accepts(async_client):
 @pytest.mark.asyncio
 async def test_history_populates(async_client):
     run = await async_client.post("/api/v1/audit/run", json={"target": "services/security-service"})
-    job_id = run.json()["job_id"]
+    run.json()["job_id"]
     # Wait for background worker to complete
     import asyncio
     await asyncio.sleep(1.2)

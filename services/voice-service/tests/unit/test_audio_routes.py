@@ -1,9 +1,10 @@
-import os
+import importlib.util
 import io
+import os
 import sys
 import types
-import importlib.util
 from pathlib import Path
+
 from fastapi.testclient import TestClient
 
 # Ensure mocks before importing app
@@ -34,8 +35,9 @@ client = TestClient(app)
 
 
 def make_wav_bytes(duration_ms=200, freq=440, sample_rate=16000):
-    import numpy as np
     import wave
+
+    import numpy as np
 
     t = np.linspace(0, duration_ms / 1000.0, int(sample_rate * duration_ms / 1000.0), False)
     audio = (0.3 * np.sin(2 * np.pi * freq * t)).astype(np.float32)

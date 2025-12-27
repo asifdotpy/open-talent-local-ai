@@ -1,13 +1,12 @@
-"""
-Tests for Explainability Service
+"""Tests for Explainability Service
 Following TDD principles - tests written before implementation
 Port: 8013
-Purpose: AI decision explanation, interpretability, transparency
+Purpose: AI decision explanation, interpretability, transparency.
 """
 
-import pytest
+
 import httpx
-from typing import Dict, Any
+import pytest
 
 
 @pytest.fixture

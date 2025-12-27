@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
@@ -19,28 +18,28 @@ class Phoneme(BaseModel):
 
 class TTSRequest(BaseModel):
     text: str = Field(min_length=1)
-    voice: Optional[str] = None
-    speed: Optional[float] = 1.0
-    extract_phonemes: Optional[bool] = True
+    voice: str | None = None
+    speed: float | None = 1.0
+    extract_phonemes: bool | None = True
 
 
 class TTSResponse(BaseModel):
     audio_data: str  # base64
     duration: float
     sample_rate: int
-    phonemes: List[Phoneme] = []
-    words: List[WordTiming] = []
+    phonemes: list[Phoneme] = []
+    words: list[WordTiming] = []
 
 
 class STTResponse(BaseModel):
     text: str
-    words: List[WordTiming] = []
+    words: list[WordTiming] = []
     duration: float
     confidence: float
 
 
 class VADRequest(BaseModel):
-    remove_silence: Optional[bool] = False
+    remove_silence: bool | None = False
 
 
 class VADFrame(BaseModel):
@@ -51,16 +50,16 @@ class VADFrame(BaseModel):
 
 class WebRTCSession(BaseModel):
     session_id: str
-    job_description: Optional[str] = None
+    job_description: str | None = None
 
 
 class WebSocketSTTMessage(BaseModel):
     # Audio chunk as base64 string
     audio_chunk_b64: str
-    use_vad: Optional[bool] = True
+    use_vad: bool | None = True
 
 
 class WebSocketTTSMessage(BaseModel):
     text: str
-    voice: Optional[str] = None
-    speed: Optional[float] = 1.0
+    voice: str | None = None
+    speed: float | None = 1.0

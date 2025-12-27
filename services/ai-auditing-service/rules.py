@@ -1,8 +1,8 @@
-from typing import Dict, Set
+
 from schemas import AuditRule, Severity
 
 # Central rule registry to keep RULES and validation aligned
-RULES: Dict[str, AuditRule] = {
+RULES: dict[str, AuditRule] = {
     "enum_validation": AuditRule(
         id="enum_validation",
         name="Enum Validation",
@@ -19,4 +19,4 @@ RULES: Dict[str, AuditRule] = {
     ),
 }
 
-KNOWN_RULE_IDS: Set[str] = set(RULES.keys())
+KNOWN_RULE_IDS: set[str] = set(RULES.keys())

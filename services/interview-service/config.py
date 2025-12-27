@@ -1,5 +1,4 @@
-"""Configuration, constants, and logging setup for Interview service.
-"""
+"""Configuration, constants, and logging setup for Interview service."""
 
 import logging
 import os
@@ -24,8 +23,19 @@ TIMEOUT_CONFIG = {
     "conversation_service": 5.0,  # Conversation service calls
     "health_check": 3.0,  # Health check calls (fast)
     "service_integration": 5.0,  # Inter-service calls
+    "room_operations": 5.0,  # Room creation/management operations
     "default": 10.0,  # Default timeout for other calls
 }
+
+# CORS Configuration
+ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:8080",
+    "http://localhost:8081",
+    "http://localhost:8000",  # Interview Service
+    "http://localhost:8001",  # Avatar Service
+]
 
 # Local service configurations (no external APIs required)
 OLLAMA_API_KEY = os.getenv(

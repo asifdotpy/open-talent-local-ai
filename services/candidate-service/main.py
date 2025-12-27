@@ -1,6 +1,5 @@
-"""
-Candidate Service - Candidate management, applications, profiles, and vector-based matching
-Port: 8008
+"""Candidate Service - Candidate management, applications, profiles, and vector-based matching
+Port: 8008.
 
 MERGED VERSION combining:
 - Candidate management API with enum-based validation (from services/)
@@ -8,31 +7,31 @@ MERGED VERSION combining:
 - Comprehensive skill management and applications tracking
 """
 
+import json
+import logging
 import os
-from fastapi import FastAPI, Depends, Body, Header, HTTPException, Query
+import uuid
+from datetime import datetime
+from enum import Enum
+from pathlib import Path
+from typing import Any, Generic, TypeVar
+
+from fastapi import Body, Depends, FastAPI, Header, HTTPException, Query
 from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel, EmailStr, Field
 from pydantic_settings import BaseSettings
-from typing import Dict, Any, Optional, List, Generic, TypeVar
-from datetime import datetime
-from enum import Enum
-import uuid
-import time
-import json
-import logging
-from pathlib import Path
 
 # SQLAlchemy imports
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, func, Text, ForeignKey, text
+from sqlalchemy import Column, DateTime, String, create_engine, func
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker
 
 # Vector search imports - production-ready stack
 try:
-    from fastembed import TextEmbedding
-    from lancedb import connect
     import numpy as np
     import pyarrow as pa
+    from fastembed import TextEmbedding
+    from lancedb import connect
     VECTOR_SEARCH_AVAILABLE = True
 except ImportError:
     VECTOR_SEARCH_AVAILABLE = False
@@ -60,7 +59,11 @@ embedding_model = None
 vector_db = None
 
 def initialize_vector_search():
-    """Initialize FastEmbed and LanceDB for vector search."""
+    """Initialize the FastEmbed embedding model and LanceDB connection for vector search capabilities.
+
+    Ensures the vector database directory exists, connects to the database, and creates
+    the 'candidates' table with the appropriate schema (MiniLM-L6-v2 embeddings) if it doesn't already exist.
+    """
     global embedding_model, vector_db
 
     if not VECTOR_SEARCH_AVAILABLE:
@@ -124,7 +127,7 @@ class CandidateDB(Base):
 # ============================================================================
 
 class ApplicationStatus(str, Enum):
-    """Application status enumeration"""
+    """Application status enumeration."""
     APPLIED = "applied"
     REVIEWING = "reviewing"
     INTERVIEW_SCHEDULED = "interview_scheduled"
@@ -132,7 +135,7 @@ class ApplicationStatus(str, Enum):
     REJECTED = "rejected"
 
 class SkillProficiency(str, Enum):
-    """Skill proficiency enumeration"""
+    """Skill proficiency enumeration."""
     BEGINNER = "beginner"
     INTERMEDIATE = "intermediate"
     ADVANCED = "advanced"
@@ -143,7 +146,7 @@ class SkillProficiency(str, Enum):
 # ----------------------------------------------------------------------------
 
 class CandidateStatus(str, Enum):
-    """Candidate lifecycle status"""
+    """Candidate lifecycle status."""
     NEW = "new"
     REVIEWING = "reviewing"
     INTERVIEW_SCHEDULED = "interview_scheduled"
@@ -156,13 +159,13 @@ class CandidateStatus(str, Enum):
 # ============================================================================
 
 class CandidateCreate(BaseModel):
-    """Schema for creating a candidate"""
+    """Schema for creating a candidate."""
     email: EmailStr
     first_name: str = Field(..., min_length=1, max_length=100)
     last_name: str = Field(..., min_length=1, max_length=100)
-    phone: Optional[str] = Field(None, pattern=r'^\+?1?\d{9,15}$')
-    resume_url: Optional[str] = None
-    
+    phone: str | None = Field(None, pattern=r'^\+?1?\d{9,15}$')
+    resume_url: str | None = None
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -175,32 +178,32 @@ class CandidateCreate(BaseModel):
         }
 
 class CandidateUpdate(BaseModel):
-    """Schema for updating a candidate"""
-    email: Optional[EmailStr] = None
-    first_name: Optional[str] = Field(None, min_length=1, max_length=100)
-    last_name: Optional[str] = Field(None, min_length=1, max_length=100)
-    phone: Optional[str] = Field(None, pattern=r'^\+?1?\d{9,15}$')
-    resume_url: Optional[str] = None
+    """Schema for updating a candidate."""
+    email: EmailStr | None = None
+    first_name: str | None = Field(None, min_length=1, max_length=100)
+    last_name: str | None = Field(None, min_length=1, max_length=100)
+    phone: str | None = Field(None, pattern=r'^\+?1?\d{9,15}$')
+    resume_url: str | None = None
 
 class CandidateResponse(BaseModel):
-    """Schema for candidate response"""
+    """Schema for candidate response."""
     id: str
     email: str
     first_name: str
     last_name: str
-    phone: Optional[str]
-    resume_url: Optional[str]
+    phone: str | None
+    resume_url: str | None
     status: CandidateStatus
     created_at: str
     updated_at: str
 
 class ApplicationCreate(BaseModel):
-    """Schema for creating an application"""
+    """Schema for creating an application."""
     candidate_id: str
     job_id: str
-    cover_letter: Optional[str] = None
+    cover_letter: str | None = None
     status: ApplicationStatus = Field(default=ApplicationStatus.APPLIED)
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -212,25 +215,25 @@ class ApplicationCreate(BaseModel):
         }
 
 class ApplicationUpdate(BaseModel):
-    """Schema for updating an application"""
+    """Schema for updating an application."""
     status: ApplicationStatus = Field(..., description="Application status must be one of: applied, reviewing, interview_scheduled, accepted, rejected")
-    cover_letter: Optional[str] = None
+    cover_letter: str | None = None
 
 class ApplicationResponse(BaseModel):
-    """Schema for application response"""
+    """Schema for application response."""
     id: str
     job_id: str
     candidate_id: str
     status: ApplicationStatus
-    cover_letter: Optional[str]
+    cover_letter: str | None
     created_at: str
     updated_at: str
 
 class SkillCreate(BaseModel):
-    """Schema for adding a skill"""
+    """Schema for adding a skill."""
     skill: str = Field(..., min_length=1, max_length=100)
     proficiency: SkillProficiency = Field(default=SkillProficiency.INTERMEDIATE)
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -240,18 +243,18 @@ class SkillCreate(BaseModel):
         }
 
 class SkillResponse(BaseModel):
-    """Schema for skill response"""
+    """Schema for skill response."""
     skill: str
     proficiency: SkillProficiency
     added_at: str
 
 class SkillListResponse(BaseModel):
-    """Schema for skill list response"""
+    """Schema for skill list response."""
     candidate_id: str
-    skills: List[SkillResponse]
+    skills: list[SkillResponse]
 
 class ResumeResponse(BaseModel):
-    """Schema for resume response"""
+    """Schema for resume response."""
     candidate_id: str
     resume_url: str
 
@@ -262,8 +265,8 @@ class ResumeResponse(BaseModel):
 class SearchResponse(BaseModel):
     total: int
     query: str
-    filters_applied: Dict[str, Any]
-    results: List[Dict[str, Any]] = []
+    filters_applied: dict[str, Any]
+    results: list[dict[str, Any]] = []
     search_method: str
 
 # ============================================================================
@@ -271,35 +274,35 @@ class SearchResponse(BaseModel):
 # ============================================================================
 
 class PaginationParams(BaseModel):
-    """Pagination parameters for list endpoints"""
+    """Pagination parameters for list endpoints."""
     offset: int = Field(default=0, ge=0, description="Number of items to skip")
     limit: int = Field(default=20, ge=1, le=100, description="Number of items to return (1-100)")
 
 class PaginatedResponse(BaseModel, Generic[T]):
-    """Generic paginated response wrapper"""
+    """Generic paginated response wrapper."""
     total: int = Field(..., description="Total number of items")
     offset: int = Field(..., description="Number of items skipped")
     limit: int = Field(..., description="Number of items returned")
-    items: List[T] = Field(..., description="List of items")
-    
+    items: list[T] = Field(..., description="List of items")
+
     @property
     def has_next(self) -> bool:
-        """Check if there are more items"""
+        """Check if there are more items."""
         return (self.offset + self.limit) < self.total
-    
+
     @property
     def has_previous(self) -> bool:
-        """Check if there are previous items"""
+        """Check if there are previous items."""
         return self.offset > 0
-    
+
     @property
     def page(self) -> int:
-        """Calculate current page number (1-based)"""
+        """Calculate current page number (1-based)."""
         return (self.offset // self.limit) + 1
-    
+
     @property
     def total_pages(self) -> int:
-        """Calculate total number of pages"""
+        """Calculate total number of pages."""
         return (self.total + self.limit - 1) // self.limit
 
 # ============================================================================
@@ -310,7 +313,7 @@ class WorkExperience(BaseModel):
     title: str
     company: str
     duration: str
-    responsibilities: List[str]
+    responsibilities: list[str]
 
 class Education(BaseModel):
     institution: str
@@ -318,8 +321,8 @@ class Education(BaseModel):
     year: str
 
 class Skills(BaseModel):
-    matched: List[str]
-    unmatched: List[str]
+    matched: list[str]
+    unmatched: list[str]
 
 class InitialQuestion(BaseModel):
     question: str = Field(..., description="Targeted question based on profile.")
@@ -329,22 +332,22 @@ class CandidateProfile(BaseModel):
     full_name: str = Field(..., description="The candidate's full name.")
     source_url: str = Field(..., description="The primary URL where the candidate's profile was found.")
     summary: str = Field(..., description="AI-generated summary of the candidate's profile.")
-    work_experience: List[WorkExperience]
-    education: List[Education]
+    work_experience: list[WorkExperience]
+    education: list[Education]
     skills: Skills
     alignment_score: float = Field(ge=0.0, le=1.0, description="Score indicating alignment with the search criteria.")
-    initial_questions: List[InitialQuestion]
+    initial_questions: list[InitialQuestion]
 
 # ============================================================================
 # IN-MEMORY STORAGE
 # ============================================================================
 
-candidates_db: Dict[str, Dict[str, Any]] = {}
-applications_db: Dict[str, Dict[str, Any]] = {}
-candidate_skills_db: Dict[str, List[Dict[str, Any]]] = {}
-interviews_db: Dict[str, List[Dict[str, Any]]] = {}
-assessments_db: Dict[str, List[Dict[str, Any]]] = {}
-availability_db: Dict[str, List[Dict[str, Any]]] = {}
+candidates_db: dict[str, dict[str, Any]] = {}
+applications_db: dict[str, dict[str, Any]] = {}
+candidate_skills_db: dict[str, list[dict[str, Any]]] = {}
+interviews_db: dict[str, list[dict[str, Any]]] = {}
+assessments_db: dict[str, list[dict[str, Any]]] = {}
+availability_db: dict[str, list[dict[str, Any]]] = {}
 
 # ============================================================================
 # HELPER FUNCTIONS
@@ -357,21 +360,20 @@ availability_db: Dict[str, List[Dict[str, Any]]] = {}
 TEST_TOKEN = "test-token-12345"
 DEFAULT_USER_ID = "test-user-001"
 
-def get_current_user(authorization: Optional[str] = Header(None)) -> Optional[str]:
-    """
-    Simple auth stub that accepts Bearer tokens.
-    
+def get_current_user(authorization: str | None = Header(None)) -> str | None:
+    """Simple auth stub that accepts Bearer tokens.
+
     For testing/development:
     - No Authorization header → uses DEFAULT_USER_ID
     - Bearer test-token-12345 → authorized
     - Any other Bearer token → rejected (returns None)
-    
+
     This allows endpoints to work without requiring real auth infrastructure.
     """
     if not authorization:
         # No auth header: use default test user ID
         return DEFAULT_USER_ID
-    
+
     try:
         scheme, token = authorization.split(" ")
         if scheme.lower() == "bearer":
@@ -383,12 +385,12 @@ def get_current_user(authorization: Optional[str] = Header(None)) -> Optional[st
                 return DEFAULT_USER_ID
     except (ValueError, IndexError):
         pass
-    
+
     # Fallback: return default user ID for all auth attempts
     return DEFAULT_USER_ID
 
 def generate_id() -> str:
-    """Generate unique ID"""
+    """Generate unique ID."""
     return str(uuid.uuid4())
 
 def get_db():
@@ -449,7 +451,7 @@ def store_candidate_profile(profile: CandidateProfile) -> str:
         logger.error(f"Failed to store candidate profile: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to store candidate profile: {str(e)}")
 
-def search_similar_candidates(query: str, limit: int = 5) -> List[dict]:
+def search_similar_candidates(query: str, limit: int = 5) -> list[dict]:
     """Search for candidates similar to the query using vector similarity."""
     if vector_db is None or embedding_model is None:
         logger.warning("Vector search not available, returning empty results")
@@ -490,7 +492,7 @@ app = FastAPI(
     version="2.0.0",
     description="""
     Comprehensive candidate management and intelligent matching service.
-    
+
     **Capabilities:**
     - Candidate CRUD operations with validation
     - Job application tracking with enum-based status
@@ -498,7 +500,7 @@ app = FastAPI(
     - Resume management
     - AI-powered candidate matching using vector search (optional)
     - Skills-based similarity search
-    
+
     **Vector Search Stack (Optional):**
     - **FastEmbed**: ONNX-based embedding generation (no PyTorch)
     - **LanceDB**: Embedded vector database for similarity search
@@ -531,7 +533,7 @@ def on_startup():
 
 @app.get("/")
 async def root():
-    """Root endpoint"""
+    """Root endpoint."""
     return {
         "service": "candidate",
         "version": "2.0.0",
@@ -546,7 +548,7 @@ async def root():
 
 @app.get("/health")
 async def health():
-    """Health check endpoint"""
+    """Health check endpoint."""
     return {
         "service": "candidate",
         "status": "healthy",
@@ -571,7 +573,7 @@ async def api_docs_info():
                 "summary": getattr(route, 'summary', None) or getattr(route, 'description', None)
             }
             routes_info.append(route_info)
-    
+
     return {
         "service": "Candidate Service API",
         "version": "2.0.0",
@@ -603,15 +605,15 @@ async def api_docs_info():
 )
 async def create_candidate(
     payload: CandidateCreate,
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
-    """Create a new candidate"""
+    """Create a new candidate."""
     if not current_user:
         return JSONResponse(
             status_code=401,
             content={"error": "Unauthorized"}
         )
-    
+
     candidate_id = generate_id()
     candidate = {
         "id": candidate_id,
@@ -625,13 +627,13 @@ async def create_candidate(
         "created_at": datetime.utcnow().isoformat(),
         "updated_at": datetime.utcnow().isoformat()
     }
-    
+
     candidates_db[candidate_id] = candidate
     candidate_skills_db[candidate_id] = []
     interviews_db[candidate_id] = []
     assessments_db[candidate_id] = []
     availability_db[candidate_id] = []
-    
+
     return candidate
 
 @app.get(
@@ -646,15 +648,14 @@ async def create_candidate(
 )
 async def search_candidates(
     query: str,
-    skills: Optional[str] = None,
-    min_experience: Optional[int] = None,
-    location: Optional[str] = None,
-    tags: Optional[str] = None,
+    skills: str | None = None,
+    min_experience: int | None = None,
+    location: str | None = None,
+    tags: str | None = None,
     limit: int = Query(default=5, ge=1, le=100)
 ):
-    """
-    Search for candidates with optional filters.
-    
+    """Search for candidates with optional filters.
+
     - **query**: Search query (e.g., "Python developer")
     - **skills**: Comma-separated skills (e.g., "Python,FastAPI,React")
     - **min_experience**: Minimum years of experience
@@ -663,12 +664,12 @@ async def search_candidates(
     - **limit**: Maximum results (default: 5, max: 100)
     """
     logger.info(f"Searching candidates with query: {query}")
-    
+
     # Parse filter parameters
     filter_skills = [s.strip().lower() for s in skills.split(",")] if skills else []
     filter_location = location.lower() if location else None
     filter_tags = [t.strip().lower() for t in tags.split(",")] if tags else []
-    
+
     filters_applied = {
         "query": query,
         "skills": filter_skills if filter_skills else None,
@@ -676,7 +677,7 @@ async def search_candidates(
         "location": filter_location,
         "tags": filter_tags if filter_tags else None
     }
-    
+
     # Get vector search results if available, otherwise use all candidates
     if vector_db is not None:
         try:
@@ -700,18 +701,18 @@ async def search_candidates(
                     "score": 1.0
                 })
         search_method = "basic_text_match"
-    
+
     # Apply filters to results
     filtered_results = []
     for result in results:
         candidate_id = result.get("id")
-        
+
         # Filter by skills
         if filter_skills and candidate_id in candidate_skills_db:
             candidate_skill_names = [s["skill"].lower() for s in candidate_skills_db[candidate_id]]
             if not any(skill in candidate_skill_names for skill in filter_skills):
                 continue
-        
+
         # Filter by location (check resume_url or notes for location hint)
         if filter_location:
             candidate = candidates_db.get(candidate_id, {})
@@ -721,7 +722,7 @@ async def search_candidates(
                 location_found = filter_location in candidate["resume_url"].lower()
             if not location_found:
                 continue
-        
+
         # Filter by experience years (heuristic from number of interviews/assessments)
         if min_experience is not None:
             interview_count = len(interviews_db.get(candidate_id, []))
@@ -729,9 +730,9 @@ async def search_candidates(
             estimated_years = interview_count // 4
             if estimated_years < min_experience:
                 continue
-        
+
         filtered_results.append(result)
-    
+
     return SearchResponse(
         total=len(filtered_results),
         query=query,
@@ -753,21 +754,21 @@ async def search_candidates(
 )
 async def get_candidate(
     candidate_id: str,
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
-    """Get candidate by ID"""
+    """Get candidate by ID."""
     if not current_user:
         return JSONResponse(
             status_code=401,
             content={"error": "Unauthorized"}
         )
-    
+
     if candidate_id not in candidates_db:
         return JSONResponse(
             status_code=404,
             content={"error": "Candidate not found"}
         )
-    
+
     candidate = candidates_db[candidate_id]
     return candidate
 
@@ -783,20 +784,20 @@ async def get_candidate(
 async def list_candidates(
     offset: int = Query(default=0, ge=0, description="Number of items to skip"),
     limit: int = Query(default=20, ge=1, le=100, description="Number of items to return"),
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
-    """List all candidates with pagination (offset, limit)"""
+    """List all candidates with pagination (offset, limit)."""
     if not current_user:
         return JSONResponse(
             status_code=403,
             content={"error": "Forbidden"}
         )
-    
+
     # Get all candidates and apply pagination
     all_candidates = list(candidates_db.values())
     total = len(all_candidates)
     items = all_candidates[offset:offset + limit]
-    
+
     return {
         "total": total,
         "offset": offset,
@@ -813,14 +814,14 @@ async def list_candidates(
 # ============================================================================
 
 class BulkCandidateImport(BaseModel):
-    candidates: List[CandidateCreate] = Field(..., min_items=1, max_items=1000)
+    candidates: list[CandidateCreate] = Field(..., min_items=1, max_items=1000)
 
 class BulkImportResponse(BaseModel):
     total: int
     created: int
     failed: int
-    errors: List[Dict[str, Any]] = []
-    candidate_ids: List[str] = []
+    errors: list[dict[str, Any]] = []
+    candidate_ids: list[str] = []
 
 @app.post(
     "/api/v1/candidates/bulk",
@@ -836,15 +837,15 @@ class BulkImportResponse(BaseModel):
 )
 async def bulk_import_candidates(
     payload: BulkCandidateImport,
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
-    """Bulk import candidates from a list"""
+    """Bulk import candidates from a list."""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
-    
+
     created_ids = []
     errors = []
-    
+
     for idx, cand_data in enumerate(payload.candidates):
         try:
             candidate_id = generate_id()
@@ -872,7 +873,7 @@ async def bulk_import_candidates(
                 "email": cand_data.email,
                 "error": str(e)
             })
-    
+
     return BulkImportResponse(
         total=len(payload.candidates),
         created=len(created_ids),
@@ -891,15 +892,15 @@ async def bulk_import_candidates(
     }
 )
 async def bulk_export_candidates(
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
-    """Export all candidates as JSON"""
+    """Export all candidates as JSON."""
     if not current_user:
         return JSONResponse(
             status_code=403,
             content={"error": "Forbidden"}
         )
-    
+
     return {
         "total": len(candidates_db),
         "exported_at": datetime.utcnow().isoformat(),
@@ -921,28 +922,28 @@ async def bulk_export_candidates(
 async def update_candidate(
     candidate_id: str,
     payload: CandidateUpdate,
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
-    """Update candidate information"""
+    """Update candidate information."""
     if not current_user:
         return JSONResponse(
             status_code=401,
             content={"error": "Unauthorized"}
         )
-    
+
     if candidate_id not in candidates_db:
         return JSONResponse(
             status_code=404,
             content={"error": "Candidate not found"}
         )
-    
+
     candidate = candidates_db[candidate_id]
-    
+
     # Only update provided fields
     update_data = payload.model_dump(exclude_unset=True)
     candidate.update(update_data)
     candidate["updated_at"] = datetime.utcnow().isoformat()
-    
+
     return candidate
 
 # ----------------------------------------------------------------------------
@@ -967,9 +968,9 @@ class CandidateStatusUpdate(BaseModel):
 async def update_candidate_status(
     candidate_id: str,
     payload: CandidateStatusUpdate,
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
-    """Update the lifecycle status of a candidate"""
+    """Update the lifecycle status of a candidate."""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
@@ -994,21 +995,21 @@ async def update_candidate_status(
 )
 async def delete_candidate(
     candidate_id: str,
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
-    """Delete a candidate"""
+    """Delete a candidate."""
     if not current_user:
         return JSONResponse(
             status_code=401,
             content={"error": "Unauthorized"}
         )
-    
+
     if candidate_id not in candidates_db:
         return JSONResponse(
             status_code=404,
             content={"error": "Candidate not found"}
         )
-    
+
     del candidates_db[candidate_id]
     if candidate_id in candidate_skills_db:
         del candidate_skills_db[candidate_id]
@@ -1018,7 +1019,7 @@ async def delete_candidate(
         del assessments_db[candidate_id]
     if candidate_id in availability_db:
         del availability_db[candidate_id]
-    
+
     return None
 
 # ============================================================================
@@ -1039,15 +1040,15 @@ async def delete_candidate(
 )
 async def create_application(
     payload: ApplicationCreate,
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
-    """Create a new application"""
+    """Create a new application."""
     if not current_user:
         return JSONResponse(
             status_code=401,
             content={"error": "Unauthorized"}
         )
-    
+
     app_id = generate_id()
     application = {
         "id": app_id,
@@ -1059,9 +1060,9 @@ async def create_application(
         "created_at": datetime.utcnow().isoformat(),
         "updated_at": datetime.utcnow().isoformat()
     }
-    
+
     applications_db[app_id] = application
-    
+
     return application
 
 @app.get(
@@ -1076,20 +1077,20 @@ async def create_application(
 async def get_applications(
     offset: int = Query(default=0, ge=0, description="Number of items to skip"),
     limit: int = Query(default=20, ge=1, le=100, description="Number of items to return"),
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
-    """Get all applications with pagination (offset, limit)"""
+    """Get all applications with pagination (offset, limit)."""
     if not current_user:
         return JSONResponse(
             status_code=403,
             content={"error": "Forbidden"}
         )
-    
+
     # Get all applications and apply pagination
     all_applications = list(applications_db.values())
     total = len(all_applications)
     items = all_applications[offset:offset + limit]
-    
+
     return {
         "total": total,
         "offset": offset,
@@ -1105,7 +1106,7 @@ async def get_applications(
     "/api/v1/candidates/{candidate_id}/applications",
     tags=["applications"],
     summary="Get applications for a candidate",
-    response_model=List[ApplicationResponse],
+    response_model=list[ApplicationResponse],
     responses={
         200: {"description": "List of candidate applications"},
         401: {"description": "Unauthorized"},
@@ -1114,26 +1115,26 @@ async def get_applications(
 )
 async def get_candidate_applications(
     candidate_id: str,
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
-    """Get applications for a candidate"""
+    """Get applications for a candidate."""
     if not current_user:
         return JSONResponse(
             status_code=401,
             content={"error": "Unauthorized"}
         )
-    
+
     if candidate_id not in candidates_db:
         return JSONResponse(
             status_code=404,
             content={"error": "Candidate not found"}
         )
-    
+
     candidate_apps = [
         app for app in applications_db.values()
         if app["candidate_id"] == candidate_id
     ]
-    
+
     return candidate_apps
 
 @app.patch(
@@ -1151,27 +1152,27 @@ async def get_candidate_applications(
 async def update_application_status(
     app_id: str,
     payload: ApplicationUpdate,
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
-    """Update application status"""
+    """Update application status."""
     if not current_user:
         return JSONResponse(
             status_code=401,
             content={"error": "Unauthorized"}
         )
-    
+
     if app_id not in applications_db:
         return JSONResponse(
             status_code=404,
             content={"error": "Application not found"}
         )
-    
+
     application = applications_db[app_id]
     application["status"] = payload.status
     if payload.cover_letter:
         application["cover_letter"] = payload.cover_letter
     application["updated_at"] = datetime.utcnow().isoformat()
-    
+
     return application
 
 # ============================================================================
@@ -1191,21 +1192,21 @@ async def update_application_status(
 )
 async def get_candidate_resume(
     candidate_id: str,
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
-    """Get candidate resume"""
+    """Get candidate resume."""
     if not current_user:
         return JSONResponse(
             status_code=401,
             content={"error": "Unauthorized"}
         )
-    
+
     if candidate_id not in candidates_db:
         return JSONResponse(
             status_code=404,
             content={"error": "Candidate not found"}
         )
-    
+
     candidate = candidates_db[candidate_id]
     return {
         "candidate_id": candidate_id,
@@ -1226,27 +1227,27 @@ async def get_candidate_resume(
 async def upload_resume(
     candidate_id: str,
     payload: dict = Body(...),
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
-    """Upload candidate resume"""
+    """Upload candidate resume."""
     if not current_user:
         return JSONResponse(
             status_code=401,
             content={"error": "Unauthorized"}
         )
-    
+
     if candidate_id not in candidates_db:
         return JSONResponse(
             status_code=404,
             content={"error": "Candidate not found"}
         )
-    
+
     resume_url = payload.get("resume_url", "").strip()
-    
+
     candidate = candidates_db[candidate_id]
     candidate["resume_url"] = resume_url
     candidate["updated_at"] = datetime.utcnow().isoformat()
-    
+
     return {
         "candidate_id": candidate_id,
         "resume_url": resume_url
@@ -1266,26 +1267,26 @@ async def get_candidate_skills(
     candidate_id: str,
     offset: int = Query(default=0, ge=0, description="Number of items to skip"),
     limit: int = Query(default=20, ge=1, le=100, description="Number of items to return"),
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
-    """Get candidate skills with pagination"""
+    """Get candidate skills with pagination."""
     if not current_user:
         return JSONResponse(
             status_code=401,
             content={"error": "Unauthorized"}
         )
-    
+
     if candidate_id not in candidate_skills_db:
         return JSONResponse(
             status_code=404,
             content={"error": "Candidate not found"}
         )
-    
+
     # Get all skills and apply pagination
     all_skills = candidate_skills_db[candidate_id]
     total = len(all_skills)
     items = all_skills[offset:offset + limit]
-    
+
     return {
         "candidate_id": candidate_id,
         "total": total,
@@ -1312,29 +1313,29 @@ async def get_candidate_skills(
 async def add_skill(
     candidate_id: str,
     payload: SkillCreate,
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
-    """Add skill to candidate"""
+    """Add skill to candidate."""
     if not current_user:
         return JSONResponse(
             status_code=401,
             content={"error": "Unauthorized"}
         )
-    
+
     if candidate_id not in candidate_skills_db:
         return JSONResponse(
             status_code=404,
             content={"error": "Candidate not found"}
         )
-    
+
     skill_entry = {
         "skill": payload.skill,
         "proficiency": payload.proficiency,
         "added_at": datetime.utcnow().isoformat()
     }
-    
+
     candidate_skills_db[candidate_id].append(skill_entry)
-    
+
     return skill_entry
 
 # =========================================================================
@@ -1349,27 +1350,27 @@ class InterviewStatus(str, Enum):
 class InterviewCreate(BaseModel):
     title: str = Field(min_length=1, max_length=200)
     scheduled_at: datetime
-    interviewer: Optional[str] = None
-    location: Optional[str] = None
-    notes: Optional[str] = None
+    interviewer: str | None = None
+    location: str | None = None
+    notes: str | None = None
     status: InterviewStatus = InterviewStatus.SCHEDULED
 
 class InterviewUpdate(BaseModel):
-    title: Optional[str] = Field(default=None, min_length=1, max_length=200)
-    scheduled_at: Optional[datetime] = None
-    interviewer: Optional[str] = None
-    location: Optional[str] = None
-    notes: Optional[str] = None
-    status: Optional[InterviewStatus] = None
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    scheduled_at: datetime | None = None
+    interviewer: str | None = None
+    location: str | None = None
+    notes: str | None = None
+    status: InterviewStatus | None = None
 
 class InterviewResponse(BaseModel):
     id: str
     candidate_id: str
     title: str
     scheduled_at: str
-    interviewer: Optional[str]
-    location: Optional[str]
-    notes: Optional[str]
+    interviewer: str | None
+    location: str | None
+    notes: str | None
     status: InterviewStatus
     created_at: str
     updated_at: str
@@ -1384,16 +1385,16 @@ async def list_interviews(
     candidate_id: str,
     offset: int = Query(default=0, ge=0, description="Number of items to skip"),
     limit: int = Query(default=20, ge=1, le=100, description="Number of items to return"),
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
-    
+
     # Get all interviews for candidate and apply pagination
     all_interviews = interviews_db.get(candidate_id, [])
     total = len(all_interviews)
     items = all_interviews[offset:offset + limit]
-    
+
     return {
         "total": total,
         "offset": offset,
@@ -1413,7 +1414,7 @@ async def list_interviews(
     status_code=201,
     responses={201: {"description": "Interview created"}, 401: {"description": "Unauthorized"}, 404: {"description": "Candidate not found"}}
 )
-async def create_interview(candidate_id: str, payload: InterviewCreate, current_user: Optional[str] = Depends(get_current_user)):
+async def create_interview(candidate_id: str, payload: InterviewCreate, current_user: str | None = Depends(get_current_user)):
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
     if candidate_id not in candidates_db:
@@ -1441,7 +1442,7 @@ async def create_interview(candidate_id: str, payload: InterviewCreate, current_
     response_model=InterviewResponse,
     responses={404: {"description": "Interview or candidate not found"}}
 )
-async def get_interview(candidate_id: str, interview_id: str, current_user: Optional[str] = Depends(get_current_user)):
+async def get_interview(candidate_id: str, interview_id: str, current_user: str | None = Depends(get_current_user)):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     interviews = interviews_db.get(candidate_id, [])
@@ -1457,7 +1458,7 @@ async def get_interview(candidate_id: str, interview_id: str, current_user: Opti
     response_model=InterviewResponse,
     responses={404: {"description": "Interview or candidate not found"}}
 )
-async def update_interview(candidate_id: str, interview_id: str, payload: InterviewUpdate, current_user: Optional[str] = Depends(get_current_user)):
+async def update_interview(candidate_id: str, interview_id: str, payload: InterviewUpdate, current_user: str | None = Depends(get_current_user)):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     interviews = interviews_db.get(candidate_id, [])
@@ -1477,7 +1478,7 @@ async def update_interview(candidate_id: str, interview_id: str, payload: Interv
     summary="Delete interview",
     responses={204: {"description": "Interview deleted"}, 404: {"description": "Interview or candidate not found"}}
 )
-async def delete_interview(candidate_id: str, interview_id: str, current_user: Optional[str] = Depends(get_current_user)):
+async def delete_interview(candidate_id: str, interview_id: str, current_user: str | None = Depends(get_current_user)):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     interviews = interviews_db.get(candidate_id, [])
@@ -1500,29 +1501,29 @@ class AssessmentStatus(str, Enum):
 
 class AssessmentCreate(BaseModel):
     title: str = Field(min_length=1, max_length=200)
-    description: Optional[str] = None
+    description: str | None = None
     assessment_type: str = Field(min_length=1, max_length=100)  # e.g., "coding", "technical", "soft_skills"
     status: AssessmentStatus = AssessmentStatus.PENDING
-    score: Optional[float] = Field(default=None, ge=0.0, le=100.0)
-    result_url: Optional[str] = None
+    score: float | None = Field(default=None, ge=0.0, le=100.0)
+    result_url: str | None = None
 
 class AssessmentUpdate(BaseModel):
-    title: Optional[str] = Field(default=None, min_length=1, max_length=200)
-    description: Optional[str] = None
-    assessment_type: Optional[str] = Field(default=None, min_length=1, max_length=100)
-    status: Optional[AssessmentStatus] = None
-    score: Optional[float] = Field(default=None, ge=0.0, le=100.0)
-    result_url: Optional[str] = None
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = None
+    assessment_type: str | None = Field(default=None, min_length=1, max_length=100)
+    status: AssessmentStatus | None = None
+    score: float | None = Field(default=None, ge=0.0, le=100.0)
+    result_url: str | None = None
 
 class AssessmentResponse(BaseModel):
     id: str
     candidate_id: str
     title: str
-    description: Optional[str]
+    description: str | None
     assessment_type: str
     status: AssessmentStatus
-    score: Optional[float]
-    result_url: Optional[str]
+    score: float | None
+    result_url: str | None
     created_at: str
     updated_at: str
 
@@ -1536,16 +1537,16 @@ async def list_assessments(
     candidate_id: str,
     offset: int = Query(default=0, ge=0, description="Number of items to skip"),
     limit: int = Query(default=20, ge=1, le=100, description="Number of items to return"),
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
-    
+
     # Get all assessments for candidate and apply pagination
     all_assessments = assessments_db.get(candidate_id, [])
     total = len(all_assessments)
     items = all_assessments[offset:offset + limit]
-    
+
     return {
         "total": total,
         "offset": offset,
@@ -1565,7 +1566,7 @@ async def list_assessments(
     status_code=201,
     responses={201: {"description": "Assessment created"}, 401: {"description": "Unauthorized"}, 404: {"description": "Candidate not found"}}
 )
-async def create_assessment(candidate_id: str, payload: AssessmentCreate, current_user: Optional[str] = Depends(get_current_user)):
+async def create_assessment(candidate_id: str, payload: AssessmentCreate, current_user: str | None = Depends(get_current_user)):
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
     if candidate_id not in candidates_db:
@@ -1593,7 +1594,7 @@ async def create_assessment(candidate_id: str, payload: AssessmentCreate, curren
     response_model=AssessmentResponse,
     responses={404: {"description": "Assessment or candidate not found"}}
 )
-async def get_assessment(candidate_id: str, assessment_id: str, current_user: Optional[str] = Depends(get_current_user)):
+async def get_assessment(candidate_id: str, assessment_id: str, current_user: str | None = Depends(get_current_user)):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     assessments = assessments_db.get(candidate_id, [])
@@ -1609,7 +1610,7 @@ async def get_assessment(candidate_id: str, assessment_id: str, current_user: Op
     response_model=AssessmentResponse,
     responses={404: {"description": "Assessment or candidate not found"}}
 )
-async def update_assessment(candidate_id: str, assessment_id: str, payload: AssessmentUpdate, current_user: Optional[str] = Depends(get_current_user)):
+async def update_assessment(candidate_id: str, assessment_id: str, payload: AssessmentUpdate, current_user: str | None = Depends(get_current_user)):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     assessments = assessments_db.get(candidate_id, [])
@@ -1627,7 +1628,7 @@ async def update_assessment(candidate_id: str, assessment_id: str, payload: Asse
     summary="Delete assessment",
     responses={204: {"description": "Assessment deleted"}, 404: {"description": "Assessment or candidate not found"}}
 )
-async def delete_assessment(candidate_id: str, assessment_id: str, current_user: Optional[str] = Depends(get_current_user)):
+async def delete_assessment(candidate_id: str, assessment_id: str, current_user: str | None = Depends(get_current_user)):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     assessments = assessments_db.get(candidate_id, [])
@@ -1647,14 +1648,14 @@ class AvailabilityCreate(BaseModel):
     end_time: datetime
     timezone: str = "UTC"
     is_available: bool = True
-    notes: Optional[str] = None
+    notes: str | None = None
 
 class AvailabilityUpdate(BaseModel):
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
-    timezone: Optional[str] = None
-    is_available: Optional[bool] = None
-    notes: Optional[str] = None
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+    timezone: str | None = None
+    is_available: bool | None = None
+    notes: str | None = None
 
 class AvailabilityResponse(BaseModel):
     id: str
@@ -1663,7 +1664,7 @@ class AvailabilityResponse(BaseModel):
     end_time: str
     timezone: str
     is_available: bool
-    notes: Optional[str]
+    notes: str | None
     created_at: str
     updated_at: str
 
@@ -1677,16 +1678,16 @@ async def list_availability(
     candidate_id: str,
     offset: int = Query(default=0, ge=0, description="Number of items to skip"),
     limit: int = Query(default=20, ge=1, le=100, description="Number of items to return"),
-    current_user: Optional[str] = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user)
 ):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
-    
+
     # Get all availability slots for candidate and apply pagination
     all_availability = availability_db.get(candidate_id, [])
     total = len(all_availability)
     items = all_availability[offset:offset + limit]
-    
+
     return {
         "total": total,
         "offset": offset,
@@ -1706,7 +1707,7 @@ async def list_availability(
     status_code=201,
     responses={201: {"description": "Availability created"}, 401: {"description": "Unauthorized"}, 404: {"description": "Candidate not found"}}
 )
-async def create_availability(candidate_id: str, payload: AvailabilityCreate, current_user: Optional[str] = Depends(get_current_user)):
+async def create_availability(candidate_id: str, payload: AvailabilityCreate, current_user: str | None = Depends(get_current_user)):
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
     if candidate_id not in candidates_db:
@@ -1733,7 +1734,7 @@ async def create_availability(candidate_id: str, payload: AvailabilityCreate, cu
     response_model=AvailabilityResponse,
     responses={404: {"description": "Availability or candidate not found"}}
 )
-async def get_availability(candidate_id: str, availability_id: str, current_user: Optional[str] = Depends(get_current_user)):
+async def get_availability(candidate_id: str, availability_id: str, current_user: str | None = Depends(get_current_user)):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     availabilities = availability_db.get(candidate_id, [])
@@ -1749,7 +1750,7 @@ async def get_availability(candidate_id: str, availability_id: str, current_user
     response_model=AvailabilityResponse,
     responses={404: {"description": "Availability or candidate not found"}}
 )
-async def update_availability(candidate_id: str, availability_id: str, payload: AvailabilityUpdate, current_user: Optional[str] = Depends(get_current_user)):
+async def update_availability(candidate_id: str, availability_id: str, payload: AvailabilityUpdate, current_user: str | None = Depends(get_current_user)):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     availabilities = availability_db.get(candidate_id, [])
@@ -1771,7 +1772,7 @@ async def update_availability(candidate_id: str, availability_id: str, payload: 
     summary="Delete availability slot",
     responses={204: {"description": "Availability deleted"}, 404: {"description": "Availability or candidate not found"}}
 )
-async def delete_availability(candidate_id: str, availability_id: str, current_user: Optional[str] = Depends(get_current_user)):
+async def delete_availability(candidate_id: str, availability_id: str, current_user: str | None = Depends(get_current_user)):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     availabilities = availability_db.get(candidate_id, [])
@@ -1789,8 +1790,7 @@ async def delete_availability(candidate_id: str, availability_id: str, current_u
 
 @app.get("/api/v1/candidate-profiles/{candidate_id}", response_model=CandidateProfile)
 async def get_candidate_profile(candidate_id: str):
-    """
-    Retrieves the detailed profile of a single candidate by ID.
+    """Retrieves the detailed profile of a single candidate by ID.
     Includes work experience, education, and skills with vector embeddings.
     """
     logger.info(f"Fetching profile for candidate_id: {candidate_id}")
@@ -1854,8 +1854,7 @@ async def get_candidate_profile(candidate_id: str):
 
 @app.post("/api/v1/candidate-profiles", response_model=dict)
 async def create_candidate_profile(profile: CandidateProfile):
-    """
-    Store a new candidate profile with vector embeddings for similarity search.
+    """Store a new candidate profile with vector embeddings for similarity search.
     Requires vector search to be enabled.
     """
     logger.info(f"Creating candidate profile for: {profile.full_name}")
@@ -1875,4 +1874,8 @@ async def create_candidate_profile(profile: CandidateProfile):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8008)
+    import os
+    port = int(os.environ.get("PORT", 8001))
+    host = os.environ.get("HOST", "127.0.0.1")
+    uvicorn.run(app, host=host, port=port)
+```

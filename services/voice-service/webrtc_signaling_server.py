@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-"""
-Simple WebRTC Signaling Server for Voice Service Testing
-Provides WebSocket signaling for WebRTC connections during testing
+"""Simple WebRTC Signaling Server for Voice Service Testing
+Provides WebSocket signaling for WebRTC connections during testing.
 """
 
-import asyncio
-import json
 import logging
 import os
-from typing import Dict, Set
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -27,11 +24,11 @@ app.add_middleware(
 )
 
 # Connected clients by session_id and peer_type
-connected_clients: Dict[str, Dict[str, WebSocket]] = {}
+connected_clients: dict[str, dict[str, WebSocket]] = {}
 
 @app.websocket("/webrtc/signal")
 async def signaling_endpoint(websocket: WebSocket):
-    """WebRTC signaling endpoint for peer-to-peer connections"""
+    """WebRTC signaling endpoint for peer-to-peer connections."""
     await websocket.accept()
 
     session_id = None
@@ -90,7 +87,7 @@ async def signaling_endpoint(websocket: WebSocket):
                 logger.info(f"Client disconnected: session={session_id}, type={peer_type}")
 
 async def handle_signaling_message(session_id: str, sender_type: str, message: dict):
-    """Forward signaling messages between peers"""
+    """Forward signaling messages between peers."""
     try:
         msg_type = message.get("type")
 
@@ -120,7 +117,7 @@ async def handle_signaling_message(session_id: str, sender_type: str, message: d
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
+    """Health check endpoint."""
     return {
         "status": "healthy",
         "service": "webrtc-signaling",
@@ -130,7 +127,7 @@ async def health_check():
 
 @app.get("/sessions")
 async def list_sessions():
-    """List active sessions"""
+    """List active sessions."""
     return {
         "sessions": [
             {
@@ -146,7 +143,7 @@ if __name__ == "__main__":
     import uvicorn
 
     port = int(os.getenv("SIGNALING_PORT", "8005"))
-    host = os.getenv("SIGNALING_HOST", "0.0.0.0")
+    host = os.getenv("SIGNALING_HOST", os.getenv("HOST", "127.0.0.1"))
 
     logger.info(f"Starting WebRTC Signaling Server on {host}:{port}")
     uvicorn.run(app, host=host, port=port)

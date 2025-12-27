@@ -1,9 +1,8 @@
 """Modular Text-to-Speech Service
-Supports both local Piper TTS and OpenAI API TTS with unified interface
+Supports both local Piper TTS and OpenAI API TTS with unified interface.
 """
 
 import logging
-from typing import Optional
 
 from .piper_tts_service import MockPiperTTSService, PiperTTSService
 
@@ -19,7 +18,7 @@ except ImportError:
 
 
 class ModularTTSService:
-    """Modular TTS service that can use either local Piper or OpenAI API
+    """Modular TTS service that can use either local Piper or OpenAI API.
 
     Features:
     - Unified interface for both local and API TTS
@@ -33,14 +32,14 @@ class ModularTTSService:
         self,
         provider: str = "local",  # "local" or "openai"
         # Piper (local) parameters
-        piper_model_path: Optional[str] = None,
-        piper_config_path: Optional[str] = None,
-        piper_binary: Optional[str] = None,
+        piper_model_path: str | None = None,
+        piper_config_path: str | None = None,
+        piper_binary: str | None = None,
         # OpenAI API parameters
-        openai_api_key: Optional[str] = None,
-        openai_model: Optional[str] = None,
-        openai_voice: Optional[str] = None,
-        openai_base_url: Optional[str] = None,
+        openai_api_key: str | None = None,
+        openai_model: str | None = None,
+        openai_voice: str | None = None,
+        openai_base_url: str | None = None,
     ):
         """Initialize modular TTS service.
 
@@ -97,17 +96,19 @@ class ModularTTSService:
         speed: float = 1.0,
         extract_phonemes: bool = True,
     ) -> dict:
-        """Synthesize speech from text using the configured provider.
+        """Synthesize speech from text using the configured provider (local or OpenAI).
+
+        Automatically tracks usage statistics and estimates costs for API-based providers.
 
         Args:
-            text: Text to synthesize
-            output_path: Path to save WAV file
-            voice: Voice name (provider-specific)
-            speed: Speech speed multiplier
-            extract_phonemes: Extract phoneme timing for lip-sync
+            text: The input text to convert to speech.
+            output_path: File system path where the resulting WAV file will be saved.
+            voice: Optional voice identifier (defaults to provider-specific default).
+            speed: Speaking rate multiplier (default: 1.0).
+            extract_phonemes: Whether to generate phoneme timing data for lip-sync.
 
         Returns:
-            Dictionary with synthesis results
+            A dictionary containing the results of the synthesis, including duration and file info.
         """
         # Update usage stats
         self.usage_stats["total_requests"] += 1
@@ -143,15 +144,15 @@ class ModularTTSService:
     def synthesize_streaming(
         self, text: str, chunk_size: int = 4096, voice: str = None
     ) -> list[bytes]:
-        """Synthesize speech in chunks for streaming.
+        """Synthesize speech in real-time chunks for low-latency streaming.
 
         Args:
-            text: Text to synthesize
-            chunk_size: Audio chunk size in bytes
-            voice: Voice name
+            text: The text string to be synthesized.
+            chunk_size: Size of the audio data chunks in bytes (default: 4096).
+            voice: Optional voice identifier.
 
         Returns:
-            List of audio chunks (bytes)
+            A list of audio data chunks as bytes.
         """
         # Use provider-specific default voice if none specified
         if voice is None:

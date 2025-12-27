@@ -5,10 +5,11 @@ Port: 8007
 Purpose: User management, profiles, preferences
 """
 
-import pytest
-import httpx
-from typing import Dict, Any
 import time
+from typing import Any
+
+import httpx
+import pytest
 
 
 @pytest.fixture
@@ -36,7 +37,7 @@ def auth_headers(auth_token):
 
 
 @pytest.fixture
-def user_data() -> Dict[str, Any]:
+def user_data() -> dict[str, Any]:
     """Sample user data"""
     timestamp = int(time.time() * 1000)
     return {
@@ -49,7 +50,7 @@ def user_data() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def user_update_data() -> Dict[str, Any]:
+def user_update_data() -> dict[str, Any]:
     """Sample user update data"""
     return {
         "first_name": "Jane",
@@ -59,7 +60,7 @@ def user_update_data() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def user_preferences() -> Dict[str, Any]:
+def user_preferences() -> dict[str, Any]:
     """Sample user preferences"""
     return {
         "language": "en",
@@ -76,7 +77,7 @@ def user_preferences() -> Dict[str, Any]:
 
 class TestUserServiceBasics:
     """Test basic service health and root endpoints"""
-    
+
     @pytest.mark.asyncio
     async def test_service_health_check(self, user_service_url, async_client):
         """Test health endpoint returns 200"""
@@ -84,7 +85,7 @@ class TestUserServiceBasics:
         assert response.status_code == 200
         data = response.json()
         assert "ok" in data or "status" in data
-    
+
     @pytest.mark.asyncio
     async def test_root_endpoint(self, user_service_url, async_client):
         """Test root endpoint is accessible"""
@@ -98,7 +99,7 @@ class TestUserServiceBasics:
 
 class TestUserCreation:
     """Test user creation endpoints"""
-    
+
     @pytest.mark.asyncio
     async def test_create_user(self, user_service_url, async_client, user_data, auth_headers):
         """Test creating a new user"""
@@ -110,7 +111,7 @@ class TestUserCreation:
         assert response.status_code in [200, 201]
         data = response.json()
         assert "id" in data or "user_id" in data
-    
+
     @pytest.mark.asyncio
     async def test_create_user_missing_email(self, user_service_url, async_client, auth_headers):
         """Test creating user without email fails"""
@@ -124,7 +125,7 @@ class TestUserCreation:
             headers=auth_headers
         )
         assert response.status_code in [400, 422]
-    
+
     @pytest.mark.asyncio
     async def test_create_user_invalid_email(self, user_service_url, async_client, auth_headers):
         """Test creating user with invalid email fails"""
@@ -146,7 +147,7 @@ class TestUserCreation:
 
 class TestUserRetrieval:
     """Test retrieving user information"""
-    
+
     @pytest.mark.asyncio
     async def test_get_user_by_id(self, user_service_url, async_client, auth_headers):
         """Test retrieving user by ID"""
@@ -158,7 +159,7 @@ class TestUserRetrieval:
         if response.status_code == 200:
             data = response.json()
             assert "id" in data or "user_id" in data
-    
+
     @pytest.mark.asyncio
     async def test_get_current_user(self, user_service_url, async_client, auth_headers):
         """Test retrieving current logged-in user"""
@@ -170,7 +171,7 @@ class TestUserRetrieval:
         if response.status_code == 200:
             data = response.json()
             assert "email" in data or "id" in data
-    
+
     @pytest.mark.asyncio
     async def test_list_users(self, user_service_url, async_client, auth_headers):
         """Test listing all users"""
@@ -182,7 +183,7 @@ class TestUserRetrieval:
         if response.status_code == 200:
             data = response.json()
             assert isinstance(data, (dict, list))
-    
+
     @pytest.mark.asyncio
     async def test_search_users(self, user_service_url, async_client, auth_headers):
         """Test searching for users"""
@@ -202,7 +203,7 @@ class TestUserRetrieval:
 
 class TestUserUpdate:
     """Test updating user information"""
-    
+
     @pytest.mark.asyncio
     async def test_update_user(self, user_service_url, async_client, user_update_data, auth_headers):
         """Test updating user information"""
@@ -215,7 +216,7 @@ class TestUserUpdate:
         if response.status_code == 200:
             data = response.json()
             assert "first_name" in data or "id" in data
-    
+
     @pytest.mark.asyncio
     async def test_partial_update_user(self, user_service_url, async_client, auth_headers):
         """Test partial update of user (PATCH)"""
@@ -226,7 +227,7 @@ class TestUserUpdate:
             headers=auth_headers
         )
         assert response.status_code in [200, 201, 404]
-    
+
     @pytest.mark.asyncio
     async def test_update_current_user_profile(self, user_service_url, async_client, user_update_data, auth_headers):
         """Test updating current user's profile"""
@@ -236,7 +237,7 @@ class TestUserUpdate:
             headers=auth_headers
         )
         assert response.status_code in [200, 201, 401]
-    
+
     @pytest.mark.asyncio
     async def test_update_with_invalid_email(self, user_service_url, async_client, auth_headers):
         """Test updating user with invalid email fails"""
@@ -255,7 +256,7 @@ class TestUserUpdate:
 
 class TestUserDeletion:
     """Test user deletion"""
-    
+
     @pytest.mark.asyncio
     async def test_delete_user(self, user_service_url, async_client, auth_headers):
         """Test deleting a user"""
@@ -264,7 +265,7 @@ class TestUserDeletion:
             headers=auth_headers
         )
         assert response.status_code in [200, 201, 204, 404]
-    
+
     @pytest.mark.asyncio
     async def test_soft_delete_user(self, user_service_url, async_client, auth_headers):
         """Test soft deleting user (deactivate)"""
@@ -273,7 +274,7 @@ class TestUserDeletion:
             headers=auth_headers
         )
         assert response.status_code in [200, 201, 404]
-    
+
     @pytest.mark.asyncio
     async def test_reactivate_user(self, user_service_url, async_client, auth_headers):
         """Test reactivating deactivated user"""
@@ -290,7 +291,7 @@ class TestUserDeletion:
 
 class TestUserProfile:
     """Test user profile management"""
-    
+
     @pytest.mark.asyncio
     async def test_get_user_profile(self, user_service_url, async_client, auth_headers):
         """Test retrieving user profile"""
@@ -299,7 +300,7 @@ class TestUserProfile:
             headers=auth_headers
         )
         assert response.status_code in [200, 404]
-    
+
     @pytest.mark.asyncio
     async def test_update_user_profile(self, user_service_url, async_client, auth_headers):
         """Test updating user profile"""
@@ -314,7 +315,7 @@ class TestUserProfile:
             headers=auth_headers
         )
         assert response.status_code in [200, 201, 404]
-    
+
     @pytest.mark.asyncio
     async def test_get_user_avatar(self, user_service_url, async_client, auth_headers):
         """Test getting user avatar URL"""
@@ -323,7 +324,7 @@ class TestUserProfile:
             headers=auth_headers
         )
         assert response.status_code in [200, 404]
-    
+
     @pytest.mark.asyncio
     async def test_upload_user_avatar(self, user_service_url, async_client, auth_headers):
         """Test uploading user avatar"""
@@ -343,7 +344,7 @@ class TestUserProfile:
 
 class TestUserPreferences:
     """Test user preferences management"""
-    
+
     @pytest.mark.asyncio
     async def test_get_user_preferences(self, user_service_url, async_client, auth_headers):
         """Test retrieving user preferences"""
@@ -355,9 +356,9 @@ class TestUserPreferences:
         if response.status_code == 200:
             data = response.json()
             assert isinstance(data, dict)
-    
+
     @pytest.mark.asyncio
-    async def test_update_user_preferences(self, user_service_url, async_client, 
+    async def test_update_user_preferences(self, user_service_url, async_client,
                                           user_preferences, auth_headers):
         """Test updating user preferences"""
         response = await async_client.put(
@@ -366,7 +367,7 @@ class TestUserPreferences:
             headers=auth_headers
         )
         assert response.status_code in [200, 201, 404]
-    
+
     @pytest.mark.asyncio
     async def test_get_current_user_preferences(self, user_service_url, async_client, auth_headers):
         """Test getting current user's preferences"""
@@ -375,9 +376,9 @@ class TestUserPreferences:
             headers=auth_headers
         )
         assert response.status_code in [200, 401, 404]
-    
+
     @pytest.mark.asyncio
-    async def test_update_current_user_preferences(self, user_service_url, async_client, 
+    async def test_update_current_user_preferences(self, user_service_url, async_client,
                                                    user_preferences, auth_headers):
         """Test updating current user's preferences"""
         response = await async_client.put(
@@ -394,7 +395,7 @@ class TestUserPreferences:
 
 class TestUserContactInformation:
     """Test managing user contact information"""
-    
+
     @pytest.mark.asyncio
     async def test_get_user_emails(self, user_service_url, async_client, auth_headers):
         """Test retrieving user email addresses"""
@@ -403,7 +404,7 @@ class TestUserContactInformation:
             headers=auth_headers
         )
         assert response.status_code in [200, 404]
-    
+
     @pytest.mark.asyncio
     async def test_add_secondary_email(self, user_service_url, async_client, auth_headers):
         """Test adding secondary email"""
@@ -413,7 +414,7 @@ class TestUserContactInformation:
             headers=auth_headers
         )
         assert response.status_code in [200, 201, 404]
-    
+
     @pytest.mark.asyncio
     async def test_remove_email(self, user_service_url, async_client, auth_headers):
         """Test removing email address"""
@@ -422,7 +423,7 @@ class TestUserContactInformation:
             headers=auth_headers
         )
         assert response.status_code in [200, 201, 204, 404]
-    
+
     @pytest.mark.asyncio
     async def test_get_user_phone_numbers(self, user_service_url, async_client, auth_headers):
         """Test retrieving user phone numbers"""
@@ -431,7 +432,7 @@ class TestUserContactInformation:
             headers=auth_headers
         )
         assert response.status_code in [200, 404]
-    
+
     @pytest.mark.asyncio
     async def test_add_phone_number(self, user_service_url, async_client, auth_headers):
         """Test adding phone number"""
@@ -441,7 +442,7 @@ class TestUserContactInformation:
             headers=auth_headers
         )
         assert response.status_code in [200, 201, 404]
-    
+
     @pytest.mark.asyncio
     async def test_remove_phone_number(self, user_service_url, async_client, auth_headers):
         """Test removing phone number"""
@@ -458,7 +459,7 @@ class TestUserContactInformation:
 
 class TestUserActivity:
     """Test user activity tracking"""
-    
+
     @pytest.mark.asyncio
     async def test_get_user_activity_log(self, user_service_url, async_client, auth_headers):
         """Test retrieving user activity log"""
@@ -467,7 +468,7 @@ class TestUserActivity:
             headers=auth_headers
         )
         assert response.status_code in [200, 404]
-    
+
     @pytest.mark.asyncio
     async def test_get_user_sessions(self, user_service_url, async_client, auth_headers):
         """Test retrieving user sessions"""
@@ -476,7 +477,7 @@ class TestUserActivity:
             headers=auth_headers
         )
         assert response.status_code in [200, 404]
-    
+
     @pytest.mark.asyncio
     async def test_revoke_user_session(self, user_service_url, async_client, auth_headers):
         """Test revoking a user session"""
@@ -493,7 +494,7 @@ class TestUserActivity:
 
 class TestUserMetadata:
     """Test user metadata"""
-    
+
     @pytest.mark.asyncio
     async def test_get_user_statistics(self, user_service_url, async_client, auth_headers):
         """Test retrieving user statistics"""
@@ -502,7 +503,7 @@ class TestUserMetadata:
             headers=auth_headers
         )
         assert response.status_code in [200, 404]
-    
+
     @pytest.mark.asyncio
     async def test_get_user_created_date(self, user_service_url, async_client, auth_headers):
         """Test getting user creation date"""
@@ -522,7 +523,7 @@ class TestUserMetadata:
 
 class TestUserErrorHandling:
     """Test error handling and edge cases"""
-    
+
     @pytest.mark.asyncio
     async def test_get_nonexistent_user(self, user_service_url, async_client, auth_headers):
         """Test getting non-existent user returns 404"""
@@ -531,7 +532,7 @@ class TestUserErrorHandling:
             headers=auth_headers
         )
         assert response.status_code == 404
-    
+
     @pytest.mark.asyncio
     async def test_unauthorized_access(self, user_service_url, async_client):
         """Test unauthorized requests are rejected"""
@@ -539,7 +540,7 @@ class TestUserErrorHandling:
             f"{user_service_url}/api/v1/users/123"
         )
         assert response.status_code in [401, 403]
-    
+
     @pytest.mark.asyncio
     async def test_invalid_json_request(self, user_service_url, async_client, auth_headers):
         """Test invalid JSON is rejected"""
@@ -557,7 +558,7 @@ class TestUserErrorHandling:
 
 class TestUserIntegration:
     """Test user service integration scenarios"""
-    
+
     @pytest.mark.asyncio
     async def test_user_lifecycle(self, user_service_url, async_client, user_data, auth_headers):
         """Test complete user lifecycle: create -> update -> retrieve -> delete"""
@@ -568,10 +569,10 @@ class TestUserIntegration:
             headers=auth_headers
         )
         assert create_response.status_code in [200, 201]
-        
+
         if create_response.status_code in [200, 201]:
             user_id = create_response.json().get("id") or create_response.json().get("user_id")
-            
+
             if user_id:
                 # Retrieve
                 get_response = await async_client.get(
@@ -579,7 +580,7 @@ class TestUserIntegration:
                     headers=auth_headers
                 )
                 assert get_response.status_code == 200
-                
+
                 # Update
                 update_response = await async_client.put(
                     f"{user_service_url}/api/v1/users/{user_id}",
@@ -587,7 +588,7 @@ class TestUserIntegration:
                     headers=auth_headers
                 )
                 assert update_response.status_code in [200, 201]
-                
+
                 # Delete
                 delete_response = await async_client.delete(
                     f"{user_service_url}/api/v1/users/{user_id}",

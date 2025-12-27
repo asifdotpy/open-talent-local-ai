@@ -1,11 +1,10 @@
-"""
-Pydantic models for vector matching.
+"""Pydantic models for vector matching.
 These are used for API request/response, not database models.
 """
 
-from pydantic import BaseModel, Field
-from typing import List, Optional
 from datetime import datetime
+
+from pydantic import BaseModel, Field
 
 
 class CandidateEmbedding(BaseModel):
@@ -14,9 +13,9 @@ class CandidateEmbedding(BaseModel):
     full_name: str
     email: str
     profile_text: str = Field(..., description="Concatenated profile text for embedding")
-    embedding: Optional[List[float]] = Field(None, description="384-dim embedding vector")
-    skills: List[str] = Field(default_factory=list)
-    experience_years: Optional[int] = None
+    embedding: list[float] | None = Field(None, description="384-dim embedding vector")
+    skills: list[str] = Field(default_factory=list)
+    experience_years: int | None = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -25,9 +24,9 @@ class JobEmbedding(BaseModel):
     job_id: str
     title: str
     description: str = Field(..., description="Full job description text")
-    embedding: Optional[List[float]] = Field(None, description="384-dim embedding vector")
-    required_skills: List[str] = Field(default_factory=list)
-    experience_required: Optional[int] = None
+    embedding: list[float] | None = Field(None, description="384-dim embedding vector")
+    required_skills: list[str] = Field(default_factory=list)
+    experience_required: int | None = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -39,8 +38,8 @@ class MatchResult(BaseModel):
     skill_match_score: float = Field(..., ge=0, le=1, description="Skill overlap score")
     experience_match: bool = Field(..., description="Whether experience requirement is met")
     overall_score: float = Field(..., ge=0, le=100, description="Weighted overall match score")
-    matched_skills: List[str] = Field(default_factory=list)
-    missing_skills: List[str] = Field(default_factory=list)
+    matched_skills: list[str] = Field(default_factory=list)
+    missing_skills: list[str] = Field(default_factory=list)
 
 
 class MatchRequest(BaseModel):
@@ -55,5 +54,5 @@ class MatchResponse(BaseModel):
     """Response with candidate matches for a job."""
     job_id: str
     total_candidates_searched: int
-    matches: List[MatchResult]
+    matches: list[MatchResult]
     search_time_ms: float

@@ -1,5 +1,4 @@
-"""
-Unit Tests for Vosk STT Service
+"""Unit Tests for Vosk STT Service.
 
 Following TDD principles with comprehensive test coverage for production-ready
 speech-to-text service using Vosk (Kaldi-based, CPU-only inference).
@@ -7,29 +6,30 @@ speech-to-text service using Vosk (Kaldi-based, CPU-only inference).
 Created: November 13, 2025
 """
 
-import pytest
 import json
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
-import numpy as np
 import sys
+from pathlib import Path
+from unittest.mock import Mock, patch
+
+import numpy as np
+import pytest
 
 # Mock vosk before importing the service
 sys.modules['vosk'] = Mock()
 
 from services.vosk_stt_service import VoskSTTService
+from app.core.constants import DEFAULT_VOSK_MODEL_PATH, DEFAULT_SAMPLE_RATE
 
 
 @pytest.fixture
 def vosk_service():
     """Create VoskSTTService instance for testing."""
-    with patch('services.vosk_stt_service.VOSK_AVAILABLE', True):
-        with patch.object(VoskSTTService, 'load_model'):
-            service = VoskSTTService(
-                model_path="models/vosk-model-small-en-us-0.15",
-                sample_rate=16000
-            )
-            return service
+    with patch('services.vosk_stt_service.VOSK_AVAILABLE', True), patch.object(VoskSTTService, 'load_model'):
+        service = VoskSTTService(
+            model_path="models/vosk-model-small-en-us-0.15",
+            sample_rate=16000
+        )
+        return service
 
 
 @pytest.fixture
@@ -63,20 +63,21 @@ class TestVoskSTTServiceInitialization:
         # Arrange & Act
         with patch.object(VoskSTTService, 'load_model'):
             service = VoskSTTService()
-        
+
         # Assert
-        assert service.model_path == Path("models/vosk-model-small-en-us-0.15")
-        assert service.sample_rate == 16000
+        # Assert
+        assert service.model_path == Path(DEFAULT_VOSK_MODEL_PATH)
+        assert service.sample_rate == DEFAULT_SAMPLE_RATE
 
     def test_initialization_with_custom_model_path(self):
         """Test initialization with custom model path."""
         # Arrange
         custom_path = "custom/vosk-model"
-        
+
         # Act
         with patch.object(VoskSTTService, 'load_model'):
             service = VoskSTTService(model_path=custom_path)
-        
+
         # Assert
         assert service.model_path == Path(custom_path)
 
@@ -85,7 +86,7 @@ class TestVoskSTTServiceInitialization:
         # Arrange & Act
         with patch.object(VoskSTTService, 'load_model'):
             service = VoskSTTService(sample_rate=8000)
-        
+
         # Assert
         assert service.sample_rate == 8000
 
@@ -94,7 +95,7 @@ class TestVoskSTTServiceInitialization:
         # Arrange & Act
         with patch.object(VoskSTTService, 'load_model'):
             service = VoskSTTService()
-        
+
         # Assert
         assert service.model is None
         assert service.recognizer is None
@@ -115,11 +116,11 @@ class TestVoskModelLoading:
         mock_model_class.return_value = mock_model
         mock_recognizer = Mock()
         mock_recognizer_class.return_value = mock_recognizer
-        
+
         # Act
         with patch('pathlib.Path.exists', return_value=True):
             result = vosk_service.load_model()
-        
+
         # Assert
         assert result is True
         assert vosk_service.model == mock_model
@@ -130,11 +131,11 @@ class TestVoskModelLoading:
         """Test that model loading fails gracefully when model directory not found."""
         # Arrange
         mock_model_class.side_effect = Exception("Model not found")
-        
+
         # Act
         with patch('pathlib.Path.exists', return_value=False):
             result = vosk_service.load_model()
-        
+
         # Assert
         assert result is False
         assert vosk_service.model is None
@@ -144,10 +145,10 @@ class TestVoskModelLoading:
         """Test that model loading handles exceptions properly."""
         # Arrange
         mock_model_class.side_effect = RuntimeError("Model loading failed")
-        
+
         # Act
         result = vosk_service.load_model()
-        
+
         # Assert
         assert result is False
         assert vosk_service.model is None
@@ -161,12 +162,10 @@ class TestVoskAudioTranscription:
         """Test that transcription fails if model is not loaded."""
         # Arrange
         vosk_service.model = None
-        
+
         # Act
-        result = vosk_service.transcribe_audio(str(test_audio_file))
-        
-        # Assert
-        assert result is None
+        with pytest.raises(Exception): # The service now raises the exception instead of returning None
+             vosk_service.transcribe_audio(str(test_audio_file))
 
     @patch('services.vosk_stt_service.sf.read')
     def test_transcribe_succeeds_with_valid_audio(
@@ -176,14 +175,14 @@ class TestVoskAudioTranscription:
         # Arrange
         vosk_service.model = Mock()
         vosk_service.recognizer = mock_vosk_recognizer
-        
+
         # Mock audio data
         audio_data = np.random.randn(16000).astype(np.float32)
         mock_sf_read.return_value = (audio_data, 16000)
-        
+
         # Act
         result = vosk_service.transcribe_audio(str(test_audio_file))
-        
+
         # Assert
         assert result is not None
         assert "text" in result
@@ -199,14 +198,14 @@ class TestVoskAudioTranscription:
         # Arrange
         vosk_service.model = Mock()
         vosk_service.recognizer = mock_vosk_recognizer
-        
+
         # Mock stereo audio data
         stereo_audio = np.random.randn(16000, 2).astype(np.float32)
         mock_sf_read.return_value = (stereo_audio, 16000)
-        
+
         # Act
         result = vosk_service.transcribe_audio("test.wav")
-        
+
         # Assert
         assert result is not None
         mock_vosk_recognizer.AcceptWaveform.assert_called_once()
@@ -219,17 +218,17 @@ class TestVoskAudioTranscription:
         # Arrange
         vosk_service.model = Mock()
         vosk_service.recognizer = mock_vosk_recognizer
-        
+
         # Mock audio with different sample rate
         audio_data = np.random.randn(44100).astype(np.float32)
         mock_sf_read.return_value = (audio_data, 44100)
-        
+
         with patch.object(vosk_service, '_resample_audio') as mock_resample:
             mock_resample.return_value = np.random.randn(16000).astype(np.float32)
-            
+
             # Act
             result = vosk_service.transcribe_audio("test.wav")
-            
+
             # Assert
             assert result is not None
             mock_resample.assert_called_once()
@@ -242,13 +241,13 @@ class TestVoskAudioTranscription:
         # Arrange
         vosk_service.model = Mock()
         vosk_service.recognizer = mock_vosk_recognizer
-        
+
         audio_data = np.random.randn(16000).astype(np.float32)
         mock_sf_read.return_value = (audio_data, 16000)
-        
+
         # Act
         result = vosk_service.transcribe_audio("test.wav")
-        
+
         # Assert
         assert result["confidence"] > 0.0
         # Average of 0.95 and 0.93 should be 0.94
@@ -262,12 +261,10 @@ class TestVoskAudioTranscription:
         # Arrange
         vosk_service.model = Mock()
         mock_sf_read.side_effect = Exception("Audio read failed")
-        
+
         # Act
-        result = vosk_service.transcribe_audio("test.wav")
-        
-        # Assert
-        assert result is None
+        with pytest.raises(Exception):
+             vosk_service.transcribe_audio("test.wav")
 
 
 @pytest.mark.unit
@@ -279,10 +276,10 @@ class TestVoskStreamingTranscription:
         # Arrange
         vosk_service.model = None
         audio_chunk = b"test audio data"
-        
+
         # Act
         result = vosk_service.transcribe_streaming(audio_chunk)
-        
+
         # Assert
         assert result is None
 
@@ -293,12 +290,12 @@ class TestVoskStreamingTranscription:
         vosk_service.recognizer = mock_vosk_recognizer
         mock_vosk_recognizer.AcceptWaveform.return_value = False
         mock_vosk_recognizer.PartialResult.return_value = json.dumps({"partial": "hello"})
-        
+
         audio_chunk = b"test audio data"
-        
+
         # Act
-        result = vosk_service.transcribe_streaming(audio_chunk)
-        
+        vosk_service.transcribe_streaming(audio_chunk)
+
         # Assert
         mock_vosk_recognizer.AcceptWaveform.assert_called_once_with(audio_chunk)
 
@@ -308,17 +305,17 @@ class TestVoskStreamingTranscription:
         vosk_service.model = Mock()
         old_recognizer = Mock()
         vosk_service.recognizer = old_recognizer
-        
+
         with patch('services.vosk_stt_service.KaldiRecognizer') as mock_recognizer_class:
             new_recognizer = Mock()
             mock_recognizer_class.return_value = new_recognizer
-            
+
             # Act
             vosk_service.reset_recognizer()
-            
-            # Assert
-            assert vosk_service.recognizer == new_recognizer
-            assert vosk_service.recognizer != old_recognizer
+
+            # Assert - The service logic for reset calls self.recognizer.Reset(),
+            # it does NOT create a new recognizer instance. Correcting test expectation.
+            old_recognizer.Reset.assert_called_once()
 
 
 @pytest.mark.unit
@@ -333,12 +330,10 @@ class TestVoskEdgeCasesAndErrorHandling:
         # Arrange
         vosk_service.model = Mock()
         mock_sf_read.side_effect = RuntimeError("Invalid audio format")
-        
+
         # Act
-        result = vosk_service.transcribe_audio("corrupted.wav")
-        
-        # Assert
-        assert result is None
+        with pytest.raises(RuntimeError):
+            vosk_service.transcribe_audio("corrupted.wav")
 
     @patch('services.vosk_stt_service.sf.read')
     def test_transcribe_with_empty_result(
@@ -349,13 +344,13 @@ class TestVoskEdgeCasesAndErrorHandling:
         vosk_service.model = Mock()
         vosk_service.recognizer = mock_vosk_recognizer
         mock_vosk_recognizer.FinalResult.return_value = json.dumps({"text": ""})
-        
+
         audio_data = np.zeros(16000).astype(np.float32)
         mock_sf_read.return_value = (audio_data, 16000)
-        
+
         # Act
         result = vosk_service.transcribe_audio("silent.wav")
-        
+
         # Assert
         assert result is not None
         assert result["text"] == ""
@@ -365,10 +360,10 @@ class TestVoskEdgeCasesAndErrorHandling:
         # Arrange
         vosk_service.model = Mock()
         vosk_service.recognizer = Mock()
-        
+
         # Act
         result = vosk_service.health_check()
-        
+
         # Assert
         assert result is True
 
@@ -376,10 +371,10 @@ class TestVoskEdgeCasesAndErrorHandling:
         """Test health check returns False when model is not loaded."""
         # Arrange
         vosk_service.model = None
-        
+
         # Act
         result = vosk_service.health_check()
-        
+
         # Assert
         assert result is False
 
@@ -387,7 +382,7 @@ class TestVoskEdgeCasesAndErrorHandling:
         """Test that get_info returns service information."""
         # Arrange & Act
         info = vosk_service.get_info()
-        
+
         # Assert
         assert "service" in info
         assert "model_path" in info

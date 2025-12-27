@@ -1,14 +1,13 @@
-"""add missing tables
+"""add missing tables.
 
 Revision ID: db36e3de88cc
 Revises: a4bf562f4cf9
 Create Date: 2025-08-30 21:54:02.601778
 
 """
-from alembic import op
 import sqlalchemy as sa
-import sqlmodel.sql.sqltypes
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = 'db36e3de88cc'

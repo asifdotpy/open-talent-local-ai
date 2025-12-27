@@ -1,4 +1,4 @@
-"""Additional tests for Conversation Service
+"""Additional tests for Conversation Service.
 
 - Persona switching and current persona endpoints
 - Generate-questions endpoint

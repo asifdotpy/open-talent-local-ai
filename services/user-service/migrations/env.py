@@ -1,9 +1,9 @@
 import os
 import sys
 from logging.config import fileConfig
-from sqlalchemy import engine_from_config, pool
-from sqlalchemy import create_engine
+
 from alembic import context
+from sqlalchemy import create_engine, pool
 
 # Ensure service root is on sys.path when running Alembic directly
 MIGRATIONS_DIR = os.path.abspath(os.path.dirname(__file__))

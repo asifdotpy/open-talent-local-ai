@@ -6,7 +6,7 @@ Downloads Vosk, Piper, and Silero models with progress tracking.
 import hashlib
 import sys
 import tarfile
-import urllib.request
+import httpx
 import zipfile
 from pathlib import Path
 
@@ -61,8 +61,8 @@ class ModelDownloader:
         self.models_dir = Path(models_dir)
         self.models_dir.mkdir(parents=True, exist_ok=True)
 
-    def download_file(self, url: str, output_path: Path, desc: str = "Downloading") -> bool:
-        """Download file with progress bar.
+    async def download_file(self, url: str, output_path: Path, desc: str = "Downloading") -> bool:
+        """Download file with progress bar using httpx.
 
         Args:
             url: Download URL
@@ -76,25 +76,28 @@ class ModelDownloader:
             print(f"\n{desc}: {url}")
             print(f"Saving to: {output_path}")
 
-            # Get file size
-            with urllib.request.urlopen(url) as response:
-                file_size = int(response.headers.get('Content-Length', 0))
+            async with httpx.AsyncClient(follow_redirects=True, timeout=30.0) as client:
+                async with client.stream("GET", url) as response:
+                    response.raise_for_status()
+                    file_size = int(response.headers.get('Content-Length', 0))
 
-            # Download with progress bar
-            if TQDM_AVAILABLE and file_size > 0:
-                with tqdm(total=file_size, unit='B', unit_scale=True, desc=desc) as pbar:
-                    def reporthook(blocknum, blocksize, totalsize):
-                        pbar.update(blocksize)
-
-                    urllib.request.urlretrieve(url, output_path, reporthook=reporthook)
-            else:
-                urllib.request.urlretrieve(url, output_path)
+                    with open(output_path, "wb") as f:
+                        if TQDM_AVAILABLE and file_size > 0:
+                            with tqdm(total=file_size, unit='B', unit_scale=True, desc=desc) as pbar:
+                                async for chunk in response.aiter_bytes():
+                                    f.write(chunk)
+                                    pbar.update(len(chunk))
+                        else:
+                            async for chunk in response.aiter_bytes():
+                                f.write(chunk)
 
             print(f"✓ Downloaded: {output_path.name}")
             return True
 
         except Exception as e:
             print(f"✗ Download failed: {e}")
+            if output_path.exists():
+                output_path.unlink()
             return False
 
     def verify_checksum(self, file_path: Path, expected_checksum: str) -> bool:
@@ -157,7 +160,7 @@ class ModelDownloader:
             print(f"✗ Extraction failed: {e}")
             return False
 
-    def download_vosk_model(self) -> bool:
+    async def download_vosk_model(self) -> bool:
         """Download Vosk speech-to-text model."""
         model_info = self.MODELS["vosk"]
         model_name = model_info["name"]
@@ -175,7 +178,7 @@ class ModelDownloader:
 
         # Download archive
         archive_path = self.models_dir / f"{model_name}.zip"
-        if not self.download_file(model_info["url"], archive_path, f"Vosk Model ({model_info['size']})"):
+        if not await self.download_file(model_info["url"], archive_path, f"Vosk Model ({model_info['size']})"):
             return False
 
         # Verify checksum if available
@@ -193,7 +196,7 @@ class ModelDownloader:
 
         return True
 
-    def download_piper_voice(self, voice_key: str = "piper_lessac") -> bool:
+    async def download_piper_voice(self, voice_key: str = "piper_lessac") -> bool:
         """Download Piper TTS voice model."""
         model_info = self.MODELS[voice_key]
         model_name = model_info["name"]
@@ -207,20 +210,20 @@ class ModelDownloader:
         model_path = self.models_dir / f"{model_name}.onnx"
         if model_path.exists():
             print(f"✓ Model already exists: {model_path}")
-        elif not self.download_file(model_info["url"], model_path, f"Piper Voice ({model_info['size']})"):
+        elif not await self.download_file(model_info["url"], model_path, f"Piper Voice ({model_info['size']})"):
             return False
 
         # Download config JSON
         config_path = self.models_dir / f"{model_name}.onnx.json"
         if config_path.exists():
             print(f"✓ Config already exists: {config_path}")
-        elif not self.download_file(model_info["config_url"], config_path, "Piper Config"):
+        elif not await self.download_file(model_info["config_url"], config_path, "Piper Config"):
             return False
 
         print(f"✓ Piper voice ready: {model_name}")
         return True
 
-    def download_silero_vad(self) -> bool:
+    async def download_silero_vad(self) -> bool:
         """Download Silero VAD model."""
         model_info = self.MODELS["silero_vad"]
 
@@ -235,13 +238,13 @@ class ModelDownloader:
             print(f"✓ Model already exists: {model_path}")
             return True
 
-        if not self.download_file(model_info["url"], model_path, f"Silero VAD ({model_info['size']})"):
+        if not await self.download_file(model_info["url"], model_path, f"Silero VAD ({model_info['size']})"):
             return False
 
         print(f"✓ Silero VAD ready: {model_path}")
         return True
 
-    def download_all(self) -> bool:
+    async def download_all(self) -> bool:
         """Download all required models."""
         print("\n" + "="*60)
         print("Voice Service Model Downloader")
@@ -263,16 +266,16 @@ class ModelDownloader:
         success = True
 
         # Download Vosk
-        if not self.download_vosk_model():
+        if not await self.download_vosk_model():
             success = False
 
         # Download Piper voices
         for voice_key in ["piper_lessac", "piper_amy"]:
-            if not self.download_piper_voice(voice_key):
+            if not await self.download_piper_voice(voice_key):
                 success = False
 
         # Download Silero VAD
-        if not self.download_silero_vad():
+        if not await self.download_silero_vad():
             success = False
 
         print("\n" + "="*60)
@@ -321,17 +324,22 @@ def main():
 
     downloader = ModelDownloader(models_dir=args.models_dir)
 
-    if args.vosk_only:
-        success = downloader.download_vosk_model()
-    elif args.piper_only:
-        success = (
-            downloader.download_piper_voice("piper_lessac") and
-            downloader.download_piper_voice("piper_amy")
-        )
-    elif args.vad_only:
-        success = downloader.download_silero_vad()
-    else:
-        success = downloader.download_all()
+    async def run():
+        if args.vosk_only:
+            success = await downloader.download_vosk_model()
+        elif args.piper_only:
+            success = (
+                await downloader.download_piper_voice("piper_lessac") and
+                await downloader.download_piper_voice("piper_amy")
+            )
+        elif args.vad_only:
+            success = await downloader.download_silero_vad()
+        else:
+            success = await downloader.download_all()
+        return success
+
+    import asyncio
+    success = asyncio.run(run())
 
     sys.exit(0 if success else 1)
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Demo script for Natural Language Question Builder
-Shows how to use the service to generate interview questions
+Shows how to use the service to generate interview questions.
 
 Inspired by PeopleGPT's natural language search paradigm
 """
@@ -16,7 +16,7 @@ from services.question_builder import (
 
 
 async def demo_natural_language_generation():
-    """Demo: Generate questions from natural language"""
+    """Demo: Generate questions from natural language."""
     print("=" * 80)
     print("DEMO 1: Natural Language Question Generation")
     print("=" * 80)
@@ -76,7 +76,7 @@ async def demo_natural_language_generation():
 
 
 async def demo_template_usage():
-    """Demo: Use a pre-built template"""
+    """Demo: Use a pre-built template."""
     print("\n" + "=" * 80)
     print("DEMO 2: Using Pre-built Templates")
     print("=" * 80)
@@ -109,7 +109,7 @@ async def demo_template_usage():
 
 
 def demo_pinning_logic():
-    """Demo: Pin/unpin questions (must-ask vs nice-to-ask)"""
+    """Demo: Pin/unpin questions (must-ask vs nice-to-ask)."""
     print("\n" + "=" * 80)
     print("DEMO 3: Question Pinning (Must-Ask vs Nice-to-Ask)")
     print("=" * 80)
@@ -143,7 +143,7 @@ def demo_pinning_logic():
 
 
 async def demo_different_roles():
-    """Demo: Generate questions for different roles"""
+    """Demo: Generate questions for different roles."""
     print("\n" + "=" * 80)
     print("DEMO 4: Questions for Different Roles")
     print("=" * 80)
@@ -185,7 +185,7 @@ async def demo_different_roles():
 
 
 async def main():
-    """Run all demos"""
+    """Run all demos."""
     print("\n")
     print("🚀 OpenTalent Natural Language Question Builder Demo")
     print("=" * 80)

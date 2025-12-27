@@ -1,5 +1,4 @@
-"""
-Session lifecycle tests for avatar API.
+"""Session lifecycle tests for avatar API.
 Validates session CRUD, WebSocket streaming, and resource cleanup.
 """
 

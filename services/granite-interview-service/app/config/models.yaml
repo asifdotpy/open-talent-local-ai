@@ -9,6 +9,7 @@ models:
       supported: true
       technique: lora
       rank: 16
+    revision: main
 
   # Fine-tuned Granite model for interviews
   granite-interview-ft:
@@ -22,6 +23,7 @@ models:
       technique: lora
       rank: 16
       dataset: interview_v1
+    revision: main
 
   # Llama 2 models for comparison and A/B testing
   llama-2-7b-chat:
@@ -33,6 +35,7 @@ models:
       supported: true
       technique: qlora
       rank: 64
+    revision: main
 
   llama-2-13b-chat:
     architecture: llama
@@ -43,6 +46,7 @@ models:
       supported: true
       technique: qlora
       rank: 64
+    revision: main
 
   # Mistral models for advanced reasoning
   mistral-7b-instruct:
@@ -54,6 +58,7 @@ models:
       supported: true
       technique: qlora
       rank: 64
+    revision: main
 
   mistral-7b-instruct-v0.2:
     architecture: mistral
@@ -64,6 +69,7 @@ models:
       supported: true
       technique: qlora
       rank: 64
+    revision: main
 
   # Larger models for enterprise use (requires significant hardware)
   llama-2-70b-chat:

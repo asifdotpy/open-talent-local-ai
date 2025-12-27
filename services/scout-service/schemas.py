@@ -1,12 +1,12 @@
-"""
-Scout Service - Pydantic V2 Schemas
+"""Scout Service - Pydantic V2 Schemas
 Generated: December 17, 2025
 Coverage: ~15 schemas for search, candidates, enrichment, and handoff.
 """
 
-from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, Field, HttpUrl, EmailStr, ConfigDict
 from datetime import datetime
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, HttpUrl
 
 
 class SearchRequest(BaseModel):
@@ -18,33 +18,33 @@ class SearchRequest(BaseModel):
 
 class CandidateResponse(BaseModel):
     name: str
-    location: Optional[str] = None
+    location: str | None = None
     profile_url: HttpUrl
     platform: str
-    bio: Optional[str] = None
-    email: Optional[EmailStr] = None
-    linkedin_url: Optional[HttpUrl] = None
-    twitter_url: Optional[HttpUrl] = None
-    website_url: Optional[HttpUrl] = None
-    company: Optional[str] = None
-    confidence_score: Optional[float] = Field(None, ge=0.0, le=1.0)
-    linkedin_enriched: Optional[Dict[str, Any]] = None
-    work_emails: Optional[List[EmailStr]] = None
-    personal_emails: Optional[List[EmailStr]] = None
-    phone_numbers: Optional[List[str]] = None
-    linkedin_headline: Optional[str] = None
-    linkedin_industry: Optional[str] = None
-    linkedin_summary: Optional[str] = None
-    linkedin_experience: Optional[List[Dict[str, Any]]] = None
-    linkedin_education: Optional[List[Dict[str, Any]]] = None
-    linkedin_skills: Optional[List[str]] = None
-    linkedin_followers: Optional[int] = None
-    
+    bio: str | None = None
+    email: EmailStr | None = None
+    linkedin_url: HttpUrl | None = None
+    twitter_url: HttpUrl | None = None
+    website_url: HttpUrl | None = None
+    company: str | None = None
+    confidence_score: float | None = Field(None, ge=0.0, le=1.0)
+    linkedin_enriched: dict[str, Any] | None = None
+    work_emails: list[EmailStr] | None = None
+    personal_emails: list[EmailStr] | None = None
+    phone_numbers: list[str] | None = None
+    linkedin_headline: str | None = None
+    linkedin_industry: str | None = None
+    linkedin_summary: str | None = None
+    linkedin_experience: list[dict[str, Any]] | None = None
+    linkedin_education: list[dict[str, Any]] | None = None
+    linkedin_skills: list[str] | None = None
+    linkedin_followers: int | None = None
+
     model_config = ConfigDict(from_attributes=True)
 
 
 class SearchResponse(BaseModel):
-    candidates: List[CandidateResponse]
+    candidates: list[CandidateResponse]
     total_found: int
     search_query: str
     location: str
@@ -52,9 +52,9 @@ class SearchResponse(BaseModel):
 
 class SearchCriteria(BaseModel):
     jobTitle: str = Field(..., description="The target job title")
-    requiredSkills: List[str] = Field(..., description="Mandatory skills")
-    niceToHaveSkills: List[str] = Field(..., description="Optional skills")
-    companyCulture: List[str] = Field(..., description="Culture keywords")
+    requiredSkills: list[str] = Field(..., description="Mandatory skills")
+    niceToHaveSkills: list[str] = Field(..., description="Optional skills")
+    companyCulture: list[str] = Field(..., description="Culture keywords")
     experienceLevel: str = Field(..., description="Seniority (e.g., Senior)")
 
 
@@ -62,7 +62,7 @@ class WorkExperience(BaseModel):
     title: str
     company: str
     duration: str
-    responsibilities: List[str]
+    responsibilities: list[str]
 
 
 class Education(BaseModel):
@@ -72,8 +72,8 @@ class Education(BaseModel):
 
 
 class Skills(BaseModel):
-    matched: List[str]
-    unmatched: List[str]
+    matched: list[str]
+    unmatched: list[str]
 
 
 class InitialQuestion(BaseModel):
@@ -85,11 +85,11 @@ class CandidateProfile(BaseModel):
     fullName: str
     sourceUrl: HttpUrl
     summary: str
-    workExperience: List[WorkExperience]
-    education: List[Education]
+    workExperience: list[WorkExperience]
+    education: list[Education]
     skills: Skills
     alignmentScore: float = Field(..., ge=0.0, le=1.0)
-    initialQuestions: List[InitialQuestion]
+    initialQuestions: list[InitialQuestion]
 
 
 class HandoffPayload(BaseModel):
@@ -99,22 +99,22 @@ class HandoffPayload(BaseModel):
 
 class AgentInfo(BaseModel):
     name: str
-    description: Optional[str] = None
-    capabilities: List[str] = []
-    average_latency_ms: Optional[int] = None
+    description: str | None = None
+    capabilities: list[str] = []
+    average_latency_ms: int | None = None
 
 
 class AgentSearchRequest(BaseModel):
     query: str
     agent: str
-    location: Optional[str] = None
+    location: str | None = None
     max_results: int = Field(10, ge=1, le=50)
 
 
 class AgentSearchResult(BaseModel):
     agent: str
-    candidates: List[CandidateResponse]
-    latency_ms: Optional[int] = None
+    candidates: list[CandidateResponse]
+    latency_ms: int | None = None
     timestamp: datetime
 
 

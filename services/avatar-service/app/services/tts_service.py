@@ -1,38 +1,31 @@
-"""
-Real Piper TTS service for avatar-service.
+"""Real Piper TTS service for avatar-service.
 Generates actual audio with phoneme timing from text.
 """
 
 from __future__ import annotations
 
-import io
 import struct
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Tuple, List, Dict, Optional
-
-import numpy as np
 
 
 class PiperTTSService:
-    """
-    Local Piper text-to-speech service.
-    
+    """Local Piper text-to-speech service.
+
     Piper is a fast, offline, neural TTS system.
     Model: en_US-glow-tts (100M parameters, ONNX)
-    
+
     Installation:
         pip install piper-tts onnxruntime librosa
-        
+
         # Download model (auto on first use)
         echo "hello world" | piper --model en_US-glow-tts --output_file output.wav
     """
 
     def __init__(self, model_id: str = "en_US-glow-tts", use_gpu: bool = False):
-        """
-        Initialize Piper TTS service.
-        
+        """Initialize Piper TTS service.
+
         Args:
             model_id: Piper model identifier (default: en_US-glow-tts)
             use_gpu: Use GPU if available (experimental)
@@ -47,7 +40,7 @@ class PiperTTSService:
         try:
             result = subprocess.run(
                 ["piper", "--version"],
-                capture_output=True,
+                check=False, capture_output=True,
                 timeout=5
             )
             if result.returncode != 0:
@@ -57,16 +50,15 @@ class PiperTTSService:
                 "Piper TTS not installed. Run: pip install piper-tts"
             ) from e
 
-    def synthesize(self, text: str) -> Tuple[bytes, int]:
-        """
-        Synthesize text to speech.
-        
+    def synthesize(self, text: str) -> tuple[bytes, int]:
+        """Synthesize text to speech.
+
         Args:
             text: Text to synthesize
-            
+
         Returns:
             (wav_bytes, sample_rate)
-            
+
         Raises:
             ValueError: If text is empty
             RuntimeError: If piper subprocess fails
@@ -92,7 +84,7 @@ class PiperTTSService:
 
             result = subprocess.run(
                 cmd,
-                input=text.encode("utf-8"),
+                check=False, input=text.encode("utf-8"),
                 capture_output=True,
                 timeout=30
             )
@@ -107,15 +99,14 @@ class PiperTTSService:
         finally:
             Path(output_path).unlink(missing_ok=True)
 
-    def extract_phonemes(self, text: str) -> List[Dict[str, any]]:
-        """
-        Extract phonemes from text without audio.
-        
+    def extract_phonemes(self, text: str) -> list[dict[str, any]]:
+        """Extract phonemes from text without audio.
+
         Uses grapheme-to-phoneme (G2P) conversion.
-        
+
         Args:
             text: Text to extract phonemes from
-            
+
         Returns:
             List of {phoneme, duration_ms}
         """
@@ -149,23 +140,22 @@ class PiperTTSService:
         self,
         wav_bytes: bytes,
         text: str
-    ) -> List[Dict[str, any]]:
-        """
-        Align phonemes with audio duration.
-        
+    ) -> list[dict[str, any]]:
+        """Align phonemes with audio duration.
+
         Args:
             wav_bytes: WAV file bytes
             text: Original text
-            
+
         Returns:
             List of {phoneme, start_ms, end_ms}
         """
         # Calculate total duration
         duration_ms = self._get_wav_duration_ms(wav_bytes)
-        
+
         # Get phonemes
         phonemes = self.extract_phonemes(text)
-        
+
         # Distribute phonemes evenly across duration
         if not phonemes:
             return []
@@ -191,23 +181,22 @@ class PiperTTSService:
 
     @staticmethod
     def _get_wav_duration_ms(wav_bytes: bytes) -> float:
-        """
-        Extract duration from WAV file bytes.
-        
+        """Extract duration from WAV file bytes.
+
         Parses WAV header to get sample count and sample rate.
         """
         try:
             # Read sample rate from WAV header (bytes 24-27, little-endian)
-            sample_rate = struct.unpack('<I', wav_bytes[24:28])[0]
-            
+            struct.unpack('<I', wav_bytes[24:28])[0]
+
             # Read byte rate (bytes 28-31)
             byte_rate = struct.unpack('<I', wav_bytes[28:32])[0]
-            
+
             # Read data chunk size (bytes 40-43, after "data" marker)
             # Find "data" chunk
             data_idx = wav_bytes.find(b'data') + 8
             data_size = struct.unpack('<I', wav_bytes[data_idx:data_idx+4])[0]
-            
+
             # Duration in seconds
             duration_s = data_size / byte_rate
             return duration_s * 1000  # Convert to milliseconds
@@ -217,36 +206,33 @@ class PiperTTSService:
 
 
 class PhonemeService:
-    """
-    Phoneme extraction and alignment service.
+    """Phoneme extraction and alignment service.
     Uses Piper TTS for actual synthesis + alignment.
     """
 
-    def __init__(self, tts_service: Optional[PiperTTSService] = None):
+    def __init__(self, tts_service: PiperTTSService | None = None):
         self.tts = tts_service or PiperTTSService()
 
     def synthesize_and_extract_phonemes(
         self,
         text: str
-    ) -> Tuple[bytes, List[Dict]]:
-        """
-        Synthesize text and extract aligned phonemes.
-        
+    ) -> tuple[bytes, list[dict]]:
+        """Synthesize text and extract aligned phonemes.
+
         Returns:
             (wav_bytes, aligned_phonemes)
         """
         # Generate audio
         wav_bytes, sample_rate = self.tts.synthesize(text)
-        
+
         # Extract and align phonemes
         aligned_phonemes = self.tts.align_phonemes_with_audio(wav_bytes, text)
-        
+
         return wav_bytes, aligned_phonemes
 
-    def get_viseme_map(self) -> Dict[str, str]:
-        """
-        Get phoneme-to-viseme mapping for lip-sync.
-        
+    def get_viseme_map(self) -> dict[str, str]:
+        """Get phoneme-to-viseme mapping for lip-sync.
+
         Visemes are visual representations of phonemes.
         Multiple phonemes can map to same viseme.
         """
@@ -262,16 +248,16 @@ class PhonemeService:
             "IY": "viseme_I",  # /i/ as in "beet"
             "OW": "viseme_O",  # /oʊ/ as in "go"
             "UW": "viseme_U",  # /u/ as in "boot"
-            
+
             # Bilabial (both lips)
             "P": "viseme_P",   # /p/
             "B": "viseme_B",   # /b/
             "M": "viseme_M",   # /m/
-            
+
             # Labiodental (lower lip + upper teeth)
             "F": "viseme_F",   # /f/
             "V": "viseme_V",   # /v/
-            
+
             # Alveolar
             "T": "viseme_T",   # /t/
             "D": "viseme_D",   # /d/
@@ -279,26 +265,26 @@ class PhonemeService:
             "S": "viseme_S",   # /s/
             "Z": "viseme_Z",   # /z/
             "L": "viseme_L",   # /l/
-            
+
             # Postalveolar
             "SH": "viseme_S",  # /ʃ/
             "ZH": "viseme_Z",  # /ʒ/
             "CH": "viseme_T",  # /tʃ/
             "JH": "viseme_D",  # /dʒ/
-            
+
             # Velar
             "K": "viseme_K",   # /k/
             "G": "viseme_G",   # /ɡ/
             "NG": "viseme_N",  # /ŋ/
-            
+
             # Glottals
             "HH": "viseme_A",  # /h/
-            
+
             # Other
             "R": "viseme_R",   # /ɹ/
             "W": "viseme_U",   # /w/
             "Y": "viseme_I",   # /j/
-            
+
             # Silence
             "SILENCE": "viseme_rest",
         }

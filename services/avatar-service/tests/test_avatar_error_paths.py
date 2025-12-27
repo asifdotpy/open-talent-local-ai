@@ -1,5 +1,4 @@
-"""
-Error path tests for avatar API endpoints.
+"""Error path tests for avatar API endpoints.
 Validates rejection of malformed, missing, and invalid inputs.
 """
 

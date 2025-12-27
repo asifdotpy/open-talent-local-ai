@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import yaml
+from .constants import MEMORY_REQUIREMENT_MAP, DISK_REQUIREMENT_MAP
 
 
 class ModelConfig:
@@ -22,6 +23,7 @@ class ModelConfig:
         self.quantization = config.get('quantization', '4bit')
         self.max_context = config.get('max_context', 2048)
         self.base_model = config.get('base_model')
+        self.revision = config.get('revision', 'main')
 
         # Fine-tuning configuration
         ft_config = config.get('fine_tuning', {})
@@ -36,25 +38,11 @@ class ModelConfig:
 
     def _get_memory_requirement(self) -> str:
         """Get minimum memory requirement based on model size."""
-        size_map = {
-            '350m': '4GB',
-            '7b': '14GB',
-            '13b': '24GB',
-            '30b': '48GB',
-            '65b': '96GB'
-        }
-        return size_map.get(self.size.lower(), '8GB')
+        return MEMORY_REQUIREMENT_MAP.get(self.size.lower(), '8GB')
 
     def _get_disk_requirement(self) -> str:
         """Get disk space requirement based on model size."""
-        size_map = {
-            '350m': '700MB',
-            '7b': '14GB',
-            '13b': '26GB',
-            '30b': '60GB',
-            '65b': '130GB'
-        }
-        return size_map.get(self.size.lower(), '1GB')
+        return DISK_REQUIREMENT_MAP.get(self.size.lower(), '1GB')
 
     def get_training_config(self) -> Dict[str, Any]:
         """Get training configuration for this model."""
@@ -139,7 +127,7 @@ class Settings:
 
     def __init__(self):
         # Service settings
-        self.host = os.environ.get('HOST', '0.0.0.0')
+        self.host = os.environ.get('HOST', '127.0.0.1')
         self.port = int(os.environ.get('PORT', 8005))
         self.workers = int(os.environ.get('WORKERS', 2))
         self.debug = os.environ.get('DEBUG', 'false').lower() == 'true'

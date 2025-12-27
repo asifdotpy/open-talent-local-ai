@@ -1,23 +1,20 @@
-"""
-Shared pytest fixtures for voice service tests.
+"""Shared pytest fixtures for voice service tests.
 
 This module provides reusable test fixtures for all voice service tests,
 following TDD best practices and DRY principles.
 """
 
-import asyncio
 import base64
 import os
 import struct
 import tempfile
 import wave
+from collections.abc import AsyncGenerator, Generator
 from pathlib import Path
-from typing import AsyncGenerator, Generator
 
 import httpx
 import pytest
 import pytest_asyncio
-
 
 # ============================================================================
 # Service Configuration Fixtures
@@ -91,37 +88,36 @@ def create_test_wav_file(
     sample_rate: int = 16000,
     channels: int = 1
 ) -> str:
-    """
-    Create a test WAV file with sine wave audio.
-    
+    """Create a test WAV file with sine wave audio.
+
     Args:
         filepath: Path to output WAV file
         duration: Duration in seconds
         frequency: Tone frequency in Hz
         sample_rate: Audio sample rate
         channels: Number of audio channels (1=mono, 2=stereo)
-    
+
     Returns:
         Path to created WAV file
     """
     import math
-    
+
     num_samples = int(duration * sample_rate)
-    
+
     with wave.open(filepath, 'w') as wav_file:
         wav_file.setnchannels(channels)
         wav_file.setsampwidth(2)  # 16-bit audio
         wav_file.setframerate(sample_rate)
-        
+
         for i in range(num_samples):
             # Generate sine wave
             value = int(32767.0 * math.sin(2.0 * math.pi * frequency * i / sample_rate))
             data = struct.pack('<h', value)
-            
+
             # Write for each channel
             for _ in range(channels):
                 wav_file.writeframes(data)
-    
+
     return filepath
 
 
@@ -150,16 +146,16 @@ def long_audio_file(test_audio_dir) -> str:
 def silent_audio_file(test_audio_dir) -> str:
     """Create a silent audio file (1 second of silence)."""
     filepath = str(test_audio_dir / "silent_audio.wav")
-    
+
     with wave.open(filepath, 'w') as wav_file:
         wav_file.setnchannels(1)
         wav_file.setsampwidth(2)
         wav_file.setframerate(16000)
-        
+
         # Write 1 second of silence
         for _ in range(16000):
             wav_file.writeframes(struct.pack('<h', 0))
-    
+
     return filepath
 
 
@@ -250,17 +246,17 @@ def mock_model_path(tmp_path) -> str:
     """Create a mock model file path."""
     model_path = tmp_path / "en_US-lessac-medium.onnx"
     model_path.write_bytes(b"mock model data")
-    
+
     # Create accompanying .json config
     json_path = tmp_path / "en_US-lessac-medium.onnx.json"
     json_path.write_text('{"sample_rate": 16000}')
-    
+
     return str(model_path)
 
 
 class AudioFileFactory:
     """Factory for creating test audio files with various properties."""
-    
+
     @staticmethod
     def create_wav(
         output_path: str,
@@ -277,7 +273,7 @@ class AudioFileFactory:
             sample_rate=sample_rate,
             channels=channels
         )
-    
+
     @staticmethod
     def create_corrupt_wav(output_path: str) -> str:
         """Create a corrupted WAV file."""
@@ -285,7 +281,7 @@ class AudioFileFactory:
             # Write invalid WAV header
             f.write(b'INVALID')
         return output_path
-    
+
     @staticmethod
     def create_empty_wav(output_path: str) -> str:
         """Create an empty WAV file."""

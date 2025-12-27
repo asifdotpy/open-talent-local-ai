@@ -1,5 +1,4 @@
-"""
-Vetta AI Service - Ollama Integration
+"""Vetta AI Service - Ollama Integration
 Simple alternative to the Unsloth-based service using Ollama for inference.
 
 This module provides the same VettaAI interface but uses Ollama backend,
@@ -11,14 +10,14 @@ Prerequisites:
 
 Usage:
     from services.vetta_ai_ollama import get_vetta_ai
-    
+
     vetta = get_vetta_ai()
     assessment = vetta.assess_candidate(...)
 """
 
 import logging
-from typing import Dict, Any, Optional, List
 from datetime import datetime
+from typing import Any
 
 # Check if ollama is available
 try:
@@ -33,51 +32,49 @@ logger = logging.getLogger(__name__)
 
 class VettaAIOllama:
     """Vetta AI service using Ollama backend."""
-    
+
     def __init__(self, model_name: str = "vetta-granite-2b"):
-        """
-        Initialize Vetta AI with Ollama backend.
-        
+        """Initialize Vetta AI with Ollama backend.
+
         Args:
             model_name: Name of the Ollama model to use
         """
         self.model_name = model_name
         self.ollama_available = self._check_ollama()
-        
+
         if self.ollama_available:
             logger.info(f"✅ Vetta AI initialized with Ollama model: {model_name}")
         else:
             logger.warning("⚠️  Ollama not available, using fallback mode")
-    
+
     def _check_ollama(self) -> bool:
         """Check if Ollama is available and model exists."""
         if not OLLAMA_AVAILABLE:
             return False
-        
+
         try:
             # Check if Ollama server is running
             models = ollama.list()
-            
+
             # Check if our model exists
             model_names = [m['name'] for m in models.get('models', [])]
             if self.model_name not in model_names:
                 logger.warning(f"Model '{self.model_name}' not found in Ollama. Available: {model_names}")
                 logger.info(f"Create model with: ollama create {self.model_name} -f Modelfile")
                 return False
-            
+
             return True
         except Exception as e:
             logger.error(f"Failed to connect to Ollama: {e}")
             return False
-    
+
     def _format_prompt(self, instruction: str, context: str = "") -> str:
-        """
-        Format prompt in Alpaca structure.
-        
+        """Format prompt in Alpaca structure.
+
         Args:
             instruction: The instruction/task description
             context: Additional context or input
-            
+
         Returns:
             Formatted prompt string
         """
@@ -101,7 +98,7 @@ class VettaAIOllama:
 ### Response:
 """
         return prompt
-    
+
     def generate(
         self,
         instruction: str,
@@ -110,25 +107,24 @@ class VettaAIOllama:
         temperature: float = 0.7,
         top_p: float = 0.9,
     ) -> str:
-        """
-        Generate text using Ollama.
-        
+        """Generate text using Ollama.
+
         Args:
             instruction: The task instruction
             context: Additional context
             max_tokens: Maximum tokens to generate
             temperature: Sampling temperature
             top_p: Nucleus sampling parameter
-            
+
         Returns:
             Generated text
         """
         if not self.ollama_available:
             return self._fallback_generate(instruction, context)
-        
+
         try:
             prompt = self._format_prompt(instruction, context)
-            
+
             response = ollama.generate(
                 model=self.model_name,
                 prompt=prompt,
@@ -138,31 +134,30 @@ class VettaAIOllama:
                     'num_predict': max_tokens,
                 }
             )
-            
+
             return response['response'].strip()
-        
+
         except Exception as e:
             logger.error(f"Ollama generation failed: {e}")
             return self._fallback_generate(instruction, context)
-    
+
     def _fallback_generate(self, instruction: str, context: str = "") -> str:
         """Fallback response when Ollama unavailable."""
         return f"[Fallback Mode] Processing: {instruction[:100]}... (Ollama not available)"
-    
+
     def assess_candidate(
         self,
         candidate_info: str,
         job_description: str,
         role: str,
-    ) -> Dict[str, Any]:
-        """
-        Assess candidate fit for a role.
-        
+    ) -> dict[str, Any]:
+        """Assess candidate fit for a role.
+
         Args:
             candidate_info: Candidate background and skills
             job_description: Job requirements
             role: Role title
-            
+
         Returns:
             Assessment with score, strengths, gaps, recommendation
         """
@@ -175,34 +170,33 @@ Provide:
 5. Hiring recommendation
 
 Be specific and actionable."""
-        
+
         context = f"""Candidate: {candidate_info}
 
 Job Requirements: {job_description}"""
-        
+
         assessment_text = self.generate(instruction, context, max_tokens=300)
-        
+
         return {
             "assessment": assessment_text,
             "candidate_info": candidate_info,
             "role": role,
             "timestamp": datetime.utcnow().isoformat()
         }
-    
+
     def generate_interview_question(
         self,
-        previous_responses: List[str],
+        previous_responses: list[str],
         job_requirements: str,
         expertise_level: str = "intermediate",
     ) -> str:
-        """
-        Generate context-aware interview question.
-        
+        """Generate context-aware interview question.
+
         Args:
             previous_responses: List of candidate's previous answers
             job_requirements: Job requirements and skills
             expertise_level: beginner, intermediate, or advanced
-            
+
         Returns:
             Interview question
         """
@@ -212,15 +206,15 @@ The question should:
 2. Assess relevant skills
 3. Be specific and practical
 4. Allow for deep technical discussion"""
-        
+
         context = f"""Previous responses:
 {chr(10).join(f'- {r}' for r in previous_responses)}
 
 Requirements: {job_requirements}"""
-        
+
         question = self.generate(instruction, context, max_tokens=150)
         return question
-    
+
     def generate_outreach_message(
         self,
         candidate_name: str,
@@ -228,15 +222,14 @@ Requirements: {job_requirements}"""
         role: str,
         company: str,
     ) -> str:
-        """
-        Generate personalized outreach message.
-        
+        """Generate personalized outreach message.
+
         Args:
             candidate_name: Candidate's name
             candidate_skills: Candidate's key skills
             role: Role title
             company: Company name
-            
+
         Returns:
             Outreach message
         """
@@ -247,29 +240,28 @@ The message should:
 3. Be professional and engaging
 4. Include a clear call-to-action
 5. Be 3-4 sentences maximum"""
-        
+
         context = f"""Candidate: {candidate_name}
 Skills: {candidate_skills}
 Role: {role}
 Company: {company}"""
-        
+
         message = self.generate(instruction, context, max_tokens=200)
         return message
-    
+
     def score_candidate_quality(
         self,
         candidate_profile: str,
         job_requirements: str,
-        scoring_criteria: List[str],
-    ) -> Dict[str, Any]:
-        """
-        Score candidate quality across multiple criteria.
-        
+        scoring_criteria: list[str],
+    ) -> dict[str, Any]:
+        """Score candidate quality across multiple criteria.
+
         Args:
             candidate_profile: Candidate background
             job_requirements: Job requirements
             scoring_criteria: List of criteria to score
-            
+
         Returns:
             Scores and overall assessment
         """
@@ -277,29 +269,28 @@ Company: {company}"""
 {chr(10).join(f'- {c}' for c in scoring_criteria)}
 
 Provide scores and brief justification for each."""
-        
+
         context = f"""Candidate: {candidate_profile}
 
 Requirements: {job_requirements}"""
-        
+
         scoring_text = self.generate(instruction, context, max_tokens=300)
-        
+
         return {
             "scoring": scoring_text,
             "criteria": scoring_criteria,
             "timestamp": datetime.utcnow().isoformat()
         }
-    
+
     def analyze_response_sentiment(
         self,
         response_text: str,
-    ) -> Dict[str, Any]:
-        """
-        Analyze sentiment of candidate response.
-        
+    ) -> dict[str, Any]:
+        """Analyze sentiment of candidate response.
+
         Args:
             response_text: Text to analyze
-            
+
         Returns:
             Sentiment analysis (positive/negative/neutral, confidence, insights)
         """
@@ -309,21 +300,20 @@ Provide:
 2. Confidence level (high/medium/low)
 3. Key emotional indicators
 4. Professional assessment"""
-        
+
         context = f"Response: {response_text}"
-        
+
         sentiment_text = self.generate(instruction, context, max_tokens=200)
-        
+
         return {
             "sentiment_analysis": sentiment_text,
             "response_text": response_text,
             "timestamp": datetime.utcnow().isoformat()
         }
-    
-    def get_model_info(self) -> Dict[str, Any]:
-        """
-        Get model information and status.
-        
+
+    def get_model_info(self) -> dict[str, Any]:
+        """Get model information and status.
+
         Returns:
             Model metadata and status
         """
@@ -344,7 +334,7 @@ Provide:
                 "integration",
             ],
         }
-        
+
         if self.ollama_available:
             try:
                 # Get model details from Ollama
@@ -356,44 +346,43 @@ Provide:
                         break
             except:
                 pass
-        
+
         return info
 
 
 # Global singleton instance
-_vetta_instance: Optional[VettaAIOllama] = None
+_vetta_instance: VettaAIOllama | None = None
 
 
 def get_vetta_ai(model_name: str = "vetta-granite-2b") -> VettaAIOllama:
-    """
-    Get global VettaAI instance (singleton pattern).
-    
+    """Get global VettaAI instance (singleton pattern).
+
     Args:
         model_name: Ollama model name
-        
+
     Returns:
         VettaAIOllama instance
     """
     global _vetta_instance
-    
+
     if _vetta_instance is None:
         _vetta_instance = VettaAIOllama(model_name=model_name)
-    
+
     return _vetta_instance
 
 
 # Example usage
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    
+
     vetta = get_vetta_ai()
-    
+
     # Check status
     info = vetta.get_model_info()
-    print(f"\n📊 Model Info:")
+    print("\n📊 Model Info:")
     for key, value in info.items():
         print(f"  {key}: {value}")
-    
+
     # Test assessment
     print("\n🧪 Testing candidate assessment...")
     assessment = vetta.assess_candidate(
@@ -402,7 +391,7 @@ if __name__ == "__main__":
         role="Senior Python Developer"
     )
     print(f"Assessment: {assessment['assessment'][:200]}...")
-    
+
     # Test question generation
     print("\n🧪 Testing question generation...")
     question = vetta.generate_interview_question(
@@ -411,5 +400,5 @@ if __name__ == "__main__":
         expertise_level="intermediate"
     )
     print(f"Question: {question}")
-    
+
     print("\n✅ Tests complete!")

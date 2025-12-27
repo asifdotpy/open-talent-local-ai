@@ -1,27 +1,26 @@
-"""
-Voice Service - Pydantic Schemas
-Comprehensive schema definitions for TTS, STT, WebRTC, and audio processing endpoints
+"""Voice Service - Pydantic Schemas
+Comprehensive schema definitions for TTS, STT, WebRTC, and audio processing endpoints.
 """
 
-from pydantic import BaseModel, Field, EmailStr, field_validator
-from typing import Optional, List, Dict, Any, Literal
-from enum import Enum
 from datetime import datetime
+from enum import Enum
+from typing import Any, Literal
 
+from pydantic import BaseModel, Field, field_validator
 
 # ============================================================================
 # ENUMS
 # ============================================================================
 
 class VoiceGender(str, Enum):
-    """Voice gender options"""
+    """Voice gender options."""
     MALE = "male"
     FEMALE = "female"
     NEUTRAL = "neutral"
 
 
 class AudioFormat(str, Enum):
-    """Supported audio formats"""
+    """Supported audio formats."""
     WAV = "wav"
     MP3 = "mp3"
     OGG = "ogg"
@@ -31,7 +30,7 @@ class AudioFormat(str, Enum):
 
 
 class VoiceQuality(str, Enum):
-    """Voice quality levels"""
+    """Voice quality levels."""
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -39,7 +38,7 @@ class VoiceQuality(str, Enum):
 
 
 class STTLanguage(str, Enum):
-    """Supported STT languages"""
+    """Supported STT languages."""
     EN_US = "en-US"
     EN_GB = "en-GB"
     ES_ES = "es-ES"
@@ -53,7 +52,7 @@ class STTLanguage(str, Enum):
 
 
 class EmotionType(str, Enum):
-    """Emotion types for voice analytics"""
+    """Emotion types for voice analytics."""
     NEUTRAL = "neutral"
     HAPPY = "happy"
     SAD = "sad"
@@ -64,7 +63,7 @@ class EmotionType(str, Enum):
 
 
 class ProcessingStatus(str, Enum):
-    """Audio processing job status"""
+    """Audio processing job status."""
     PENDING = "pending"
     PROCESSING = "processing"
     COMPLETED = "completed"
@@ -76,16 +75,16 @@ class ProcessingStatus(str, Enum):
 # ============================================================================
 
 class VoiceInfo(BaseModel):
-    """Voice information model"""
+    """Voice information model."""
     voice_id: str = Field(..., description="Unique voice identifier")
     name: str = Field(..., min_length=1, max_length=100)
     language: STTLanguage
     gender: VoiceGender
-    description: Optional[str] = Field(None, max_length=500)
-    sample_url: Optional[str] = None
+    description: str | None = Field(None, max_length=500)
+    sample_url: str | None = None
     is_premium: bool = False
     quality: VoiceQuality = VoiceQuality.MEDIUM
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -101,12 +100,12 @@ class VoiceInfo(BaseModel):
 
 
 class VoiceConfigUpdate(BaseModel):
-    """Voice configuration update"""
-    speaking_rate: Optional[float] = Field(None, ge=0.25, le=4.0)
-    pitch: Optional[float] = Field(None, ge=-20.0, le=20.0)
-    volume_gain_db: Optional[float] = Field(None, ge=-96.0, le=16.0)
-    sample_rate: Optional[int] = Field(None, ge=8000, le=48000)
-    audio_format: Optional[AudioFormat] = None
+    """Voice configuration update."""
+    speaking_rate: float | None = Field(None, ge=0.25, le=4.0)
+    pitch: float | None = Field(None, ge=-20.0, le=20.0)
+    volume_gain_db: float | None = Field(None, ge=-96.0, le=16.0)
+    sample_rate: int | None = Field(None, ge=8000, le=48000)
+    audio_format: AudioFormat | None = None
 
 
 # ============================================================================
@@ -114,16 +113,16 @@ class VoiceConfigUpdate(BaseModel):
 # ============================================================================
 
 class TTSRequest(BaseModel):
-    """Text-to-speech synthesis request"""
+    """Text-to-speech synthesis request."""
     text: str = Field(..., min_length=1, max_length=5000, description="Text to synthesize")
     voice_id: str = Field(..., description="Voice identifier")
-    language: Optional[STTLanguage] = STTLanguage.EN_US
+    language: STTLanguage | None = STTLanguage.EN_US
     speaking_rate: float = Field(1.0, ge=0.25, le=4.0)
     pitch: float = Field(0.0, ge=-20.0, le=20.0)
     volume_gain_db: float = Field(0.0, ge=-96.0, le=16.0)
     audio_format: AudioFormat = AudioFormat.MP3
     sample_rate: int = Field(24000, ge=8000, le=48000)
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -140,13 +139,13 @@ class TTSRequest(BaseModel):
 
 
 class TTSSynthesizeRequest(BaseModel):
-    """Advanced TTS synthesis with SSML support"""
+    """Advanced TTS synthesis with SSML support."""
     text: str = Field(..., min_length=1, max_length=5000)
     voice_id: str
     ssml_enabled: bool = False
-    effects: Optional[List[str]] = None
-    config: Optional[VoiceConfigUpdate] = None
-    
+    effects: list[str] | None = None
+    config: VoiceConfigUpdate | None = None
+
     @field_validator('text')
     @classmethod
     def validate_ssml(cls, v, info):
@@ -156,9 +155,9 @@ class TTSSynthesizeRequest(BaseModel):
 
 
 class TTSResponse(BaseModel):
-    """TTS synthesis response"""
+    """TTS synthesis response."""
     audio_url: str = Field(..., description="URL to generated audio file")
-    audio_base64: Optional[str] = Field(None, description="Base64-encoded audio data")
+    audio_base64: str | None = Field(None, description="Base64-encoded audio data")
     duration_seconds: float = Field(..., ge=0)
     format: AudioFormat
     sample_rate: int
@@ -170,14 +169,14 @@ class TTSResponse(BaseModel):
 # ============================================================================
 
 class STTRequest(BaseModel):
-    """Speech-to-text transcription request"""
-    audio_url: Optional[str] = Field(None, description="URL to audio file")
-    audio_base64: Optional[str] = Field(None, description="Base64-encoded audio data")
+    """Speech-to-text transcription request."""
+    audio_url: str | None = Field(None, description="URL to audio file")
+    audio_base64: str | None = Field(None, description="Base64-encoded audio data")
     language: STTLanguage = STTLanguage.EN_US
     enable_punctuation: bool = True
     enable_word_timestamps: bool = False
     model: str = "default"
-    
+
     @field_validator('audio_url')
     @classmethod
     def validate_audio_source(cls, v, info):
@@ -188,7 +187,7 @@ class STTRequest(BaseModel):
 
 
 class WordTimestamp(BaseModel):
-    """Word-level timestamp"""
+    """Word-level timestamp."""
     word: str
     start_time: float = Field(..., ge=0, description="Start time in seconds")
     end_time: float = Field(..., ge=0, description="End time in seconds")
@@ -196,12 +195,12 @@ class WordTimestamp(BaseModel):
 
 
 class STTResponse(BaseModel):
-    """STT transcription response"""
+    """STT transcription response."""
     transcript: str
     confidence: float = Field(..., ge=0.0, le=1.0)
     language: STTLanguage
     duration_seconds: float = Field(..., ge=0)
-    word_timestamps: Optional[List[WordTimestamp]] = None
+    word_timestamps: list[WordTimestamp] | None = None
 
 
 # ============================================================================
@@ -209,14 +208,14 @@ class STTResponse(BaseModel):
 # ============================================================================
 
 class AudioProcessRequest(BaseModel):
-    """Audio processing request"""
+    """Audio processing request."""
     audio_url: str
-    operations: List[str] = Field(..., min_items=1)
+    operations: list[str] = Field(..., min_items=1)
     output_format: AudioFormat = AudioFormat.WAV
 
 
 class AudioEnhanceRequest(BaseModel):
-    """Audio enhancement request"""
+    """Audio enhancement request."""
     audio_url: str
     denoise: bool = True
     normalize: bool = True
@@ -225,20 +224,20 @@ class AudioEnhanceRequest(BaseModel):
 
 
 class AudioConvertRequest(BaseModel):
-    """Audio format conversion request"""
+    """Audio format conversion request."""
     audio_url: str
     target_format: AudioFormat
-    target_sample_rate: Optional[int] = Field(None, ge=8000, le=48000)
-    target_bitrate: Optional[int] = Field(None, ge=32, le=320)
+    target_sample_rate: int | None = Field(None, ge=8000, le=48000)
+    target_bitrate: int | None = Field(None, ge=32, le=320)
 
 
 class AudioMetadata(BaseModel):
-    """Audio file metadata"""
+    """Audio file metadata."""
     duration_seconds: float
     format: str
     sample_rate: int
     channels: int
-    bitrate: Optional[int] = None
+    bitrate: int | None = None
     file_size_bytes: int
 
 
@@ -247,38 +246,38 @@ class AudioMetadata(BaseModel):
 # ============================================================================
 
 class WebRTCOffer(BaseModel):
-    """WebRTC offer"""
+    """WebRTC offer."""
     sdp: str = Field(..., description="Session Description Protocol")
     type: Literal["offer"] = "offer"
 
 
 class WebRTCAnswer(BaseModel):
-    """WebRTC answer"""
+    """WebRTC answer."""
     sdp: str = Field(..., description="Session Description Protocol")
     type: Literal["answer"] = "answer"
 
 
 class ICECandidate(BaseModel):
-    """ICE candidate for WebRTC"""
+    """ICE candidate for WebRTC."""
     candidate: str
-    sdp_mid: Optional[str] = None
-    sdp_m_line_index: Optional[int] = None
+    sdp_mid: str | None = None
+    sdp_m_line_index: int | None = None
 
 
 class WebRTCConnectionRequest(BaseModel):
-    """WebRTC connection establishment"""
+    """WebRTC connection establishment."""
     peer_id: str
-    offer: Optional[WebRTCOffer] = None
-    ice_servers: Optional[List[Dict[str, Any]]] = None
+    offer: WebRTCOffer | None = None
+    ice_servers: list[dict[str, Any]] | None = None
 
 
 class WebRTCStatus(BaseModel):
-    """WebRTC connection status"""
+    """WebRTC connection status."""
     peer_id: str
     connection_state: str
     ice_connection_state: str
     signaling_state: str
-    connected_at: Optional[datetime] = None
+    connected_at: datetime | None = None
 
 
 # ============================================================================
@@ -286,14 +285,14 @@ class WebRTCStatus(BaseModel):
 # ============================================================================
 
 class PhonemeExtractionRequest(BaseModel):
-    """Extract phonemes from audio"""
+    """Extract phonemes from audio."""
     audio_url: str
     language: STTLanguage = STTLanguage.EN_US
     include_timing: bool = True
 
 
 class PhonemeTiming(BaseModel):
-    """Phoneme with timing information"""
+    """Phoneme with timing information."""
     phoneme: str
     start_time: float = Field(..., ge=0)
     end_time: float = Field(..., ge=0)
@@ -301,19 +300,19 @@ class PhonemeTiming(BaseModel):
 
 
 class PhonemeExtractionResponse(BaseModel):
-    """Phoneme extraction response"""
-    phonemes: List[str]
-    timing: Optional[List[PhonemeTiming]] = None
+    """Phoneme extraction response."""
+    phonemes: list[str]
+    timing: list[PhonemeTiming] | None = None
     language: STTLanguage
     duration_seconds: float
 
 
 class PhonemeMapping(BaseModel):
-    """Phoneme mapping information"""
+    """Phoneme mapping information."""
     phoneme: str
     ipa: str = Field(..., description="International Phonetic Alphabet representation")
     example: str
-    description: Optional[str] = None
+    description: str | None = None
 
 
 # ============================================================================
@@ -321,7 +320,7 @@ class PhonemeMapping(BaseModel):
 # ============================================================================
 
 class VoiceQualityAnalysisRequest(BaseModel):
-    """Voice quality analysis request"""
+    """Voice quality analysis request."""
     audio_url: str
     analyze_pitch: bool = True
     analyze_volume: bool = True
@@ -329,24 +328,24 @@ class VoiceQualityAnalysisRequest(BaseModel):
 
 
 class VoiceQualityAnalysisResponse(BaseModel):
-    """Voice quality analysis result"""
+    """Voice quality analysis result."""
     overall_quality_score: float = Field(..., ge=0.0, le=10.0)
-    pitch_mean: Optional[float] = None
-    pitch_std: Optional[float] = None
-    volume_mean_db: Optional[float] = None
-    volume_std_db: Optional[float] = None
-    clarity_score: Optional[float] = Field(None, ge=0.0, le=1.0)
-    signal_to_noise_ratio: Optional[float] = None
+    pitch_mean: float | None = None
+    pitch_std: float | None = None
+    volume_mean_db: float | None = None
+    volume_std_db: float | None = None
+    clarity_score: float | None = Field(None, ge=0.0, le=1.0)
+    signal_to_noise_ratio: float | None = None
 
 
 class SpeechRateAnalysisRequest(BaseModel):
-    """Speech rate analysis request"""
+    """Speech rate analysis request."""
     audio_url: str
-    transcript: Optional[str] = None
+    transcript: str | None = None
 
 
 class SpeechRateAnalysisResponse(BaseModel):
-    """Speech rate analysis result"""
+    """Speech rate analysis result."""
     words_per_minute: float
     syllables_per_second: float
     pause_count: int
@@ -355,16 +354,16 @@ class SpeechRateAnalysisResponse(BaseModel):
 
 
 class EmotionDetectionRequest(BaseModel):
-    """Emotion detection request"""
+    """Emotion detection request."""
     audio_url: str
     granular: bool = False
 
 
 class EmotionDetectionResponse(BaseModel):
-    """Emotion detection response"""
+    """Emotion detection response."""
     primary_emotion: EmotionType
     confidence: float = Field(..., ge=0.0, le=1.0)
-    emotion_scores: Dict[EmotionType, float]
+    emotion_scores: dict[EmotionType, float]
 
 
 # ============================================================================
@@ -372,13 +371,13 @@ class EmotionDetectionResponse(BaseModel):
 # ============================================================================
 
 class BatchProcessRequest(BaseModel):
-    """Batch processing request"""
-    operations: List[Dict[str, Any]] = Field(..., min_length=1, max_length=100)
-    callback_url: Optional[str] = None
+    """Batch processing request."""
+    operations: list[dict[str, Any]] = Field(..., min_length=1, max_length=100)
+    callback_url: str | None = None
 
 
 class BatchProcessResponse(BaseModel):
-    """Batch processing response"""
+    """Batch processing response."""
     batch_id: str
     total_operations: int
     status: ProcessingStatus
@@ -386,13 +385,13 @@ class BatchProcessResponse(BaseModel):
 
 
 class VoiceHistoryEntry(BaseModel):
-    """Voice service usage history entry"""
+    """Voice service usage history entry."""
     operation_id: str
     operation_type: str
     timestamp: datetime
-    duration_seconds: Optional[float] = None
+    duration_seconds: float | None = None
     status: ProcessingStatus
-    user_id: Optional[str] = None
+    user_id: str | None = None
 
 
 # ============================================================================
@@ -400,18 +399,18 @@ class VoiceHistoryEntry(BaseModel):
 # ============================================================================
 
 class VoiceServiceInfo(BaseModel):
-    """Voice service information"""
+    """Voice service information."""
     service_name: str = "Voice Service"
     version: str
-    supported_languages: List[STTLanguage]
-    supported_formats: List[AudioFormat]
+    supported_languages: list[STTLanguage]
+    supported_formats: list[AudioFormat]
     available_voices: int
     webrtc_enabled: bool
-    features: List[str]
+    features: list[str]
 
 
 class HealthCheckResponse(BaseModel):
-    """Health check response"""
+    """Health check response."""
     status: Literal["healthy", "degraded", "unhealthy"]
     timestamp: datetime
     tts_available: bool
@@ -426,8 +425,8 @@ class HealthCheckResponse(BaseModel):
 # ============================================================================
 
 class ErrorResponse(BaseModel):
-    """Standard error response"""
+    """Standard error response."""
     error: str
-    detail: Optional[str] = None
-    code: Optional[str] = None
+    detail: str | None = None
+    code: str | None = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)

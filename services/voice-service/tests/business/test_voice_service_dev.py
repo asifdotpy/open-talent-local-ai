@@ -1,19 +1,14 @@
 #!/usr/bin/env python3
-"""
-Safe Development Tests for Voice Service
-Tests basic functionality without system-crashing stress tests
+"""Safe Development Tests for Voice Service
+Tests basic functionality without system-crashing stress tests.
 """
 
 import asyncio
-import json
 import os
 import tempfile
-import time
-from pathlib import Path
-from typing import Dict, Any
+from typing import Any
 
 import httpx
-import pytest
 import numpy as np
 import soundfile as sf
 
@@ -31,7 +26,7 @@ class SafeVoiceServiceTester:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.client.aclose()
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Check service health."""
         try:
             response = await self.client.get(f"{self.base_url}/health")
@@ -41,7 +36,7 @@ class SafeVoiceServiceTester:
         except Exception as e:
             return {"success": False, "error": str(e), "status": "unreachable"}
 
-    async def test_stt_basic(self, audio_file: str = None) -> Dict[str, Any]:
+    async def test_stt_basic(self, audio_file: str = None) -> dict[str, Any]:
         """Test STT by generating audio with TTS first."""
         try:
             # Generate test audio using TTS if none provided
@@ -109,7 +104,7 @@ class SafeVoiceServiceTester:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    async def test_tts_basic(self, text: str = "Hello, this is a test.") -> Dict[str, Any]:
+    async def test_tts_basic(self, text: str = "Hello, this is a test.") -> dict[str, Any]:
         """Test basic TTS functionality."""
         try:
             payload = {"text": text, "voice": "lessac"}
@@ -145,7 +140,7 @@ class SafeVoiceServiceTester:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    async def test_voices_endpoint(self) -> Dict[str, Any]:
+    async def test_voices_endpoint(self) -> dict[str, Any]:
         """Test voices endpoint."""
         try:
             response = await self.client.get(f"{self.base_url}/voices")
@@ -159,7 +154,7 @@ class SafeVoiceServiceTester:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    async def test_service_info(self) -> Dict[str, Any]:
+    async def test_service_info(self) -> dict[str, Any]:
         """Test service info endpoint."""
         try:
             response = await self.client.get(f"{self.base_url}/info")
@@ -172,7 +167,7 @@ class SafeVoiceServiceTester:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    async def _analyze_audio(self, audio_file: str) -> Dict[str, Any]:
+    async def _analyze_audio(self, audio_file: str) -> dict[str, Any]:
         """Analyze generated audio file."""
         try:
             audio_data, sample_rate = sf.read(audio_file)

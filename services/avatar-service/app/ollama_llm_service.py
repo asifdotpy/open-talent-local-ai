@@ -1,7 +1,8 @@
-import os
-import httpx
-from typing import Dict, Any, Optional
 import asyncio
+import os
+from typing import Any
+
+import httpx
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -16,8 +17,7 @@ class OllamaLLMService:
     """Service for handling LLM processing using local Ollama."""
 
     def __init__(self, base_url: str = "http://localhost:11434"):
-        """
-        Initialize Ollama LLM service.
+        """Initialize Ollama LLM service.
 
         Args:
             base_url: The base URL for Ollama API (default: http://localhost:11434)
@@ -29,10 +29,9 @@ class OllamaLLMService:
         self,
         candidate_input: str,
         system_prompt: str,
-        context: Optional[Dict[str, Any]] = None
+        context: dict[str, Any] | None = None
     ) -> str:
-        """
-        Generate interview response using local Ollama LLM.
+        """Generate interview response using local Ollama LLM.
 
         Args:
             candidate_input: The candidate's response or input
@@ -71,11 +70,10 @@ class OllamaLLMService:
 
     async def generate_script_text(
         self,
-        interview_context: Dict[str, Any],
+        interview_context: dict[str, Any],
         system_prompt: str
     ) -> str:
-        """
-        Generate script text for avatar video creation.
+        """Generate script text for avatar video creation.
 
         Args:
             interview_context: Context about the interview (stage, questions, responses)
@@ -112,7 +110,7 @@ class OllamaLLMService:
         self,
         candidate_input: str,
         system_prompt: str,
-        context: Optional[Dict[str, Any]] = None
+        context: dict[str, Any] | None = None
     ) -> str:
         """Build complete prompt for interview response generation."""
         prompt_parts = [
@@ -137,7 +135,7 @@ class OllamaLLMService:
 
         return "\n".join(prompt_parts)
 
-    def _build_script_prompt(self, interview_context: Dict[str, Any], system_prompt: str) -> str:
+    def _build_script_prompt(self, interview_context: dict[str, Any], system_prompt: str) -> str:
         """Build prompt for script generation."""
         return f"""
 Generate a natural, conversational script for an AI interviewer avatar based on this context:

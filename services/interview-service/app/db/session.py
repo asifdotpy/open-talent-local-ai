@@ -1,6 +1,4 @@
-"""
-SQLAlchemy session maker.
-"""
+"""SQLAlchemy session maker."""
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker

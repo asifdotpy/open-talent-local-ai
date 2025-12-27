@@ -5,15 +5,14 @@ Tests all Phase 0 endpoints without requiring other services.
 """
 
 import asyncio
-import httpx
 import json
-from typing import Dict
 
+import httpx
 
 BASE_URL = "http://localhost:8009"
 
 
-async def test_endpoint(client: httpx.AsyncClient, name: str, method: str, url: str, **kwargs) -> Dict:
+async def test_endpoint(client: httpx.AsyncClient, name: str, method: str, url: str, **kwargs) -> dict:
     """Test a single endpoint."""
     try:
         if method == "GET":
@@ -22,7 +21,7 @@ async def test_endpoint(client: httpx.AsyncClient, name: str, method: str, url: 
             response = await client.post(url, **kwargs)
         else:
             return {"status": "error", "message": f"Unsupported method: {method}"}
-        
+
         return {
             "status": "success" if response.status_code < 400 else "error",
             "status_code": response.status_code,
@@ -34,9 +33,7 @@ async def test_endpoint(client: httpx.AsyncClient, name: str, method: str, url: 
 
 async def main():
     """Run all endpoint tests."""
-    print("🧪 Testing Desktop Integration Service Endpoints")
-    print("=" * 60)
-    
+
     async with httpx.AsyncClient(timeout=10.0) as client:
         tests = [
             ("Root", "GET", f"{BASE_URL}/"),
@@ -52,45 +49,35 @@ async def main():
                 }
             }),
         ]
-        
+
         results = []
         for name, method, url, *args in tests:
             kwargs = args[0] if args else {}
-            print(f"\n📍 Testing: {name}")
-            print(f"   {method} {url}")
-            
+
             result = await test_endpoint(client, name, method, url, **kwargs)
             results.append((name, result))
-            
+
             if result["status"] == "success":
-                print(f"   ✅ {result['status_code']} - Success")
+                pass
             else:
-                print(f"   ❌ Error: {result.get('message', result.get('status_code'))}")
-            
+                pass
+
             # Print response preview
             if "response" in result:
-                response_str = json.dumps(result["response"], indent=2)[:300]
-                print(f"   Response preview: {response_str}...")
-        
+                json.dumps(result["response"], indent=2)[:300]
+
         # Summary
-        print("\n" + "=" * 60)
-        print("📊 Test Summary")
-        print("=" * 60)
-        
+
         passed = sum(1 for _, r in results if r["status"] == "success")
         total = len(results)
-        
+
         for name, result in results:
-            status_icon = "✅" if result["status"] == "success" else "❌"
-            print(f"{status_icon} {name}")
-        
-        print(f"\n✨ Passed: {passed}/{total} tests")
-        
+            "✅" if result["status"] == "success" else "❌"
+
+
         if passed == total:
-            print("\n🎉 All tests passed! Gateway is ready.")
             return 0
         else:
-            print(f"\n⚠️  {total - passed} test(s) failed. Check logs.")
             return 1
 
 

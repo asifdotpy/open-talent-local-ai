@@ -4,11 +4,11 @@ Generated: December 17, 2025
 Coverage: 14 endpoints with full type safety
 """
 
-from enum import Enum
-from typing import Optional, Dict, Any, List
 from datetime import datetime
+from enum import Enum
+from typing import Any
 
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class NotificationPriority(str, Enum):
@@ -43,29 +43,29 @@ class NotificationType(str, Enum):
 class EmailNotificationRequest(BaseModel):
     to: EmailStr
     subject: str = Field(..., min_length=1, strip_whitespace=True)
-    html: Optional[str] = ""
-    text: Optional[str] = None
-    priority: Optional[NotificationPriority] = Field(default=NotificationPriority.NORMAL)
-    cc: Optional[List[EmailStr]] = None
-    bcc: Optional[List[EmailStr]] = None
-    attachments: Optional[List[str]] = None  # File URLs
+    html: str | None = ""
+    text: str | None = None
+    priority: NotificationPriority | None = Field(default=NotificationPriority.NORMAL)
+    cc: list[EmailStr] | None = None
+    bcc: list[EmailStr] | None = None
+    attachments: list[str] | None = None  # File URLs
 
 
 class SMSNotificationRequest(BaseModel):
     # E.164 phone format: optional +, up to 15 digits
     to: str = Field(..., pattern=r'^\+?[1-9]\d{1,14}$', strip_whitespace=True)
     text: str = Field(..., min_length=1, max_length=1600, strip_whitespace=True)
-    priority: Optional[NotificationPriority] = Field(default=NotificationPriority.NORMAL)
+    priority: NotificationPriority | None = Field(default=NotificationPriority.NORMAL)
 
 
 class PushNotificationRequest(BaseModel):
     to: str = Field(..., min_length=1, strip_whitespace=True)
     title: str = Field(..., min_length=1, max_length=100, strip_whitespace=True)
     body: str = Field(..., min_length=1, max_length=500, strip_whitespace=True)
-    data: Optional[Dict[str, Any]] = None
-    priority: Optional[NotificationPriority] = Field(default=NotificationPriority.NORMAL)
-    icon: Optional[str] = None
-    action_url: Optional[str] = None
+    data: dict[str, Any] | None = None
+    priority: NotificationPriority | None = Field(default=NotificationPriority.NORMAL)
+    icon: str | None = None
+    action_url: str | None = None
 
 
 class InAppNotificationRequest(BaseModel):
@@ -74,19 +74,19 @@ class InAppNotificationRequest(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     message: str = Field(..., min_length=1, max_length=1000)
     type: str = Field(..., pattern=r'^(info|success|warning|error)$')
-    action_url: Optional[str] = None
-    data: Optional[Dict[str, Any]] = None
+    action_url: str | None = None
+    data: dict[str, Any] | None = None
 
 
 class BulkNotificationRequest(BaseModel):
     """Bulk notification request"""
-    recipients: List[str] = Field(..., min_length=1, max_length=1000)
+    recipients: list[str] = Field(..., min_length=1, max_length=1000)
     notification_type: NotificationType
-    template_id: Optional[str] = None
-    subject: Optional[str] = None
+    template_id: str | None = None
+    subject: str | None = None
     message: str = Field(..., min_length=1)
     priority: NotificationPriority = NotificationPriority.NORMAL
-    scheduled_at: Optional[datetime] = None
+    scheduled_at: datetime | None = None
 
 
 # ============================================================================
@@ -98,8 +98,8 @@ class NotificationResponse(BaseModel):
     id: str
     status: NotificationStatus
     message: str
-    sent_at: Optional[datetime] = None
-    
+    sent_at: datetime | None = None
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -109,7 +109,7 @@ class BulkNotificationResponse(BaseModel):
     sent: int
     failed: int
     pending: int
-    notification_ids: List[str]
+    notification_ids: list[str]
 
 
 class NotificationHistoryResponse(BaseModel):
@@ -118,17 +118,17 @@ class NotificationHistoryResponse(BaseModel):
     notification_type: NotificationType
     recipient: str
     status: NotificationStatus
-    subject: Optional[str] = None
+    subject: str | None = None
     sent_at: datetime
-    delivered_at: Optional[datetime] = None
-    error_message: Optional[str] = None
-    
+    delivered_at: datetime | None = None
+    error_message: str | None = None
+
     model_config = ConfigDict(from_attributes=True)
 
 
 class NotificationHistoryListResponse(BaseModel):
     """Paginated notification history"""
-    items: List[NotificationHistoryResponse]
+    items: list[NotificationHistoryResponse]
     total: int
     page: int
     page_size: int
@@ -143,9 +143,9 @@ class TemplateBase(BaseModel):
     """Base template model"""
     name: str = Field(..., min_length=1, max_length=100)
     notification_type: NotificationType
-    subject: Optional[str] = Field(None, max_length=200)
+    subject: str | None = Field(None, max_length=200)
     content: str = Field(..., min_length=1)
-    variables: Optional[List[str]] = None
+    variables: list[str] | None = None
 
 
 class TemplateCreate(TemplateBase):
@@ -155,10 +155,10 @@ class TemplateCreate(TemplateBase):
 
 class TemplateUpdate(BaseModel):
     """Update template request"""
-    name: Optional[str] = Field(None, min_length=1, max_length=100)
-    subject: Optional[str] = Field(None, max_length=200)
-    content: Optional[str] = None
-    variables: Optional[List[str]] = None
+    name: str | None = Field(None, min_length=1, max_length=100)
+    subject: str | None = Field(None, max_length=200)
+    content: str | None = None
+    variables: list[str] | None = None
 
 
 class TemplateResponse(TemplateBase):
@@ -167,13 +167,13 @@ class TemplateResponse(TemplateBase):
     created_at: datetime
     updated_at: datetime
     usage_count: int = 0
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
 class TemplateListResponse(BaseModel):
     """Paginated template list"""
-    items: List[TemplateResponse]
+    items: list[TemplateResponse]
     total: int
     page: int
     page_size: int
@@ -202,14 +202,14 @@ class NotificationPreferencesCreate(NotificationPreferencesBase):
 
 class NotificationPreferencesUpdate(BaseModel):
     """Update notification preferences"""
-    email_enabled: Optional[bool] = None
-    sms_enabled: Optional[bool] = None
-    push_enabled: Optional[bool] = None
-    in_app_enabled: Optional[bool] = None
-    marketing_emails: Optional[bool] = None
-    interview_reminders: Optional[bool] = None
-    application_updates: Optional[bool] = None
-    system_alerts: Optional[bool] = None
+    email_enabled: bool | None = None
+    sms_enabled: bool | None = None
+    push_enabled: bool | None = None
+    in_app_enabled: bool | None = None
+    marketing_emails: bool | None = None
+    interview_reminders: bool | None = None
+    application_updates: bool | None = None
+    system_alerts: bool | None = None
 
 
 class NotificationPreferencesResponse(NotificationPreferencesBase):
@@ -218,7 +218,7 @@ class NotificationPreferencesResponse(NotificationPreferencesBase):
     user_id: str
     created_at: datetime
     updated_at: datetime
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -230,7 +230,7 @@ class NotificationAnalyticsRequest(BaseModel):
     """Notification analytics request"""
     start_date: datetime
     end_date: datetime
-    notification_type: Optional[NotificationType] = None
+    notification_type: NotificationType | None = None
 
 
 class NotificationAnalyticsResponse(BaseModel):
@@ -239,9 +239,9 @@ class NotificationAnalyticsResponse(BaseModel):
     total_delivered: int
     total_failed: int
     delivery_rate: float
-    by_type: Dict[str, int]
-    by_status: Dict[str, int]
-    peak_hours: List[int]
+    by_type: dict[str, int]
+    by_status: dict[str, int]
+    peak_hours: list[int]
 
 
 # ============================================================================
@@ -261,6 +261,6 @@ class HealthCheckResponse(BaseModel):
 class ErrorResponse(BaseModel):
     """Error response"""
     error: str
-    detail: Optional[str] = None
+    detail: str | None = None
     timestamp: datetime
 

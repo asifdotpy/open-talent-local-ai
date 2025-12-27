@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Optional, List
 
 from pydantic import BaseModel, EmailStr, Field, constr
 
@@ -19,8 +18,8 @@ class LoginRequest(BaseModel):
 class RegisterRequest(BaseModel):
     email: EmailStr
     password: constr(min_length=1)
-    first_name: Optional[constr(strip_whitespace=True, min_length=1)] = None
-    last_name: Optional[constr(strip_whitespace=True, min_length=1)] = None
+    first_name: constr(strip_whitespace=True, min_length=1) | None = None
+    last_name: constr(strip_whitespace=True, min_length=1) | None = None
 
 
 class TokenVerifyRequest(BaseModel):
@@ -33,10 +32,10 @@ class TokenRefreshRequest(BaseModel):
 
 class ProfileResponse(BaseModel):
     email: EmailStr
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    roles: List[str]
-    permissions: List[str]
+    first_name: str | None = None
+    last_name: str | None = None
+    roles: list[str]
+    permissions: list[str]
     mfa_enabled: bool
 
 
@@ -56,8 +55,8 @@ class EncryptRequest(BaseModel):
 
 
 class DecryptRequest(BaseModel):
-    encrypted: Optional[constr(min_length=1)] = Field(default=None)
-    ciphertext: Optional[constr(min_length=1)] = Field(default=None)
+    encrypted: constr(min_length=1) | None = Field(default=None)
+    ciphertext: constr(min_length=1) | None = Field(default=None)
 
 
 # Password management

@@ -1,15 +1,11 @@
-"""
-Voice generation service - Local implementation planned.
+"""Voice generation service - Local implementation planned.
 
 Currently provides mock responses. Local TTS/STT research and implementation
 will be added in future updates.
 """
 
-import os
-from typing import List
-from fastapi import HTTPException
 
-from app.models.voice import VoiceRequest, VoiceResponse, VoiceInfo, VoiceListResponse
+from app.models.voice import VoiceListResponse, VoiceRequest, VoiceResponse
 
 
 class VoiceService:

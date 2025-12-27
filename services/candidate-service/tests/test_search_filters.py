@@ -1,5 +1,5 @@
+
 from fastapi.testclient import TestClient
-from urllib.parse import quote
 
 from main import app
 
@@ -21,10 +21,10 @@ def test_search_with_basic_query():
     }
     r1 = client.post("/api/v1/candidates", json=cand1, headers=AUTH)
     r2 = client.post("/api/v1/candidates", json=cand2, headers=AUTH)
-    
+
     assert r1.status_code == 201
     assert r2.status_code == 201
-    
+
     # Search for Python developer
     r3 = client.get("/api/v1/candidates/search?query=Python", headers=AUTH)
     assert r3.status_code == 200
@@ -45,13 +45,13 @@ def test_search_with_skills_filter():
     r = client.post("/api/v1/candidates", json=cand, headers=AUTH)
     assert r.status_code == 201
     candidate_id = r.json()["id"]
-    
+
     # Add skills
     skill1 = {"skill": "Python", "proficiency": "advanced"}
     skill2 = {"skill": "FastAPI", "proficiency": "advanced"}
     client.post(f"/api/v1/candidates/{candidate_id}/skills", json=skill1, headers=AUTH)
     client.post(f"/api/v1/candidates/{candidate_id}/skills", json=skill2, headers=AUTH)
-    
+
     # Search with skill filter
     r2 = client.get("/api/v1/candidates/search?query=developer&skills=Python", headers=AUTH)
     assert r2.status_code == 200
@@ -69,7 +69,7 @@ def test_search_with_multiple_filters():
     r = client.post("/api/v1/candidates", json=cand, headers=AUTH)
     assert r.status_code == 201
     candidate_id = r.json()["id"]
-    
+
     # Add skills
     skills = [
         {"skill": "Python", "proficiency": "expert"},
@@ -78,7 +78,7 @@ def test_search_with_multiple_filters():
     ]
     for skill in skills:
         client.post(f"/api/v1/candidates/{candidate_id}/skills", json=skill, headers=AUTH)
-    
+
     # Search with multiple filters
     r2 = client.get(
         "/api/v1/candidates/search?query=developer&skills=Python,React&min_experience=3&location=NYC&tags=remote",
@@ -122,11 +122,11 @@ def test_search_case_insensitive_filters():
     r = client.post("/api/v1/candidates", json=cand, headers=AUTH)
     assert r.status_code == 201
     candidate_id = r.json()["id"]
-    
+
     # Add skill with mixed case
     skill = {"skill": "JavaScript", "proficiency": "intermediate"}
     client.post(f"/api/v1/candidates/{candidate_id}/skills", json=skill, headers=AUTH)
-    
+
     # Search with lowercase skill filter
     r2 = client.get("/api/v1/candidates/search?query=developer&skills=javascript", headers=AUTH)
     assert r2.status_code == 200

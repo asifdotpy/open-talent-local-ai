@@ -1,21 +1,19 @@
-"""
-Candidate Service - Comprehensive Pydantic V2 Schemas
+"""Candidate Service - Comprehensive Pydantic V2 Schemas
 Generated: December 17, 2025
-Coverage: 76 endpoints with full type safety
+Coverage: 76 endpoints with full type safety.
 """
 
-from pydantic import BaseModel, Field, EmailStr, HttpUrl, field_validator, ConfigDict
-from typing import Optional, List, Dict, Any
+from datetime import date, datetime
 from enum import Enum
-from datetime import datetime, date
 
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, HttpUrl
 
 # ============================================================================
 # ENUMS - Type-Safe Status Fields
 # ============================================================================
 
 class CandidateStatus(str, Enum):
-    """Candidate application status"""
+    """Candidate application status."""
     ACTIVE = "active"
     INACTIVE = "inactive"
     INTERVIEWING = "interviewing"
@@ -25,7 +23,7 @@ class CandidateStatus(str, Enum):
 
 
 class ApplicationStatus(str, Enum):
-    """Application lifecycle status"""
+    """Application lifecycle status."""
     DRAFT = "draft"
     SUBMITTED = "submitted"
     UNDER_REVIEW = "under_review"
@@ -40,7 +38,7 @@ class ApplicationStatus(str, Enum):
 
 
 class SkillLevel(str, Enum):
-    """Skill proficiency level"""
+    """Skill proficiency level."""
     BEGINNER = "beginner"
     INTERMEDIATE = "intermediate"
     ADVANCED = "advanced"
@@ -48,7 +46,7 @@ class SkillLevel(str, Enum):
 
 
 class EducationLevel(str, Enum):
-    """Education degree level"""
+    """Education degree level."""
     HIGH_SCHOOL = "high_school"
     ASSOCIATE = "associate"
     BACHELOR = "bachelor"
@@ -59,7 +57,7 @@ class EducationLevel(str, Enum):
 
 
 class EmploymentType(str, Enum):
-    """Employment type"""
+    """Employment type."""
     FULL_TIME = "full_time"
     PART_TIME = "part_time"
     CONTRACT = "contract"
@@ -74,7 +72,7 @@ class EmploymentType(str, Enum):
 class ProfileSource(BaseModel):
     """Records the origin of the candidate data."""
     source_name: Literal['ContactOut', 'SalesQL', 'LinkedIn', 'Manual']
-    source_id: Optional[str] = None # The record ID from the external system
+    source_id: str | None = None # The record ID from the external system
     retrieved_at: date
 
 class WorkExperience(BaseModel):
@@ -82,8 +80,8 @@ class WorkExperience(BaseModel):
     position: str
     company: str
     start_date: date
-    end_date: Optional[date] = None
-    description: Optional[str] = None
+    end_date: date | None = None
+    description: str | None = None
 
 class Education(BaseModel):
     """Represents an entry in a candidate's education history."""
@@ -91,7 +89,7 @@ class Education(BaseModel):
     degree: str
     field_of_study: str
     start_date: date
-    end_date: Optional[date] = None
+    end_date: date | None = None
 
 class SocialProfile(BaseModel):
     """Links to social and professional profiles."""
@@ -99,16 +97,15 @@ class SocialProfile(BaseModel):
     url: HttpUrl
 
 class EnrichedProfile(BaseModel):
-    """
-    A universal data model to accommodate data from ContactOut and other
+    """A universal data model to accommodate data from ContactOut and other
     sourcing tools, designed to be compatible with the Agent-Interview bridge.
     """
     source: ProfileSource
-    work_history: List[WorkExperience] = []
-    education_history: List[Education] = []
-    social_profiles: List[SocialProfile] = []
-    contact_email: Optional[str] = None
-    contact_phone: Optional[str] = None
+    work_history: list[WorkExperience] = []
+    education_history: list[Education] = []
+    social_profiles: list[SocialProfile] = []
+    contact_email: str | None = None
+    contact_phone: str | None = None
 
 
 # ============================================================================
@@ -116,62 +113,62 @@ class EnrichedProfile(BaseModel):
 # ============================================================================
 
 class CandidateBase(BaseModel):
-    """Base candidate model"""
+    """Base candidate model."""
     first_name: str = Field(..., min_length=1, max_length=100)
     last_name: str = Field(..., min_length=1, max_length=100)
     email: EmailStr
-    phone: Optional[str] = Field(None, pattern=r'^\+?[1-9]\d{1,14}$')  # E.164 format
-    linkedin_url: Optional[HttpUrl] = None
-    github_url: Optional[HttpUrl] = None
-    portfolio_url: Optional[HttpUrl] = None
-    location: Optional[str] = Field(None, max_length=200)
+    phone: str | None = Field(None, pattern=r'^\+?[1-9]\d{1,14}$')  # E.164 format
+    linkedin_url: HttpUrl | None = None
+    github_url: HttpUrl | None = None
+    portfolio_url: HttpUrl | None = None
+    location: str | None = Field(None, max_length=200)
     status: CandidateStatus = CandidateStatus.ACTIVE
-    bio: Optional[str] = Field(None, max_length=2000)
-    years_of_experience: Optional[int] = Field(None, ge=0, le=50)
-    current_title: Optional[str] = Field(None, max_length=200)
-    current_company: Optional[str] = Field(None, max_length=200)
+    bio: str | None = Field(None, max_length=2000)
+    years_of_experience: int | None = Field(None, ge=0, le=50)
+    current_title: str | None = Field(None, max_length=200)
+    current_company: str | None = Field(None, max_length=200)
 
 
 class CandidateCreate(CandidateBase):
-    """Create candidate request"""
-    user_id: Optional[str] = None
-    source: Optional[str] = Field(None, max_length=100)  # Referral, job board, etc.
-    referred_by: Optional[str] = None  # User ID of referrer
+    """Create candidate request."""
+    user_id: str | None = None
+    source: str | None = Field(None, max_length=100)  # Referral, job board, etc.
+    referred_by: str | None = None  # User ID of referrer
 
 
 class CandidateUpdate(BaseModel):
-    """Update candidate request"""
-    first_name: Optional[str] = Field(None, min_length=1, max_length=100)
-    last_name: Optional[str] = Field(None, min_length=1, max_length=100)
-    email: Optional[EmailStr] = None
-    phone: Optional[str] = Field(None, pattern=r'^\+?[1-9]\d{1,14}$')
-    linkedin_url: Optional[HttpUrl] = None
-    github_url: Optional[HttpUrl] = None
-    portfolio_url: Optional[HttpUrl] = None
-    location: Optional[str] = Field(None, max_length=200)
-    status: Optional[CandidateStatus] = None
-    bio: Optional[str] = Field(None, max_length=2000)
-    years_of_experience: Optional[int] = Field(None, ge=0, le=50)
-    current_title: Optional[str] = Field(None, max_length=200)
-    current_company: Optional[str] = Field(None, max_length=200)
+    """Update candidate request."""
+    first_name: str | None = Field(None, min_length=1, max_length=100)
+    last_name: str | None = Field(None, min_length=1, max_length=100)
+    email: EmailStr | None = None
+    phone: str | None = Field(None, pattern=r'^\+?[1-9]\d{1,14}$')
+    linkedin_url: HttpUrl | None = None
+    github_url: HttpUrl | None = None
+    portfolio_url: HttpUrl | None = None
+    location: str | None = Field(None, max_length=200)
+    status: CandidateStatus | None = None
+    bio: str | None = Field(None, max_length=2000)
+    years_of_experience: int | None = Field(None, ge=0, le=50)
+    current_title: str | None = Field(None, max_length=200)
+    current_company: str | None = Field(None, max_length=200)
 
 
 class CandidateResponse(CandidateBase):
-    """Candidate response with metadata"""
+    """Candidate response with metadata."""
     id: str
-    user_id: Optional[str]
+    user_id: str | None
     created_at: datetime
     updated_at: datetime
-    last_activity: Optional[datetime] = None
+    last_activity: datetime | None = None
     applications_count: int = 0
     interviews_count: int = 0
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
 class CandidateListResponse(BaseModel):
-    """Paginated candidate list"""
-    items: List[CandidateResponse]
+    """Paginated candidate list."""
+    items: list[CandidateResponse]
     total: int
     page: int
     page_size: int
@@ -183,25 +180,25 @@ class CandidateListResponse(BaseModel):
 # ============================================================================
 
 class SkillBase(BaseModel):
-    """Base skill model"""
+    """Base skill model."""
     name: str = Field(..., min_length=1, max_length=100)
     level: SkillLevel
-    years_of_experience: Optional[int] = Field(None, ge=0, le=50)
-    category: Optional[str] = Field(None, max_length=100)  # e.g., "Programming", "Framework"
+    years_of_experience: int | None = Field(None, ge=0, le=50)
+    category: str | None = Field(None, max_length=100)  # e.g., "Programming", "Framework"
 
 
 class SkillCreate(SkillBase):
-    """Create skill request"""
+    """Create skill request."""
     pass
 
 
 class SkillResponse(SkillBase):
-    """Skill response with metadata"""
+    """Skill response with metadata."""
     id: str
     candidate_id: str
     created_at: datetime
     updated_at: datetime
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -210,45 +207,45 @@ class SkillResponse(SkillBase):
 # ============================================================================
 
 class ApplicationBase(BaseModel):
-    """Base application model"""
+    """Base application model."""
     job_id: str
-    cover_letter: Optional[str] = Field(None, max_length=5000)
+    cover_letter: str | None = Field(None, max_length=5000)
     status: ApplicationStatus = ApplicationStatus.DRAFT
-    expected_salary: Optional[int] = Field(None, ge=0)
-    available_start_date: Optional[date] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    expected_salary: int | None = Field(None, ge=0)
+    available_start_date: date | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class ApplicationCreate(ApplicationBase):
-    """Create application request"""
-    candidate_id: Optional[str] = None  # Auto-detected from auth if not provided
+    """Create application request."""
+    candidate_id: str | None = None  # Auto-detected from auth if not provided
 
 
 class ApplicationUpdate(BaseModel):
-    """Update application request"""
-    cover_letter: Optional[str] = Field(None, max_length=5000)
-    status: Optional[ApplicationStatus] = None
-    expected_salary: Optional[int] = Field(None, ge=0)
-    available_start_date: Optional[date] = None
-    notes: Optional[str] = Field(None, max_length=2000)
+    """Update application request."""
+    cover_letter: str | None = Field(None, max_length=5000)
+    status: ApplicationStatus | None = None
+    expected_salary: int | None = Field(None, ge=0)
+    available_start_date: date | None = None
+    notes: str | None = Field(None, max_length=2000)
 
 
 class ApplicationResponse(ApplicationBase):
-    """Application response with metadata"""
+    """Application response with metadata."""
     id: str
     candidate_id: str
     created_at: datetime
     updated_at: datetime
-    submitted_at: Optional[datetime] = None
-    reviewed_at: Optional[datetime] = None
-    reviewed_by: Optional[str] = None  # Recruiter ID
-    
+    submitted_at: datetime | None = None
+    reviewed_at: datetime | None = None
+    reviewed_by: str | None = None  # Recruiter ID
+
     model_config = ConfigDict(from_attributes=True)
 
 
 class ApplicationListResponse(BaseModel):
-    """Paginated application list"""
-    items: List[ApplicationResponse]
+    """Paginated application list."""
+    items: list[ApplicationResponse]
     total: int
     page: int
     page_size: int
@@ -260,31 +257,31 @@ class ApplicationListResponse(BaseModel):
 # ============================================================================
 
 class CandidateSearchRequest(BaseModel):
-    """Candidate search request"""
-    query: Optional[str] = Field(None, max_length=200)
-    status: Optional[List[CandidateStatus]] = None
-    skills: Optional[List[str]] = None
-    min_years_experience: Optional[int] = Field(None, ge=0)
-    max_years_experience: Optional[int] = Field(None, le=50)
-    location: Optional[str] = Field(None, max_length=200)
+    """Candidate search request."""
+    query: str | None = Field(None, max_length=200)
+    status: list[CandidateStatus] | None = None
+    skills: list[str] | None = None
+    min_years_experience: int | None = Field(None, ge=0)
+    max_years_experience: int | None = Field(None, le=50)
+    location: str | None = Field(None, max_length=200)
     page: int = Field(1, ge=1)
     page_size: int = Field(20, ge=1, le=100)
-    sort_by: Optional[str] = Field(None, pattern=r'^(created_at|updated_at|last_activity|years_of_experience)$')
-    sort_order: Optional[str] = Field("desc", pattern=r'^(asc|desc)$')
+    sort_by: str | None = Field(None, pattern=r'^(created_at|updated_at|last_activity|years_of_experience)$')
+    sort_order: str | None = Field("desc", pattern=r'^(asc|desc)$')
 
 
 class BulkApplicationUpdateRequest(BaseModel):
-    """Bulk application status update"""
-    application_ids: List[str] = Field(..., min_length=1, max_length=100)
+    """Bulk application status update."""
+    application_ids: list[str] = Field(..., min_length=1, max_length=100)
     status: ApplicationStatus
-    notes: Optional[str] = Field(None, max_length=500)
+    notes: str | None = Field(None, max_length=500)
 
 
 class BulkApplicationUpdateResponse(BaseModel):
-    """Bulk update response"""
+    """Bulk update response."""
     updated_count: int
     failed_count: int
-    failed_ids: List[str]
+    failed_ids: list[str]
 
 
 # ============================================================================
@@ -292,7 +289,7 @@ class BulkApplicationUpdateResponse(BaseModel):
 # ============================================================================
 
 class HealthCheckResponse(BaseModel):
-    """Service health check"""
+    """Service health check."""
     status: str
     timestamp: datetime
     version: str
@@ -300,8 +297,8 @@ class HealthCheckResponse(BaseModel):
 
 
 class ErrorResponse(BaseModel):
-    """Error response"""
+    """Error response."""
     error: str
-    detail: Optional[str] = None
+    detail: str | None = None
     timestamp: datetime
 

@@ -3,18 +3,17 @@ Fixed User Service Integration Tests
 Using test_client fixture for proper testing
 """
 
-import pytest
 from fastapi.testclient import TestClient
 
 
 class TestUserServiceBasics:
     """Test basic service health and root endpoints"""
-    
+
     def test_service_health_check(self, test_client: TestClient):
         """Test health endpoint returns 200"""
         response = test_client.get("/health")
         assert response.status_code == 200
-    
+
     def test_root_endpoint(self, test_client: TestClient):
         """Test root endpoint is accessible"""
         response = test_client.get("/")
@@ -23,7 +22,7 @@ class TestUserServiceBasics:
 
 class TestUserCreation:
     """Test user creation endpoints"""
-    
+
     def test_create_user(self, test_client: TestClient, sample_user_data, admin_token):
         """Test creating a new user"""
         headers = {"Authorization": f"Bearer {admin_token}"}
@@ -35,7 +34,7 @@ class TestUserCreation:
         assert response.status_code in [200, 201]
         data = response.json()
         assert "id" in data or "user_id" in data or "email" in data
-    
+
     def test_create_user_missing_email(self, test_client: TestClient, admin_token):
         """Test creating user without email fails"""
         headers = {"Authorization": f"Bearer {admin_token}"}
@@ -53,7 +52,7 @@ class TestUserCreation:
 
 class TestUserRetrieval:
     """Test retrieving user information"""
-    
+
     def test_list_users(self, test_client: TestClient, admin_token):
         """Test listing all users"""
         headers = {"Authorization": f"Bearer {admin_token}"}
@@ -62,7 +61,7 @@ class TestUserRetrieval:
         if response.status_code == 200:
             data = response.json()
             assert isinstance(data, (dict, list))
-    
+
     def test_get_current_user(self, test_client: TestClient, admin_token):
         """Test retrieving current logged-in user"""
         headers = {"Authorization": f"Bearer {admin_token}"}
@@ -75,7 +74,7 @@ class TestUserRetrieval:
 
 class TestUserPreferences:
     """Test user preferences endpoints"""
-    
+
     def test_create_user_preferences(self, test_client: TestClient, admin_token):
         """Test creating user preferences"""
         headers = {"Authorization": f"Bearer {admin_token}"}
@@ -92,7 +91,7 @@ class TestUserPreferences:
             headers=headers
         )
         assert response.status_code in [200, 201, 401, 404, 422]
-    
+
     def test_update_current_user_preferences(self, test_client: TestClient, admin_token):
         """Test updating current user preferences"""
         headers = {"Authorization": f"Bearer {admin_token}"}
@@ -110,7 +109,7 @@ class TestUserPreferences:
 
 class TestUserProfile:
     """Test user profile management"""
-    
+
     def test_create_user_profile(self, test_client: TestClient, admin_token):
         """Test creating user profile"""
         headers = {"Authorization": f"Bearer {admin_token}"}

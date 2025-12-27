@@ -1,4 +1,4 @@
-"""Modular LLM Service for OpenTalent Platform
+"""Modular LLM Service for OpenTalent Platform.
 
 This service provides a unified interface for different LLM providers:
 - Ollama (local models like granite4:350m-h)
@@ -18,7 +18,7 @@ from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 
@@ -54,13 +54,13 @@ class LLMConfig:
 
     provider: LLMProvider
     model: str
-    api_key: Optional[str] = None
-    base_url: Optional[str] = None
+    api_key: str | None = None
+    base_url: str | None = None
     timeout: int = 300
     temperature: float = 0.7
-    max_tokens: Optional[int] = None
-    fallback_provider: Optional[LLMProvider] = None
-    lora_adapter: Optional[str] = None  # For vLLM LoRA adapters
+    max_tokens: int | None = None
+    fallback_provider: LLMProvider | None = None
+    lora_adapter: str | None = None  # For vLLM LoRA adapters
 
 
 class LLMResponse:
@@ -100,7 +100,14 @@ class BaseLLMProvider(ABC):
         pass
 
     async def health_check(self) -> bool:
-        """Check if the provider is healthy and available."""
+        """Verify the health and availability of the LLM provider.
+
+        Performs a minimal generation request to ensure the provider is
+        responding correctly.
+
+        Returns:
+            True if the provider is healthy, False otherwise.
+        """
         try:
             # Simple health check - try a minimal prompt
             response = await self.generate("Hello", max_tokens=10)
@@ -127,7 +134,15 @@ class OllamaProvider(BaseLLMProvider):
         logger.info(f"Switched to persona model: {persona_model}")
 
     async def generate(self, prompt: str, **kwargs) -> LLMResponse:
-        """Generate text using Ollama."""
+        """Generate a text response using the Ollama API.
+
+        Args:
+            prompt: The input text to provide to the model.
+            **kwargs: Additional parameters like temperature and max_tokens.
+
+        Returns:
+            An LLMResponse object containing the generated text and metadata.
+        """
         start_time = datetime.now()
 
         try:
@@ -640,8 +655,8 @@ class VLLMProvider(BaseLLMProvider):
 
     def __init__(self):
         self.providers: dict[LLMProvider, BaseLLMProvider] = {}
-        self.primary_provider: Optional[LLMProvider] = None
-        self.fallback_provider: Optional[LLMProvider] = None
+        self.primary_provider: LLMProvider | None = None
+        self.fallback_provider: LLMProvider | None = None
 
     def configure_provider(self, config: LLMConfig):
         """Configure a specific LLM provider."""

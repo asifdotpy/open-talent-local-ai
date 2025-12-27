@@ -5,9 +5,10 @@ Port: 8005
 Purpose: Granite AI interview questions, scoring, analysis
 """
 
-import pytest
+from typing import Any
+
 import httpx
-from typing import Dict, Any
+import pytest
 
 
 @pytest.fixture
@@ -26,7 +27,7 @@ def auth_headers():
 
 
 @pytest.fixture
-def interview_session_data() -> Dict[str, Any]:
+def interview_session_data() -> dict[str, Any]:
     return {
         "candidate_id": "candidate123",
         "job_id": "job123",
@@ -36,7 +37,7 @@ def interview_session_data() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def answer_data() -> Dict[str, Any]:
+def answer_data() -> dict[str, Any]:
     return {
         "question_id": "q123",
         "answer_text": "I would approach this by...",
@@ -58,7 +59,7 @@ class TestGraniteInterviewServiceBasics:
 
 class TestQuestionGeneration:
     @pytest.mark.asyncio
-    async def test_generate_questions(self, granite_interview_service_url, async_client, 
+    async def test_generate_questions(self, granite_interview_service_url, async_client,
                                      interview_session_data, auth_headers):
         response = await async_client.post(
             f"{granite_interview_service_url}/api/v1/questions/generate",
@@ -89,7 +90,7 @@ class TestQuestionGeneration:
 
 class TestAnswerAnalysis:
     @pytest.mark.asyncio
-    async def test_submit_answer(self, granite_interview_service_url, async_client, 
+    async def test_submit_answer(self, granite_interview_service_url, async_client,
                                 answer_data, auth_headers):
         response = await async_client.post(
             f"{granite_interview_service_url}/api/v1/interviews/int123/answers",
@@ -99,7 +100,7 @@ class TestAnswerAnalysis:
         assert response.status_code in [200, 201]
 
     @pytest.mark.asyncio
-    async def test_analyze_answer(self, granite_interview_service_url, async_client, 
+    async def test_analyze_answer(self, granite_interview_service_url, async_client,
                                  answer_data, auth_headers):
         response = await async_client.post(
             f"{granite_interview_service_url}/api/v1/interviews/int123/analyze",

@@ -1,19 +1,17 @@
-"""
-Comprehensive Test Suite for Voice Service
-Tests accuracy (>90% WER), latency (<500ms), quality (MOS 4.1+), memory (<300MB)
+"""Comprehensive Test Suite for Voice Service
+Tests accuracy (>90% WER), latency (<500ms), quality (MOS 4.1+), memory (<300MB).
 """
 
 import asyncio
-import json
 import os
 import tempfile
 import time
 from pathlib import Path
-import pytest
+
 import httpx
 import numpy as np
+import pytest
 import soundfile as sf
-from typing import Dict, List, Tuple
 
 # Test configuration
 SERVICE_URL = "http://localhost:8002"
@@ -46,17 +44,17 @@ class VoiceServiceTester:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.client.aclose()
 
-    async def health_check(self) -> Dict:
+    async def health_check(self) -> dict:
         """Check service health status."""
         response = await self.client.get(f"{self.base_url}/health")
         return response.json()
 
-    async def get_info(self) -> Dict:
+    async def get_info(self) -> dict:
         """Get service information."""
         response = await self.client.get(f"{self.base_url}/info")
         return response.json()
 
-    async def test_stt_accuracy(self, audio_file: Path, expected_text: str) -> Dict:
+    async def test_stt_accuracy(self, audio_file: Path, expected_text: str) -> dict:
         """Test STT accuracy on audio file."""
         start_time = time.time()
 
@@ -93,7 +91,7 @@ class VoiceServiceTester:
             "within_target": wer <= TARGET_WER and latency <= TARGET_LATENCY_MS
         }
 
-    async def test_tts_quality(self, text: str, voice: str = "lessac") -> Dict:
+    async def test_tts_quality(self, text: str, voice: str = "lessac") -> dict:
         """Test TTS quality and latency."""
         start_time = time.time()
 
@@ -153,7 +151,7 @@ class VoiceServiceTester:
                 "latency_ms": latency
             }
 
-    async def test_vad_functionality(self, audio_file: Path) -> Dict:
+    async def test_vad_functionality(self, audio_file: Path) -> dict:
         """Test VAD functionality."""
         start_time = time.time()
 
@@ -227,7 +225,7 @@ class TestVoiceService:
     async def test_tts_basic(self, tester):
         """Test basic TTS functionality."""
         result = await tester.test_tts_quality("Hello world")
-        assert result["success"] == True
+        assert result["success"]
         assert result["latency_ms"] <= TARGET_LATENCY_MS
         assert result["sample_rate"] == 16000  # Mock TTS default
         assert result["duration"] > 0
@@ -238,7 +236,7 @@ class TestVoiceService:
         voices = ["lessac", "amy"]
         for voice in voices:
             result = await tester.test_tts_quality("Test voice", voice=voice)
-            assert result["success"] == True
+            assert result["success"]
             assert result["voice"] == voice
 
     @pytest.mark.asyncio
@@ -246,7 +244,7 @@ class TestVoiceService:
         """Test TTS with longer text."""
         long_text = "This is a longer test of the text-to-speech system. " * 5
         result = await tester.test_tts_quality(long_text)
-        assert result["success"] == True
+        assert result["success"]
         assert result["duration"] > 2.0  # Should be several seconds
 
     @pytest.mark.asyncio
@@ -254,7 +252,7 @@ class TestVoiceService:
         """Test TTS with special characters and punctuation."""
         text = "Hello, world! How are you? I'm doing great."
         result = await tester.test_tts_quality(text)
-        assert result["success"] == True
+        assert result["success"]
 
     @pytest.mark.asyncio
     async def test_performance_targets(self, tester):
@@ -264,7 +262,7 @@ class TestVoiceService:
         for text in TEST_TEXTS[:3]:  # Test first 3 texts
             result = await tester.test_tts_quality(text)
             results.append(result)
-            assert result["success"] == True
+            assert result["success"]
             assert result["latency_ms"] <= TARGET_LATENCY_MS, f"TTS latency too high: {result['latency_ms']}ms"
 
         # Calculate average latency
@@ -276,8 +274,9 @@ class TestVoiceService:
     async def test_memory_usage(self, tester):
         """Test memory usage is within limits."""
         # This is a basic check - in production you'd use memory profiling tools
-        import psutil
         import os
+
+        import psutil
 
         process = psutil.Process(os.getpid())
         memory_mb = process.memory_info().rss / 1024 / 1024
@@ -299,19 +298,19 @@ class TestVoiceService:
         results = await asyncio.gather(*tasks)
 
         for result in results:
-            assert result["success"] == True
+            assert result["success"]
             assert result["latency_ms"] <= TARGET_LATENCY_MS * 2  # Allow some overhead for concurrent requests
 
     @pytest.mark.asyncio
     async def test_error_handling(self, tester):
         """Test error handling for invalid inputs."""
         # Test empty text
-        result = await tester.test_tts_quality("")
+        await tester.test_tts_quality("")
         # Should handle gracefully (either success or proper error)
 
         # Test very long text
         long_text = "word " * 1000
-        result = await tester.test_tts_quality(long_text)
+        await tester.test_tts_quality(long_text)
         # Should handle large inputs
 
 

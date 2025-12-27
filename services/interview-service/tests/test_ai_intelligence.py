@@ -1,25 +1,19 @@
-"""
-Unit tests for AI Interview Intelligence functions.
+"""Unit tests for AI Interview Intelligence functions.
 
 Tests the core AI analysis functions: sentiment analysis, bias detection,
 response quality assessment, and expertise evaluation.
 """
 
+
 import pytest
-from textblob import TextBlob
-from unittest.mock import patch, MagicMock
+
 from main import (
-    SentimentAnalysis,
-    ResponseQuality,
-    BiasDetection,
-    ExpertiseAssessment,
     FollowupQuestion,
-    ResponseAnalysis,
-    analyze_response_sentiment,
-    detect_response_bias,
     analyze_response_quality,
+    analyze_response_sentiment,
     assess_response_expertise,
-    generate_followup_questions
+    detect_response_bias,
+    generate_followup_questions,
 )
 
 

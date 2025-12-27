@@ -34,20 +34,35 @@ app = FastAPI(
 
 @app.get("/")
 async def root():
-    """Root endpoint for the Analytics Service."""
+    """Service identification endpoint for the Analytics Service.
+
+    Returns:
+        A dictionary confirming the service name and purpose.
+    """
     return {"message": "OpenTalent Analytics Service - AI Interview Intelligence"}
 
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint."""
+    """Standard health check endpoint for system monitoring.
+
+    Returns:
+        A dictionary confirming the service health status.
+    """
     return {"status": "healthy", "service": "analytics"}
 
 
 # --- Sentiment Analysis ---
 @app.post("/api/v1/analyze/sentiment", response_model=SentimentAnalysis)
 async def analyze_sentiment(request: SentimentAnalysisRequest):
-    """Analyze sentiment of text using TextBlob."""
+    """Analyze the sentiment and emotional tone of the provided text using TextBlob.
+
+    Args:
+        request: A SentimentAnalysisRequest containing the text to analyze.
+
+    Returns:
+        A SentimentAnalysis object with polarity, subjectivity, and emotion.
+    """
     try:
         blob = TextBlob(request.text)
         polarity = blob.sentiment.polarity
@@ -85,7 +100,16 @@ async def analyze_sentiment(request: SentimentAnalysisRequest):
 # --- Response Quality Analysis ---
 @app.post("/api/v1/analyze/quality", response_model=ResponseQuality)
 async def analyze_response_quality(request: ResponseQualityRequest):
-    """Analyze the quality of a candidate response."""
+    """Assess the quality and relevance of a candidate's response in a given context.
+
+    Calculates scores for response length, relevance to the question, and clarity.
+
+    Args:
+        request: A ResponseQualityRequest with the response text and question context.
+
+    Returns:
+        A ResponseQuality object with granular quality metrics.
+    """
     try:
         # Basic quality metrics
         length_score = min(len(request.response_text) / 200, 1.0) * 2.5
@@ -188,8 +212,15 @@ async def detect_bias(request: BiasDetectionRequest):
 
 # --- Expertise Assessment ---
 @app.post("/api/v1/analyze/expertise", response_model=ExpertiseAssessment)
-async def assess_expertise(request: ExpertiseAssessmentRequest):
-    """Assess candidate's expertise level from response."""
+async def analyze_expertise(request: ExpertiseAssessmentRequest):
+    """Assess a candidate's expertise level based on their response and required skills.
+
+    Args:
+        request: An ExpertiseAssessmentRequest with response text and skills.
+
+    Returns:
+        An ExpertiseAssessment object with the detected expertise level.
+    """
     try:
         # Technical skill detection
         technical_skills = []
@@ -213,7 +244,7 @@ async def assess_expertise(request: ExpertiseAssessmentRequest):
             "expert": ["designed systems", "mentored", "innovated", "pioneered"],
         }
 
-        expertise_scores = {level: 0 for level in experience_indicators.keys()}
+        expertise_scores = dict.fromkeys(experience_indicators.keys(), 0)
 
         for level, indicators in experience_indicators.items():
             for indicator in indicators:
@@ -222,10 +253,7 @@ async def assess_expertise(request: ExpertiseAssessmentRequest):
 
         # Determine expertise level
         max_score = max(expertise_scores.values())
-        if max_score == 0:
-            level = "intermediate"
-        else:
-            level = max(expertise_scores, key=expertise_scores.get)
+        level = "intermediate" if max_score == 0 else max(expertise_scores, key=expertise_scores.get)
 
         # Estimate years of experience
         years_estimate = {"beginner": 1, "intermediate": 3, "advanced": 5, "expert": 8}.get(
@@ -446,11 +474,11 @@ async def generate_intelligence_report(request: IntelligenceReportRequest):
             expertise_evaluation={
                 "level": most_common_expertise,
                 "technical_skills_identified": list(
-                    set(
+                    {
                         skill
                         for a in analyses
                         for skill in a.get("expertise_assessment", {}).get("technical_skills", [])
-                    )
+                    }
                 ),
                 "average_experience_years": sum(
                     a.get("expertise_assessment", {}).get("experience_years", 0) or 0
@@ -487,7 +515,12 @@ async def generate_intelligence_report(request: IntelligenceReportRequest):
 # --- Analytics & Reporting Endpoints (minimal stubs to satisfy contract) ---
 @app.get("/api/v1/analytics/interviews", response_model=MetricsResponse)
 async def get_interview_stats():
-    """Return basic interview analytics metrics."""
+    """Retrieve basic analytics metrics for processed interviews.
+
+    Returns:
+        A MetricsResponse containing total count, sentiment, quality scores,
+        and trend analysis.
+    """
     return MetricsResponse(
         interviews_analyzed=0,
         avg_sentiment=0.0,
@@ -499,7 +532,14 @@ async def get_interview_stats():
 
 @app.get("/api/v1/analytics/candidates/{candidate_id}")
 async def get_candidate_analytics(candidate_id: str):
-    """Return placeholder analytics for a candidate."""
+    """Fetch analytics insights for a specific candidate.
+
+    Args:
+        candidate_id: Unique identifier for the candidate.
+
+    Returns:
+        A dictionary containing candidate-specific insights and status.
+    """
     return {
         "candidate_id": candidate_id,
         "insights": [],
@@ -509,7 +549,14 @@ async def get_candidate_analytics(candidate_id: str):
 
 @app.get("/api/v1/analytics/interviews/{interview_id}")
 async def get_interview_performance(interview_id: str):
-    """Return placeholder performance summary for an interview."""
+    """Retrieve a detailed performance summary for a single interview session.
+
+    Args:
+        interview_id: Unique identifier for the interview.
+
+    Returns:
+        A dictionary containing the performance summary and status.
+    """
     return {
         "interview_id": interview_id,
         "summary": {},
@@ -519,7 +566,11 @@ async def get_interview_performance(interview_id: str):
 
 @app.get("/api/v1/analytics/metrics", response_model=MetricsResponse)
 async def get_overall_metrics():
-    """Return aggregate analytics metrics."""
+    """Get high-level aggregate analytics metrics for the entire system.
+
+    Returns:
+        A MetricsResponse summarizing system-wide interview performance and bias checks.
+    """
     return MetricsResponse(
         interviews_analyzed=0,
         avg_sentiment=0.0,
@@ -531,7 +582,11 @@ async def get_overall_metrics():
 
 @app.get("/api/v1/analytics/metrics/timeseries", response_model=MetricsTimeSeriesResponse)
 async def get_time_series_metrics():
-    """Return a minimal time series for metrics."""
+    """Retrieve time-series data for key analytics metrics.
+
+    Returns:
+        A MetricsTimeSeriesResponse containing timestamped data points.
+    """
     now = datetime.utcnow()
     return MetricsTimeSeriesResponse(
         metric="overall_quality",
@@ -541,7 +596,14 @@ async def get_time_series_metrics():
 
 @app.post("/api/v1/analytics/reports", response_model=ReportResponse, status_code=201)
 async def create_report(request: ReportCreateRequest):
-    """Create a placeholder report entry."""
+    """Generate a new analytics report based on the provided parameters.
+
+    Args:
+        request: A ReportCreateRequest object specifying report criteria.
+
+    Returns:
+        A ReportResponse containing the ID and status of the generated report.
+    """
     now = datetime.utcnow()
     return ReportResponse(
         report_id="report-generated",
@@ -553,7 +615,14 @@ async def create_report(request: ReportCreateRequest):
 
 @app.get("/api/v1/analytics/reports/{report_id}", response_model=ReportResponse)
 async def get_report(report_id: str):
-    """Fetch a placeholder report by id."""
+    """Retrieve an existing report by its unique identifier.
+
+    Args:
+        report_id: Unique identifier for the report.
+
+    Returns:
+        A ReportResponse object with report details.
+    """
     now = datetime.utcnow()
     return ReportResponse(
         report_id=report_id,
@@ -565,7 +634,14 @@ async def get_report(report_id: str):
 
 @app.get("/api/v1/analytics/reports/{report_id}/export", response_model=ReportExportResponse)
 async def export_report(report_id: str):
-    """Return a placeholder export link for a report."""
+    """Generate a download link for exporting a report.
+
+    Args:
+        report_id: Unique identifier for the report to export.
+
+    Returns:
+        A ReportExportResponse containing the export format and download URL.
+    """
     return ReportExportResponse(
         report_id=report_id,
         format="pdf",
@@ -579,5 +655,5 @@ if __name__ == "__main__":
 
     import uvicorn
 
-    port = int(os.environ.get("PORT", 8005))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    host = os.environ.get("HOST", "127.0.0.1")
+    uvicorn.run(app, host=host, port=port)

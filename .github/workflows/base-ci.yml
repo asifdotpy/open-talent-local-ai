@@ -2,9 +2,19 @@ name: Base CI
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main, develop]
+    paths-ignore:
+      - '**.md'
+      - 'internal/**'
+      - 'specs/**'
+      - 'docs/**'
   pull_request:
-    branches: [main, dev]
+    branches: [main, develop]
+    paths-ignore:
+      - '**.md'
+      - 'internal/**'
+      - 'specs/**'
+      - 'docs/**'
 
 jobs:
   test:

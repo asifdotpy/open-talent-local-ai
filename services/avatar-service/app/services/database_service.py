@@ -1,34 +1,29 @@
-"""
-Database service layer for avatar-service.
+"""Database service layer for avatar-service.
 Provides CRUD operations and data persistence.
 """
 
 from __future__ import annotations
 
-from typing import Optional, List, Dict, Any
-from datetime import datetime
 from contextlib import contextmanager
+from datetime import datetime
+from typing import Any
 
 from sqlalchemy import create_engine, func
-from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import sessionmaker
 
-from app.models.database import (
-    Base, Avatar, Session as DBSession, Preset, Render, Audio, 
-    Phoneme, Asset, Config
-)
+from app.models.database import Asset, Audio, Avatar, Base, Config, Phoneme, Preset, Render
+from app.models.database import Session as DBSession
 
 
 class DatabaseService:
-    """
-    Database service for avatar-service.
+    """Database service for avatar-service.
     Handles all persistence operations.
     """
 
     def __init__(self, database_url: str = "sqlite:///./avatar.db"):
-        """
-        Initialize database service.
-        
+        """Initialize database service.
+
         Args:
             database_url: SQLAlchemy connection string
                 - SQLite: sqlite:///./avatar.db
@@ -40,7 +35,7 @@ class DatabaseService:
             connect_args={"check_same_thread": False} if "sqlite" in database_url else {}
         )
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
-        
+
         # Create tables
         Base.metadata.create_all(bind=self.engine)
 
@@ -59,7 +54,7 @@ class DatabaseService:
 
     # ============= AVATAR OPERATIONS =============
 
-    def get_avatar(self, avatar_id: str) -> Optional[Avatar]:
+    def get_avatar(self, avatar_id: str) -> Avatar | None:
         """Get avatar by ID."""
         with self.get_db() as db:
             return db.query(Avatar).filter_by(avatar_id=avatar_id).first()
@@ -70,13 +65,13 @@ class DatabaseService:
             avatar = db.query(Avatar).filter_by(avatar_id=avatar_id).first()
             if avatar:
                 return avatar
-            
+
             avatar = Avatar(avatar_id=avatar_id, **kwargs)
             db.add(avatar)
             db.commit()
             return avatar
 
-    def create_avatar(self, avatar_id: str, name: Optional[str] = None, **kwargs) -> Avatar:
+    def create_avatar(self, avatar_id: str, name: str | None = None, **kwargs) -> Avatar:
         """Create new avatar."""
         with self.get_db() as db:
             avatar = Avatar(avatar_id=avatar_id, name=name, **kwargs)
@@ -88,44 +83,44 @@ class DatabaseService:
                 raise ValueError(f"Avatar {avatar_id} already exists")
             return avatar
 
-    def update_avatar(self, avatar_id: str, **kwargs) -> Optional[Avatar]:
+    def update_avatar(self, avatar_id: str, **kwargs) -> Avatar | None:
         """Update avatar."""
         with self.get_db() as db:
             avatar = db.query(Avatar).filter_by(avatar_id=avatar_id).first()
             if not avatar:
                 return None
-            
+
             for key, value in kwargs.items():
                 if hasattr(avatar, key):
                     setattr(avatar, key, value)
-            
+
             db.commit()
             return avatar
 
-    def update_avatar_state(self, avatar_id: str, state_updates: Dict) -> Optional[Avatar]:
+    def update_avatar_state(self, avatar_id: str, state_updates: dict) -> Avatar | None:
         """Merge state updates into avatar state."""
         with self.get_db() as db:
             avatar = db.query(Avatar).filter_by(avatar_id=avatar_id).first()
             if not avatar:
                 return None
-            
+
             avatar.state.update(state_updates)
             db.commit()
             return avatar
 
-    def list_avatars(self, limit: int = 100, offset: int = 0) -> List[Avatar]:
+    def list_avatars(self, limit: int = 100, offset: int = 0) -> list[Avatar]:
         """List all avatars with pagination."""
         with self.get_db() as db:
             return db.query(Avatar).offset(offset).limit(limit).all()
 
     # ============= SESSION OPERATIONS =============
 
-    def get_session(self, session_id: str) -> Optional[DBSession]:
+    def get_session(self, session_id: str) -> DBSession | None:
         """Get session by ID."""
         with self.get_db() as db:
             return db.query(DBSession).filter_by(session_id=session_id).first()
 
-    def create_session(self, session_id: str, avatar_id: str, metadata: Dict = None) -> DBSession:
+    def create_session(self, session_id: str, avatar_id: str, metadata: dict = None) -> DBSession:
         """Create new session."""
         with self.get_db() as db:
             session = DBSession(
@@ -143,12 +138,12 @@ class DatabaseService:
             session = db.query(DBSession).filter_by(session_id=session_id).first()
             if not session:
                 return False
-            
+
             session.deleted_at = datetime.utcnow()
             db.commit()
             return True
 
-    def list_sessions(self, avatar_id: str, limit: int = 100) -> List[DBSession]:
+    def list_sessions(self, avatar_id: str, limit: int = 100) -> list[DBSession]:
         """List sessions for avatar (excluding deleted)."""
         with self.get_db() as db:
             return db.query(DBSession).filter_by(
@@ -158,12 +153,12 @@ class DatabaseService:
 
     # ============= PRESET OPERATIONS =============
 
-    def get_preset(self, preset_id: str) -> Optional[Preset]:
+    def get_preset(self, preset_id: str) -> Preset | None:
         """Get preset by ID."""
         with self.get_db() as db:
             return db.query(Preset).filter_by(preset_id=preset_id).first()
 
-    def create_preset(self, preset_id: str, name: str, settings: Dict) -> Preset:
+    def create_preset(self, preset_id: str, name: str, settings: dict) -> Preset:
         """Create new preset."""
         with self.get_db() as db:
             preset = Preset(preset_id=preset_id, name=name, settings=settings)
@@ -171,17 +166,17 @@ class DatabaseService:
             db.commit()
             return preset
 
-    def update_preset(self, preset_id: str, **kwargs) -> Optional[Preset]:
+    def update_preset(self, preset_id: str, **kwargs) -> Preset | None:
         """Update preset."""
         with self.get_db() as db:
             preset = db.query(Preset).filter_by(preset_id=preset_id).first()
             if not preset:
                 return None
-            
+
             for key, value in kwargs.items():
                 if hasattr(preset, key):
                     setattr(preset, key, value)
-            
+
             db.commit()
             return preset
 
@@ -191,12 +186,12 @@ class DatabaseService:
             preset = db.query(Preset).filter_by(preset_id=preset_id).first()
             if not preset:
                 return False
-            
+
             db.delete(preset)
             db.commit()
             return True
 
-    def list_presets(self, limit: int = 100) -> List[Preset]:
+    def list_presets(self, limit: int = 100) -> list[Preset]:
         """List all presets."""
         with self.get_db() as db:
             return db.query(Preset).limit(limit).all()
@@ -226,12 +221,12 @@ class DatabaseService:
             db.commit()
             return render
 
-    def get_render(self, frame_id: str) -> Optional[Render]:
+    def get_render(self, frame_id: str) -> Render | None:
         """Get render by frame ID."""
         with self.get_db() as db:
             return db.query(Render).filter_by(frame_id=frame_id).first()
 
-    def list_renders(self, avatar_id: str, limit: int = 50) -> List[Render]:
+    def list_renders(self, avatar_id: str, limit: int = 50) -> list[Render]:
         """List renders for avatar (most recent first)."""
         with self.get_db() as db:
             return db.query(Render).filter_by(avatar_id=avatar_id).order_by(
@@ -263,12 +258,12 @@ class DatabaseService:
             db.commit()
             return audio
 
-    def get_audio(self, audio_id: str) -> Optional[Audio]:
+    def get_audio(self, audio_id: str) -> Audio | None:
         """Get audio by ID."""
         with self.get_db() as db:
             return db.query(Audio).filter_by(audio_id=audio_id).first()
 
-    def list_audios(self, avatar_id: str, limit: int = 50) -> List[Audio]:
+    def list_audios(self, avatar_id: str, limit: int = 50) -> list[Audio]:
         """List audios for avatar (most recent first)."""
         with self.get_db() as db:
             return db.query(Audio).filter_by(avatar_id=avatar_id).order_by(
@@ -291,14 +286,14 @@ class DatabaseService:
             db.commit()
             return ph
 
-    def get_phonemes(self, audio_id: str) -> List[Phoneme]:
+    def get_phonemes(self, audio_id: str) -> list[Phoneme]:
         """Get all phonemes for audio."""
         with self.get_db() as db:
             return db.query(Phoneme).filter_by(audio_id=audio_id).order_by(
                 Phoneme.start_ms
             ).all()
 
-    def create_phonemes_batch(self, audio_id: str, phonemes: List[Dict]) -> List[Phoneme]:
+    def create_phonemes_batch(self, audio_id: str, phonemes: list[dict]) -> list[Phoneme]:
         """Create multiple phonemes in one transaction."""
         with self.get_db() as db:
             created = []
@@ -325,12 +320,12 @@ class DatabaseService:
             db.commit()
             return asset
 
-    def get_asset(self, asset_id: str) -> Optional[Asset]:
+    def get_asset(self, asset_id: str) -> Asset | None:
         """Get asset by ID."""
         with self.get_db() as db:
             return db.query(Asset).filter_by(asset_id=asset_id).first()
 
-    def list_assets(self, asset_type: Optional[str] = None, limit: int = 100) -> List[Asset]:
+    def list_assets(self, asset_type: str | None = None, limit: int = 100) -> list[Asset]:
         """List assets, optionally filtered by type."""
         with self.get_db() as db:
             query = db.query(Asset)
@@ -358,7 +353,7 @@ class DatabaseService:
             db.commit()
             return config
 
-    def get_all_config(self) -> Dict[str, Any]:
+    def get_all_config(self) -> dict[str, Any]:
         """Get all config values as dictionary."""
         with self.get_db() as db:
             configs = db.query(Config).all()
@@ -375,7 +370,7 @@ class DatabaseService:
         except Exception:
             return False
 
-    def get_stats(self) -> Dict[str, int]:
+    def get_stats(self) -> dict[str, int]:
         """Get database statistics."""
         with self.get_db() as db:
             return {

@@ -20,27 +20,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
 
-# Import Vetta AI routes
+from config import ALLOWED_ORIGINS, TIMEOUT_CONFIG, logger, setup_logging
 from routes.vetta_routes import router as vetta_router
+from routes.interview_routes import router as interview_router
 
-# Import question builder routes
-# from app.api.routes.question_routes import router as question_router
-
-
-# Network timeout configuration for enterprise-grade reliability
-TIMEOUT_CONFIG = {
-    "health_check": 3.0,  # Quick health checks
-    "room_operations": 5.0,  # Room creation/management operations
-    "service_integration": 5.0,  # Inter-service communication
-}
-
-# Configure structured logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)],
-)
-logger = logging.getLogger("interview-service")
+# Configure logging
+setup_logging()
 
 app = FastAPI(
     title="OpenTalent - Interview Service",
@@ -73,14 +58,7 @@ async def log_requests(request: Request, call_next):
 # Enhanced CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://localhost:8080",
-        "http://localhost:8081",
-        "http://localhost:8000",  # Interview Service
-        "http://localhost:8001",  # Avatar Service
-    ],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -91,25 +69,34 @@ app.add_middleware(
 
 # Include Vetta AI routes
 app.include_router(vetta_router)
+app.include_router(interview_router, prefix="/api/v1")
 
 # --- OpenAPI Documentation Routes ---
 
 
 @app.get("/docs", include_in_schema=False)
 async def docs_redirect():
-    """Redirect to Swagger UI documentation"""
+    """Redirect to the principal Swagger UI documentation.
+
+    Returns:
+        A RedirectResponse to the /docs endpoint.
+    """
     return RedirectResponse(url="/docs")
 
 
 @app.get("/doc", include_in_schema=False)
 async def doc_redirect():
-    """Alternative redirect to Swagger UI documentation"""
+    """Alternative redirect path for principal Swagger UI documentation.
+
+    Returns:
+        A RedirectResponse to the /docs endpoint.
+    """
     return RedirectResponse(url="/docs")
 
 
 @app.get("/api-docs", include_in_schema=False)
 async def api_docs():
-    """Comprehensive API documentation with route scanning"""
+    """Comprehensive API documentation with route scanning."""
     routes_info = []
 
     for route in app.routes:
@@ -191,7 +178,7 @@ class Participant(BaseModel):
     user_id: str
     role: ParticipantRole
     display_name: str
-    joined_at: Optional[datetime] = None
+    joined_at: datetime | None = None
     connection_status: ConnectionStatus = ConnectionStatus.CONNECTING
 
 
@@ -209,7 +196,7 @@ class InterviewQuestion(BaseModel):
     text: str
     order: int
     generated_at: datetime
-    ai_metadata: Optional[dict[str, Any]] = {}
+    ai_metadata: dict[str, Any] | None = {}
 
 
 class InterviewAnswer(BaseModel):
@@ -243,7 +230,7 @@ class InterviewRoom(BaseModel):
     participants: list[Participant] = Field(default_factory=list)
     security_settings: RoomSecurity = Field(default_factory=RoomSecurity)
     max_duration_minutes: int = 45
-    current_question_index: Optional[int] = None
+    current_question_index: int | None = None
     questions: list[InterviewQuestion] = Field(default_factory=list)
     responses: list["InterviewAnswer"] = Field(default_factory=list)
     response_analyses: list["ResponseAnalysis"] = Field(default_factory=list)
@@ -254,10 +241,10 @@ class CreateRoomRequest(BaseModel):
     interview_session_id: str
     participants: list[Participant]
     duration_minutes: int = 45
-    security_settings: Optional[RoomSecurity] = None
-    job_id: Optional[str] = None  # NEW: Job/project ID for dynamic loading
-    project_id: Optional[str] = None  # NEW: Alternative to job_id
-    job_description: Optional[str] = None  # NEW: Direct job description (fallback)
+    security_settings: RoomSecurity | None = None
+    job_id: str | None = None  # NEW: Job/project ID for dynamic loading
+    project_id: str | None = None  # NEW: Alternative to job_id
+    job_description: str | None = None  # NEW: Direct job description (fallback)
 
 
 class JoinRoomRequest(BaseModel):
@@ -280,8 +267,8 @@ class WebRTCSignal(BaseModel):
     session_id: str
     room_id: str
     participant_id: str
-    data: Optional[dict] = None
-    timestamp: Optional[datetime] = None
+    data: dict | None = None
+    timestamp: datetime | None = None
 
 
 class WebRTCConnection(BaseModel):
@@ -313,7 +300,7 @@ class TranscriptionSegment(BaseModel):
     start_time: float
     end_time: float
     confidence: float
-    speaker_id: Optional[str] = None
+    speaker_id: str | None = None
     is_final: bool = False
     words: list[dict] = []  # Word-level timing and confidence
 
@@ -334,7 +321,7 @@ class WebSocketConnection(BaseModel):
     connection_id: str
     room_id: str
     participant_id: str
-    websocket: Optional[object] = None  # FastAPI WebSocket object
+    websocket: object | None = None  # FastAPI WebSocket object
     connected_at: datetime = Field(default_factory=datetime.now)
     last_activity: datetime = Field(default_factory=datetime.now)
 
@@ -390,7 +377,7 @@ class ExpertiseAssessment(BaseModel):
         default_factory=list, description="Identified technical skills"
     )
     knowledge_gaps: list[str] = Field(default_factory=list, description="Knowledge gaps identified")
-    experience_years: Optional[int] = Field(None, description="Estimated years of experience")
+    experience_years: int | None = Field(None, description="Estimated years of experience")
 
 
 class FollowupQuestion(BaseModel):
@@ -423,8 +410,8 @@ class NextQuestionRequest(BaseModel):
     """Request for next AI-generated question."""
 
     current_responses: list[InterviewAnswer] = Field(default_factory=list)
-    job_requirements: Optional[str] = None
-    interview_phase: Optional[str] = None
+    job_requirements: str | None = None
+    interview_phase: str | None = None
 
 
 class ResponseAnalysisRequest(BaseModel):
@@ -500,11 +487,13 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Comprehensive health check endpoint with enterprise-grade reliability.
+    """Comprehensive health check endpoint for the Interview Service.
 
-    Note: Interview Service primarily handles in-memory operations,
-    so network timeouts are less critical than for AI Avatar/AI Voice integrations.
-    Timeout protection would be added for any future external service calls.
+    Monitors in-memory room storage, active session counts, and service
+    integration status.
+
+    Returns:
+        A dictionary containing health status, version, and room metrics.
     """
     logger.info("Health check requested")
     try:
@@ -794,7 +783,7 @@ async def get_room_status(room_id: str):
 
 
 @app.get("/api/v1/rooms")
-async def list_rooms(status: Optional[RoomStatus] = None):
+async def list_rooms(status: RoomStatus | None = None):
     """List all rooms, optionally filtered by status."""
     rooms = list(rooms_store.values())
 
@@ -831,7 +820,7 @@ async def get_room_participants(room_id: str):
 
 @app.post("/api/v1/rooms/{room_id}/webrtc/start", tags=["webrtc"])
 async def start_webrtc_audio_stream(
-    room_id: str, participant_id: str, config: Optional[AudioStreamConfig] = None
+    room_id: str, participant_id: str, config: AudioStreamConfig | None = None
 ):
     """Start WebRTC audio streaming for a participant in an interview room.
 
@@ -977,8 +966,7 @@ async def webrtc_signaling(room_id: str, signal: WebRTCSignal):
 
 @app.get("/api/v1/rooms/{room_id}/webrtc/status", tags=["webrtc"])
 async def get_webrtc_status(room_id: str):
-    """Get WebRTC connection status for all participants in a room.
-    """
+    """Get WebRTC connection status for all participants in a room."""
     if room_id not in rooms_store:
         raise HTTPException(status_code=404, detail="Room not found")
 
@@ -1001,7 +989,7 @@ async def get_webrtc_status(room_id: str):
 
 
 @app.delete("/api/v1/rooms/{room_id}/webrtc/stop", tags=["webrtc"])
-async def stop_webrtc_audio_stream(room_id: str, participant_id: Optional[str] = None):
+async def stop_webrtc_audio_stream(room_id: str, participant_id: str | None = None):
     """Stop WebRTC audio streaming for a room or specific participant.
 
     If participant_id is not provided, stops all connections in the room.
@@ -1140,7 +1128,7 @@ async def websocket_live_transcription(websocket: WebSocket, room_id: str):
                 else:
                     logger.debug(f"Unknown WebSocket message type: {data.get('type')}")
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # Send keepalive ping
                 await websocket.send_json({"type": "ping", "timestamp": datetime.now().isoformat()})
 
@@ -1262,7 +1250,7 @@ async def broadcast_transcription_update(room_id: str, update: LiveTranscription
 
 @app.get("/api/v1/rooms/{room_id}/transcription", tags=["transcription"])
 async def get_transcription_history(
-    room_id: str, limit: Optional[int] = None, offset: Optional[int] = 0
+    room_id: str, limit: int | None = None, offset: int | None = 0
 ):
     """Get transcription history for a room.
 
@@ -1313,7 +1301,7 @@ async def get_transcription_status():
     Returns statistics about active WebSocket connections and transcription data.
     """
     total_segments = sum(len(segments) for segments in transcription_history.values())
-    active_rooms = len([r for r in transcription_history.keys() if r in rooms_store])
+    active_rooms = len([r for r in transcription_history if r in rooms_store])
 
     return {
         "active_websocket_connections": len(websocket_connections),
@@ -1322,7 +1310,7 @@ async def get_transcription_status():
         "total_transcription_segments": total_segments,
         "connections_by_room": {
             room_id: len([c for c in websocket_connections.values() if c.room_id == room_id])
-            for room_id in transcription_history.keys()
+            for room_id in transcription_history
         },
         "timestamp": datetime.now().isoformat(),
     }
@@ -1538,7 +1526,7 @@ async def assess_response_expertise(
         "expert": ["designed systems", "mentored", "innovated", "pioneered"],
     }
 
-    expertise_scores = {level: 0 for level in experience_indicators.keys()}
+    expertise_scores = dict.fromkeys(experience_indicators.keys(), 0)
 
     for level, indicators in experience_indicators.items():
         for indicator in indicators:
@@ -1860,7 +1848,7 @@ async def generate_intelligence_report(
         expertise_evaluation={
             "level": most_common_expertise,
             "technical_skills_identified": list(
-                set(skill for a in analyses for skill in a.expertise_assessment.technical_skills)
+                {skill for a in analyses for skill in a.expertise_assessment.technical_skills}
             ),
             "average_experience_years": sum(
                 a.expertise_assessment.experience_years or 0 for a in analyses
@@ -1891,7 +1879,7 @@ async def get_next_ai_question(room_id: str, request: NextQuestionRequest):
     - Candidate's expertise level assessment
     - Job requirements matching
     - Sentiment analysis of responses
-    - Bias detection and mitigation
+    - Bias detection and mitigation.
     """
     if room_id not in rooms_store:
         raise HTTPException(status_code=404, detail="Room not found")
@@ -1980,7 +1968,7 @@ async def analyze_candidate_response(room_id: str, request: ResponseAnalysisRequ
     - Content quality assessment
     - Expertise level evaluation
     - Bias detection in response patterns
-    - Follow-up question suggestions
+    - Follow-up question suggestions.
     """
     if room_id not in rooms_store:
         raise HTTPException(status_code=404, detail="Room not found")
@@ -2060,7 +2048,7 @@ async def adapt_interview_strategy(room_id: str, request: InterviewAdaptationReq
     - Adjust question difficulty
     - Modify interview focus areas
     - Suggest early termination or extension
-    - Provide real-time feedback to interviewer
+    - Provide real-time feedback to interviewer.
     """
     if room_id not in rooms_store:
         raise HTTPException(status_code=404, detail="Room not found")
@@ -2110,7 +2098,7 @@ async def get_interview_intelligence_report(room_id: str):
     - Bias detection results
     - Expertise assessment
     - Interview effectiveness metrics
-    - Recommendations for improvement
+    - Recommendations for improvement.
     """
     if room_id not in rooms_store:
         raise HTTPException(status_code=404, detail="Room not found")
@@ -2140,8 +2128,7 @@ async def get_interview_intelligence_report(room_id: str):
 
 if __name__ == "__main__":
     import os
-
     import uvicorn
-
     port = int(os.environ.get("PORT", 8004))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    host = os.environ.get("HOST", "127.0.0.1")
+    uvicorn.run(app, host=host, port=port)

@@ -1,58 +1,56 @@
-"""
-Avatar v1 API scaffold with in-memory state and mock responses.
-"""
+"""Avatar v1 API scaffold with in-memory state and mock responses."""
 
 from __future__ import annotations
 
 import asyncio
 import uuid
-from typing import Dict, Any, List, Optional
+from typing import Any
 
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 
 from app.models.avatar import (
-    RenderRequest,
-    LipsyncRequest,
-    EmotionRequest,
+    AnimationRequest,
+    ConfigUpdateRequest,
     CustomizeRequest,
-    StatePatch,
+    EmotionRequest,
+    LipsyncRequest,
+    ModelSelectRequest,
     PhonemeRequest,
     PhonemeTimingRequest,
     PresetCreateRequest,
     PresetUpdateRequest,
-    ModelSelectRequest,
+    RenderRequest,
     SessionCreateRequest,
-    AnimationRequest,
     SnapshotRequest,
-    ConfigUpdateRequest,
+    StatePatch,
 )
 
 router = APIRouter(prefix="/api/v1/avatars", tags=["Avatars"])
 
 # In-memory stores (ephemeral, for stub/testing only)
-avatars: Dict[str, Dict[str, Any]] = {}
-presets: Dict[str, Dict[str, Any]] = {
+avatars: dict[str, dict[str, Any]] = {}
+presets: dict[str, dict[str, Any]] = {
     "default": {"name": "default", "values": {"skin_tone": "medium", "hair": "short"}},
     "casual": {"name": "casual", "values": {"outfit": "casual", "mood": "friendly"}},
 }
-assets: List[Dict[str, Any]] = [
+assets: list[dict[str, Any]] = [
     {"asset_id": "mesh_face", "type": "mesh", "label": "Base Face"},
     {"asset_id": "tex_default", "type": "texture", "label": "Default Texture"},
 ]
-models: List[Dict[str, Any]] = [
+models: list[dict[str, Any]] = [
     {"model_id": "granite-avatar-small", "quality": "fast"},
     {"model_id": "granite-avatar-pro", "quality": "high"},
 ]
-sessions: Dict[str, Dict[str, Any]] = {}
-config: Dict[str, Any] = {"quality": "medium", "fps": 30, "shading": "pbr"}
-viseme_map: Dict[str, str] = {
+sessions: dict[str, dict[str, Any]] = {}
+config: dict[str, Any] = {"quality": "medium", "fps": 30, "shading": "pbr"}
+viseme_map: dict[str, str] = {
     "A": "viseme_AE",
     "B": "viseme_BM",
     "C": "viseme_CH",
 }
 
 
-def _ensure_avatar(avatar_id: str) -> Dict[str, Any]:
+def _ensure_avatar(avatar_id: str) -> dict[str, Any]:
     if avatar_id not in avatars:
         avatars[avatar_id] = {
             "avatar_id": avatar_id,
@@ -242,7 +240,7 @@ async def get_snapshot(avatar_id: str):
 
 
 @router.post("/{avatar_id}/snapshot")
-async def create_snapshot(avatar_id: str, payload: Optional[SnapshotRequest] = None):
+async def create_snapshot(avatar_id: str, payload: SnapshotRequest | None = None):
     note = payload.note if payload else None
     snap_id = str(uuid.uuid4())
     return {"avatar_id": avatar_id, "snapshot_id": snap_id, "note": note}

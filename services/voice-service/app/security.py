@@ -1,10 +1,9 @@
+import asyncio
+import time
+
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
-import asyncio
-import time
-from typing import Optional, Tuple
-
 
 SECURITY_HEADERS = {
     "X-Frame-Options": "DENY",
@@ -39,9 +38,8 @@ class RequestSizeLimitMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         content_length = request.headers.get("content-length")
-        if content_length and content_length.isdigit():
-            if int(content_length) > self.max_bytes:
-                return Response(status_code=413, content="Payload Too Large")
+        if content_length and content_length.isdigit() and int(content_length) > self.max_bytes:
+            return Response(status_code=413, content="Payload Too Large")
         return await call_next(request)
 
 
@@ -54,7 +52,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     Keys: client IP + path. Allowlist skips health/docs endpoints.
     """
 
-    def __init__(self, app, burst: int = 10, rate_per_sec: int = 5, allowlist: Optional[Tuple[str, ...]] = None):
+    def __init__(self, app, burst: int = 10, rate_per_sec: int = 5, allowlist: tuple[str, ...] | None = None):
         super().__init__(app)
         self.burst = max(1, burst)
         self.rate = max(1, rate_per_sec)

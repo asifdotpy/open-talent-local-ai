@@ -1,13 +1,12 @@
-"""
-Tests for Scout Service
+"""Tests for Scout Service
 Following TDD principles - tests written before implementation
 Port: 8010
-Purpose: Talent sourcing, candidate discovery, search
+Purpose: Talent sourcing, candidate discovery, search.
 """
 
-import pytest
+
 import httpx
-from typing import Dict, Any
+import pytest
 
 
 @pytest.fixture

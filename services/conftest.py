@@ -3,12 +3,12 @@ Pytest configuration and shared fixtures for all microservices
 Located at: /services/conftest.py
 """
 
-import pytest
-import httpx
 import asyncio
 import os
-from typing import Generator, AsyncGenerator
+from collections.abc import AsyncGenerator, Generator
 
+import httpx
+import pytest
 
 # ============================================================================
 # ASYNCIO CONFIGURATION
@@ -302,7 +302,7 @@ async def make_authenticated_request(
     """Helper function to make authenticated HTTP requests"""
     kwargs.setdefault("headers", {})
     kwargs["headers"].update(auth_headers)
-    
+
     if method.upper() == "GET":
         return await client.get(url, **kwargs)
     elif method.upper() == "POST":

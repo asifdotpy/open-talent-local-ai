@@ -1,15 +1,15 @@
-"""
-Legacy Ollama Service - Now uses Modular LLM Service
+"""Legacy Ollama Service - Now uses Modular LLM Service.
 
 This service maintains backward compatibility while using the new modular LLM service.
 For new implementations, use modular_llm_service directly.
 """
 
+import asyncio
 import logging
 import os
 import random
-import asyncio
-from typing import Dict, Any
+from typing import Any
+
 from .modular_llm_service import modular_llm_service
 
 # Configure logging
@@ -23,9 +23,8 @@ USE_MOCK_OLLAMA = USE_MOCK
 
 def generate_questions_from_ollama(
     job_description: str, num_questions: int, difficulty: str
-) -> Dict[str, Any]:
-    """
-    Generates interview questions based on a job description.
+) -> dict[str, Any]:
+    """Generates interview questions based on a job description.
     Now uses the modular LLM service for better provider flexibility.
 
     This function maintains the same interface for backward compatibility.
@@ -84,9 +83,9 @@ Do not include any other text, explanations, or markdown formatting in your resp
         except Exception as e:
             logger.error(f"Modular LLM service failed: {e}")
             # Fallback to mock responses
-            from .modular_llm_service import LLMProvider, LLMConfig, MockProvider
+            from .modular_llm_service import LLMConfig, LLMProvider, MockProvider
             mock_config = LLMConfig(provider=LLMProvider.MOCK, model="mock")
-            mock_provider = MockProvider(mock_config)
+            MockProvider(mock_config)
 
             # Generate mock questions (same logic as before)
             return _generate_mock_questions(job_description, num_questions, difficulty)
@@ -109,10 +108,8 @@ Do not include any other text, explanations, or markdown formatting in your resp
         logger.error(f"Failed to generate questions: {e}")
         return _generate_mock_questions(job_description, num_questions, difficulty)
 
-def _generate_mock_questions(job_description: str, num_questions: int, difficulty: str) -> Dict[str, Any]:
-    """
-    Generate mock interview questions for development/testing when Ollama is not available.
-    """
+def _generate_mock_questions(job_description: str, num_questions: int, difficulty: str) -> dict[str, Any]:
+    """Generate mock interview questions for development/testing when Ollama is not available."""
     logger.info(f"Generating {num_questions} mock questions (difficulty: {difficulty})")
 
     # Extract keywords from job description for relevant questions

@@ -5,16 +5,16 @@ Handles model downloads from Hugging Face, local caching, and
 prerequisite validation for different model architectures.
 """
 
-import logging
 import asyncio
-from typing import Dict, Any, Optional, List
+import logging
 from pathlib import Path
-import aiohttp
-from huggingface_hub import snapshot_download, HfApi
-import torch
+from typing import Any
+
+from huggingface_hub import HfApi, snapshot_download
 
 from ..config import settings
 from ..models import model_registry
+from .constants import HG_REPO_MAP
 
 logger = logging.getLogger(__name__)
 
@@ -23,10 +23,18 @@ class ModelLoader:
 
     def __init__(self):
         self.hf_api = HfApi()
-        self.download_tasks: Dict[str, asyncio.Task] = {}
+        self.download_tasks: dict[str, asyncio.Task] = {}
 
     async def download_model(self, model_name: str, force: bool = False) -> bool:
-        """Download model from Hugging Face if not cached."""
+        """Download model from Hugging Face if not cached.
+
+        Args:
+            model_name: Name of the model to download.
+            force: Whether to force download even if cached.
+
+        Returns:
+            True if successful, False otherwise.
+        """
         config = settings.get_model_config(model_name)
         if not config:
             logger.error(f"No configuration found for model: {model_name}")
@@ -80,6 +88,7 @@ class ModelLoader:
             # Download with progress
             snapshot_download(
                 repo_id=repo_id,
+                revision=config.revision,
                 local_dir=str(model_path),
                 local_dir_use_symlinks=False,
                 ignore_patterns=["*.md", "*.txt", "*.json"]  # Skip documentation
@@ -91,38 +100,19 @@ class ModelLoader:
             logger.error(f"Download failed for {model_name}: {e}")
             return False
 
-    def _get_huggingface_repo_id(self, model_name: str) -> Optional[str]:
+    def _get_huggingface_repo_id(self, model_name: str) -> str | None:
         """Map model names to Hugging Face repository IDs."""
-        # Granite models
-        if model_name == 'granite4:350m-h':
-            return 'ibm-granite/granite-3.1-2b-instruct'  # Using available Granite model
-        elif model_name == 'granite-interview-ft':
-            return 'ibm-granite/granite-3.1-2b-instruct'  # Base model for fine-tuning
-
-        # Llama models
-        elif model_name == 'llama-2-7b-chat':
-            return 'meta-llama/Llama-2-7b-chat-hf'
-        elif model_name == 'llama-2-13b-chat':
-            return 'meta-llama/Llama-2-13b-chat-hf'
-        elif model_name == 'llama-2-70b-chat':
-            return 'meta-llama/Llama-2-70b-chat-hf'
-
-        # Mistral models
-        elif model_name == 'mistral-7b-instruct':
-            return 'mistralai/Mistral-7B-Instruct-v0.1'
-        elif model_name == 'mistral-7b-instruct-v0.2':
-            return 'mistralai/Mistral-7B-Instruct-v0.2'
-
-        # Custom fine-tuned models (would need actual repo IDs)
-        elif model_name == 'granite-interview-advanced':
-            return 'ibm-granite/granite-3.1-2b-instruct'
-        elif model_name == 'llama-interview-ft':
-            return 'meta-llama/Llama-2-7b-chat-hf'
-
-        return None
+        return HG_REPO_MAP.get(model_name)
 
     async def load_model(self, model_name: str) -> bool:
-        """Load a model into memory."""
+        """Load a model into memory, downloading it first if necessary.
+
+        Args:
+            model_name: Name of the model to load.
+
+        Returns:
+            True if successful, False otherwise.
+        """
         # Ensure model is downloaded first
         if not await self.download_model(model_name):
             return False
@@ -134,7 +124,7 @@ class ModelLoader:
         """Unload a model from memory."""
         model_registry.unload_model(model_name)
 
-    def get_download_progress(self, model_name: str) -> Optional[Dict[str, Any]]:
+    def get_download_progress(self, model_name: str) -> dict[str, Any] | None:
         """Get download progress for a model."""
         if model_name in self.download_tasks:
             task = self.download_tasks[model_name]
@@ -145,11 +135,11 @@ class ModelLoader:
             }
         return None
 
-    def get_loaded_models(self) -> List[str]:
+    def get_loaded_models(self) -> list[str]:
         """Get list of currently loaded models."""
         return model_registry.get_loaded_models()
 
-    def get_cached_models(self) -> List[str]:
+    def get_cached_models(self) -> list[str]:
         """Get list of cached models on disk."""
         cached = []
         if settings.model_cache_dir.exists():
@@ -158,7 +148,7 @@ class ModelLoader:
                     cached.append(item.name)
         return cached
 
-    def get_model_info(self, model_name: str) -> Optional[Dict[str, Any]]:
+    def get_model_info(self, model_name: str) -> dict[str, Any] | None:
         """Get comprehensive model information."""
         config = settings.get_model_config(model_name)
         if not config:
@@ -194,7 +184,7 @@ class ModelLoader:
 
         return info
 
-    async def preload_models(self, model_names: List[str]):
+    async def preload_models(self, model_names: list[str]):
         """Preload multiple models asynchronously."""
         tasks = []
         for model_name in model_names:
@@ -212,7 +202,7 @@ class ModelLoader:
             except Exception as e:
                 logger.error(f"Failed to preload model {model_name}: {e}")
 
-    def cleanup_cache(self, keep_models: Optional[List[str]] = None):
+    def cleanup_cache(self, keep_models: list[str] | None = None):
         """Clean up model cache, keeping specified models."""
         if not settings.model_cache_dir.exists():
             return

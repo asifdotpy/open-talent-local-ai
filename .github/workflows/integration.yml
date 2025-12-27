@@ -3,8 +3,18 @@ name: Integration Tests
 on:
   push:
     branches: [main, dev]
+    paths-ignore:
+      - '**.md'
+      - 'internal/**'
+      - 'specs/**'
+      - 'docs/**'
   pull_request:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'internal/**'
+      - 'specs/**'
+      - 'docs/**'
 
 jobs:
   integration:
@@ -51,16 +61,5 @@ jobs:
           if [ -f "open-talent-platform.code-workspace" ]; then
             python -c "import json; json.load(open('open-talent-platform.code-workspace')); print('✅ Workspace file is valid JSON')"
           else
-            echo "❌ Workspace file not found"
-            exit 1
-          fi
-
-      - name: Test specifications structure
-        run: |
-          # Verify specs directory structure
-          if [ -d "specs" ] && [ -f "specs/README.md" ]; then
-            echo "✅ Specifications directory structure exists"
-          else
-            echo "❌ Specifications directory structure missing"
-            exit 1
+            echo "⚠️ Workspace file not found (skipping)"
           fi

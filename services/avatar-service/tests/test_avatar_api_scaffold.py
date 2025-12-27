@@ -1,9 +1,7 @@
-"""
-Lightweight tests for scaffolded avatar API endpoints.
-"""
+"""Lightweight tests for scaffolded avatar API endpoints."""
 
-from pathlib import Path
 import importlib.util
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 

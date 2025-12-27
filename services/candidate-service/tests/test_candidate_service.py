@@ -1,14 +1,14 @@
-"""
-Tests for Candidate Service
+"""Tests for Candidate Service
 Following TDD principles - tests written before implementation
 Port: 8008
-Purpose: Candidate management, applications, profiles
+Purpose: Candidate management, applications, profiles.
 """
 
-import pytest
-import httpx
-from typing import Dict, Any
 import time
+from typing import Any
+
+import httpx
+import pytest
 
 
 @pytest.fixture
@@ -27,7 +27,7 @@ def auth_headers():
 
 
 @pytest.fixture
-def candidate_data() -> Dict[str, Any]:
+def candidate_data() -> dict[str, Any]:
     timestamp = int(time.time() * 1000)
     return {
         "email": f"candidate+{timestamp}@example.com",
@@ -39,7 +39,7 @@ def candidate_data() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def application_data() -> Dict[str, Any]:
+def application_data() -> dict[str, Any]:
     return {
         "job_id": "job123",
         "candidate_id": "candidate123",

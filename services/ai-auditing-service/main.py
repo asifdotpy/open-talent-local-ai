@@ -1,24 +1,25 @@
-from fastapi import FastAPI, Body
-from fastapi.responses import JSONResponse
-from typing import Dict, Any
-import time
 import os
+import os as _os
+import sys as _sys
+import time
+from typing import Any
 
-import sys as _sys, os as _os
+from fastapi import Body, FastAPI
+from fastapi.responses import JSONResponse
+
 _this_dir = _os.path.dirname(__file__)
 if _this_dir not in _sys.path:
     _sys.path.append(_this_dir)
 
 from schemas import (
-    AuditRunRequest,
-    AuditJobStatusResponse,
-    AuditReportResponse,
-    AuditRule,
     AuditConfig,
+    AuditFinding,
     AuditHistoryItem,
     AuditJobStatus,
+    AuditJobStatusResponse,
+    AuditReportResponse,
+    AuditRunRequest,
     Severity,
-    AuditFinding,
 )
 
 app = FastAPI(title="AI Auditing Service", version="1.0.0")
@@ -30,17 +31,18 @@ except ImportError:
     from .rules import RULES  # fallback if package context is available
 
 CONFIG: AuditConfig = AuditConfig(default_ruleset=list(RULES.keys()), fail_on_severity=Severity.HIGH, max_findings=1000)
-JOBS: Dict[str, Dict[str, Any]] = {}
-HISTORY: Dict[str, AuditHistoryItem] = {}
+JOBS: dict[str, dict[str, Any]] = {}
+HISTORY: dict[str, AuditHistoryItem] = {}
 
 # Simple JSON file persistence
 import json as _json
+
 _STATE_FILE = os.path.join(os.path.dirname(__file__), "state.json")
 
 def _load_state():
     global JOBS, HISTORY
     try:
-        with open(_STATE_FILE, "r", encoding="utf-8") as f:
+        with open(_STATE_FILE, encoding="utf-8") as f:
             data = _json.load(f)
         jobs = data.get("jobs", {})
         hist = data.get("history", {})
@@ -70,16 +72,34 @@ _load_state()
 
 @app.get("/")
 async def root():
-    return {"service": "ai-auditing", "status": "ok"}
+    """Service identification endpoint for the AI Auditing Service.
+
+    Returns:
+        A dictionary confirming the service name and purpose.
+    """
+    return {"message": "OpenTalent AI Auditing Service - Governance and Policy Enforcement"}
 
 
 @app.get("/health")
 async def health():
+    """Standard health check endpoint for system monitoring.
+
+    Returns:
+        A dictionary confirming the service health status.
+    """
     return {"service": "ai-auditing", "status": "healthy"}
 
 
 @app.post("/api/v1/audit/run")
 async def audit_run(payload: AuditRunRequest = Body(...)):
+    """Initialize and start a new AI audit job for the specified target.
+
+    Args:
+        payload: An AuditRunRequest containing the target and optional ruleset.
+
+    Returns:
+        A response containing the newly created job_id.
+    """
     if not payload.target:
         return JSONResponse(status_code=400, content={"error": "Missing target"})
     job_id = f"job_{int(time.time() * 1000)}"
@@ -105,16 +125,17 @@ async def audit_run(payload: AuditRunRequest = Body(...)):
 # Background job worker: auto-complete jobs after a short delay
 import asyncio as _asyncio
 
+
 async def _job_worker():
     while True:
         try:
-            now = time.time()
+            time.time()
             for jid, job in list(JOBS.items()):
                 if job.get("status") == AuditJobStatus.RUNNING:
                     # Initialize progress
                     job.setdefault("progress", 0.0)
                     # Auto-complete after ~1 second
-                    started_iso = job.get("started_at")
+                    job.get("started_at")
                     # parse started_at (YYYY-MM-DDTHH:MM:SSZ)
                     # use a simple elapsed counter stored in job if parsing is complex
                     elapsed = job.get("_elapsed", 0.0)
@@ -207,6 +228,5 @@ async def audit_history():
 
 
 if __name__ == "__main__":
-    import uvicorn
-    port = int(os.environ.get("AI_AUDITING_PORT", "8012"))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    host = os.environ.get("HOST", "127.0.0.1")
+    uvicorn.run(app, host=host, port=port)

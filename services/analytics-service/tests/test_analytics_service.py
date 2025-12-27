@@ -1,13 +1,12 @@
-"""
-Tests for Analytics Service
+"""Tests for Analytics Service
 Following TDD principles - tests written before implementation
 Port: 8017
-Purpose: Interview analytics, reporting, metrics
+Purpose: Interview analytics, reporting, metrics.
 """
 
-import pytest
+
 import httpx
-from typing import Dict, Any
+import pytest
 
 
 @pytest.fixture

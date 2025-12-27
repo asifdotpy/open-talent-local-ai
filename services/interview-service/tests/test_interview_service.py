@@ -1,13 +1,13 @@
-"""
-Tests for Interview Service
+"""Tests for Interview Service
 Following TDD principles - tests written before implementation
 Port: 8006
-Purpose: Interview management, scheduling, feedback
+Purpose: Interview management, scheduling, feedback.
 """
 
-import pytest
+from typing import Any
+
 import httpx
-from typing import Dict, Any
+import pytest
 
 
 @pytest.fixture
@@ -26,7 +26,7 @@ def auth_headers():
 
 
 @pytest.fixture
-def interview_data() -> Dict[str, Any]:
+def interview_data() -> dict[str, Any]:
     return {
         "candidate_id": "candidate123",
         "job_id": "job123",
@@ -38,7 +38,7 @@ def interview_data() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def feedback_data() -> Dict[str, Any]:
+def feedback_data() -> dict[str, Any]:
     return {
         "rating": 4,
         "technical_skills": 4,

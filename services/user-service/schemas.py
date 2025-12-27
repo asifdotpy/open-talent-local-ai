@@ -3,11 +3,11 @@ User Service - Pydantic Schemas
 Comprehensive schema definitions for user management, profiles, and activity tracking
 """
 
-from pydantic import BaseModel, Field, EmailStr, HttpUrl, field_validator, ConfigDict
-from typing import Optional, List, Dict, Any
-from enum import Enum
 from datetime import datetime
+from enum import Enum
+from typing import Any
 
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, HttpUrl, field_validator
 
 # ============================================================================
 # ENUMS
@@ -80,8 +80,8 @@ class UserBase(BaseModel):
     email: EmailStr
     first_name: str = Field(..., min_length=1, max_length=50)
     last_name: str = Field(..., min_length=1, max_length=50)
-    phone: Optional[str] = Field(None, pattern=r'^\+?[1-9]\d{1,14}$')  # E.164 format
-    
+    phone: str | None = Field(None, pattern=r'^\+?[1-9]\d{1,14}$')  # E.164 format
+
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
@@ -98,7 +98,7 @@ class UserCreate(UserBase):
     """Create new user"""
     password: str = Field(..., min_length=8, max_length=100)
     role: UserRole = UserRole.CANDIDATE
-    
+
     @field_validator('password')
     @classmethod
     def validate_password(cls, v):
@@ -113,12 +113,12 @@ class UserCreate(UserBase):
 
 class UserUpdate(BaseModel):
     """Update user (all fields optional)"""
-    email: Optional[EmailStr] = None
-    first_name: Optional[str] = Field(None, min_length=1, max_length=50)
-    last_name: Optional[str] = Field(None, min_length=1, max_length=50)
-    phone: Optional[str] = Field(None, pattern=r'^\+?[1-9]\d{1,14}$')
-    status: Optional[UserStatus] = None
-    role: Optional[UserRole] = None
+    email: EmailStr | None = None
+    first_name: str | None = Field(None, min_length=1, max_length=50)
+    last_name: str | None = Field(None, min_length=1, max_length=50)
+    phone: str | None = Field(None, pattern=r'^\+?[1-9]\d{1,14}$')
+    status: UserStatus | None = None
+    role: UserRole | None = None
 
 
 class UserResponse(UserBase):
@@ -128,15 +128,15 @@ class UserResponse(UserBase):
     role: UserRole
     created_at: datetime
     updated_at: datetime
-    last_login: Optional[datetime] = None
+    last_login: datetime | None = None
     is_verified: bool = False
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
 class UserListResponse(BaseModel):
     """List of users with pagination"""
-    users: List[UserResponse]
+    users: list[UserResponse]
     total: int
     page: int
     page_size: int
@@ -149,16 +149,16 @@ class UserListResponse(BaseModel):
 
 class ProfileBase(BaseModel):
     """Base profile information"""
-    bio: Optional[str] = Field(None, max_length=500)
-    avatar_url: Optional[HttpUrl] = None
-    location: Optional[str] = Field(None, max_length=100)
-    timezone: Optional[str] = Field(None, max_length=50)
-    date_of_birth: Optional[datetime] = None
-    gender: Optional[Gender] = None
-    linkedin_url: Optional[HttpUrl] = None
-    twitter_url: Optional[HttpUrl] = None
-    github_url: Optional[HttpUrl] = None
-    website_url: Optional[HttpUrl] = None
+    bio: str | None = Field(None, max_length=500)
+    avatar_url: HttpUrl | None = None
+    location: str | None = Field(None, max_length=100)
+    timezone: str | None = Field(None, max_length=50)
+    date_of_birth: datetime | None = None
+    gender: Gender | None = None
+    linkedin_url: HttpUrl | None = None
+    twitter_url: HttpUrl | None = None
+    github_url: HttpUrl | None = None
+    website_url: HttpUrl | None = None
 
 
 class ProfileCreate(ProfileBase):
@@ -179,7 +179,7 @@ class ProfileResponse(ProfileBase):
     profile_completion: int = Field(..., ge=0, le=100, description="Profile completion percentage")
     created_at: datetime
     updated_at: datetime
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -199,7 +199,7 @@ class UserPreferences(BaseModel):
     language: str = Field("en", max_length=10)
     theme: str = Field("light", pattern=r'^(light|dark|auto)$')
     notifications_enabled: bool = True
-    notification_channels: List[NotificationPreference] = [NotificationPreference.EMAIL]
+    notification_channels: list[NotificationPreference] = [NotificationPreference.EMAIL]
     email_notifications: bool = True
     sms_notifications: bool = False
     push_notifications: bool = True
@@ -209,7 +209,7 @@ class UserPreferences(BaseModel):
     timezone: str = "UTC"
     date_format: str = Field("YYYY-MM-DD", max_length=20)
     time_format: str = Field("HH:mm", pattern=r'^(12h|24h|HH:mm|hh:mm A)$')
-    
+
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
@@ -234,7 +234,7 @@ class UserSettings(BaseModel):
     items_per_page: int = Field(25, ge=10, le=100)
     enable_analytics: bool = True
     enable_keyboard_shortcuts: bool = True
-    custom_settings: Optional[Dict[str, Any]] = None
+    custom_settings: dict[str, Any] | None = None
 
 
 # ============================================================================
@@ -247,11 +247,11 @@ class ActivityLog(BaseModel):
     user_id: str
     activity_type: ActivityType
     description: str
-    metadata: Optional[Dict[str, Any]] = None
-    ip_address: Optional[str] = None
-    user_agent: Optional[str] = None
+    metadata: dict[str, Any] | None = None
+    ip_address: str | None = None
+    user_agent: str | None = None
     timestamp: datetime
-    
+
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
@@ -270,7 +270,7 @@ class ActivityLogRequest(BaseModel):
     """Create activity log entry"""
     activity_type: ActivityType
     description: str
-    metadata: Optional[Dict[str, Any]] = None
+    metadata: dict[str, Any] | None = None
 
 
 class SessionInfo(BaseModel):
@@ -292,9 +292,9 @@ class LoginHistoryEntry(BaseModel):
     timestamp: datetime
     ip_address: str
     user_agent: str
-    location: Optional[str] = None
+    location: str | None = None
     success: bool
-    failure_reason: Optional[str] = None
+    failure_reason: str | None = None
 
 
 # ============================================================================
@@ -303,12 +303,12 @@ class LoginHistoryEntry(BaseModel):
 
 class UserSearchRequest(BaseModel):
     """User search request"""
-    query: Optional[str] = Field(None, min_length=1, max_length=200)
-    roles: Optional[List[UserRole]] = None
-    statuses: Optional[List[UserStatus]] = None
-    created_after: Optional[datetime] = None
-    created_before: Optional[datetime] = None
-    last_login_after: Optional[datetime] = None
+    query: str | None = Field(None, min_length=1, max_length=200)
+    roles: list[UserRole] | None = None
+    statuses: list[UserStatus] | None = None
+    created_after: datetime | None = None
+    created_before: datetime | None = None
+    last_login_after: datetime | None = None
     verified_only: bool = False
     page: int = Field(1, ge=1)
     page_size: int = Field(25, ge=1, le=100)
@@ -318,14 +318,14 @@ class UserSearchRequest(BaseModel):
 
 class UserFilterRequest(BaseModel):
     """User filter request"""
-    filters: Dict[str, Any]
+    filters: dict[str, Any]
     page: int = Field(1, ge=1)
     page_size: int = Field(25, ge=1, le=100)
 
 
 class UserBulkLookupRequest(BaseModel):
     """Bulk user lookup request"""
-    user_ids: List[str] = Field(..., min_length=1, max_length=100)
+    user_ids: list[str] = Field(..., min_length=1, max_length=100)
     include_profiles: bool = False
     include_preferences: bool = False
 
@@ -343,7 +343,7 @@ class UserStatistics(BaseModel):
     pending_users: int
     verified_users: int
     unverified_users: int
-    users_by_role: Dict[UserRole, int]
+    users_by_role: dict[UserRole, int]
     new_users_today: int
     new_users_this_week: int
     new_users_this_month: int
@@ -359,10 +359,10 @@ class NotificationRequest(BaseModel):
     """Send notification to user"""
     title: str = Field(..., min_length=1, max_length=200)
     message: str = Field(..., min_length=1, max_length=1000)
-    channels: List[NotificationPreference]
+    channels: list[NotificationPreference]
     priority: str = Field("normal", pattern=r'^(low|normal|high|urgent)$')
-    action_url: Optional[HttpUrl] = None
-    metadata: Optional[Dict[str, Any]] = None
+    action_url: HttpUrl | None = None
+    metadata: dict[str, Any] | None = None
 
 
 class NotificationResponse(BaseModel):
@@ -373,8 +373,8 @@ class NotificationResponse(BaseModel):
     message: str
     is_read: bool
     created_at: datetime
-    read_at: Optional[datetime] = None
-    action_url: Optional[str] = None
+    read_at: datetime | None = None
+    action_url: str | None = None
 
 
 # ============================================================================
@@ -385,9 +385,9 @@ class UserInviteRequest(BaseModel):
     """Invite user to platform"""
     email: EmailStr
     role: UserRole
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    message: Optional[str] = Field(None, max_length=500)
+    first_name: str | None = None
+    last_name: str | None = None
+    message: str | None = Field(None, max_length=500)
 
 
 class UserInviteResponse(BaseModel):
@@ -412,7 +412,7 @@ class UserExportRequest(BaseModel):
 
 class UserImportRequest(BaseModel):
     """Import users"""
-    users: List[UserCreate] = Field(..., min_items=1, max_items=1000)
+    users: list[UserCreate] = Field(..., min_items=1, max_items=1000)
     skip_duplicates: bool = True
     send_invites: bool = False
 
@@ -424,7 +424,7 @@ class UserImportRequest(BaseModel):
 class UserStatusUpdate(BaseModel):
     """Update user status"""
     status: UserStatus
-    reason: Optional[str] = Field(None, max_length=200)
+    reason: str | None = Field(None, max_length=200)
 
 
 class HealthCheckResponse(BaseModel):
@@ -445,8 +445,8 @@ class HealthCheckResponse(BaseModel):
 class ErrorResponse(BaseModel):
     """Standard error response"""
     error: str
-    detail: Optional[str] = None
-    code: Optional[str] = None
+    detail: str | None = None
+    code: str | None = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -454,11 +454,11 @@ class ValidationErrorDetail(BaseModel):
     """Validation error detail"""
     field: str
     message: str
-    value: Optional[Any] = None
+    value: Any | None = None
 
 
 class ValidationErrorResponse(BaseModel):
     """Validation error response"""
     error: str = "Validation Error"
-    details: List[ValidationErrorDetail]
+    details: list[ValidationErrorDetail]
     timestamp: datetime = Field(default_factory=datetime.utcnow)

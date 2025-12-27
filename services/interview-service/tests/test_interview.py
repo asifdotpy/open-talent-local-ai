@@ -1,6 +1,4 @@
-"""
-Tests for the interview process.
-"""
+"""Tests for the interview process."""
 
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
@@ -8,10 +6,8 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 
 
-def test_start_interview(client: TestClient, db: Session) -> None:
-    """
-    Test the start_interview endpoint.
-    """
+def test_start_interview(test_client: TestClient) -> None:
+    """Test the start_interview endpoint."""
     payload = {
         "searchCriteria": {
             "jobTitle": "Software Engineer",
@@ -53,7 +49,7 @@ def test_start_interview(client: TestClient, db: Session) -> None:
         }
     }
 
-    response = client.post(f"{settings.API_V1_STR}/interview/start", json=payload)
+    response = test_client.post(f"{settings.API_V1_STR}/interview/start", json=payload)
     assert response.status_code == 201
     data = response.json()
     assert data["message"] == "Handoff received successfully. Interview process initiated."

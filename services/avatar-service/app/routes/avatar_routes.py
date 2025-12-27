@@ -6,7 +6,6 @@ Endpoints for avatar video generation and management.
 import io
 import logging
 from pathlib import Path
-from typing import Optional
 
 import httpx
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
@@ -26,8 +25,8 @@ class AvatarRequest(BaseModel):
     """Request model for avatar generation."""
 
     text: str
-    voice: Optional[str] = "en_US-lessac-medium"
-    avatar_id: Optional[str] = "default"
+    voice: str | None = "en_US-lessac-medium"
+    avatar_id: str | None = "default"
 
 
 class PhonemeData(BaseModel):
@@ -143,7 +142,7 @@ async def generate_avatar_video(request: AvatarRequest):
             audio_data = voice_data.get("audio_data")
             duration = voice_data.get("duration", 5.0)
             phonemes = voice_data.get("phonemes", [])
-            words = voice_data.get("words", [])
+            voice_data.get("words", [])
 
         if not audio_data:
             raise HTTPException(status_code=500, detail="No audio data from voice service")
@@ -220,7 +219,7 @@ async def get_phonemes():
 @router.post("/generate-from-audio")
 async def generate_avatar_from_audio(
     audio_file: UploadFile = File(...),
-    phonemes: Optional[str] = Form(None),  # JSON string of phonemes
+    phonemes: str | None = Form(None),  # JSON string of phonemes
 ):
     """Generate avatar video from uploaded audio file.
 

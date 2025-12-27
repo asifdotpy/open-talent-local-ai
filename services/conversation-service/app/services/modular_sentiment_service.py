@@ -1,4 +1,4 @@
-"""Modular Sentiment Analysis Service for OpenTalent Platform
+"""Modular Sentiment Analysis Service for OpenTalent Platform.
 
 This service provides sentiment analysis capabilities using various models:
 - BERT (via transformers library)
@@ -18,7 +18,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Optional
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -89,7 +88,7 @@ class BaseSentimentAnalyzer(ABC):
         """Generate hash for text caching."""
         return hashlib.md5(text.encode()).hexdigest()
 
-    def _get_cached_result(self, text_hash: str) -> Optional[SentimentResult]:
+    def _get_cached_result(self, text_hash: str) -> SentimentResult | None:
         """Get cached result if available and not expired."""
         if not self.config.cache_enabled:
             return None
@@ -325,8 +324,8 @@ class ModularSentimentService:
 
     def __init__(self):
         self.analyzers: dict[SentimentModel, BaseSentimentAnalyzer] = {}
-        self.primary_analyzer: Optional[SentimentModel] = None
-        self.fallback_analyzer: Optional[SentimentModel] = None
+        self.primary_analyzer: SentimentModel | None = None
+        self.fallback_analyzer: SentimentModel | None = None
 
     def configure_analyzer(self, config: SentimentConfig):
         """Configure a specific sentiment analyzer."""

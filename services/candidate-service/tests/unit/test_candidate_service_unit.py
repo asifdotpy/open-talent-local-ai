@@ -1,5 +1,4 @@
-"""
-Candidate Service Unit Tests
+"""Candidate Service Unit Tests.
 
 Unit tests for individual components of the candidate service.
 Focus on vector search, profile management, and data validation without external dependencies.
@@ -14,22 +13,22 @@ Test Coverage:
 Total: 28 tests
 """
 
-import pytest
-import numpy as np
-from unittest.mock import Mock, patch, MagicMock
 import json
-import uuid
+from unittest.mock import Mock, patch
+
+import numpy as np
+import pytest
 
 # Import service components
 from main import (
-    create_candidate_embedding,
-    store_candidate_profile,
-    search_similar_candidates,
     CandidateProfile,
-    WorkExperience,
     Education,
+    InitialQuestion,
     Skills,
-    InitialQuestion
+    WorkExperience,
+    create_candidate_embedding,
+    search_similar_candidates,
+    store_candidate_profile,
 )
 
 
@@ -85,7 +84,7 @@ class TestVectorSearch:
         mock_uuid_obj = Mock()
         mock_uuid_obj.__str__ = Mock(return_value="test-uuid-123")
         mock_uuid.return_value = mock_uuid_obj
-        
+
         mock_create_embedding.return_value = np.array([0.1] * 384)
 
         mock_table = Mock()
@@ -333,7 +332,7 @@ class TestEmbeddingGeneration:
             initial_questions=[]
         )
 
-        embedding = create_candidate_embedding(profile)
+        create_candidate_embedding(profile)
 
         # Verify embed was called
         mock_embedding_model.embed.assert_called_once()

@@ -1,21 +1,19 @@
-"""Add initial system version record
+"""Add initial system version record.
 
 Revision ID: f6de77eb2e44
 Revises: 1f2b8ae492b8
 Create Date: 2025-09-10 13:45:29.291663
 
 """
-from typing import Sequence, Union
+from collections.abc import Sequence
 
 from alembic import op
-import sqlalchemy as sa
-
 
 # revision identifiers, used by Alembic.
 revision: str = 'f6de77eb2e44'
-down_revision: Union[str, Sequence[str], None] = 'dbc9b50dd47a'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = 'dbc9b50dd47a'
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:

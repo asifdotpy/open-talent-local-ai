@@ -5,24 +5,30 @@ Handles LoRA/QLoRA fine-tuning with prerequisite validation,
 data preparation, and training orchestration for different model architectures.
 """
 
-import logging
 import json
-from typing import Dict, Any, Optional, List
+import logging
 from pathlib import Path
+from typing import Any
+
 import torch
-from transformers import (
-    AutoTokenizer,
-    AutoModelForCausalLM,
-    TrainingArguments,
-    Trainer,
-    DataCollatorForLanguageModeling
-)
-from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
-from datasets import Dataset
 import wandb
+from datasets import Dataset
+from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    DataCollatorForLanguageModeling,
+    Trainer,
+    TrainingArguments,
+)
 
 from ..config import settings
-from ..models import model_registry
+from .constants import (
+    MIN_DATASET_SAMPLES,
+    GB_TO_BYTES,
+    DISK_SPACE_MULTIPLIER,
+    DEFAULT_TRAINING_CONFIG,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -30,14 +36,22 @@ class TrainingService:
     """Service for fine-tuning AI models."""
 
     def __init__(self):
-        self.active_trainings: Dict[str, Dict[str, Any]] = {}
+        self.active_trainings: dict[str, dict[str, Any]] = {}
 
     def validate_training_prerequisites(
         self,
         model_name: str,
-        dataset_path: Optional[str] = None
-    ) -> Dict[str, Any]:
-        """Validate all prerequisites for training a model."""
+        dataset_path: str | None = None
+    ) -> dict[str, Any]:
+        """Validate all prerequisites for training a model, including hardware, dataset, and disk space.
+
+        Args:
+            model_name: Name of the model to validate.
+            dataset_path: Optional path to the dataset file.
+
+        Returns:
+            Dictionary containing validation status ('valid') and failure reasons.
+        """
 
         config = settings.get_model_config(model_name)
         if not config:
@@ -77,13 +91,13 @@ class TrainingService:
 
         # Validate dataset format and size
         try:
-            with open(dataset_file, 'r') as f:
+            with open(dataset_file) as f:
                 data = json.load(f)
 
-            if not isinstance(data, list) or len(data) < 100:
+            if not isinstance(data, list) or len(data) < MIN_DATASET_SAMPLES:
                 return {
                     'valid': False,
-                    'reason': f'Dataset must contain at least 100 samples, found {len(data) if isinstance(data, list) else 0}'
+                    'reason': f'Dataset must contain at least {MIN_DATASET_SAMPLES} samples, found {len(data) if isinstance(data, list) else 0}'
                 }
 
             # Check data format
@@ -105,11 +119,11 @@ class TrainingService:
         try:
             import shutil
             total, used, free = shutil.disk_usage(settings.output_dir.parent)
-            free_gb = free / (1024**3)
+            free_gb = free / GB_TO_BYTES
 
-            # Estimate space needed (model size * 2 for checkpoints)
+            # Estimate space needed (model size * multiplier for checkpoints)
             model_size_gb = self._estimate_model_size_gb(config.size)
-            required_space = model_size_gb * 2
+            required_space = model_size_gb * DISK_SPACE_MULTIPLIER
 
             if free_gb < required_space:
                 return {
@@ -166,10 +180,19 @@ class TrainingService:
     async def start_training(
         self,
         model_name: str,
-        dataset_path: Optional[str] = None,
-        training_config: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
-        """Start fine-tuning a model."""
+        dataset_path: str | None = None,
+        training_config: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
+        """Start a fine-tuning job in a background task.
+
+        Args:
+            model_name: Name of the base model to fine-tune.
+            dataset_path: Path to the training dataset.
+            training_config: Optional overrides for default training parameters.
+
+        Returns:
+            Dictionary with 'success', 'training_id', and 'estimated_duration'.
+        """
 
         # Validate prerequisites
         validation = self.validate_training_prerequisites(model_name, dataset_path)
@@ -220,28 +243,15 @@ class TrainingService:
     def _get_default_training_config(
         self,
         config: Any,
-        user_config: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        user_config: dict[str, Any]
+    ) -> dict[str, Any]:
         """Get default training configuration."""
 
-        defaults = {
+        defaults = DEFAULT_TRAINING_CONFIG.copy()
+        defaults.update({
             'output_dir': str(settings.output_dir / f"{config.name}_ft"),
-            'num_train_epochs': 3,
-            'per_device_train_batch_size': 4,
-            'gradient_accumulation_steps': 2,
-            'learning_rate': 2e-4,
-            'weight_decay': 0.01,
-            'warmup_steps': 100,
-            'logging_steps': 10,
-            'save_steps': 500,
-            'evaluation_strategy': 'steps',
-            'eval_steps': 500,
-            'load_best_model_at_end': True,
-            'metric_for_best_model': 'loss',
-            'greater_is_better': False,
-            'fp16': True,
             'report_to': 'wandb' if settings.wandb_project else 'none'
-        }
+        })
 
         # Apply model-specific training config
         model_training_config = config.get_training_config()
@@ -257,7 +267,7 @@ class TrainingService:
         training_id: str,
         model_name: str,
         dataset_file: str,
-        train_config: Dict[str, Any]
+        train_config: dict[str, Any]
     ):
         """Run the actual training process."""
 
@@ -266,7 +276,7 @@ class TrainingService:
             logger.info(f"Starting training {training_id}")
 
             # Load dataset
-            with open(dataset_file, 'r') as f:
+            with open(dataset_file) as f:
                 data = json.load(f)
 
             # Prepare dataset
@@ -350,7 +360,7 @@ class TrainingService:
 
         return dataset.map(format_instruction)
 
-    def get_training_status(self, training_id: str) -> Optional[Dict[str, Any]]:
+    def get_training_status(self, training_id: str) -> dict[str, Any] | None:
         """Get status of a training job."""
         if training_id not in self.active_trainings:
             return None
@@ -376,11 +386,11 @@ class TrainingService:
 
         return status
 
-    def list_active_trainings(self) -> List[Dict[str, Any]]:
+    def list_active_trainings(self) -> list[dict[str, Any]]:
         """List all active training jobs."""
         return [
             self.get_training_status(training_id)
-            for training_id in self.active_trainings.keys()
+            for training_id in self.active_trainings
         ]
 
     def cancel_training(self, training_id: str) -> bool:

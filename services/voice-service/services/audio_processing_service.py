@@ -1,15 +1,14 @@
-import asyncio
 import logging
+
+import numpy as np
 from aiortc import AudioStreamTrack
 from av import AudioFrame
-import numpy as np
 from pyrnnoise import RNNoise
 
 logger = logging.getLogger(__name__)
 
 class RNNoiseTrack(AudioStreamTrack):
-    """
-    AudioStreamTrack that applies RNNoise noise suppression to incoming audio frames.
+    """AudioStreamTrack that applies RNNoise noise suppression to incoming audio frames.
     Buffers audio to ensure 10ms (480 sample) frames for RNNoise processing.
     """
 
@@ -49,10 +48,10 @@ class RNNoiseTrack(AudioStreamTrack):
                 # denoise_frame returns (speech_probs, denoised_frame)
                 frame_2d = frame_chunk.reshape(1, -1)  # Add channel dimension
                 speech_probs, denoised_2d = self.rnnoise.denoise_frame(frame_2d)
-                
+
                 # Extract the denoised audio (remove channel dimension)
                 denoised = denoised_2d.flatten()
-                
+
             except Exception as e:
                 logger.error(f"RNNoise processing error: {e}")
                 denoised = frame_chunk  # Fallback to original

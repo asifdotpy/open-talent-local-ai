@@ -1,5 +1,4 @@
-"""
-Unit Tests for Whisper STT Service
+"""Unit Tests for Whisper STT Service.
 
 Following TDD principles:
 - Red-Green-Refactor cycle
@@ -11,11 +10,10 @@ Following TDD principles:
 Created: November 13, 2025
 """
 
-import pytest
-import os
 import sys
-from unittest.mock import Mock, patch, MagicMock, call
-from pathlib import Path
+from unittest.mock import Mock, patch
+
+import pytest
 
 # Mock torch and whisper before importing the service
 sys.modules['torch'] = Mock()
@@ -48,13 +46,13 @@ class TestWhisperSTTServiceInitialization:
     def test_initialization_with_default_model(self):
         """Test that service initializes with base model by default."""
         service = WhisperSTTService()
-        
+
         assert service.model_size == "base"
 
     def test_initialization_with_custom_model_size(self):
         """Test that service initializes with custom model size."""
         service = WhisperSTTService(model_size="large")
-        
+
         assert service.model_size == "large"
 
     def test_initialization_sets_model_to_none(self, stt_service):
@@ -65,26 +63,26 @@ class TestWhisperSTTServiceInitialization:
     def test_initialization_selects_cuda_when_available(self, mock_cuda):
         """Test that service uses CUDA when available."""
         service = WhisperSTTService()
-        
+
         assert service.device == "cuda"
 
     @patch('torch.cuda.is_available', return_value=False)
     def test_initialization_falls_back_to_cpu(self, mock_cuda):
         """Test that service falls back to CPU when CUDA unavailable."""
         service = WhisperSTTService()
-        
+
         assert service.device == "cpu"
 
     def test_initialization_with_custom_device(self):
         """Test that service accepts custom device specification."""
         service = WhisperSTTService(device="cuda:1")
-        
+
         assert service.device == "cuda:1"
 
     def test_initialization_with_all_model_sizes(self):
         """Test that service accepts all valid model sizes."""
         model_sizes = ["tiny", "base", "small", "medium", "large"]
-        
+
         for size in model_sizes:
             service = WhisperSTTService(model_size=size)
             assert service.model_size == size
@@ -100,10 +98,10 @@ class TestModelLoading:
         """Test that model loads successfully with valid configuration."""
         # Arrange
         mock_load.return_value = mock_whisper_model
-        
+
         # Act
         result = stt_service.load_model()
-        
+
         # Assert
         assert result is True
         assert stt_service.model == mock_whisper_model
@@ -116,10 +114,10 @@ class TestModelLoading:
         """Test that model loading fails gracefully when model not found."""
         # Arrange
         mock_load.side_effect = FileNotFoundError("Model not found")
-        
+
         # Act
         result = stt_service.load_model()
-        
+
         # Assert
         assert result is False
         assert stt_service.model is None
@@ -131,10 +129,10 @@ class TestModelLoading:
         """Test that model loading handles exceptions gracefully."""
         # Arrange
         mock_load.side_effect = Exception("Model load failed")
-        
+
         # Act
         result = stt_service.load_model()
-        
+
         # Assert
         assert result is False
         assert stt_service.model is None
@@ -145,12 +143,12 @@ class TestModelLoading:
         # Arrange
         mock_load.return_value = mock_whisper_model
         model_sizes = ["tiny", "base", "small", "medium", "large"]
-        
+
         for size in model_sizes:
             # Act
             service = WhisperSTTService(model_size=size)
             result = service.load_model()
-            
+
             # Assert
             assert result is True
             mock_load.assert_called_with(size, device=service.device)
@@ -162,11 +160,11 @@ class TestModelLoading:
         """Test that loading model multiple times replaces the old one."""
         # Arrange
         mock_load.return_value = mock_whisper_model
-        
+
         # Act
         first_load = stt_service.load_model()
         second_load = stt_service.load_model()
-        
+
         # Assert
         assert first_load is True
         assert second_load is True
@@ -180,7 +178,7 @@ class TestAudioTranscription:
         """Test that transcription fails when model is not loaded."""
         # Act
         result = stt_service.transcribe_audio(test_audio_file)
-        
+
         # Assert
         assert result is None
 
@@ -193,10 +191,10 @@ class TestAudioTranscription:
         mock_whisper_model.transcribe.return_value = {"text": "Hello world"}
         mock_load.return_value = mock_whisper_model
         stt_service.load_model()
-        
+
         # Act
         result = stt_service.transcribe_audio(test_audio_file)
-        
+
         # Assert
         assert result == "Hello world"
         mock_whisper_model.transcribe.assert_called_once_with(
@@ -215,10 +213,10 @@ class TestAudioTranscription:
         mock_whisper_model.transcribe.return_value = {"text": "  Hello world  \n\t"}
         mock_load.return_value = mock_whisper_model
         stt_service.load_model()
-        
+
         # Act
         result = stt_service.transcribe_audio(test_audio_file)
-        
+
         # Assert
         assert result == "Hello world"
 
@@ -231,10 +229,10 @@ class TestAudioTranscription:
         mock_whisper_model.transcribe.return_value = {"text": "Hola mundo"}
         mock_load.return_value = mock_whisper_model
         stt_service.load_model()
-        
+
         # Act
         result = stt_service.transcribe_audio(test_audio_file, language="es")
-        
+
         # Assert
         assert result == "Hola mundo"
         mock_whisper_model.transcribe.assert_called_once_with(
@@ -253,10 +251,10 @@ class TestAudioTranscription:
         mock_whisper_model.transcribe.side_effect = Exception("Transcription failed")
         mock_load.return_value = mock_whisper_model
         stt_service.load_model()
-        
+
         # Act
         result = stt_service.transcribe_audio(test_audio_file)
-        
+
         # Assert
         assert result is None
 
@@ -269,10 +267,10 @@ class TestAudioTranscription:
         mock_whisper_model.transcribe.side_effect = FileNotFoundError("File not found")
         mock_load.return_value = mock_whisper_model
         stt_service.load_model()
-        
+
         # Act
         result = stt_service.transcribe_audio("/nonexistent/file.wav")
-        
+
         # Assert
         assert result is None
 
@@ -285,10 +283,10 @@ class TestAudioTranscription:
         mock_whisper_model.transcribe.return_value = {"text": ""}
         mock_load.return_value = mock_whisper_model
         stt_service.load_model()
-        
+
         # Act
         result = stt_service.transcribe_audio(test_audio_file)
-        
+
         # Assert
         assert result == ""
 
@@ -304,11 +302,11 @@ class TestAudioTranscription:
         ]
         mock_load.return_value = mock_whisper_model
         stt_service.load_model()
-        
+
         # Act
         result1 = stt_service.transcribe_audio(test_audio_file)
         result2 = stt_service.transcribe_audio(short_audio_file)
-        
+
         # Assert
         assert result1 == "First transcription"
         assert result2 == "Second transcription"
@@ -327,10 +325,10 @@ class TestEdgeCasesAndErrorHandling:
         mock_whisper_model.transcribe.side_effect = RuntimeError("Invalid audio format")
         mock_load.return_value = mock_whisper_model
         stt_service.load_model()
-        
+
         # Act
         result = stt_service.transcribe_audio(invalid_audio_file)
-        
+
         # Assert
         assert result is None
 
@@ -344,10 +342,10 @@ class TestEdgeCasesAndErrorHandling:
         mock_whisper_model.transcribe.return_value = {"text": long_transcription}
         mock_load.return_value = mock_whisper_model
         stt_service.load_model()
-        
+
         # Act
         result = stt_service.transcribe_audio(long_audio_file)
-        
+
         # Assert
         assert result == long_transcription.strip()
 
@@ -360,10 +358,10 @@ class TestEdgeCasesAndErrorHandling:
         mock_whisper_model.transcribe.return_value = {"text": ""}
         mock_load.return_value = mock_whisper_model
         stt_service.load_model()
-        
+
         # Act
         result = stt_service.transcribe_audio(silent_audio_file)
-        
+
         # Assert
         assert result == ""
 
@@ -376,9 +374,9 @@ class TestEdgeCasesAndErrorHandling:
             mock_model.transcribe.side_effect = ValueError("Invalid language")
             mock_load.return_value = mock_model
             stt_service.load_model()
-            
+
             result = stt_service.transcribe_audio(test_audio_file, language="invalid")
-            
+
             assert result is None
 
     @patch('whisper.load_model')
@@ -391,10 +389,10 @@ class TestEdgeCasesAndErrorHandling:
         mock_whisper_model.transcribe.return_value = {"text": text_with_punctuation}
         mock_load.return_value = mock_whisper_model
         stt_service.load_model()
-        
+
         # Act
         result = stt_service.transcribe_audio(test_audio_file)
-        
+
         # Assert
         assert result == text_with_punctuation
 
@@ -408,10 +406,10 @@ class TestEdgeCasesAndErrorHandling:
         mock_whisper_model.transcribe.return_value = {"text": text_with_numbers}
         mock_load.return_value = mock_whisper_model
         stt_service.load_model()
-        
+
         # Act
         result = stt_service.transcribe_audio(test_audio_file)
-        
+
         # Assert
         assert result == text_with_numbers
 
@@ -428,10 +426,10 @@ class TestDeviceManagement:
         # Arrange
         mock_load.return_value = mock_whisper_model
         service = WhisperSTTService()
-        
+
         # Act
         result = service.load_model()
-        
+
         # Assert
         assert result is True
         mock_load.assert_called_once_with("base", device="cpu")
@@ -445,10 +443,10 @@ class TestDeviceManagement:
         # Arrange
         mock_load.return_value = mock_whisper_model
         service = WhisperSTTService()
-        
+
         # Act
         result = service.load_model()
-        
+
         # Assert
         assert result is True
         mock_load.assert_called_once_with("base", device="cuda")
@@ -461,10 +459,10 @@ class TestDeviceManagement:
         # Arrange
         mock_load.return_value = mock_whisper_model
         service = WhisperSTTService(device="cuda:2")
-        
+
         # Act
         result = service.load_model()
-        
+
         # Assert
         assert result is True
         mock_load.assert_called_once_with("base", device="cuda:2")
