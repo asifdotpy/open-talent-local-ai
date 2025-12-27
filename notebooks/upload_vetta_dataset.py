@@ -4,13 +4,13 @@ Upload Vetta Multi-Persona Dataset to Hugging Face Hub
 """
 
 import os
-import json
-from huggingface_hub import HfApi, HfFolder, create_repo
-from pathlib import Path
+
+from huggingface_hub import HfApi, create_repo
+
 
 def create_dataset_card():
     """Create a comprehensive dataset card for the Vetta dataset."""
-    
+
     dataset_card = """---
 dataset_info:
   features:
@@ -39,7 +39,7 @@ dataset_info:
 
 ## Overview
 
-The Vetta Multi-Persona Dataset is a comprehensive instruction-tuning dataset designed to train AI models for multi-role orchestration within the TalentAI platform. This dataset transforms a single-purpose interview AI into a versatile platform orchestrator capable of handling the entire hiring workflow.
+The Vetta Multi-Persona Dataset is a comprehensive instruction-tuning dataset designed to train AI models for multi-role orchestration within the OpenTalent platform. This dataset transforms a single-purpose interview AI into a versatile platform orchestrator capable of handling the entire hiring workflow.
 
 ## Dataset Details
 
@@ -81,7 +81,7 @@ The Vetta Multi-Persona Dataset is a comprehensive instruction-tuning dataset de
 - **ML/AI** (1.3%): AI-specific technical assessment
 - **System Design** (1.3%): Architecture and scalability
 - **Analytics** (1.3%): Data-driven insights
-- **Platform** (0.9%): TalentAI platform navigation
+- **Platform** (0.9%): OpenTalent platform navigation
 - **Agents** (1.1%): Multi-agent coordination
 - **Sourcing** (1.1%): Candidate discovery
 - **Profiling** (1.1%): Deep candidate assessment
@@ -99,7 +99,7 @@ Coordinates sourcing activities and manages candidate discovery pipelines.
 Conducts professional technical interviews and assesses candidate skills.
 
 ### 3. Platform Navigator
-Guides users through TalentAI platform features and workflows.
+Guides users through OpenTalent platform features and workflows.
 
 ### 4. Analytics Insights
 Provides data-driven hiring insights and performance metrics.
@@ -174,7 +174,7 @@ trainer.train()
 ### Primary Use Cases
 - **Fine-tuning LLMs** for multi-role AI assistants in HR/recruiting
 - **Research** in persona-based AI systems and role adaptation
-- **Platform Integration** for TalentAI and similar HR platforms
+- **Platform Integration** for OpenTalent and similar HR platforms
 - **Benchmarking** multi-persona AI capabilities
 
 ### Out-of-Scope Use
@@ -229,41 +229,37 @@ This dataset is released under the Apache 2.0 License.
 
 For questions or contributions, please contact the maintainer at the Hugging Face repository.
 """
-    
+
     return dataset_card
+
 
 def upload_dataset():
     """Upload the Vetta dataset to Hugging Face Hub."""
-    
+
     # Set up authentication
     api = HfApi()
-    
+
     # Repository details
     repo_name = "vetta-multi-persona-dataset"
     repo_id = f"asifdotpy/{repo_name}"
-    
+
     try:
         # Create repository
         print(f"Creating repository: {repo_id}")
-        create_repo(
-            repo_id=repo_id,
-            repo_type="dataset",
-            private=False,
-            exist_ok=True
-        )
-        
+        create_repo(repo_id=repo_id, repo_type="dataset", private=False, exist_ok=True)
+
         # Create dataset card
         dataset_card = create_dataset_card()
-        
+
         # Upload dataset card (README.md)
         print("Uploading dataset card...")
         api.upload_file(
             path_or_fileobj=dataset_card.encode(),
             path_in_repo="README.md",
             repo_id=repo_id,
-            repo_type="dataset"
+            repo_type="dataset",
         )
-        
+
         # Upload main dataset
         dataset_path = "data/vetta_comprehensive.json"
         if os.path.exists(dataset_path):
@@ -272,11 +268,11 @@ def upload_dataset():
                 path_or_fileobj=dataset_path,
                 path_in_repo="data/vetta_comprehensive.json",
                 repo_id=repo_id,
-                repo_type="dataset"
+                repo_type="dataset",
             )
         else:
             print(f"Warning: {dataset_path} not found")
-        
+
         # Upload persona prompts
         persona_path = "data/vetta_persona_prompts.json"
         if os.path.exists(persona_path):
@@ -285,17 +281,17 @@ def upload_dataset():
                 path_or_fileobj=persona_path,
                 path_in_repo="data/vetta_persona_prompts.json",
                 repo_id=repo_id,
-                repo_type="dataset"
+                repo_type="dataset",
             )
         else:
             print(f"Warning: {persona_path} not found")
-        
+
         # Upload documentation
         docs_to_upload = [
             ("VETTA_IMPLEMENTATION_GUIDE.md", "docs/IMPLEMENTATION_GUIDE.md"),
-            ("VETTA_DATASET_RESEARCH.md", "docs/DATASET_RESEARCH.md")
+            ("VETTA_DATASET_RESEARCH.md", "docs/DATASET_RESEARCH.md"),
         ]
-        
+
         for local_path, repo_path in docs_to_upload:
             if os.path.exists(local_path):
                 print(f"Uploading {local_path}...")
@@ -303,21 +299,24 @@ def upload_dataset():
                     path_or_fileobj=local_path,
                     path_in_repo=repo_path,
                     repo_id=repo_id,
-                    repo_type="dataset"
+                    repo_type="dataset",
                 )
             else:
                 print(f"Warning: {local_path} not found")
-        
+
         print("\n✅ Dataset upload complete!")
         print(f"📊 Repository: https://huggingface.co/datasets/{repo_id}")
         print("📖 Dataset Card: Comprehensive documentation included")
-        print("🔗 Direct Download: https://huggingface.co/datasets/asifdotpy/vetta-multi-persona-dataset/resolve/main/data/vetta_comprehensive.json")
-        
+        print(
+            "🔗 Direct Download: https://huggingface.co/datasets/asifdotpy/vetta-multi-persona-dataset/resolve/main/data/vetta_comprehensive.json"
+        )
+
     except Exception as e:
         print(f"❌ Upload failed: {e}")
         return False
-    
+
     return True
+
 
 if __name__ == "__main__":
     # Set API token from environment variable
@@ -326,14 +325,16 @@ if __name__ == "__main__":
         print("❌ Error: HF_TOKEN environment variable not set")
         print("Please set your Hugging Face token: export HF_TOKEN='your_token_here'")
         exit(1)
-    
+
     print("�� Starting Vetta Dataset Upload to Hugging Face Hub")
     print("=" * 60)
-    
+
     success = upload_dataset()
-    
+
     if success:
         print("\n🎉 Success! The Vetta Multi-Persona Dataset is now available on Hugging Face!")
-        print("🌟 This dataset can help others build multi-role AI assistants for HR and recruiting!")
+        print(
+            "🌟 This dataset can help others build multi-role AI assistants for HR and recruiting!"
+        )
     else:
         print("\n💥 Upload failed. Please check the error messages above.")

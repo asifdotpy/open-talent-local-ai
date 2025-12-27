@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Create GEMINI.md files for all repositories in talent-ai-platform
+# Create GEMINI.md files for all repositories in open-talent-platform
 # This script generates context-aware documentation for AI models
 #
 
@@ -32,19 +32,19 @@ FAILED=0
 generate_gemini() {
     local service_path=$1
     local service_name=$(basename "$service_path")
-    
+
     TOTAL=$((TOTAL + 1))
-    
+
     # Check if GEMINI.md already exists
     if [ -f "$service_path/GEMINI.md" ]; then
         echo -e "${YELLOW}⏭️  SKIP: $service_name (GEMINI.md already exists)${NC}"
         SKIPPED=$((SKIPPED + 1))
         return
     fi
-    
+
     # Generate GEMINI.md
     echo -e "${BLUE}📝 Generating: $service_name${NC}"
-    
+
     if python3 "$GENERATOR" "$service_path"; then
         echo -e "${GREEN}✅ SUCCESS: $service_name${NC}"
         SUCCESS=$((SUCCESS + 1))
@@ -58,17 +58,17 @@ generate_gemini() {
 # 1. Root directory (if not exists)
 echo -e "${BLUE}=== Processing Root Directory ===${NC}"
 if [ ! -f "$PROJECT_ROOT/GEMINI.md" ]; then
-    echo -e "${BLUE}📝 Generating: talent-ai-platform (root)${NC}"
+    echo -e "${BLUE}📝 Generating: open-talent-platform (root)${NC}"
     TOTAL=$((TOTAL + 1))
     if python3 "$GENERATOR" "$PROJECT_ROOT"; then
-        echo -e "${GREEN}✅ SUCCESS: talent-ai-platform (root)${NC}"
+        echo -e "${GREEN}✅ SUCCESS: open-talent-platform (root)${NC}"
         SUCCESS=$((SUCCESS + 1))
     else
-        echo -e "${RED}❌ FAILED: talent-ai-platform (root)${NC}"
+        echo -e "${RED}❌ FAILED: open-talent-platform (root)${NC}"
         FAILED=$((FAILED + 1))
     fi
 else
-    echo -e "${YELLOW}⏭️  SKIP: talent-ai-platform (root) - GEMINI.md already exists${NC}"
+    echo -e "${YELLOW}⏭️  SKIP: open-talent-platform (root) - GEMINI.md already exists${NC}"
     TOTAL=$((TOTAL + 1))
     SKIPPED=$((SKIPPED + 1))
 fi
@@ -77,16 +77,16 @@ echo ""
 # 2. Level 1 Submodules
 echo -e "${BLUE}=== Processing Level 1 Submodules ===${NC}"
 
-# Note: talent-ai-infrastructure needs custom template
-if [ -d "$PROJECT_ROOT/talent-ai-infrastructure" ]; then
-    echo -e "${YELLOW}⚠️  TODO: talent-ai-infrastructure (needs custom infrastructure template)${NC}"
+# Note: open-talent-infrastructure needs custom template
+if [ -d "$PROJECT_ROOT/open-talent-infrastructure" ]; then
+    echo -e "${YELLOW}⚠️  TODO: open-talent-infrastructure (needs custom infrastructure template)${NC}"
     TOTAL=$((TOTAL + 1))
     SKIPPED=$((SKIPPED + 1))
 fi
 
-# Note: talent-ai-landing-page needs custom template
-if [ -d "$PROJECT_ROOT/talent-ai-landing-page" ]; then
-    echo -e "${YELLOW}⚠️  TODO: talent-ai-landing-page (needs custom frontend template)${NC}"
+# Note: open-talent-landing-page needs custom template
+if [ -d "$PROJECT_ROOT/open-talent-landing-page" ]; then
+    echo -e "${YELLOW}⚠️  TODO: open-talent-landing-page (needs custom frontend template)${NC}"
     TOTAL=$((TOTAL + 1))
     SKIPPED=$((SKIPPED + 1))
 fi
@@ -102,10 +102,10 @@ fi
 
 echo ""
 
-# 3. talent-ai-microservices parent
+# 3. open-talent-microservices parent
 echo -e "${BLUE}=== Processing Microservices Parent ===${NC}"
-if [ -d "$PROJECT_ROOT/talent-ai-microservices" ]; then
-    echo -e "${YELLOW}⚠️  TODO: talent-ai-microservices parent (needs orchestration template)${NC}"
+if [ -d "$PROJECT_ROOT/open-talent-microservices" ]; then
+    echo -e "${YELLOW}⚠️  TODO: open-talent-microservices parent (needs orchestration template)${NC}"
     TOTAL=$((TOTAL + 1))
     SKIPPED=$((SKIPPED + 1))
 fi
@@ -114,16 +114,16 @@ echo ""
 # 4. Individual Microservices (Level 2)
 echo -e "${BLUE}=== Processing Individual Microservices ===${NC}"
 
-MICROSERVICES_DIR="$PROJECT_ROOT/talent-ai-microservices"
+MICROSERVICES_DIR="$PROJECT_ROOT/open-talent-microservices"
 
 if [ -d "$MICROSERVICES_DIR" ]; then
-    for service_dir in "$MICROSERVICES_DIR"/talent-ai-*/; do
+    for service_dir in "$MICROSERVICES_DIR"/open-talent-*/; do
         if [ -d "$service_dir" ]; then
             generate_gemini "$service_dir"
         fi
     done
 else
-    echo -e "${RED}❌ ERROR: talent-ai-microservices directory not found${NC}"
+    echo -e "${RED}❌ ERROR: open-talent-microservices directory not found${NC}"
 fi
 
 # Summary

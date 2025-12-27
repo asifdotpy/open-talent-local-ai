@@ -11,7 +11,7 @@ echo ""
 
 # Check if we're in the right directory
 if [ ! -d "microservices/granite-interview-service" ]; then
-    echo "❌ Error: Please run this script from the talent-ai-platform root directory"
+    echo "❌ Error: Please run this script from the open-talent-platform root directory"
     exit 1
 fi
 

@@ -33,7 +33,7 @@ print_error() {
 check_directory() {
     if [ ! -f ".gitmodules" ]; then
         print_error "Not in the root of a Git repository with submodules"
-        print_error "Please run this script from the talent-ai-platform root directory"
+        print_error "Please run this script from the open-talent-platform root directory"
         exit 1
     fi
     print_success "Found .gitmodules file"
@@ -63,9 +63,9 @@ update_all_submodules() {
 # Function to check for uncommitted changes
 check_uncommitted_changes() {
     print_status "Checking for uncommitted changes in submodules..."
-    
+
     local has_changes=false
-    
+
     git submodule foreach --quiet '
         if [ -n "$(git status --porcelain)" ]; then
             echo "Uncommitted changes in: $name"
@@ -73,7 +73,7 @@ check_uncommitted_changes() {
             exit 1
         fi
     ' || has_changes=true
-    
+
     if [ "$has_changes" = "true" ]; then
         print_warning "Found uncommitted changes in submodules"
         echo
@@ -100,7 +100,7 @@ open_submodule_in_vscode() {
         list_submodules
         return 1
     fi
-    
+
     if [ -d "$submodule" ]; then
         print_status "Opening $submodule in VS Code..."
         code "$submodule"
@@ -119,15 +119,15 @@ list_submodules() {
 
 # Function to create VS Code workspace
 create_vscode_workspace() {
-    if [ -f "talent-ai-platform.code-workspace" ]; then
+    if [ -f "open-talent-platform.code-workspace" ]; then
         print_success "VS Code workspace file already exists"
     else
         print_error "VS Code workspace file not found"
-        print_status "Please create talent-ai-platform.code-workspace file first"
+        print_status "Please create open-talent-platform.code-workspace file first"
     fi
-    
+
     print_status "To use the workspace:"
-    echo "  code talent-ai-platform.code-workspace"
+    echo "  code open-talent-platform.code-workspace"
 }
 
 # Function to show help
@@ -149,14 +149,14 @@ show_help() {
     echo
     echo "Examples:"
     echo "  $0 status                              # Show submodule status"
-    echo "  $0 open talent-ai-microservices         # Open microservices in VS Code"
+    echo "  $0 open open-talent-microservices         # Open microservices in VS Code"
     echo "  $0 update                              # Update all submodules"
 }
 
 # Main script logic
 main() {
     check_directory
-    
+
     case "${1:-help}" in
         "status")
             show_submodule_status

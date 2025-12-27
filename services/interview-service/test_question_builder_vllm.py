@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
-"""
-Test script for vLLM + Qdrant integration
+"""Test script for vLLM + Qdrant integration
 Tests the Natural Language Question Builder with vector database
 """
 
 import asyncio
 import sys
-import os
 
 # Add the app directory to the Python path
-sys.path.append('.')
+sys.path.append(".")
 
-from services.question_builder import NaturalLanguageQuestionBuilder, NaturalLanguagePrompt
+from services.question_builder import (
+    NaturalLanguagePrompt,
+    NaturalLanguageQuestionBuilder,
+)
 
 
 async def test_vllm_qdrant_integration():
@@ -31,7 +32,7 @@ async def test_vllm_qdrant_integration():
             prompt="Create technical questions for a senior Python backend developer role",
             job_title="Senior Python Backend Developer",
             required_skills=["Python", "FastAPI", "PostgreSQL", "Docker"],
-            num_questions=3
+            num_questions=3,
         )
 
         questions = await builder.generate_questions(prompt)
@@ -46,7 +47,7 @@ async def test_vllm_qdrant_integration():
             prompt="Questions about Python web development and APIs",
             job_title="Python Developer",
             required_skills=["Python", "Django", "REST APIs"],
-            num_questions=2
+            num_questions=2,
         )
 
         similar_questions = await builder._semantic_search_questions(search_prompt)
@@ -63,7 +64,7 @@ async def test_vllm_qdrant_integration():
             prompt="Technical questions for backend development with databases",
             job_title="Backend Developer",
             required_skills=["Python", "SQL", "APIs"],
-            num_questions=2
+            num_questions=2,
         )
 
         questions2 = await builder.generate_questions(prompt2)
@@ -80,6 +81,7 @@ async def test_vllm_qdrant_integration():
     except Exception as e:
         print(f"❌ Test failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -119,7 +121,7 @@ async def test_basic_vllm_connection():
 
 
 if __name__ == "__main__":
-    print("🚀 TalentAI Question Builder - vLLM + Qdrant Test Suite")
+    print("🚀 OpenTalent Question Builder - vLLM + Qdrant Test Suite")
     print("=" * 60)
 
     async def main():

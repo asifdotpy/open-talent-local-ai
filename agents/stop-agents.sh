@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# TalentAI Agents - Stop Script
+# OpenTalent Agents - Stop Script
 # Stops all running agents
 
 set -e
 
-echo "🛑 Stopping TalentAI Agents..."
+echo "🛑 Stopping OpenTalent Agents..."
 
 # Colors
 RED='\033[0;31m'
@@ -20,8 +20,8 @@ pkill -f "npm run dev" || echo -e "${YELLOW}Genkit service not running${NC}"
 # Function to stop an agent
 stop_agent() {
     local agent_name=$1
-    local pid_file="/tmp/talent-ai-$agent_name.pid"
-    
+    local pid_file="/tmp/open-talent-$agent_name.pid"
+
     if [ -f "$pid_file" ]; then
         local pid=$(cat "$pid_file")
         if ps -p "$pid" > /dev/null 2>&1; then
@@ -52,8 +52,8 @@ pkill -f "uvicorn main:app" || echo -e "${YELLOW}No uvicorn processes found${NC}
 
 # Optionally stop Redis (commented out by default)
 # echo -e "${YELLOW}Stopping Redis...${NC}"
-# docker stop talent-ai-redis || echo -e "${YELLOW}Redis container not running${NC}"
-# docker rm talent-ai-redis || echo -e "${YELLOW}Redis container not found${NC}"
+# docker stop open-talent-redis || echo -e "${YELLOW}Redis container not running${NC}"
+# docker rm open-talent-redis || echo -e "${YELLOW}Redis container not found${NC}"
 
 echo ""
 echo -e "${GREEN}=====================================${NC}"

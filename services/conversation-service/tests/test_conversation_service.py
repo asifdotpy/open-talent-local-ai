@@ -4,8 +4,9 @@ Uses FastAPI TestClient to avoid requiring a running server on port 8014.
 Relies on mock LLM/database flags set in tests/conftest.py.
 """
 
-from fastapi.testclient import TestClient
 import uuid
+
+from fastapi.testclient import TestClient
 
 
 def _unique_session() -> str:
@@ -22,7 +23,7 @@ class TestConversationServiceBasics:
         resp = test_client.get("/")
         assert resp.status_code == 200
         data = resp.json()
-        assert data.get("service") == "TalentAI Conversation Service"
+        assert data.get("service") == "OpenTalent Conversation Service"
 
 
 class TestConversationFlow:
@@ -133,4 +134,3 @@ class TestAdaptiveEndpoints:
         assert resp.status_code == 200
         data = resp.json()
         assert "adaptations" in data
-

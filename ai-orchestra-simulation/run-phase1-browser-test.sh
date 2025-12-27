@@ -5,7 +5,7 @@
 
 set -e
 
-PROJECT_ROOT="/home/asif1/talent-ai-platform"
+PROJECT_ROOT="/home/asif1/open-talent-platform"
 ORCHESTRA_DIR="$PROJECT_ROOT/ai-orchestra-simulation"
 VENV="$PROJECT_ROOT/.venv/bin/activate"
 
@@ -41,7 +41,7 @@ if ! curl -s http://localhost:8002/health > /dev/null 2>&1; then
     VOICE_PID=$!
     echo $VOICE_PID > /tmp/voice-service.pid
     sleep 2
-    
+
     # Check if service started
     if curl -s http://localhost:8002/health > /dev/null 2>&1; then
         echo "   ✓ Voice Service started (PID: $VOICE_PID)"
@@ -64,7 +64,7 @@ if ! curl -s http://localhost:9000/test-phase1-browser.html > /dev/null 2>&1; th
     HTTP_PID=$!
     echo $HTTP_PID > /tmp/http-server.pid
     sleep 1
-    
+
     if curl -s http://localhost:9000/test-phase1-browser.html > /dev/null 2>&1; then
         echo "   ✓ HTTP Server started (PID: $HTTP_PID)"
     else

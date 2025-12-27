@@ -1,26 +1,24 @@
-"""
-Main application file for the TalentAI Avatar Service.
+"""Main application file for the OpenTalent Avatar Service.
 
 This service manages AI avatar interactions with Irish voice integration
 using AI Voice API. It provides voice generation capabilities for the
-TalentAI recruitment platform.
+OpenTalent recruitment platform.
 """
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes.voice_routes import router as voice_router
 from app.config.settings import (
+    ALLOWED_ORIGINS,
+    SERVICE_DESCRIPTION,
     SERVICE_TITLE,
-    SERVICE_DESCRIPTION, 
     SERVICE_VERSION,
-    ALLOWED_ORIGINS
 )
+from app.routes.voice_routes import router as voice_router
 
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
-    
     app = FastAPI(
         title=SERVICE_TITLE,
         description=SERVICE_DESCRIPTION,
@@ -38,7 +36,7 @@ def create_app() -> FastAPI:
 
     # Include routers
     app.include_router(voice_router)
-    
+
     return app
 
 
@@ -55,4 +53,5 @@ async def ping():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8001)

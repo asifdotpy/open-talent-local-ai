@@ -1,5 +1,4 @@
-"""
-Modular Sentiment Analysis Service for TalentAI Platform
+"""Modular Sentiment Analysis Service for OpenTalent Platform
 
 This service provides sentiment analysis capabilities using various models:
 - BERT (via transformers library)
@@ -11,43 +10,48 @@ The service uses a strategy pattern for easy model switching and includes
 caching, batch processing, and confidence scoring.
 """
 
-import os
-import logging
 import asyncio
-from typing import Dict, Any, List, Optional, Tuple
+import hashlib
+import logging
+import os
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum
-import hashlib
-import json
 from datetime import datetime, timedelta
+from enum import Enum
+from typing import Optional
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class SentimentModel(Enum):
     """Available sentiment analysis models."""
+
     BERT_BASE = "bert_base"
     BERT_LARGE = "bert_large"
     DISTILBERT = "distilbert"
     ROBERTA = "roberta"
     MOCK = "mock"
 
+
 @dataclass
 class SentimentResult:
     """Result of sentiment analysis."""
+
     sentiment: str  # "positive", "negative", "neutral"
     confidence: float  # 0.0 to 1.0
-    scores: Dict[str, float]  # Raw scores for each class
+    scores: dict[str, float]  # Raw scores for each class
     model_used: str
     processing_time: float
     text_hash: str
     timestamp: datetime
 
+
 @dataclass
 class SentimentConfig:
     """Configuration for sentiment analysis."""
+
     model: SentimentModel
     model_name: str
     cache_enabled: bool = True
@@ -56,12 +60,13 @@ class SentimentConfig:
     max_length: int = 512
     device: str = "auto"  # "cpu", "cuda", "auto"
 
+
 class BaseSentimentAnalyzer(ABC):
     """Abstract base class for sentiment analyzers."""
 
     def __init__(self, config: SentimentConfig):
         self.config = config
-        self.cache: Dict[str, SentimentResult] = {}
+        self.cache: dict[str, SentimentResult] = {}
         self.model = None
         self.tokenizer = None
 
@@ -71,7 +76,7 @@ class BaseSentimentAnalyzer(ABC):
         pass
 
     @abstractmethod
-    async def analyze_batch(self, texts: List[str]) -> List[SentimentResult]:
+    async def analyze_batch(self, texts: list[str]) -> list[SentimentResult]:
         """Analyze sentiment of multiple texts in batch."""
         pass
 
@@ -102,6 +107,7 @@ class BaseSentimentAnalyzer(ABC):
         if self.config.cache_enabled:
             self.cache[text_hash] = result
 
+
 class BERTSentimentAnalyzer(BaseSentimentAnalyzer):
     """BERT-based sentiment analyzer using transformers."""
 
@@ -112,8 +118,8 @@ class BERTSentimentAnalyzer(BaseSentimentAnalyzer):
     def _load_model(self):
         """Load the BERT model and tokenizer."""
         try:
-            from transformers import AutoTokenizer, AutoModelForSequenceClassification
             import torch
+            from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
             # Determine device
             if self.config.device == "auto":
@@ -132,7 +138,9 @@ class BERTSentimentAnalyzer(BaseSentimentAnalyzer):
             self.id2label = self.model.config.id2label
             self.label2id = {v: k for k, v in self.id2label.items()}
 
-            logger.info(f"Successfully loaded {self.config.model_name} with labels: {list(self.id2label.values())}")
+            logger.info(
+                f"Successfully loaded {self.config.model_name} with labels: {list(self.id2label.values())}"
+            )
 
         except ImportError as e:
             logger.error(f"Failed to import required libraries: {e}")
@@ -161,7 +169,7 @@ class BERTSentimentAnalyzer(BaseSentimentAnalyzer):
                 return_tensors="pt",
                 truncation=True,
                 padding=True,
-                max_length=self.config.max_length
+                max_length=self.config.max_length,
             )
 
             # Move to device
@@ -196,7 +204,7 @@ class BERTSentimentAnalyzer(BaseSentimentAnalyzer):
                 model_used=self.config.model_name,
                 processing_time=processing_time,
                 text_hash=text_hash,
-                timestamp=datetime.now()
+                timestamp=datetime.now(),
             )
 
             # Cache result
@@ -208,14 +216,14 @@ class BERTSentimentAnalyzer(BaseSentimentAnalyzer):
             logger.error(f"BERT sentiment analysis failed: {e}")
             raise
 
-    async def analyze_batch(self, texts: List[str]) -> List[SentimentResult]:
+    async def analyze_batch(self, texts: list[str]) -> list[SentimentResult]:
         """Analyze sentiment of multiple texts in batch."""
         results = []
         for i in range(0, len(texts), self.config.batch_size):
-            batch_texts = texts[i:i + self.config.batch_size]
-            batch_results = await asyncio.gather(*[
-                self.analyze_sentiment(text) for text in batch_texts
-            ])
+            batch_texts = texts[i : i + self.config.batch_size]
+            batch_results = await asyncio.gather(
+                *[self.analyze_sentiment(text) for text in batch_texts]
+            )
             results.extend(batch_results)
         return results
 
@@ -224,9 +232,19 @@ class BERTSentimentAnalyzer(BaseSentimentAnalyzer):
         label_lower = label.lower()
 
         # Common mappings for different BERT models
-        if "positive" in label_lower or "pos" in label_lower or "4" in label_lower or "5" in label_lower:
+        if (
+            "positive" in label_lower
+            or "pos" in label_lower
+            or "4" in label_lower
+            or "5" in label_lower
+        ):
             return "positive"
-        elif "negative" in label_lower or "neg" in label_lower or "1" in label_lower or "2" in label_lower:
+        elif (
+            "negative" in label_lower
+            or "neg" in label_lower
+            or "1" in label_lower
+            or "2" in label_lower
+        ):
             return "negative"
         elif "neutral" in label_lower or "neu" in label_lower or "3" in label_lower:
             return "neutral"
@@ -246,6 +264,7 @@ class BERTSentimentAnalyzer(BaseSentimentAnalyzer):
         except Exception as e:
             logger.error(f"BERT health check failed: {e}")
             return False
+
 
 class MockSentimentAnalyzer(BaseSentimentAnalyzer):
     """Mock sentiment analyzer for testing."""
@@ -276,7 +295,7 @@ class MockSentimentAnalyzer(BaseSentimentAnalyzer):
         scores = {
             "positive": confidence if sentiment == "positive" else 0.1,
             "negative": confidence if sentiment == "negative" else 0.1,
-            "neutral": confidence if sentiment == "neutral" else 0.1
+            "neutral": confidence if sentiment == "neutral" else 0.1,
         }
 
         result = SentimentResult(
@@ -286,13 +305,13 @@ class MockSentimentAnalyzer(BaseSentimentAnalyzer):
             model_used="mock_analyzer",
             processing_time=0.01,
             text_hash=text_hash,
-            timestamp=datetime.now()
+            timestamp=datetime.now(),
         )
 
         self._cache_result(text_hash, result)
         return result
 
-    async def analyze_batch(self, texts: List[str]) -> List[SentimentResult]:
+    async def analyze_batch(self, texts: list[str]) -> list[SentimentResult]:
         """Analyze batch with mock results."""
         return await asyncio.gather(*[self.analyze_sentiment(text) for text in texts])
 
@@ -300,11 +319,12 @@ class MockSentimentAnalyzer(BaseSentimentAnalyzer):
         """Mock health check always passes."""
         return True
 
+
 class ModularSentimentService:
     """Main service that manages multiple sentiment analyzers."""
 
     def __init__(self):
-        self.analyzers: Dict[SentimentModel, BaseSentimentAnalyzer] = {}
+        self.analyzers: dict[SentimentModel, BaseSentimentAnalyzer] = {}
         self.primary_analyzer: Optional[SentimentModel] = None
         self.fallback_analyzer: Optional[SentimentModel] = None
 
@@ -326,7 +346,7 @@ class ModularSentimentService:
         """Analyze sentiment using primary analyzer with fallback."""
         return await self._execute_with_fallback("analyze_sentiment", text)
 
-    async def analyze_batch(self, texts: List[str]) -> List[SentimentResult]:
+    async def analyze_batch(self, texts: list[str]) -> list[SentimentResult]:
         """Analyze sentiment for multiple texts."""
         return await self._execute_with_fallback("analyze_batch", texts)
 
@@ -350,14 +370,18 @@ class ModularSentimentService:
                     fallback = self.analyzers[self.fallback_analyzer]
                     method = getattr(fallback, method_name)
                     result = await method(*args, **kwargs)
-                    logger.info(f"Successfully used fallback {self.fallback_analyzer.value} for {method_name}")
+                    logger.info(
+                        f"Successfully used fallback {self.fallback_analyzer.value} for {method_name}"
+                    )
                     return result
                 except Exception as fallback_e:
-                    logger.error(f"Fallback analyzer {self.fallback_analyzer.value} also failed: {fallback_e}")
+                    logger.error(
+                        f"Fallback analyzer {self.fallback_analyzer.value} also failed: {fallback_e}"
+                    )
 
             raise e
 
-    async def health_check(self) -> Dict[str, bool]:
+    async def health_check(self) -> dict[str, bool]:
         """Check health of all configured analyzers."""
         results = {}
         for analyzer_type, analyzer in self.analyzers.items():
@@ -370,18 +394,24 @@ class ModularSentimentService:
             analyzer.cache.clear()
         logger.info("Cleared all sentiment analysis caches")
 
+
 # Global instance
 modular_sentiment_service = ModularSentimentService()
+
 
 def configure_sentiment_service():
     """Configure the sentiment service based on environment variables."""
     # Primary analyzer configuration
     primary_model_str = os.getenv("SENTIMENT_MODEL", "mock").lower()
-    primary_model_name = os.getenv("SENTIMENT_MODEL_NAME", "cardiffnlp/twitter-roberta-base-sentiment-latest")
+    primary_model_name = os.getenv(
+        "SENTIMENT_MODEL_NAME", "cardiffnlp/twitter-roberta-base-sentiment-latest"
+    )
 
     # Fallback analyzer configuration
     fallback_model_str = os.getenv("SENTIMENT_FALLBACK_MODEL", "mock").lower()
-    fallback_model_name = os.getenv("SENTIMENT_FALLBACK_MODEL_NAME", "cardiffnlp/twitter-roberta-base-sentiment-latest")
+    fallback_model_name = os.getenv(
+        "SENTIMENT_FALLBACK_MODEL_NAME", "cardiffnlp/twitter-roberta-base-sentiment-latest"
+    )
 
     # Map string to enum
     try:
@@ -404,7 +434,7 @@ def configure_sentiment_service():
         cache_ttl_hours=int(os.getenv("SENTIMENT_CACHE_TTL_HOURS", "24")),
         batch_size=int(os.getenv("SENTIMENT_BATCH_SIZE", "16")),
         max_length=int(os.getenv("SENTIMENT_MAX_LENGTH", "512")),
-        device=os.getenv("SENTIMENT_DEVICE", "auto")
+        device=os.getenv("SENTIMENT_DEVICE", "auto"),
     )
 
     modular_sentiment_service.configure_analyzer(primary_config)
@@ -418,13 +448,16 @@ def configure_sentiment_service():
             cache_ttl_hours=int(os.getenv("SENTIMENT_FALLBACK_CACHE_TTL_HOURS", "24")),
             batch_size=int(os.getenv("SENTIMENT_FALLBACK_BATCH_SIZE", "16")),
             max_length=int(os.getenv("SENTIMENT_FALLBACK_MAX_LENGTH", "512")),
-            device=os.getenv("SENTIMENT_FALLBACK_DEVICE", "auto")
+            device=os.getenv("SENTIMENT_FALLBACK_DEVICE", "auto"),
         )
 
         modular_sentiment_service.configure_analyzer(fallback_config)
         # Note: We don't set fallback in config since it's handled at service level
 
-    logger.info(f"Configured sentiment service with primary: {primary_model.value}, fallback: {fallback_model.value}")
+    logger.info(
+        f"Configured sentiment service with primary: {primary_model.value}, fallback: {fallback_model.value}"
+    )
+
 
 # Initialize on import
 configure_sentiment_service()

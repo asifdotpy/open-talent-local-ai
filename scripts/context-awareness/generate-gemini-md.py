@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """
-Simple GEMINI.md Generator for TalentAI Services
+Simple GEMINI.md Generator for OpenTalent Services
 
 Generates basic documentation files for services.
 """
 
-import os
 import sys
 from pathlib import Path
+
 
 def generate_gemini_doc(service_name):
     """Generate a basic GEMINI.md file for a service"""
     content = f"""# {service_name.upper()}
 
 ## Overview
-{service_name} is a service in the TalentAI platform.
+{service_name} is a service in the OpenTalent platform.
 
 ## Architecture
 - Language: Python
@@ -46,6 +46,7 @@ Deployed via Docker containers in the platform infrastructure.
 
     return content
 
+
 def main():
     """Main function"""
     if len(sys.argv) < 2:
@@ -64,7 +65,7 @@ def main():
         output_path = Path(f"{service_name}/GEMINI.md")
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             f.write(content)
 
         print(f"Generated {output_path}")
@@ -72,6 +73,7 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

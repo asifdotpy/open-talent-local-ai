@@ -9,31 +9,33 @@ Usage:
     python scripts/upload_enhanced_dataset.py
 """
 
-import os
 import json
+import os
+
 from datasets import Dataset, DatasetDict
-from huggingface_hub import HfApi, create_repo, upload_file
-import argparse
+from huggingface_hub import HfApi, create_repo
+
 
 def load_enhanced_dataset(file_path: str) -> Dataset:
     """Load the enhanced dataset from JSON file."""
     print(f"📥 Loading enhanced dataset from {file_path}")
 
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, encoding="utf-8") as f:
         data = json.load(f)
 
-    examples = data['examples']
+    examples = data["examples"]
     print(f"✅ Loaded {len(examples)} examples")
 
     # Convert to Dataset
     dataset = Dataset.from_list(examples)
     return dataset
 
+
 def create_dataset_card(dataset_name: str, num_examples: int) -> str:
     """Create a comprehensive dataset card."""
     card = f"""# Vetta Interview Dataset - Enhanced Quality
 
-A high-quality, curated dataset for fine-tuning Vetta AI interviewer agents in the TalentAI platform.
+A high-quality, curated dataset for fine-tuning Vetta AI interviewer agents in the OpenTalent platform.
 
 ## Dataset Details
 
@@ -125,9 +127,9 @@ This dataset is optimized for fine-tuning interviewer AI agents. Recommended tra
 - **Epochs**: 3-5
 - **LoRA**: r=16, alpha=32 for efficient fine-tuning
 
-## Integration with TalentAI
+## Integration with OpenTalent
 
-This dataset powers the Vetta AI interviewer in the TalentAI platform, enabling:
+This dataset powers the Vetta AI interviewer in the OpenTalent platform, enabling:
 - Professional interview flow management
 - Context-aware question generation
 - Bias-free candidate assessment
@@ -140,12 +142,13 @@ MIT License - See LICENSE file for details.
 
 ## Contact
 
-For questions about this dataset or the TalentAI platform:
-- Repository: https://github.com/asifdotpy/talent-ai-platform
-- Issues: https://github.com/asifdotpy/talent-ai-platform/issues
+For questions about this dataset or the OpenTalent platform:
+- Repository: https://github.com/asifdotpy/open-talent-platform
+- Issues: https://github.com/asifdotpy/open-talent-platform/issues
 """
 
     return card
+
 
 def upload_dataset(dataset: Dataset, dataset_name: str, token: str):
     """Upload the dataset to Hugging Face."""
@@ -153,12 +156,7 @@ def upload_dataset(dataset: Dataset, dataset_name: str, token: str):
 
     # Create repository if it doesn't exist
     try:
-        create_repo(
-            repo_id=dataset_name,
-            repo_type="dataset",
-            private=False,
-            token=token
-        )
+        create_repo(repo_id=dataset_name, repo_type="dataset", private=False, token=token)
         print("✅ Created new dataset repository")
     except Exception as e:
         if "already exists" in str(e).lower() or "409" in str(e):
@@ -179,13 +177,14 @@ def upload_dataset(dataset: Dataset, dataset_name: str, token: str):
             repo_id=dataset_name,
             token=token,
             commit_message="Upload enhanced quality Vetta interview dataset v1.1.0",
-            private=False
+            private=False,
         )
         print("✅ Dataset uploaded successfully!")
 
         # Upload dataset card
         import tempfile
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write(dataset_card)
             temp_file_path = f.name
 
@@ -197,7 +196,7 @@ def upload_dataset(dataset: Dataset, dataset_name: str, token: str):
                 repo_id=dataset_name,
                 repo_type="dataset",
                 token=token,
-                commit_message="Add comprehensive dataset card for enhanced quality version"
+                commit_message="Add comprehensive dataset card for enhanced quality version",
             )
             print("✅ Dataset card uploaded!")
         finally:
@@ -210,27 +209,32 @@ def upload_dataset(dataset: Dataset, dataset_name: str, token: str):
         print(f"❌ Failed to upload dataset: {e}")
         return False
 
+
 def main():
     """Main function to upload enhanced dataset."""
     import argparse
-    
-    parser = argparse.ArgumentParser(description='Upload enhanced dataset to Hugging Face')
-    parser.add_argument('--input', type=str, 
-                        default='notebooks/data/vetta_comprehensive_enhanced.json',
-                        help='Input dataset file')
-    parser.add_argument('--repo', type=str,
-                        default='asifdotpy/vetta-interview-dataset-enhanced',
-                        help='Hugging Face repo ID')
-    parser.add_argument('--version', type=str,
-                        default='2.0.0',
-                        help='Dataset version')
+
+    parser = argparse.ArgumentParser(description="Upload enhanced dataset to Hugging Face")
+    parser.add_argument(
+        "--input",
+        type=str,
+        default="notebooks/data/vetta_comprehensive_enhanced.json",
+        help="Input dataset file",
+    )
+    parser.add_argument(
+        "--repo",
+        type=str,
+        default="asifdotpy/vetta-interview-dataset-enhanced",
+        help="Hugging Face repo ID",
+    )
+    parser.add_argument("--version", type=str, default="2.0.0", help="Dataset version")
     args = parser.parse_args()
-    
+
     print("🚀 Vetta Dataset Upload to Hugging Face")
     print("=" * 50)
 
     # Check for Hugging Face token
-    token = os.environ.get('HF_TOKEN') or os.environ.get('HUGGINGFACE_TOKEN')
+    token = os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_TOKEN")
     if not token:
         print("❌ Error: HF_TOKEN or HUGGINGFACE_TOKEN environment variable required")
         print("Please set your token:")
@@ -262,7 +266,7 @@ def main():
         return
 
     # Check required columns
-    required_columns = ['instruction', 'response', 'category', 'difficulty', 'domain']
+    required_columns = ["instruction", "response", "category", "difficulty", "domain"]
     missing_columns = [col for col in required_columns if col not in dataset.column_names]
     if missing_columns:
         print(f"❌ Missing required columns: {missing_columns}")
@@ -278,10 +282,11 @@ def main():
         print("🎉 Upload complete!")
         print(f"📊 Dataset: {dataset_name}")
         print(f"📈 Examples: {len(dataset)}")
-        print(f"⭐ Quality: Enhanced (no duplicates, 100% quality score)")
+        print("⭐ Quality: Enhanced (no duplicates, 100% quality score)")
         print(f"🔗 URL: https://huggingface.co/datasets/{dataset_name}")
     else:
         print("\\n❌ Upload failed!")
+
 
 if __name__ == "__main__":
     main()

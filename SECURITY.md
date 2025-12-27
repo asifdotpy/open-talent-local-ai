@@ -1,6 +1,6 @@
 # OpenTalent Security Policy
 
-**Last Updated:** December 5, 2025  
+**Last Updated:** December 5, 2025
 **Version:** 1.0
 
 ## Security Scanning Requirements
@@ -14,6 +14,7 @@ All code commits to OpenTalent must pass the following security standards:
 No API keys, passwords, tokens, or sensitive credentials can be committed.
 
 **Blocked patterns:**
+
 - API keys (OpenAI, AWS, Azure, etc.)
 - Database credentials
 - Private encryption keys
@@ -22,6 +23,7 @@ No API keys, passwords, tokens, or sensitive credentials can be committed.
 - Database connection strings
 
 **If a secret is detected:**
+
 1. Pre-commit hook will reject the commit
 2. Remove the secret from code
 3. Use environment variables instead
@@ -34,6 +36,7 @@ No API keys, passwords, tokens, or sensitive credentials can be committed.
 All medium-severity and above security issues must be fixed before commit.
 
 **Common issues detected:**
+
 - Hardcoded secrets
 - Use of insecure functions (pickle, exec, eval)
 - SQL injection risks
@@ -42,6 +45,7 @@ All medium-severity and above security issues must be fixed before commit.
 - Missing input validation
 
 **Fix issues:**
+
 ```bash
 bandit -r . -ll  # Show issues
 # Fix code, then rerun
@@ -61,6 +65,7 @@ safety check -r requirements-dev.txt
 ```
 
 **Response time:**
+
 - Critical (CVSS 9+): Fix within 24 hours
 - High (CVSS 7-8.9): Fix within 1 week
 - Medium (CVSS 4-6.9): Fix within 2 weeks
@@ -73,6 +78,7 @@ safety check -r requirements-dev.txt
 Code must follow consistent formatting and quality standards.
 
 **Checks:**
+
 - PEP 8 style compliance (ruff)
 - Code formatting consistency (black)
 - Type safety (mypy)
@@ -92,13 +98,14 @@ SENTRY_DSN=your_sentry_dsn
 
 # .env (NEVER commit)
 OPENAI_API_KEY=sk-1234567890abcdef
-DATABASE_URL=postgresql://admin:SuperSecret123@prod.db.example.com/talentai
+DATABASE_URL=postgresql://admin:SuperSecret123@prod.db.example.com/OpenTalent
 SENTRY_DSN=https://key@sentry.io/project
 ```
 
 ### Variable Categories
 
 **Never commit:**
+
 - API keys and tokens
 - Database credentials
 - Private keys and certificates
@@ -108,6 +115,7 @@ SENTRY_DSN=https://key@sentry.io/project
 - Payment processor keys (Stripe, etc.)
 
 **Safe to commit:**
+
 - Application configuration
 - Feature flags
 - Logging levels
@@ -136,13 +144,14 @@ Closes #123
 ```
 
 **Types:**
+
 - `fix:` - Bug fix
 - `feat:` - New feature
 - `security:` - Security fix
 - `chore:` - Maintenance
 - `docs:` - Documentation
 
-### Example:
+### Example
 
 ```
 security: rotate API keys and update environment configuration
@@ -195,6 +204,7 @@ pytest tests/ --cov=src
 All third-party services must be vetted for security:
 
 ✅ **Approved:**
+
 - OpenAI (GPT models)
 - Hugging Face (model hub)
 - AWS (infrastructure)
@@ -205,6 +215,7 @@ All third-party services must be vetted for security:
 ### Adding New Integration
 
 Submit security review:
+
 1. Service documentation
 2. Security practices
 3. Data handling procedures
@@ -277,7 +288,7 @@ When reviewing pull requests, check:
 
 ### Security Questions?
 
-Email: security@opentalent.ai  
+Email: <security@opentalent.ai>
 Or create a private security issue on GitHub
 
 ### Report a Vulnerability?
@@ -285,7 +296,8 @@ Or create a private security issue on GitHub
 Do NOT create public GitHub issues for security vulnerabilities.
 
 **Submit to:**
-1. security@opentalent.ai with details
+
+1. <security@opentalent.ai> with details
 2. Or create private GitHub security advisory
 3. Include reproduction steps and potential impact
 
@@ -298,6 +310,7 @@ Do NOT create public GitHub issues for security vulnerabilities.
 ## Acknowledgments
 
 Security policy inspired by:
+
 - OWASP Application Security Verification Standard (ASVS)
 - GitGuardian best practices
 - Industry security standards

@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # ╔═══════════════════════════════════════════════════════════════════════════╗
-# ║  TalentAI - Lightweight Persona Setup with Ollama LoRA               ║
+# ║  OpenTalent - Lightweight Persona Setup with Ollama LoRA               ║
 # ╚═══════════════════════════════════════════════════════════════════════════╝
 
 set -e
 
-echo "🎭 Setting up TalentAI Interviewer Personas with Ollama + LoRA"
+echo "🎭 Setting up OpenTalent Interviewer Personas with Ollama + LoRA"
 echo "================================================================="
 
 # Check if Ollama is running

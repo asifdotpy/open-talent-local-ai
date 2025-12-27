@@ -3,8 +3,9 @@
 # ╚═══════════════════════════════════════════════════════════════════════════╝
 
 import os
-from huggingface_hub import login, HfApi
+
 from google.colab import userdata
+from huggingface_hub import HfApi, login
 from unsloth import FastLanguageModel
 
 # 1. Retrieve HuggingFace token securely
@@ -24,8 +25,8 @@ REPO_ID_MERGED = f"{HF_USERNAME}/{BASE_MODEL_NAME}-{VERSION}"
 REPO_ID_LORA = f"{HF_USERNAME}/{BASE_MODEL_NAME}-lora-{VERSION}"
 
 # Directories (from Drive - persistent storage)
-output_dir = "/content/drive/MyDrive/talent-ai-vetta/checkpoints"  # Checkpoints
-models_dir = "/content/drive/MyDrive/talent-ai-vetta/models"      # Saved models
+output_dir = "/content/drive/MyDrive/open-talent-vetta/checkpoints"  # Checkpoints
+models_dir = "/content/drive/MyDrive/open-talent-vetta/models"      # Saved models
 lora_dir = f"{models_dir}/lora"
 merged_dir = f"{models_dir}/merged"
 gguf_dir = f"{models_dir}/gguf"
@@ -345,4 +346,4 @@ if not merged_available or not gguf_available:
         print("3. Convert GGUF: python convert_to_gguf.py")
         print("4. Upload GGUF to: asifdotpy/vetta-granite-2b-gguf-v3")
 print("\nYou can now integrate Vetta into your interview service using LoRA format!")</content>
-<parameter name="filePath">/home/asif1/talent-ai-platform/notebook_chunks/11_upload_huggingface.py
+<parameter name="filePath">/home/asif1/open-talent-platform/notebook_chunks/11_upload_huggingface.py

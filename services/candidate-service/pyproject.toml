@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "candidate-service"
 version = "0.1.0"
-description = "TALENT-AI Candidate Service"
+description = "open-talent Candidate Service"
 authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]

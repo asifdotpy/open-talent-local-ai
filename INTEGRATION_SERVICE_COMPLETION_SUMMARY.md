@@ -13,29 +13,35 @@ The Desktop Integration Service (Gateway on port 8009) has been **fully audited 
 ### ✅ Registered Services by Category
 
 **Core Services (3)**
+
 - Scout Service (8000) - Talent sourcing
-- User Service (8001) - User management  
+- User Service (8001) - User management
 - Candidate Service (8006) - Profile management
 
 **AI Services (3)**
+
 - Conversation Service (8002) - AI conversations
 - Interview Service (8005) - Interview orchestration
 - Granite Interview Service (8005, hidden) - Custom trained
 
 **Media Services (2)**
+
 - Voice Service (8003) - Piper TTS
 - Avatar Service (8004) - 3D avatars
 
 **Analytics Services (3)**
+
 - Analytics Service (8007) - Sentiment analysis
 - AI Auditing Service (8012) - Bias detection
 - Explainability Service (8013) - Model interpretability
 
 **Infrastructure Services (2)**
+
 - Security Service (8010) - Auth & encryption
 - Notification Service (8011) - Notifications
 
 **AI Engine (1)**
+
 - Ollama (11434) - Local Granite 4 models
 
 ---
@@ -43,6 +49,7 @@ The Desktop Integration Service (Gateway on port 8009) has been **fully audited 
 ## Changes Made
 
 ### 1. **settings.py** - Added 14 Service URLs
+
 ```python
 scout_url = "http://localhost:8000"
 user_url = "http://localhost:8001"
@@ -60,17 +67,20 @@ ollama_url = "http://localhost:11434"
 ```
 
 ### 2. **service_discovery.py** - Registered All Services
+
 - 14 services registered with proper categorization
 - Enhanced logging showing service startup status
 - 13 visible services (1 hidden: _granite-interview-service)
 - Service discovery initialization logging
 
 ### 3. **main.py** - New Endpoints & Enhanced Logging
+
 - **NEW**: `/api/v1/services` - Complete service registry endpoint
 - Enhanced startup logging with service status table
 - Improved health check and aggregation
 
 ### 4. **test_service_registry.py** - Comprehensive Tests (NEW)
+
 - 25+ test cases covering all 14 services
 - Port mapping verification
 - Service registry completeness
@@ -78,8 +88,9 @@ ollama_url = "http://localhost:11434"
 - No hardcoded URLs verification
 
 ### 5. **docker-compose.yml** - Already Corrected
+
 - All 14 services with correct port mappings
-- Service-to-service networking via talentai-network
+- Service-to-service networking via OpenTalent-network
 - Health checks for dependency management
 
 ---
@@ -87,7 +98,9 @@ ollama_url = "http://localhost:11434"
 ## New API Endpoints
 
 ### `/api/v1/services` - Service Registry
+
 Returns complete registry of all 14 services organized by category:
+
 ```json
 {
   "total_services": 14,
@@ -124,17 +137,20 @@ Returns complete registry of all 14 services organized by category:
 ## Verification
 
 ### Run Service Registry Tests
+
 ```bash
 cd /home/asif1/open-talent
 pytest microservices/desktop-integration-service/tests/test_service_registry.py -v
 ```
 
 ### Run All Tests
+
 ```bash
 pytest -v
 ```
 
 ### Check Service Registry via API
+
 ```bash
 curl http://localhost:8009/api/v1/services | jq
 ```
@@ -156,11 +172,11 @@ curl http://localhost:8009/api/v1/services | jq
 
 ## Git Commit
 
-**Commit Hash**: `8fbe505`  
+**Commit Hash**: `8fbe505`
 **Message**: `feat(microservices): complete integration service with all 14 microservices registry`
 
-**Files Changed**: 43  
-**Insertions**: 11,959  
+**Files Changed**: 43
+**Insertions**: 11,959
 **Deletions**: 274
 
 ---
@@ -194,6 +210,7 @@ curl http://localhost:8009/api/v1/services | jq
 ✅ **All 14 Services Properly Integrated**
 
 The integration service gateway is now production-ready to:
+
 - Serve requests on port 8009
 - Route to all 14 microservices
 - Provide service discovery and health monitoring

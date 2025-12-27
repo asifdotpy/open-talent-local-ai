@@ -6,7 +6,7 @@
  */
 
 const API_KEY = 'sk_live_-E0zM-esf3a69p1mi1W3JVcNgGU9lTQCKjs0';
-const SUBDOMAIN = 'talent-ai.readyplayer.me';
+const SUBDOMAIN = 'open-talent.readyplayer.me';
 const API_BASE = 'https://api.readyplayer.me';
 
 // Color output helpers
@@ -26,7 +26,7 @@ function log(color, ...args) {
 async function testEndpoint(name, url, options = {}) {
   log(colors.cyan, `\n🔍 Testing: ${name}`);
   log(colors.yellow, `   URL: ${url}`);
-  
+
   try {
     const response = await fetch(url, {
       ...options,
@@ -39,7 +39,7 @@ async function testEndpoint(name, url, options = {}) {
 
     const contentType = response.headers.get('content-type');
     let data;
-    
+
     if (contentType && contentType.includes('application/json')) {
       data = await response.json();
     } else {
@@ -64,7 +64,7 @@ async function testEndpoint(name, url, options = {}) {
 async function main() {
   log(colors.bright, '\n🚀 Ready Player Me API Explorer\n');
   log(colors.bright, '================================\n');
-  
+
   const results = {};
 
   // 1. Create Anonymous User
@@ -75,7 +75,7 @@ async function main() {
       method: 'POST',
       body: JSON.stringify({
         data: {
-          appName: 'talent-ai'
+          appName: 'open-talent'
         }
       })
     }
@@ -96,10 +96,10 @@ async function main() {
   let templateId = null;
   if (results.templates.success && results.templates.data.data && results.templates.data.data.length > 0) {
     // Find a template with good morph targets
-    const template = results.templates.data.data.find(t => 
+    const template = results.templates.data.data.find(t =>
       t.bodyType === 'halfbody' || t.bodyType === 'fullbody'
     ) || results.templates.data.data[0];
-    
+
     templateId = template.id;
     log(colors.green, `   📋 Selected Template: ${template.id} (${template.bodyType})`);
     log(colors.yellow, `   Available templates: ${results.templates.data.data.length}`);
@@ -114,7 +114,7 @@ async function main() {
         method: 'POST',
         body: JSON.stringify({
           data: {
-            partner: 'talent-ai',
+            partner: 'open-talent',
             bodyType: 'halfbody',
             userId: userId
           }
@@ -140,7 +140,7 @@ async function main() {
         log(colors.cyan, '\n📊 Avatar Details:');
         log(colors.yellow, `   Body Type: ${meta.bodyType || 'unknown'}`);
         log(colors.yellow, `   Outfit Gender: ${meta.outfitGender || 'unknown'}`);
-        
+
         if (meta.properties && meta.properties.morphTargets) {
           log(colors.green, `   ✅ Morph Targets: ${meta.properties.morphTargets}`);
         } else {
@@ -167,7 +167,7 @@ async function main() {
   // 6. Test different body types capability
   if (userId && templateId) {
     log(colors.cyan, '\n🔬 Testing Body Type Options...');
-    
+
     for (const bodyType of ['halfbody', 'fullbody']) {
       const result = await testEndpoint(
         `Create ${bodyType} Avatar`,
@@ -176,7 +176,7 @@ async function main() {
           method: 'POST',
           body: JSON.stringify({
             data: {
-              partner: 'talent-ai',
+              partner: 'open-talent',
               bodyType: bodyType,
               userId: userId
             }
@@ -195,7 +195,7 @@ async function main() {
   // Summary
   log(colors.bright, '\n\n📋 Summary');
   log(colors.bright, '===========\n');
-  
+
   console.log('API Capabilities:');
   console.log('  ✅ Create Anonymous Users:', results.user?.success ? 'YES' : 'NO');
   console.log('  ✅ Get Templates:', results.templates?.success ? 'YES' : 'NO');

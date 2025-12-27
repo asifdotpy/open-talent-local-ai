@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-Simple Cypher Script Runner for TalentAI Platform
+Simple Cypher Script Runner for OpenTalent Platform
 
 Runs basic Cypher queries against Neo4j database.
 """
 
 import os
 import sys
+
 
 def get_credentials():
     """Get Neo4j credentials from environment"""
@@ -17,11 +18,13 @@ def get_credentials():
 
     return uri, user, password, database
 
+
 def run_query(query):
     """Run a Cypher query (placeholder implementation)"""
     print(f"Would run query: {query}")
     # In real implementation, this would connect to Neo4j and execute the query
     return {"result": "success", "rows_affected": 1}
+
 
 def main():
     """Main function"""
@@ -32,7 +35,7 @@ def main():
     query = sys.argv[1]
 
     try:
-        print("TalentAI Cypher Runner")
+        print("OpenTalent Cypher Runner")
         print("======================")
 
         # Get credentials
@@ -46,6 +49,7 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

@@ -13,17 +13,17 @@ git pull
 echo ""
 echo "🔧 Updating submodules to correct branches..."
 
-# talent-ai-infrastructure (default main branch)
-echo "  └─ talent-ai-infrastructure (main)..."
-cd talent-ai-infrastructure
+# open-talent-infrastructure (default main branch)
+echo "  └─ open-talent-infrastructure (main)..."
+cd open-talent-infrastructure
 git fetch origin
 git checkout main
 git pull origin main
 cd ..
 
-# talent-ai-microservices (and its submodules)
-echo "  └─ talent-ai-microservices (main)..."
-cd talent-ai-microservices
+# open-talent-microservices (and its submodules)
+echo "  └─ open-talent-microservices (main)..."
+cd open-talent-microservices
 git fetch origin
 git checkout main
 git pull origin main
@@ -33,12 +33,12 @@ echo "    └─ Updating nested microservice submodules..."
 git submodule status | while read -r line ; do
     repo_path=$(echo "$line" | awk '{print $2}')
     repo_name=$(basename "$repo_path")
-    
+
     echo "      └─ $repo_name..."
     (
         cd "$repo_path" || exit
         git fetch origin
-        if [[ "$repo_name" == "talent-ai-interview-service" || "$repo_name" == "talent-ai-avatar-service" ]]; then
+        if [[ "$repo_name" == "open-talent-interview-service" || "$repo_name" == "open-talent-avatar-service" ]]; then
             echo "        (Expected: main)"
             git checkout main
             git pull origin main
@@ -59,17 +59,17 @@ git checkout main
 git pull origin main
 cd ..
 
-# talent-ai-landing-page (default main branch)
-echo "  └─ talent-ai-landing-page (main)..."
-cd talent-ai-landing-page
+# open-talent-landing-page (default main branch)
+echo "  └─ open-talent-landing-page (main)..."
+cd open-talent-landing-page
 git fetch origin
 git checkout main
 git pull origin main
 cd ..
 
-# talent-ai-mini (default main branch)
-echo "  └─ talent-ai-mini (main)..."
-cd talent-ai-mini
+# open-talent-mini (default main branch)
+echo "  └─ open-talent-mini (main)..."
+cd open-talent-mini
 git fetch origin
 git checkout main
 git pull origin main

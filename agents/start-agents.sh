@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# TalentAI Agents - Quick Start Script
+# OpenTalent Agents - Quick Start Script
 # Starts all agents in development mode
 
 set -e
 
-echo "🚀 Starting TalentAI Agents..."
+echo "🚀 Starting OpenTalent Agents..."
 
 # Colors
 RED='\033[0;31m'
@@ -22,7 +22,7 @@ fi
 
 if ! redis-cli ping &> /dev/null; then
     echo -e "${YELLOW}Starting Redis...${NC}"
-    docker run -d -p 6379:6379 --name talent-ai-redis redis:7-alpine
+    docker run -d -p 6379:6379 --name open-talent-redis redis:7-alpine
     sleep 2
 fi
 
@@ -64,27 +64,27 @@ start_agent() {
     local agent_dir=$1
     local agent_name=$2
     local port=$3
-    
+
     echo -e "${YELLOW}Starting $agent_name...${NC}"
     cd "$agent_dir"
-    
+
     # Create virtual environment if it doesn't exist
     if [ ! -d ".venv" ]; then
         python3 -m venv .venv
     fi
-    
+
     # Activate virtual environment and install dependencies
     source .venv/bin/activate
     pip install -q -r requirements.txt
-    
+
     # Start agent in background
     python main.py &
     local pid=$!
-    echo "$pid" > "/tmp/talent-ai-$agent_name.pid"
-    
+    echo "$pid" > "/tmp/open-talent-$agent_name.pid"
+
     cd ..
     sleep 1
-    
+
     # Check if agent started successfully
     if curl -s "http://localhost:$port/health" > /dev/null 2>&1; then
         echo -e "${GREEN}✓ $agent_name started on port $port (PID: $pid)${NC}"

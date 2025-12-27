@@ -7,7 +7,7 @@ set -e
 
 # Define the absolute path to the directory containing your microservices.
 # IMPORTANT: Make sure to update this path to the correct location on your system.
-MICROSERVICES_DIR="/root/talent-ai-platform-root/talent-ai-microservices"
+MICROSERVICES_DIR="/root/open-talent-platform-root/open-talent-microservices"
 
 # Define the content for the .gitignore file using a heredoc for readability.
 GITIGNORE_CONTENT=$(cat <<'EOF'

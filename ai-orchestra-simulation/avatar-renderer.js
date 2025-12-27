@@ -100,7 +100,7 @@ const swaggerOptions = {
       title: 'AI Orchestra Simulation - Avatar Renderer API',
       version: '1.0.0',
       description: `
-      Real-time avatar rendering and lip-sync animation service for TalentAI Platform.
+      Real-time avatar rendering and lip-sync animation service for OpenTalent Platform.
 
       **Capabilities:**
       - Real-time lip-sync animation with phoneme-based mouth movement

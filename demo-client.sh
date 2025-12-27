@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# TalentAI Client Demo Script
+# OpenTalent Client Demo Script
 # Interactive demonstration of AI avatar interview capabilities
 
 set -e
@@ -255,12 +255,12 @@ show_results() {
 main() {
     echo -e "${PURPLE}"
     echo "╔══════════════════════════════════════════════════════════════════════════════╗"
-    echo "║                          🎯 TALENTAI MVP DEMO                           ║"
+    echo "║                          🎯 OpenTalent MVP DEMO                           ║"
     echo "║                    AI Avatar Interview Platform                         ║"
     echo "╚══════════════════════════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
 
-    echo -e "${CYAN}Welcome to TalentAI - Revolutionizing Technical Hiring with AI${NC}"
+    echo -e "${CYAN}Welcome to OpenTalent - Revolutionizing Technical Hiring with AI${NC}"
     echo ""
 
     check_services
@@ -280,7 +280,7 @@ main() {
     echo -e "  🚀 Plan production deployment"
     echo -e "  📊 Discuss integration options"
     echo ""
-    echo -e "${BLUE}Thank you for exploring TalentAI! 🚀${NC}"
+    echo -e "${BLUE}Thank you for exploring OpenTalent! 🚀${NC}"
 }
 
 # Handle command line arguments

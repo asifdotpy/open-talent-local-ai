@@ -10,10 +10,10 @@ set -e
 # !!! IMPORTANT: Please verify these URLs match your GitHub setup !!!
 
 # 1. The URL for the PARENT management repository.
-PARENT_REPO_URL="https//github.com/TalentAI/talent-ai-microservices-management.git"
+PARENT_REPO_URL="https//github.com/OpenTalent/open-talent-microservices-management.git"
 
 # 2. The base GitHub URL for your individual services.
-SERVICE_REPO_BASE_URL="https://github.com/TalentAI"
+SERVICE_REPO_BASE_URL="https://github.com/OpenTalent"
 
 
 # --- Script Execution ---
@@ -22,7 +22,7 @@ echo "This script will not make any changes."
 echo ""
 
 
-# --- Part 1: Verifying the Parent 'talent-ai-microservices' Repository ---
+# --- Part 1: Verifying the Parent 'open-talent-microservices' Repository ---
 
 echo "-----------------------------------------------------"
 echo "Part 1: Checking Parent Repository..."
@@ -54,8 +54,8 @@ echo "-----------------------------------------------------"
 echo "Part 2: Checking all Microservice Sub-Repositories..."
 echo "-----------------------------------------------------"
 
-# Loop through each subdirectory that starts with 'talent-ai-'
-for service_dir in ./talent-ai-*/; do
+# Loop through each subdirectory that starts with 'open-talent-'
+for service_dir in ./open-talent-*/; do
   if [ -d "$service_dir" ]; then
     service_name=$(basename "$service_dir")
     echo "--- Checking service: $service_name ---"
@@ -72,7 +72,7 @@ for service_dir in ./talent-ai-*/; do
 
     # Construct the unique URL for this specific service
     service_repo_url="$SERVICE_REPO_BASE_URL/$service_name.git"
-    
+
     echo "VERIFICATION: Checking remote URL accessibility..."
     echo "  URL to check: $service_repo_url"
 

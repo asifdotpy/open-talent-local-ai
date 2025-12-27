@@ -8,6 +8,7 @@ bleed.
 
 import time
 import uuid
+
 from fastapi.testclient import TestClient
 
 
@@ -25,7 +26,7 @@ class TestConversationServiceIntegration:
         resp = test_client.get("/")
         assert resp.status_code == 200
         data = resp.json()
-        assert "TalentAI Conversation Service" in data.get("service", "")
+        assert "OpenTalent Conversation Service" in data.get("service", "")
         assert "documentation" in data
 
     def test_api_docs_redirect(self, test_client: TestClient):
@@ -196,19 +197,25 @@ class TestConversationServiceIntegration:
         session_id = _unique_session("perf")
         start = time.time()
 
-        assert test_client.post(
-            "/conversation/start",
-            json={"session_id": session_id, "job_description": "Python Developer"},
-        ).status_code == 200
+        assert (
+            test_client.post(
+                "/conversation/start",
+                json={"session_id": session_id, "job_description": "Python Developer"},
+            ).status_code
+            == 200
+        )
 
-        assert test_client.post(
-            "/conversation/message",
-            json={
-                "session_id": session_id,
-                "message": "I have experience with Django and Flask",
-                "message_type": "transcript",
-            },
-        ).status_code == 200
+        assert (
+            test_client.post(
+                "/conversation/message",
+                json={
+                    "session_id": session_id,
+                    "message": "I have experience with Django and Flask",
+                    "message_type": "transcript",
+                },
+            ).status_code
+            == 200
+        )
 
         assert test_client.get(f"/conversation/status/{session_id}").status_code == 200
         assert test_client.post(f"/conversation/end/{session_id}").status_code == 200

@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# TalentAI - Start AI Services (vLLM + Qdrant)
+# OpenTalent - Start AI Services (vLLM + Qdrant)
 # This script starts the vLLM inference server and Qdrant vector database
 
 set -e
 
-echo "🚀 Starting TalentAI AI Services (vLLM + Qdrant)"
+echo "🚀 Starting OpenTalent AI Services (vLLM + Qdrant)"
 echo "================================================="
 
 # Colors for output
@@ -69,20 +69,20 @@ fi
 if command -v nvidia-smi &> /dev/null && nvidia-smi > /dev/null 2>&1; then
     echo -e "${GREEN}🎮 NVIDIA GPU detected - using GPU acceleration${NC}"
     GPU_AVAILABLE=true
-    VLLM_COMMAND="docker run --gpus all --shm-size 1g -d --name talentai-vllm -p 8000:8000 -v \$HOME/.cache/huggingface:/root/.cache/huggingface vllm/vllm-openai:latest --model ibm/granite-3.1-2b-instruct --host 0.0.0.0 --port 8000 --dtype float16 --max-model-len 2048"
+    VLLM_COMMAND="docker run --gpus all --shm-size 1g -d --name OpenTalent-vllm -p 8000:8000 -v \$HOME/.cache/huggingface:/root/.cache/huggingface vllm/vllm-openai:latest --model ibm/granite-3.1-2b-instruct --host 0.0.0.0 --port 8000 --dtype float16 --max-model-len 2048"
 else
     echo -e "${YELLOW}💻 No NVIDIA GPU detected - using CPU mode (slower)${NC}"
     GPU_AVAILABLE=false
-    VLLM_COMMAND="docker run --shm-size 1g -d --name talentai-vllm -p 8000:8000 vllm/vllm-openai:latest --model ibm/granite-3.1-2b-instruct --host 0.0.0.0 --port 8000 --dtype float16 --max-model-len 2048"
+    VLLM_COMMAND="docker run --shm-size 1g -d --name OpenTalent-vllm -p 8000:8000 vllm/vllm-openai:latest --model ibm/granite-3.1-2b-instruct --host 0.0.0.0 --port 8000 --dtype float16 --max-model-len 2048"
 fi
 
 # Start Qdrant (lightweight, always works)
 echo -e "${BLUE}🗄️  Starting Qdrant vector database...${NC}"
-if docker ps -a --format 'table {{.Names}}' | grep -q "^talentai-qdrant$"; then
+if docker ps -a --format 'table {{.Names}}' | grep -q "^OpenTalent-qdrant$"; then
     echo -e "${YELLOW}📦 Qdrant container already exists, restarting...${NC}"
-    docker restart talentai-qdrant
+    docker restart OpenTalent-qdrant
 else
-    docker run -d --name talentai-qdrant \
+    docker run -d --name OpenTalent-qdrant \
         -p 6333:6333 \
         -v $(pwd)/qdrant_storage:/qdrant/storage \
         qdrant/qdrant:latest
@@ -93,9 +93,9 @@ wait_for_service "http://localhost:6333/health" "Qdrant"
 
 # Start vLLM
 echo -e "${BLUE}🤖 Starting vLLM inference server...${NC}"
-if docker ps -a --format 'table {{.Names}}' | grep -q "^talentai-vllm$"; then
+if docker ps -a --format 'table {{.Names}}' | grep -q "^OpenTalent-vllm$"; then
     echo -e "${YELLOW}🚀 vLLM container already exists, restarting...${NC}"
-    docker restart talentai-vllm
+    docker restart OpenTalent-vllm
 else
     eval $VLLM_COMMAND
 fi
@@ -119,6 +119,6 @@ echo "2. Start interview service: uvicorn app.main:app --reload --host 0.0.0.0 -
 echo "3. Check API docs: http://localhost:8004/api/v1/docs"
 echo ""
 echo -e "${BLUE}🔧 Management Commands:${NC}"
-echo "Stop services: docker stop talentai-vllm talentai-qdrant"
-echo "View logs: docker logs talentai-vllm"
-echo "Cleanup: docker rm talentai-vllm talentai-qdrant"
+echo "Stop services: docker stop OpenTalent-vllm OpenTalent-qdrant"
+echo "View logs: docker logs OpenTalent-vllm"
+echo "Cleanup: docker rm OpenTalent-vllm OpenTalent-qdrant"

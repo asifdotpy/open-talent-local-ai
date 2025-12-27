@@ -33,40 +33,40 @@ README_COUNT=0
 check_repo() {
     local repo_path=$1
     local repo_name=$(basename "$repo_path")
-    
+
     TOTAL_REPOS=$((TOTAL_REPOS + 1))
-    
+
     echo -e "${CYAN}📁 Checking: $repo_name${NC}"
-    
+
     local has_gemini_md="❌"
     local has_gemini_dir="❌"
     local has_docs="❌"
     local has_readme="❌"
-    
+
     # Check GEMINI.md
     if [ -f "$repo_path/GEMINI.md" ]; then
         has_gemini_md="✅"
         GEMINI_MD_COUNT=$((GEMINI_MD_COUNT + 1))
     fi
-    
+
     # Check .gemini/
     if [ -d "$repo_path/.gemini" ]; then
         has_gemini_dir="✅"
         GEMINI_DIR_COUNT=$((GEMINI_DIR_COUNT + 1))
     fi
-    
+
     # Check docs/
     if [ -d "$repo_path/docs" ]; then
         has_docs="✅"
         DOCS_DIR_COUNT=$((DOCS_DIR_COUNT + 1))
     fi
-    
+
     # Check README.md
     if [ -f "$repo_path/README.md" ]; then
         has_readme="✅"
         README_COUNT=$((README_COUNT + 1))
     fi
-    
+
     echo "   GEMINI.md: $has_gemini_md  |  .gemini/: $has_gemini_dir  |  docs/: $has_docs  |  README.md: $has_readme"
     echo ""
 }
@@ -77,15 +77,15 @@ check_repo "$PROJECT_ROOT"
 
 # Check Level 1 submodules
 echo -e "${BLUE}=== Level 1 Submodules ===${NC}"
-[ -d "$PROJECT_ROOT/talent-ai-infrastructure" ] && check_repo "$PROJECT_ROOT/talent-ai-infrastructure"
-[ -d "$PROJECT_ROOT/talent-ai-landing-page" ] && check_repo "$PROJECT_ROOT/talent-ai-landing-page"
+[ -d "$PROJECT_ROOT/open-talent-infrastructure" ] && check_repo "$PROJECT_ROOT/open-talent-infrastructure"
+[ -d "$PROJECT_ROOT/open-talent-landing-page" ] && check_repo "$PROJECT_ROOT/open-talent-landing-page"
 [ -d "$PROJECT_ROOT/quarkdown-specs" ] && check_repo "$PROJECT_ROOT/quarkdown-specs"
-[ -d "$PROJECT_ROOT/talent-ai-microservices" ] && check_repo "$PROJECT_ROOT/talent-ai-microservices"
+[ -d "$PROJECT_ROOT/open-talent-microservices" ] && check_repo "$PROJECT_ROOT/open-talent-microservices"
 
 # Check Level 2 microservices
 echo -e "${BLUE}=== Microservices (Level 2) ===${NC}"
-if [ -d "$PROJECT_ROOT/talent-ai-microservices" ]; then
-    for service_dir in "$PROJECT_ROOT/talent-ai-microservices"/talent-ai-*/; do
+if [ -d "$PROJECT_ROOT/open-talent-microservices" ]; then
+    for service_dir in "$PROJECT_ROOT/open-talent-microservices"/open-talent-*/; do
         if [ -d "$service_dir" ]; then
             check_repo "$service_dir"
         fi

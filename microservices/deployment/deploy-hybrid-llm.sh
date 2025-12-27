@@ -103,7 +103,7 @@ update_service_configuration() {
     print_step "Updating service configuration..."
 
     local deployment_mode=${1:-"production"}
-    local env_file="talent-ai-avatar-service/.env.${deployment_mode}"
+    local env_file="open-talent-avatar-service/.env.${deployment_mode}"
 
     if [ "$deployment_mode" = "dev" ]; then
         print_info "Configuring for LOCAL LLM mode"
@@ -136,7 +136,7 @@ build_services() {
     print_step "Building services with hybrid integration..."
 
     # Build avatar service with new dependencies
-    cd talent-ai-avatar-service
+    cd open-talent-avatar-service
 
     # Update requirements.txt if needed
     if ! grep -q "httpx" requirements.txt; then
@@ -145,11 +145,11 @@ build_services() {
     fi
 
     # Build Docker image
-    docker build -t talent-ai-avatar-service:hybrid-latest .
+    docker build -t open-talent-avatar-service:hybrid-latest .
 
     # Build other related services
-    cd ../talent-ai-interview-service
-    docker build -t talent-ai-interview-service:latest .
+    cd ../open-talent-interview-service
+    docker build -t open-talent-interview-service:latest .
 
     print_success "Services built successfully"
 }
@@ -157,7 +157,7 @@ build_services() {
 run_tests() {
     print_step "Running integration tests..."
 
-    cd talent-ai-avatar-service
+    cd open-talent-avatar-service
 
     # Make test script executable
     chmod +x test_hybrid_integration.py
@@ -180,7 +180,7 @@ version: '3.8'
 
 services:
   avatar-service:
-    image: talent-ai-avatar-service:hybrid-latest
+    image: open-talent-avatar-service:hybrid-latest
     environment:
       - OLLAMA_MODEL=$OLLAMA_MODEL
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
@@ -188,17 +188,17 @@ services:
     volumes:
       - /mnt/d/ollama-models:/ollama-models:ro
     networks:
-      - talent-ai-network
+      - open-talent-network
 
   interview-service:
-    image: talent-ai-interview-service:latest
+    image: open-talent-interview-service:latest
     depends_on:
       - avatar-service
     networks:
-      - talent-ai-network
+      - open-talent-network
 
 networks:
-  talent-ai-network:
+  open-talent-network:
     external: true
 EOF
 

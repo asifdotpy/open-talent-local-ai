@@ -1,9 +1,9 @@
 """
-Main application file for the TalentAI Avatar Service.
+Main application file for the OpenTalent Avatar Service.
 
 This service manages AI avatar interactions with Irish voice integration
 using AI Voice API. It provides voice generation capabilities for the
-TalentAI recruitment platform.
+OpenTalent recruitment platform.
 """
 
 from fastapi import FastAPI
@@ -13,7 +13,7 @@ from app.routes.voice_routes import router as voice_router
 from app.routes.avatar_v1 import router as avatar_router
 from app.config.settings import (
     SERVICE_TITLE,
-    SERVICE_DESCRIPTION, 
+    SERVICE_DESCRIPTION,
     SERVICE_VERSION,
     ALLOWED_ORIGINS
 )
@@ -21,7 +21,7 @@ from app.config.settings import (
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
-    
+
     app = FastAPI(
         title=SERVICE_TITLE,
         description=SERVICE_DESCRIPTION,
@@ -40,7 +40,7 @@ def create_app() -> FastAPI:
     # Include routers
     app.include_router(voice_router)
     app.include_router(avatar_router)
-    
+
     return app
 
 

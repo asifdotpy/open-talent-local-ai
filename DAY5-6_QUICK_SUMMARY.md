@@ -3,6 +3,7 @@
 ## Quick Reference: What Changed
 
 ### Created Files
+
 1. **[frontend/dashboard/src/components/ServiceStatus.tsx](frontend/dashboard/src/components/ServiceStatus.tsx)** (82 lines)
    - Real-time gateway health status component
    - Shows online/degraded/offline status
@@ -19,6 +20,7 @@
 ### Modified Files
 
 #### [frontend/dashboard/src/components/Header.tsx](frontend/dashboard/src/components/Header.tsx)
+
 ```tsx
 // BEFORE
 <header>
@@ -48,6 +50,7 @@
 | getInterviewResults() | Mock assessment data | Local |
 
 **Before:**
+
 ```ts
 const { interviewAPI } = await import('../services/api');
 const room = await interviewAPI.createRoom(candidateId, jobRole);
@@ -55,6 +58,7 @@ const room = await interviewAPI.createRoom(candidateId, jobRole);
 ```
 
 **After:**
+
 ```ts
 const integrationGatewayAPI = await import('../services/integrationGatewayAPI');
 const session = await integrationGatewayAPI.default.interview.start({
@@ -75,13 +79,14 @@ const session = await integrationGatewayAPI.default.interview.start({
    - Shows yellow alert when service unavailable
 
 2. **Three-Tier Error Display**
+
    ```tsx
    // 1. Gateway status alert (yellow warning)
    {!gatewayAvailable && <div>Integration service offline</div>}
-   
+
    // 2. Validation errors (red alert)
    {localError && <div>{localError}</div>}
-   
+
    // 3. API errors from store (red alert)
    {error && <div>{error}</div>}
    ```
@@ -97,6 +102,7 @@ const session = await integrationGatewayAPI.default.interview.start({
 ## Architecture Impact
 
 ### Before: Direct Microservice Access
+
 ```
 Dashboard → Port 8004 (Interview Service)
          → Port 8002 (Voice Service)
@@ -105,6 +111,7 @@ Dashboard → Port 8004 (Interview Service)
 ```
 
 ### After: Gateway-Mediated Access
+
 ```
 Dashboard → Port 8009 (Desktop Integration Service)
          → Health aggregation
@@ -119,6 +126,7 @@ Dashboard → Port 8009 (Desktop Integration Service)
 ## Testing Verification
 
 ### ✅ Completed
+
 - [x] ServiceStatus component created and styled
 - [x] Header integration with status display
 - [x] interviewStore fully migrated to gateway API
@@ -131,6 +139,7 @@ Dashboard → Port 8009 (Desktop Integration Service)
 - [x] Comprehensive documentation written
 
 ### Gateway Endpoints Used
+
 | Endpoint | Called By | Status |
 |----------|-----------|--------|
 | GET /health | ServiceStatus.check() | ✅ |
@@ -145,6 +154,7 @@ Dashboard → Port 8009 (Desktop Integration Service)
 ## For SelectUSA Demo
 
 ### What Works ✅
+
 - Start interview form with validation
 - Real-time service health monitoring
 - Graceful error handling
@@ -153,6 +163,7 @@ Dashboard → Port 8009 (Desktop Integration Service)
 - Gateway acting as unified API
 
 ### What's Ready for Enhancement
+
 - Dynamic question generation (currently hardcoded)
 - Real sentiment analysis (currently mock)
 - Voice synthesis integration (endpoint ready)
@@ -185,12 +196,14 @@ microservices/desktop-integration-service/app/core/service_discovery.py
 ## Quick Start for Testing
 
 ### 1. Start the Gateway
+
 ```bash
 cd microservices/desktop-integration-service
 python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8009 &
 ```
 
 ### 2. Start the Dashboard
+
 ```bash
 cd frontend/dashboard
 npm install  # if not done
@@ -199,6 +212,7 @@ npm run dev
 ```
 
 ### 3. Test the Flow
+
 - View ServiceStatus in header (should show "Degraded Service" if only Ollama online)
 - Enter candidate ID (e.g., "CAND-001")
 - Select job role (e.g., "Software Engineer")
@@ -206,6 +220,7 @@ npm run dev
 - Dashboard should route through gateway on port 8009
 
 ### 4. Monitor Gateway
+
 ```bash
 # In another terminal
 curl http://localhost:8009/api/v1/system/status

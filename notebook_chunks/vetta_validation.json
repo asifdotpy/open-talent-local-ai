@@ -477,7 +477,7 @@
     "has_context": false
   },
   {
-    "instruction": "Help user navigate to candidate profiles in the TalentAI dashboard",
+    "instruction": "Help user navigate to candidate profiles in the OpenTalent dashboard",
     "response": "I can help you access candidate profiles. Go to the main dashboard, click on \"Candidates\" in the left sidebar, then use the search bar to filter by role, location, or skills. Would you like me to show you how to use advanced filters?",
     "category": "general",
     "difficulty": "intermediate",

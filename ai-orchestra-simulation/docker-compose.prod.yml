@@ -23,7 +23,7 @@ services:
       start_period: 10s
     restart: unless-stopped
     networks:
-      - talent-ai-network
+      - open-talent-network
 
   # Avatar Renderer (Backend) - Port 3001
   avatar-renderer:
@@ -50,7 +50,7 @@ services:
       start_period: 40s
     restart: unless-stopped
     networks:
-      - talent-ai-network
+      - open-talent-network
 
   # Voice Service - Port 8002
   voice-service:
@@ -75,7 +75,7 @@ services:
       retries: 3
     restart: unless-stopped
     networks:
-      - talent-ai-network
+      - open-talent-network
 
   # Conversation Service - Port 8003
   conversation-service:
@@ -98,7 +98,7 @@ services:
       retries: 3
     restart: unless-stopped
     networks:
-      - talent-ai-network
+      - open-talent-network
 
   # Interview Service - Port 8004
   interview-service:
@@ -123,7 +123,7 @@ services:
       retries: 3
     restart: unless-stopped
     networks:
-      - talent-ai-network
+      - open-talent-network
 
   # Ollama Service for AI Models
   ollama:
@@ -143,7 +143,7 @@ services:
       retries: 5
     restart: unless-stopped
     networks:
-      - talent-ai-network
+      - open-talent-network
 
   # Development service for R3F frontend with hot reload
   r3f-frontend-dev:
@@ -161,12 +161,12 @@ services:
     profiles:
       - dev
     networks:
-      - talent-ai-network
+      - open-talent-network
 
 networks:
-  talent-ai-network:
+  open-talent-network:
     driver: bridge
-    name: talent-ai-network
+    name: open-talent-network
 
 volumes:
   voice_models:

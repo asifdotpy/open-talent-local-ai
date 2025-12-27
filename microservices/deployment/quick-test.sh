@@ -46,7 +46,7 @@ fi
 
 # Test 3: Run Python integration test
 print_test "Running hybrid integration test..."
-cd /home/asif/talent-ai-platform/talent-ai-microservices/talent-ai-avatar-service
+cd /home/asif/open-talent-platform/open-talent-microservices/open-talent-avatar-service
 if python test_hybrid_integration.py; then
     print_pass "Integration test passed"
 else

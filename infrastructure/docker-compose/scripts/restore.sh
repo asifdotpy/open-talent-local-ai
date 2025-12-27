@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# TalentAI Platform - Restore Script
+# OpenTalent Platform - Restore Script
 # Restores PostgreSQL, Redis, and MinIO from backup
 
 set -e
@@ -17,7 +17,7 @@ fi
 TIMESTAMP="$1"
 BACKUP_DIR="${BACKUP_DIR:-/backups}"
 
-echo "🔄 TalentAI Platform Restore - $TIMESTAMP"
+echo "🔄 OpenTalent Platform Restore - $TIMESTAMP"
 echo "========================================="
 echo ""
 echo "⚠️  WARNING: This will overwrite current data!"
@@ -29,20 +29,20 @@ if [ "$confirm" != "yes" ]; then
 fi
 
 # PostgreSQL restore
-POSTGRES_BACKUP="$BACKUP_DIR/postgres/talentai_$TIMESTAMP.dump.gz"
+POSTGRES_BACKUP="$BACKUP_DIR/postgres/OpenTalent_$TIMESTAMP.dump.gz"
 if [ -f "$POSTGRES_BACKUP" ]; then
     echo "📥 Restoring PostgreSQL from $POSTGRES_BACKUP..."
     gunzip -c "$POSTGRES_BACKUP" > /tmp/restore.dump
-    
+
     PGPASSWORD="$POSTGRES_PASSWORD" pg_restore \
         -h "${POSTGRES_HOST:-postgres}" \
         -p "${POSTGRES_PORT:-5432}" \
-        -U "${POSTGRES_USER:-talentai}" \
-        -d "${POSTGRES_DB:-talentai}" \
+        -U "${POSTGRES_USER:-OpenTalent}" \
+        -d "${POSTGRES_DB:-OpenTalent}" \
         --clean \
         --if-exists \
         /tmp/restore.dump
-    
+
     rm /tmp/restore.dump
     echo "  ✅ PostgreSQL restored"
 else
@@ -54,8 +54,8 @@ REDIS_BACKUP="$BACKUP_DIR/redis/dump_$TIMESTAMP.rdb.gz"
 if [ -f "$REDIS_BACKUP" ]; then
     echo "📥 Restoring Redis from $REDIS_BACKUP..."
     gunzip -c "$REDIS_BACKUP" > /tmp/dump.rdb
-    docker cp /tmp/dump.rdb talentai-redis:/data/dump.rdb
-    docker restart talentai-redis
+    docker cp /tmp/dump.rdb OpenTalent-redis:/data/dump.rdb
+    docker restart OpenTalent-redis
     rm /tmp/dump.rdb
     echo "  ✅ Redis restored"
 else
@@ -68,8 +68,8 @@ if [ -f "$MINIO_BACKUP" ]; then
     echo "📥 Restoring MinIO from $MINIO_BACKUP..."
     mkdir -p /tmp/minio_restore
     tar -xzf "$MINIO_BACKUP" -C /tmp/minio_restore
-    docker cp /tmp/minio_restore/data_$TIMESTAMP/. talentai-minio:/data/
-    docker restart talentai-minio
+    docker cp /tmp/minio_restore/data_$TIMESTAMP/. OpenTalent-minio:/data/
+    docker restart OpenTalent-minio
     rm -rf /tmp/minio_restore
     echo "  ✅ MinIO restored"
 else

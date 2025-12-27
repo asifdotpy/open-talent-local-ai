@@ -1,27 +1,28 @@
-"""
-Avatar Rendering Service for TalentAI Platform.
+"""Avatar Rendering Service for OpenTalent Platform.
 
 This service handles AI avatar video generation with lip-sync capabilities.
 """
 
-import os
+import asyncio
 import logging
+import os
 import tempfile
 from pathlib import Path
-from typing import Optional, Dict, Any
-import requests
-import aiohttp
-import asyncio
+from typing import Any, Optional
 from urllib.parse import urljoin
 
+import aiohttp
+import requests
+
 logger = logging.getLogger(__name__)
+
 
 class AvatarRenderingService:
     """Service for rendering AI avatar videos with audio."""
 
     def __init__(self, renderer_url: str = "http://localhost:3001"):
         self.renderer_url = renderer_url
-        self.temp_dir = Path(tempfile.gettempdir()) / "talentai_avatars"
+        self.temp_dir = Path(tempfile.gettempdir()) / "OpenTalent_avatars"
         self.temp_dir.mkdir(exist_ok=True)
 
         # Test connection to renderer server
@@ -44,10 +45,9 @@ class AvatarRenderingService:
         audio_data: bytes,
         phonemes: Optional[list] = None,
         duration: Optional[float] = None,
-        model: str = "face"
+        model: str = "face",
     ) -> bytes:
-        """
-        Generate avatar video with audio using Node.js renderer.
+        """Generate avatar video with audio using Node.js renderer.
 
         Args:
             audio_data: Raw audio bytes
@@ -72,7 +72,7 @@ class AvatarRenderingService:
                 "phonemes": phonemes,
                 "audioUrl": audio_url,
                 "model": model,
-                "duration": duration
+                "duration": duration,
             }
 
             # Call Node.js avatar renderer
@@ -80,7 +80,7 @@ class AvatarRenderingService:
                 async with session.post(
                     urljoin(self.renderer_url, "/render/lipsync"),
                     json=request_data,
-                    timeout=aiohttp.ClientTimeout(total=300)  # 5 minute timeout
+                    timeout=aiohttp.ClientTimeout(total=300),  # 5 minute timeout
                 ) as response:
                     if response.status != 200:
                         error_text = await response.text()
@@ -91,10 +91,12 @@ class AvatarRenderingService:
                     video_data = await response.read()
 
                     # Log processing info
-                    processing_time = response.headers.get('X-Processing-Time', 'unknown')
-                    video_duration = response.headers.get('X-Video-Duration', 'unknown')
-                    logger.info(f"Avatar video rendered: {len(video_data)} bytes, "
-                              f"duration: {video_duration}, processing: {processing_time}")
+                    processing_time = response.headers.get("X-Processing-Time", "unknown")
+                    video_duration = response.headers.get("X-Video-Duration", "unknown")
+                    logger.info(
+                        f"Avatar video rendered: {len(video_data)} bytes, "
+                        f"duration: {video_duration}, processing: {processing_time}"
+                    )
 
                     return video_data
 
@@ -108,7 +110,7 @@ class AvatarRenderingService:
         # For now, save to local temp file and return file:// URL
         # In production, upload to cloud storage (S3, etc.)
         audio_file = self.temp_dir / f"temp_audio_{os.urandom(8).hex()}.wav"
-        with open(audio_file, 'wb') as f:
+        with open(audio_file, "wb") as f:
             f.write(audio_data)
 
         # Return file:// URL (Node.js can handle this)
@@ -127,24 +129,26 @@ class AvatarRenderingService:
         except Exception as e:
             logger.warning(f"Failed to cleanup temp file {file_path}: {e}")
 
-    async def _generate_mock_video(self, audio_data: bytes, duration: Optional[float] = None) -> bytes:
+    async def _generate_mock_video(
+        self, audio_data: bytes, duration: Optional[float] = None
+    ) -> bytes:
         """Generate a simple mock video when renderer is unavailable."""
         try:
-            from moviepy import ImageClip, AudioFileClip, CompositeVideoClip
-            from PIL import Image, ImageDraw
             import numpy as np
+            from moviepy import AudioFileClip, CompositeVideoClip, ImageClip
+            from PIL import Image, ImageDraw
 
             # Create simple avatar image
-            img = Image.new('RGB', (400, 600), color='lightblue')
+            img = Image.new("RGB", (400, 600), color="lightblue")
             draw = ImageDraw.Draw(img)
-            draw.rectangle([50, 200, 350, 400], fill='white')  # Face
-            draw.ellipse([150, 250, 200, 300], fill='black')  # Left eye
-            draw.ellipse([250, 250, 300, 300], fill='black')  # Right eye
-            draw.arc([175, 325, 275, 375], start=0, end=180, fill='black', width=3)  # Mouth
+            draw.rectangle([50, 200, 350, 400], fill="white")  # Face
+            draw.ellipse([150, 250, 200, 300], fill="black")  # Left eye
+            draw.ellipse([250, 250, 300, 300], fill="black")  # Right eye
+            draw.arc([175, 325, 275, 375], start=0, end=180, fill="black", width=3)  # Mouth
 
             # Save audio to temp file
             audio_file = self.temp_dir / f"mock_audio_{os.urandom(8).hex()}.wav"
-            with open(audio_file, 'wb') as f:
+            with open(audio_file, "wb") as f:
                 f.write(audio_data)
 
             # Create video clip
@@ -154,15 +158,10 @@ class AvatarRenderingService:
 
             # Export to temp file
             video_file = self.temp_dir / f"mock_video_{os.urandom(8).hex()}.mp4"
-            video.write_videofile(
-                str(video_file),
-                fps=24,
-                codec='libx264',
-                audio_codec='aac'
-            )
+            video.write_videofile(str(video_file), fps=24, codec="libx264", audio_codec="aac")
 
             # Read video bytes
-            with open(video_file, 'rb') as f:
+            with open(video_file, "rb") as f:
                 video_bytes = f.read()
 
             # Cleanup
@@ -176,12 +175,14 @@ class AvatarRenderingService:
             logger.error(f"Failed to generate mock video: {e}")
             raise
 
-    async def get_avatar_info(self) -> Dict[str, Any]:
+    async def get_avatar_info(self) -> dict[str, Any]:
         """Get avatar service information."""
         renderer_status = "unknown"
         try:
             response = requests.get(urljoin(self.renderer_url, "/health"), timeout=5)
-            renderer_status = "connected" if response.status_code == 200 else f"error_{response.status_code}"
+            renderer_status = (
+                "connected" if response.status_code == 200 else f"error_{response.status_code}"
+            )
         except:
             renderer_status = "disconnected"
 
@@ -192,5 +193,5 @@ class AvatarRenderingService:
             "lip_sync": "morph-target-based",
             "supported_formats": ["webm", "mp4"],
             "supported_models": ["face", "metahuman", "conductor"],
-            "temp_dir": str(self.temp_dir)
+            "temp_dir": str(self.temp_dir),
         }

@@ -209,7 +209,7 @@ class RPMService {
    * @returns {string} - Application ID
    */
   getApplicationId() {
-    // Extract from subdomain: talent-ai.readyplayer.me -> talent-ai
+    // Extract from subdomain: open-talent.readyplayer.me -> open-talent
     return this.subdomain.split('.')[0];
   }
 
@@ -246,7 +246,7 @@ class RPMService {
       },
       // RPM avatar - fallback for visual variety (but no visemes)
       {
-        id: 'talent-ai-avatar',
+        id: 'open-talent-avatar',
         name: 'RPM Avatar (Fallback)',
         gender: 'neutral',
         style: 'professional',
@@ -264,7 +264,7 @@ class RPMService {
     avatars.forEach(avatar => {
       console.log(`   - ${avatar.name} (${avatar.morphTargetType}${avatar.hasFullLipSync ? ' ✅ Full Lip-Sync' : ''})`);
     });
-    
+
     return avatars;
   }
 

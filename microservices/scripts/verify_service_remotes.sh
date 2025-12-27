@@ -7,8 +7,8 @@
 set -e
 
 # --- Configuration ---
-# The base for constructing the SSH URLs for your TalentAI service repos.
-SERVICE_REPO_BASE="git@github.com:TalentAI"
+# The base for constructing the SSH URLs for your OpenTalent service repos.
+SERVICE_REPO_BASE="git@github.com:OpenTalent"
 
 
 # --- Script Execution ---
@@ -16,15 +16,15 @@ echo "--- Starting Microservice Remote Verification (Dry Run) ---"
 echo "This script will not make any changes."
 echo ""
 
-# Loop through each subdirectory that starts with 'talent-ai-'
-for service_dir in ./talent-ai-*/; do
+# Loop through each subdirectory that starts with 'open-talent-'
+for service_dir in ./open-talent-*/; do
   if [ -d "$service_dir" ]; then
     service_name=$(basename "$service_dir")
     echo "--- Checking service: $service_name ---"
 
     # Construct the SSH URL that the main script WILL use
     service_repo_url="$SERVICE_REPO_BASE/$service_name.git"
-    
+
     echo "VERIFICATION: Checking remote URL accessibility..."
     echo "  URL to check: $service_repo_url"
 
@@ -35,8 +35,8 @@ for service_dir in ./talent-ai-*/; do
     else
         echo "FAILURE: Could not access the remote for this service."
         echo "  Please check:"
-        echo "  1. The repository '$service_name' exists in the 'TalentAI' GitHub organization."
-        echo "  2. Your SSH key has been granted access to the 'TalentAI' organization."
+        echo "  1. The repository '$service_name' exists in the 'OpenTalent' GitHub organization."
+        echo "  2. Your SSH key has been granted access to the 'OpenTalent' organization."
     fi
     echo ""
   fi

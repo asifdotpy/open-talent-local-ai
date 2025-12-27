@@ -1,20 +1,20 @@
 version: '3.8'
 
-# TalentAI Platform - Local Infrastructure
+# OpenTalent Platform - Local Infrastructure
 # Open Source | Self-Hosted | Desktop & Web Ready
 
 services:
   #===========================================================================
   # DATABASE SERVICES
   #===========================================================================
-  
+
   postgres:
     image: postgres:15-alpine
-    container_name: talentai-postgres
+    container_name: OpenTalent-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-talentai}
-      POSTGRES_USER: ${POSTGRES_USER:-talentai}
+      POSTGRES_DB: ${POSTGRES_DB:-OpenTalent}
+      POSTGRES_USER: ${POSTGRES_USER:-OpenTalent}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_MAX_CONNECTIONS: ${POSTGRES_MAX_CONNECTIONS:-100}
       PGDATA: /var/lib/postgresql/data/pgdata
@@ -24,12 +24,12 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./init-scripts/postgres:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-talentai}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-OpenTalent}"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -38,7 +38,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: talentai-redis
+    container_name: OpenTalent-redis
     restart: unless-stopped
     command: >
       redis-server
@@ -57,7 +57,7 @@ services:
       timeout: 3s
       retries: 5
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -66,7 +66,7 @@ services:
 
   minio:
     image: minio/minio:latest
-    container_name: talentai-minio
+    container_name: OpenTalent-minio
     restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
@@ -83,7 +83,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -96,7 +96,7 @@ services:
 
   ollama:
     image: ollama/ollama:latest
-    container_name: talentai-ollama
+    container_name: OpenTalent-ollama
     restart: unless-stopped
     ports:
       - "${OLLAMA_PORT:-11434}:11434"
@@ -108,7 +108,7 @@ services:
       timeout: 10s
       retries: 5
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -124,8 +124,8 @@ services:
     build:
       context: ../../agents/genkit-service
       dockerfile: Dockerfile
-    image: talentai/genkit-service:latest
-    container_name: talentai-genkit-service
+    image: OpenTalent/genkit-service:latest
+    container_name: OpenTalent-genkit-service
     restart: unless-stopped
     environment:
       - GOOGLE_GENAI_API_KEY=${GOOGLE_GENAI_API_KEY}
@@ -143,7 +143,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -155,8 +155,8 @@ services:
       context: ../../ai-orchestra-simulation
       dockerfile: Dockerfile
       target: production
-    image: talentai/ai-orchestra:latest
-    container_name: talentai-ai-orchestra
+    image: OpenTalent/ai-orchestra:latest
+    container_name: Openopen-talent-orchestra
     restart: unless-stopped
     environment:
       - NODE_ENV=production
@@ -175,7 +175,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -190,8 +190,8 @@ services:
     build:
       context: ../../microservices/avatar-service
       dockerfile: Dockerfile
-    image: talentai/avatar-service:latest
-    container_name: talentai-avatar-service
+    image: OpenTalent/avatar-service:latest
+    container_name: OpenTalent-avatar-service
     restart: unless-stopped
     environment:
       - DATABASE_URL=${DATABASE_URL}
@@ -199,7 +199,7 @@ services:
       - MINIO_ENDPOINT=${MINIO_ENDPOINT}
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
-      - MINIO_BUCKET=${MINIO_BUCKET:-talent-ai-videos}
+      - MINIO_BUCKET=${MINIO_BUCKET:-open-talent-videos}
       - RENDERING_MODE=${AVATAR_RENDERING_MODE:-hybrid}
       - WEBGL_RENDERER=${WEBGL_RENDERER:-cpu}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
@@ -222,7 +222,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -234,8 +234,8 @@ services:
       context: ../../microservices/voice-service
       dockerfile: Dockerfile
       target: production
-    image: talentai/voice-service:latest
-    container_name: talentai-voice-service
+    image: OpenTalent/voice-service:latest
+    container_name: OpenTalent-voice-service
     restart: unless-stopped
     environment:
       - VOICE_ENGINE=${VOICE_ENGINE:-piper}
@@ -256,7 +256,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -267,8 +267,8 @@ services:
     build:
       context: ../../microservices/conversation-service
       dockerfile: Dockerfile
-    image: talentai/conversation-service:latest
-    container_name: talentai-conversation-service
+    image: OpenTalent/conversation-service:latest
+    container_name: OpenTalent-conversation-service
     restart: unless-stopped
     environment:
       - OLLAMA_URL=${OLLAMA_URL}
@@ -290,7 +290,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -301,8 +301,8 @@ services:
     build:
       context: ../../microservices/interview-service
       dockerfile: Dockerfile
-    image: talentai/interview-service:latest
-    container_name: talentai-interview-service
+    image: OpenTalent/interview-service:latest
+    container_name: OpenTalent-interview-service
     restart: unless-stopped
     environment:
       - DATABASE_URL=${DATABASE_URL}
@@ -329,7 +329,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -340,8 +340,8 @@ services:
     build:
       context: ../../microservices/scout-service
       dockerfile: Dockerfile
-    image: talentai/scout-service:latest
-    container_name: talentai-scout-service
+    image: OpenTalent/scout-service:latest
+    container_name: OpenTalent-scout-service
     restart: unless-stopped
     environment:
       - DATABASE_URL=${DATABASE_URL}
@@ -360,7 +360,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -371,8 +371,8 @@ services:
     build:
       context: ../../microservices/analytics-service
       dockerfile: Dockerfile
-    image: talentai/analytics-service:latest
-    container_name: talentai-analytics-service
+    image: OpenTalent/analytics-service:latest
+    container_name: OpenTalent-analytics-service
     restart: unless-stopped
     environment:
       - DATABASE_URL=${DATABASE_URL}
@@ -390,7 +390,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -401,8 +401,8 @@ services:
     build:
       context: ../../microservices/ai-auditing-service
       dockerfile: Dockerfile
-    image: talentai/ai-auditing-service:latest
-    container_name: talentai-ai-auditing-service
+    image: OpenTalent/ai-auditing-service:latest
+    container_name: Openopen-talent-auditing-service
     restart: unless-stopped
     environment:
       - DATABASE_URL=${DATABASE_URL}
@@ -419,7 +419,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -430,8 +430,8 @@ services:
     build:
       context: ../../microservices/candidate-service
       dockerfile: Dockerfile
-    image: talentai/candidate-service:latest
-    container_name: talentai-candidate-service
+    image: OpenTalent/candidate-service:latest
+    container_name: OpenTalent-candidate-service
     restart: unless-stopped
     environment:
       - DATABASE_URL=${DATABASE_URL}
@@ -449,7 +449,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -460,8 +460,8 @@ services:
     build:
       context: ../../microservices/explainability-service
       dockerfile: Dockerfile
-    image: talentai/explainability-service:latest
-    container_name: talentai-explainability-service
+    image: OpenTalent/explainability-service:latest
+    container_name: OpenTalent-explainability-service
     restart: unless-stopped
     environment:
       - DATABASE_URL=${DATABASE_URL}
@@ -478,7 +478,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -489,8 +489,8 @@ services:
     build:
       context: ../../microservices/notification-service
       dockerfile: Dockerfile
-    image: talentai/notification-service:latest
-    container_name: talentai-notification-service
+    image: OpenTalent/notification-service:latest
+    container_name: OpenTalent-notification-service
     restart: unless-stopped
     environment:
       - DATABASE_URL=${DATABASE_URL}
@@ -514,7 +514,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -525,8 +525,8 @@ services:
     build:
       context: ../../microservices/project-service
       dockerfile: Dockerfile
-    image: talentai/project-service:latest
-    container_name: talentai-project-service
+    image: OpenTalent/project-service:latest
+    container_name: OpenTalent-project-service
     restart: unless-stopped
     environment:
       - DATABASE_URL=${DATABASE_URL}
@@ -543,7 +543,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -554,8 +554,8 @@ services:
     build:
       context: ../../microservices/security-service
       dockerfile: Dockerfile
-    image: talentai/security-service:latest
-    container_name: talentai-security-service
+    image: OpenTalent/security-service:latest
+    container_name: OpenTalent-security-service
     restart: unless-stopped
     environment:
       - DATABASE_URL=${DATABASE_URL}
@@ -576,7 +576,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -587,8 +587,8 @@ services:
     build:
       context: ../../microservices/user-service
       dockerfile: Dockerfile
-    image: talentai/user-service:latest
-    container_name: talentai-user-service
+    image: OpenTalent/user-service:latest
+    container_name: OpenTalent-user-service
     restart: unless-stopped
     environment:
       - DATABASE_URL=${DATABASE_URL}
@@ -613,7 +613,7 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -628,8 +628,8 @@ services:
     build:
       context: ../../microservices/avatar-service
       dockerfile: Dockerfile
-    image: talentai/avatar-service:latest
-    container_name: talentai-celery-render-worker
+    image: OpenTalent/avatar-service:latest
+    container_name: OpenTalent-celery-render-worker
     restart: unless-stopped
     command: >
       celery -A avatar_service.celery_app worker
@@ -654,7 +654,7 @@ services:
       minio:
         condition: service_healthy
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -665,8 +665,8 @@ services:
     build:
       context: ../../microservices/avatar-service
       dockerfile: Dockerfile
-    image: talentai/avatar-service:latest
-    container_name: talentai-celery-beat
+    image: OpenTalent/avatar-service:latest
+    container_name: OpenTalent-celery-beat
     restart: unless-stopped
     command: celery -A avatar_service.celery_app beat --loglevel=INFO
     environment:
@@ -676,7 +676,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - talentai-network
+      - OpenTalent-network
     deploy:
       resources:
         limits:
@@ -689,7 +689,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: talentai-nginx
+    container_name: OpenTalent-nginx
     restart: unless-stopped
     ports:
       - "${NGINX_PORT:-8080}:80"
@@ -711,15 +711,15 @@ services:
       timeout: 10s
       retries: 3
     networks:
-      - talentai-network
+      - OpenTalent-network
 
   # Optional: Frontend build (uncomment if bundling frontend)
   # frontend:
   #   build:
   #     context: ../../frontend/dashboard
   #     dockerfile: Dockerfile
-  #   image: talentai/frontend:latest
-  #   container_name: talentai-frontend
+  #   image: OpenTalent/frontend:latest
+  #   container_name: OpenTalent-frontend
   #   volumes:
   #     - frontend-build:/app/dist
 
@@ -729,7 +729,7 @@ services:
 
   # prometheus:
   #   image: prom/prometheus:latest
-  #   container_name: talentai-prometheus
+  #   container_name: OpenTalent-prometheus
   #   restart: unless-stopped
   #   ports:
   #     - "${PROMETHEUS_PORT:-9090}:9090"
@@ -740,11 +740,11 @@ services:
   #     - '--config.file=/etc/prometheus/prometheus.yml'
   #     - '--storage.tsdb.path=/prometheus'
   #   networks:
-  #     - talentai-network
+  #     - OpenTalent-network
 
   # grafana:
   #   image: grafana/grafana:latest
-  #   container_name: talentai-grafana
+  #   container_name: OpenTalent-grafana
   #   restart: unless-stopped
   #   ports:
   #     - "${GRAFANA_PORT:-3001}:3000"
@@ -757,7 +757,7 @@ services:
   #   depends_on:
   #     - prometheus
   #   networks:
-  #     - talentai-network
+  #     - OpenTalent-network
 
 #=============================================================================
 # VOLUMES
@@ -792,7 +792,7 @@ volumes:
 #=============================================================================
 
 networks:
-  talentai-network:
+  OpenTalent-network:
     driver: bridge
     ipam:
       config:

@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: talentai-vllm-server
+    container_name: OpenTalent-vllm-server
     ports:
       - "8000:8000"
     volumes:

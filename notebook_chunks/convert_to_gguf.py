@@ -20,7 +20,9 @@ REQUIRES: 16GB+ RAM, Python with unsloth installed
 """
 
 import os
+
 from unsloth import FastLanguageModel
+
 
 def convert_to_gguf():
     # CONFIGURE THIS PATH: Download from Hugging Face first
@@ -94,4 +96,4 @@ def convert_to_gguf():
 
 if __name__ == "__main__":
     convert_to_gguf()</content>
-<parameter name="filePath">/home/asif1/talent-ai-platform/notebook_chunks/convert_to_gguf.py
+<parameter name="filePath">/home/asif1/open-talent-platform/notebook_chunks/convert_to_gguf.py

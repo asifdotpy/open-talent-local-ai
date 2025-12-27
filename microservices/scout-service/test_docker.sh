@@ -2,7 +2,7 @@
 # Test script for Agent Agent (Talent Sourcing) Docker build
 set -e
 
-echo "Building TalentAI - Sourcer Service (Talent Sourcing) with Docker..."
+echo "Building OpenTalent - Sourcer Service (Talent Sourcing) with Docker..."
 docker build -t sourcer-service .
 
 echo "Running basic import test..."

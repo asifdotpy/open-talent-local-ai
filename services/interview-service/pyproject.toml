@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "interview-service"
 version = "0.1.0"
-description = "Interview AI Service for TalentAI Platform"
-authors = ["Md [TECH_LEAD] <asif@talentai.io>"]
+description = "Interview AI Service for OpenTalent Platform"
+authors = ["Md [TECH_LEAD] <asif@OpenTalent.io>"]
 packages = [{include = "app"}]
 
 [tool.poetry.dependencies]

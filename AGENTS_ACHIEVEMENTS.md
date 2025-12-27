@@ -1,6 +1,6 @@
 # OpenTalent AI Agents - Achievements Summary
 
-**Last Updated:** Current Session  
+**Last Updated:** Current Session
 **Status:** 8 Production-Ready AI Agents + Genkit Service (Google AI) + Scout Coordinator
 
 ---
@@ -10,6 +10,7 @@
 OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout Coordinator** that work together to create an end-to-end intelligent recruiting platform. All agents are containerized with Docker and communicate via Redis message bus for real-time coordination.
 
 **Key Stats:**
+
 - ✅ **8 Production Agents**: All implemented, FastAPI-based, Redis-connected
 - ✅ **1 Coordinator Service**: Scout AI orchestrates multi-agent workflow
 - ✅ **1 LLM Bridge**: Google Genkit service (Node.js/TypeScript)
@@ -22,9 +23,11 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 ## 🤖 Agent Breakdown
 
 ### 1. **Scout Coordinator Agent** (Port 8090)
+
 **Purpose:** Orchestrates intelligent talent sourcing workflow across all specialized agents
 
 **Capabilities:**
+
 - Manages end-to-end talent acquisition pipelines
 - Coordinates message flow between agents
 - Publishes events to: candidate events, pipeline events, engagement events, market intel
@@ -32,6 +35,7 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 - Implements background task processing for long-running workflows
 
 **Key Dependencies:**
+
 - Redis (message bus)
 - All downstream agents via topic subscriptions
 - Handles: `CANDIDATE_EVENTS`, `PIPELINE_EVENTS`, `ENGAGEMENT_EVENTS`, `MARKET_INTEL`
@@ -41,9 +45,11 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 ---
 
 ### 2. **Proactive Scanning Agent** (Port 8091)
+
 **Purpose:** Multi-platform talent discovery (LinkedIn, GitHub, Stack Overflow)
 
 **Capabilities:**
+
 - Scans multiple social platforms for talent
 - Discovers candidate profiles across GitHub, LinkedIn, Stack Overflow
 - Extracts social profiles and candidate metadata
@@ -51,6 +57,7 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 - Triggered by: `agents:scanning` topic messages
 
 **Key Dependencies:**
+
 - Redis
 - GitHub Token (via env)
 - LinkedIn API Key (via env)
@@ -61,9 +68,11 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 ---
 
 ### 3. **Boolean Mastery Agent** (Port 8092)
+
 **Purpose:** Advanced search query generation for talent discovery
 
 **Capabilities:**
+
 - Generates sophisticated boolean search queries
 - Optimizes search syntax for job boards and platforms
 - Converts simple talent criteria into powerful search operators
@@ -71,6 +80,7 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 - Listens to: `agents:boolean` topic
 
 **Key Dependencies:**
+
 - Redis
 - Genkit Service (Google AI for query generation)
 - Service clients: conversation, voice, avatar, interview
@@ -80,9 +90,11 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 ---
 
 ### 4. **Personalized Engagement Agent** (Port 8093)
+
 **Purpose:** Custom outreach message creation and multi-channel communication
 
 **Capabilities:**
+
 - Generates personalized outreach messages
 - Multi-channel communication (email, LinkedIn, SMS)
 - Tracks engagement history per candidate
@@ -91,6 +103,7 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 - Listens to: `ENGAGEMENT_EVENTS`, `agents:engagement`
 
 **Key Dependencies:**
+
 - Redis
 - Genkit Service (message generation)
 - SMTP configuration (email outreach)
@@ -101,9 +114,11 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 ---
 
 ### 5. **Market Intelligence Agent** (Port 8094)
+
 **Purpose:** Salary trends, competitor talent mapping, industry insights
 
 **Capabilities:**
+
 - Analyzes market salary trends
 - Maps competitor talent pools
 - Provides industry skill demand insights
@@ -112,6 +127,7 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 - Listens to: `agents:market_intel`
 
 **Key Dependencies:**
+
 - Redis
 - Glassdoor API Key
 - LinkedIn API Key
@@ -122,9 +138,11 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 ---
 
 ### 6. **Tool Leverage Agent** (Port 8095)
+
 **Purpose:** ATS/CRM integration and external API orchestration
 
 **Capabilities:**
+
 - Integrates with ATS (Applicant Tracking Systems)
 - Integrates with CRM platforms
 - Syncs candidate data across systems
@@ -133,6 +151,7 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 - Listens to: `agents:tools`, `CANDIDATE_EVENTS`
 
 **Key Dependencies:**
+
 - Redis
 - ATS API (configurable)
 - CRM API (configurable)
@@ -144,9 +163,11 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 ---
 
 ### 7. **Quality-Focused Agent** (Port 8096)
+
 **Purpose:** Candidate scoring, ranking, and bias detection
 
 **Capabilities:**
+
 - Evaluates candidate quality metrics
 - Assigns quality scores based on: skills, experience, fit, assessment results
 - Detects and mitigates bias in scoring
@@ -155,6 +176,7 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 - Listens to: `agents:quality`, `CANDIDATE_EVENTS`
 
 **Key Dependencies:**
+
 - Redis
 - Genkit Service (assessment generation)
 - Service clients: conversation, voice, avatar, interview
@@ -164,9 +186,11 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 ---
 
 ### 8. **Interviewer Agent** (Port 8091)
+
 **Purpose:** AI-driven avatar interviews with real-time evaluation
 
 **Capabilities:**
+
 - Conducts full-interview workflows with candidates
 - Generates contextual interview questions using LLM
 - Evaluates candidate responses in real-time
@@ -176,12 +200,14 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 - Handles: Interview session management, question generation, response evaluation
 
 **Key Dependencies:**
+
 - Redis
 - Message Bus (event-driven)
 - Service clients: Candidate, Conversation, Voice, Avatar
 - Genkit Service (question generation, response evaluation)
 
 **Key Files:**
+
 - `interviewer-agent/main.py` (558 lines, structured logging)
 - Shared models: `InterviewResult`, `InterviewSession`, `CandidateProfile`
 
@@ -190,9 +216,11 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 ---
 
 ### 9. **Genkit Service** (Port 3400)
+
 **Purpose:** LLM bridge for Google Generative AI (Gemini, etc.)
 
 **Architecture:**
+
 - Node.js/TypeScript service
 - Uses Google's Genkit framework
 - Provides AI capabilities to all agents that need LLM functions
@@ -200,6 +228,7 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 - Redis integration for distributed processing
 
 **Key Features:**
+
 - Generative text (query generation, message crafting, scoring)
 - Real-time response evaluation
 - Prompt engineering and orchestration
@@ -211,6 +240,7 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 ## 🏗️ Architecture Overview
 
 ### Service Communication
+
 ```
 ┌─────────────────────────────────────────┐
 │         Redis Message Bus (6379)        │
@@ -292,6 +322,7 @@ OpenTalent has implemented **8 specialized AI agents** orchestrated by a **Scout
 ## 📦 Docker Compose Services
 
 All services run via single command:
+
 ```bash
 cd agents/
 docker-compose up -d
@@ -299,9 +330,10 @@ docker-compose up -d
 
 **Health Checks:** All agents have health checks configured
 **Restart Policy:** `unless-stopped` (auto-recovery)
-**Network:** `talent-ai-network` (internal service discovery)
+**Network:** `open-talent-network` (internal service discovery)
 
 ### Service Dependencies
+
 ```
 Redis (core dependency)
   ├── Scout Coordinator
@@ -360,6 +392,7 @@ Genkit Service (LLM bridge)
 All agents use common models from `agents/shared/`:
 
 **Key Models:**
+
 - `CandidateProfile`: Complete candidate data
 - `InterviewSession`: Interview state and progress
 - `InterviewResult`: Interview outcomes and scores
@@ -370,6 +403,7 @@ All agents use common models from `agents/shared/`:
 - `OutreachAttempt`: Engagement tracking
 
 **Message Bus Protocol:**
+
 - All events have: `type`, `priority`, `timestamp`, `source_agent`
 - Async message handling via Redis Pub/Sub
 - Topic-based routing (selective listening)

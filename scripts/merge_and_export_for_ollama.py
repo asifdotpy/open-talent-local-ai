@@ -24,9 +24,9 @@ import sys
 from pathlib import Path
 
 try:
-    from unsloth import FastLanguageModel
     import torch
     from transformers import AutoTokenizer
+    from unsloth import FastLanguageModel
 except ImportError as e:
     print(f"Error: Missing required dependencies: {e}")
     print("\nInstall with:")
@@ -43,19 +43,19 @@ def merge_lora_adapters(
 ):
     """
     Merge LoRA adapters with base model.
-    
+
     Args:
         base_model_name: HuggingFace model ID for base model
         lora_model_name: HuggingFace model ID for LoRA adapters
         output_dir: Directory to save merged model
         max_seq_length: Maximum sequence length
-        
+
     Returns:
         Path to merged model directory
     """
     print(f"🔄 Loading base model: {base_model_name}")
     print(f"🔄 Loading LoRA adapters: {lora_model_name}")
-    
+
     # Load model with LoRA adapters
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=lora_model_name,
@@ -63,28 +63,28 @@ def merge_lora_adapters(
         dtype=None,  # Auto-detect
         load_in_4bit=False,  # We want full precision for merging
     )
-    
+
     print("✅ Model and adapters loaded successfully")
     print(f"📊 Model dtype: {model.dtype}")
     print(f"📊 Model device: {model.device}")
-    
+
     # Merge LoRA weights into base model
     print("\n🔀 Merging LoRA adapters into base model...")
     model = model.merge_and_unload()
-    
+
     print("✅ LoRA adapters merged successfully")
-    
+
     # Save merged model
     print(f"\n💾 Saving merged model to: {output_dir}")
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
-    
+
     model.save_pretrained(str(output_path))
     tokenizer.save_pretrained(str(output_path))
-    
+
     print("✅ Merged model saved successfully")
     print(f"📁 Model location: {output_path.absolute()}")
-    
+
     return str(output_path.absolute())
 
 
@@ -95,12 +95,12 @@ def export_to_gguf(
 ):
     """
     Export merged model to GGUF format for Ollama.
-    
+
     Args:
         model_dir: Directory containing merged model
         output_file: Output GGUF filename
         quantization: Quantization method (q4_k_m, q5_k_m, q8_0, f16, f32)
-    
+
     Returns:
         Path to GGUF file
     """
@@ -117,14 +117,14 @@ def export_to_gguf(
         print(f"\n3. Quantize (optional):")
         print(f"   ./llama.cpp/quantize {output_file} vetta-granite-2b-{quantization}.gguf {quantization.upper()}")
         return None
-    
+
     print(f"\n🔄 Converting to GGUF format (quantization: {quantization})...")
-    
+
     # Note: This is a placeholder - actual GGUF conversion requires llama.cpp
     # The proper way is to use llama.cpp's convert.py script
     print("⚠️  GGUF conversion requires manual steps with llama.cpp")
     print("📝 See instructions above")
-    
+
     return None
 
 
@@ -135,7 +135,7 @@ def create_modelfile(
 ):
     """
     Create Ollama Modelfile for the merged model.
-    
+
     Args:
         model_path: Path to GGUF model file
         output_dir: Directory to save Modelfile
@@ -183,15 +183,15 @@ PARAMETER stop "### Instruction:"
 PARAMETER stop "### Input:"
 PARAMETER stop "### Response:"
 """
-    
+
     modelfile_path = Path(output_dir) / "Modelfile"
     modelfile_path.write_text(modelfile_content)
-    
+
     print(f"\n✅ Modelfile created: {modelfile_path.absolute()}")
     print(f"\n📝 To use with Ollama:")
     print(f"   ollama create {model_name} -f {modelfile_path}")
     print(f"   ollama run {model_name}")
-    
+
     return str(modelfile_path.absolute())
 
 
@@ -286,18 +286,18 @@ class VettaAI:
     def __init__(self, model_name="vetta-granite-2b"):
         self.model_name = model_name
         self.ollama_available = self._check_ollama()
-    
+
     def _check_ollama(self):
         try:
             ollama.list()
             return True
         except:
             return False
-    
+
     def generate(self, instruction, context="", max_tokens=256, temperature=0.7):
         if not self.ollama_available:
             return self._fallback_generate(instruction, context)
-        
+
         prompt = f"""Below is an instruction that describes a task, paired with an input that provides further context.
 
 ### Instruction:
@@ -308,7 +308,7 @@ class VettaAI:
 
 ### Response:
 """
-        
+
         response = ollama.generate(
             model=self.model_name,
             prompt=prompt,
@@ -317,7 +317,7 @@ class VettaAI:
                 'num_predict': max_tokens,
             }
         )
-        
+
         return response['response']
 ```
 
@@ -340,7 +340,7 @@ ollama run vetta-granite-2b "Create a boolean search query for LinkedIn to find 
 
 ### 4. Engagement - Outreach
 ```bash
-ollama run vetta-granite-2b "Write a personalized outreach message for Sarah Chen, a Python/AWS expert, for Senior Backend Engineer role at TalentAI"
+ollama run vetta-granite-2b "Write a personalized outreach message for Sarah Chen, a Python/AWS expert, for Senior Backend Engineer role at OpenTalent"
 ```
 
 ### 5. Discovery - Profile Analysis
@@ -391,12 +391,12 @@ ollama ps
 ./quantize vetta-granite-2b.gguf vetta-granite-2b-q4_0.gguf q4_0
 ```
 """
-    
+
     guide_path = Path(output_dir) / "OLLAMA_USAGE_GUIDE.md"
     guide_path.write_text(guide_content)
-    
+
     print(f"✅ Usage guide created: {guide_path.absolute()}")
-    
+
     return str(guide_path.absolute())
 
 
@@ -420,30 +420,30 @@ def main():
         action="store_true",
         help="Skip merging step (use if already merged)",
     )
-    
+
     args = parser.parse_args()
-    
+
     print("=" * 60)
     print("  Vetta AI v4 → Ollama Export Tool")
     print("=" * 60)
-    
+
     # Step 1: Merge LoRA adapters
     if not args.skip_merge:
         model_dir = merge_lora_adapters(output_dir=args.output_dir)
     else:
         model_dir = args.output_dir
         print(f"⏭️  Skipping merge, using existing model at: {model_dir}")
-    
+
     # Step 2: Create Modelfile
     gguf_path = f"{model_dir}/vetta-granite-2b-{args.quantization}.gguf"
     modelfile_path = create_modelfile(
         model_path=gguf_path,
         output_dir=args.output_dir,
     )
-    
+
     # Step 3: Create usage guide
     guide_path = create_ollama_usage_guide(args.output_dir)
-    
+
     # Step 4: Export to GGUF (manual steps)
     print("\n" + "=" * 60)
     print("  📋 Next Steps for GGUF Conversion")
@@ -460,7 +460,7 @@ def main():
     print(f"   ollama create vetta-granite-2b -f {modelfile_path}")
     print(f"\n5️⃣  Test the model:")
     print("   ollama run vetta-granite-2b 'Assess this candidate: 5 years Python, Django expert'")
-    
+
     print(f"\n📚 Full guide: {guide_path}")
     print("\n✅ Merge complete! Follow the steps above to create GGUF and use with Ollama.")
 

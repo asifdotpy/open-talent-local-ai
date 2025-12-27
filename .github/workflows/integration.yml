@@ -48,8 +48,8 @@ jobs:
       - name: Test workspace configuration
         run: |
           # Verify workspace file exists and is valid JSON
-          if [ -f "talent-ai-platform.code-workspace" ]; then
-            python -c "import json; json.load(open('talent-ai-platform.code-workspace')); print('✅ Workspace file is valid JSON')"
+          if [ -f "open-talent-platform.code-workspace" ]; then
+            python -c "import json; json.load(open('open-talent-platform.code-workspace')); print('✅ Workspace file is valid JSON')"
           else
             echo "❌ Workspace file not found"
             exit 1

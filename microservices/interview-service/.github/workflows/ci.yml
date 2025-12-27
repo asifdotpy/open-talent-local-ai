@@ -67,7 +67,7 @@ jobs:
       - name: Build and push Docker image to Artifact Registry
         id: build-image
         run: |
-          IMAGE_NAME="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/talent-ai/interview-service"
+          IMAGE_NAME="us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/open-talent/interview-service"
           TAG="${{ github.sha }}"
           LATEST_TAG="latest"
 
@@ -82,7 +82,7 @@ jobs:
         run: |
           docker pull aquasec/trivy:latest
           docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image \
-            us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/talent-ai/interview-service:${{ github.sha }} \
+            us-central1-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/open-talent/interview-service:${{ github.sha }} \
             --format json --output trivy-results.json || true # Allow failure for now, review results
           echo "Trivy scan completed. Review trivy-results.json for findings."
         env:

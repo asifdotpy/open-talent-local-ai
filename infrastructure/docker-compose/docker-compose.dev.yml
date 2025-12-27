@@ -142,28 +142,28 @@ services:
   # Development tools
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: talentai-pgadmin-dev
+    container_name: OpenTalent-pgadmin-dev
     restart: unless-stopped
     environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@talentai.local
+      - PGADMIN_DEFAULT_EMAIL=admin@OpenTalent.local
       - PGADMIN_DEFAULT_PASSWORD=devpassword
       - PGADMIN_CONFIG_SERVER_MODE=False
     ports:
       - "5050:80"
     networks:
-      - talentai-network
+      - OpenTalent-network
 
   redis-commander:
     image: rediscommander/redis-commander:latest
-    container_name: talentai-redis-commander-dev
+    container_name: OpenTalent-redis-commander-dev
     restart: unless-stopped
     environment:
       - REDIS_HOSTS=local:redis:6379:0:devpassword
     ports:
       - "8081:8081"
     networks:
-      - talentai-network
+      - OpenTalent-network
 
 networks:
-  talentai-network:
+  OpenTalent-network:
     driver: bridge

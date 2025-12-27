@@ -55,7 +55,7 @@ jobs:
           if [[ -f "package.json" ]]; then
             npm run build
           elif [[ -f "Dockerfile" ]]; then
-            docker build -t talent-ai/${{ matrix.submodule }}:$GITHUB_REF_NAME .
+            docker build -t open-talent/${{ matrix.submodule }}:$GITHUB_REF_NAME .
           fi
 
       - name: Create Release

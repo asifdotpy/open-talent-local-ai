@@ -4,7 +4,7 @@ services:
   # Redis - Message Bus
   redis:
     image: redis:7-alpine
-    container_name: talent-ai-redis
+    container_name: open-talent-redis
     ports:
       - "6379:6379"
     volumes:
@@ -21,7 +21,7 @@ services:
     build:
       context: ./genkit-service
       dockerfile: Dockerfile
-    container_name: talent-ai-genkit
+    container_name: open-talent-genkit
     ports:
       - "3400:3400"
     environment:
@@ -40,7 +40,7 @@ services:
     build:
       context: ./scout-coordinator-agent
       dockerfile: Dockerfile
-    container_name: talent-ai-scout
+    container_name: open-talent-scout
     ports:
       - "8090:8090"
     environment:
@@ -60,7 +60,7 @@ services:
     build:
       context: ./proactive-scanning-agent
       dockerfile: Dockerfile
-    container_name: talent-ai-scanning
+    container_name: open-talent-scanning
     ports:
       - "8091:8091"
     environment:
@@ -76,7 +76,7 @@ services:
     build:
       context: ./boolean-mastery-agent
       dockerfile: Dockerfile
-    container_name: talent-ai-boolean
+    container_name: open-talent-boolean
     ports:
       - "8092:8092"
     environment:
@@ -92,7 +92,7 @@ services:
     build:
       context: ./personalized-engagement-agent
       dockerfile: Dockerfile
-    container_name: talent-ai-engagement
+    container_name: open-talent-engagement
     ports:
       - "8093:8093"
     environment:
@@ -112,7 +112,7 @@ services:
     build:
       context: ./market-intelligence-agent
       dockerfile: Dockerfile
-    container_name: talent-ai-market
+    container_name: open-talent-market
     ports:
       - "8094:8094"
     environment:
@@ -128,7 +128,7 @@ services:
     build:
       context: ./tool-leverage-agent
       dockerfile: Dockerfile
-    container_name: talent-ai-tools
+    container_name: open-talent-tools
     ports:
       - "8095:8095"
     environment:
@@ -146,7 +146,7 @@ services:
     build:
       context: ./quality-focused-agent
       dockerfile: Dockerfile
-    container_name: talent-ai-quality
+    container_name: open-talent-quality
     ports:
       - "8096:8096"
     environment:
@@ -162,7 +162,7 @@ services:
     build:
       context: ./data-enrichment-agent
       dockerfile: Dockerfile
-    container_name: talent-ai-enrichment
+    container_name: open-talent-enrichment
     ports:
       - "8097:8097"
     environment:
@@ -187,5 +187,5 @@ volumes:
 
 networks:
   default:
-    name: talent-ai-network
+    name: open-talent-network
     driver: bridge

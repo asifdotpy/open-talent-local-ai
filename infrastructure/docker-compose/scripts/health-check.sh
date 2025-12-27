@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# TalentAI Platform - Health Check Script
+# OpenTalent Platform - Health Check Script
 # Validates all services are running and healthy
 
 set -e
 
-echo "🏥 TalentAI Platform Health Check"
+echo "🏥 OpenTalent Platform Health Check"
 echo "=================================="
 echo ""
 
@@ -27,7 +27,7 @@ check_service() {
     local name=$1
     local port=$2
     local endpoint=${3:-/health}
-    
+
     if curl -sf "http://localhost:$port$endpoint" > /dev/null 2>&1; then
         echo "  ✅ $name (port $port)"
     else
@@ -50,7 +50,7 @@ echo ""
 echo "🗄️  Database Checks:"
 
 # PostgreSQL
-if docker exec talentai-postgres pg_isready -U talentai > /dev/null 2>&1; then
+if docker exec OpenTalent-postgres pg_isready -U OpenTalent > /dev/null 2>&1; then
     echo "  ✅ PostgreSQL"
 else
     echo "  ❌ PostgreSQL - FAILED"
@@ -58,7 +58,7 @@ else
 fi
 
 # Redis
-if docker exec talentai-redis redis-cli ping > /dev/null 2>&1; then
+if docker exec OpenTalent-redis redis-cli ping > /dev/null 2>&1; then
     echo "  ✅ Redis"
 else
     echo "  ❌ Redis - FAILED"

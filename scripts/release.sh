@@ -36,8 +36,8 @@ if [[ -f "package.json" ]]; then
     mv *.tgz "../../releases/$SUBMODULE/$VERSION/"
 elif [[ -f "Dockerfile" ]]; then
     # Build and push Docker image
-    docker build -t "talent-ai/$SUBMODULE:$VERSION" .
-    docker push "talent-ai/$SUBMODULE:$VERSION"
+    docker build -t "open-talent/$SUBMODULE:$VERSION" .
+    docker push "open-talent/$SUBMODULE:$VERSION"
 fi
 
 # Tag release

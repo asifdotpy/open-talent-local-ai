@@ -1,5 +1,4 @@
-"""
-Conversation Service Integration Tests
+"""Conversation Service Integration Tests
 
 Comprehensive testing of the conversation service endpoints with honest validation
 of actual service behavior. Tests both mock and real LLM modes where applicable.
@@ -15,12 +14,8 @@ Test Coverage:
 Total: 28 tests
 """
 
-import pytest
-import httpx
-import asyncio
 import time
-from typing import Dict, Any
-import json
+
 from fastapi.testclient import TestClient
 
 from main import app
@@ -28,6 +23,7 @@ from main import app
 # Test configuration
 SERVICE_URL = "http://localhost:8003"
 TEST_TIMEOUT = 30  # seconds
+
 
 class TestConversationServiceIntegration:
     """Integration tests for Conversation Service endpoints."""
@@ -60,7 +56,7 @@ class TestConversationServiceIntegration:
         assert response.status_code == 200
         data = response.json()
         assert "service" in data
-        assert "TalentAI Conversation Service" in data["service"]
+        assert "OpenTalent Conversation Service" in data["service"]
         assert "version" in data
         assert "documentation" in data
 
@@ -90,13 +86,12 @@ class TestConversationServiceIntegration:
         assert "/conversation/start" in route_paths
         assert "/conversation/message" in route_paths
 
-    
     def test_generate_questions_valid_request(self):
         """Test question generation with valid job description."""
         payload = {
             "job_description": "Senior Python Developer with React experience",
             "num_questions": 3,
-            "difficulty": "medium"
+            "difficulty": "medium",
         }
 
         response = self.client.post("/conversation/generate-questions", json=payload)
@@ -117,12 +112,9 @@ class TestConversationServiceIntegration:
             assert isinstance(question["text"], str)
             assert len(question["text"]) > 10
 
-    
     def test_generate_questions_minimal_request(self):
         """Test question generation with minimal required fields."""
-        payload = {
-            "job_description": "Software Engineer"
-        }
+        payload = {"job_description": "Software Engineer"}
 
         response = self.client.post("/conversation/generate-questions", json=payload)
 
@@ -131,13 +123,9 @@ class TestConversationServiceIntegration:
         assert "questions" in data
         assert len(data["questions"]) == 10  # default num_questions
 
-    
     def test_generate_questions_max_questions(self):
         """Test question generation respects maximum limit."""
-        payload = {
-            "job_description": "Data Scientist",
-            "num_questions": 25  # Above max limit
-        }
+        payload = {"job_description": "Data Scientist", "num_questions": 25}  # Above max limit
 
         response = self.client.post("/conversation/generate-questions", json=payload)
 
@@ -146,13 +134,9 @@ class TestConversationServiceIntegration:
         data = response.json()
         assert "detail" in data
 
-    
     def test_generate_questions_empty_description(self):
         """Test question generation with empty job description."""
-        payload = {
-            "job_description": "",
-            "num_questions": 2
-        }
+        payload = {"job_description": "", "num_questions": 2}
 
         response = self.client.post("/conversation/generate-questions", json=payload)
 
@@ -166,13 +150,12 @@ class TestConversationServiceIntegration:
             data = response.json()
             assert "questions" in data
 
-    
     def test_generate_questions_invalid_difficulty(self):
         """Test question generation with invalid difficulty level."""
         payload = {
             "job_description": "Frontend Developer",
             "num_questions": 2,
-            "difficulty": "invalid_level"
+            "difficulty": "invalid_level",
         }
 
         response = self.client.post("/conversation/generate-questions", json=payload)
@@ -180,14 +163,13 @@ class TestConversationServiceIntegration:
         # Should accept gracefully (service handles validation)
         assert response.status_code in [200, 422]
 
-    
     def test_start_conversation_valid(self):
         """Test starting a conversation with valid parameters."""
         payload = {
             "session_id": "test-session-123",
             "job_description": "Python Developer with Django experience",
             "interview_type": "technical",
-            "tone": "professional"
+            "tone": "professional",
         }
 
         response = self.client.post("/conversation/start", json=payload)
@@ -200,13 +182,9 @@ class TestConversationServiceIntegration:
         assert "status" in data
         assert data["status"] == "started"
 
-    
     def test_start_conversation_minimal(self):
         """Test starting conversation with minimal parameters."""
-        payload = {
-            "session_id": "test-session-minimal",
-            "job_description": "Software Engineer"
-        }
+        payload = {"session_id": "test-session-minimal", "job_description": "Software Engineer"}
 
         response = self.client.post("/conversation/start", json=payload)
 
@@ -215,13 +193,12 @@ class TestConversationServiceIntegration:
         assert "conversation_id" in data
         assert data["session_id"] == "test-session-minimal"
 
-    
     def test_send_message_to_conversation(self):
         """Test sending a message to an active conversation."""
         # First start a conversation
         start_payload = {
             "session_id": "test-message-session",
-            "job_description": "Python Developer"
+            "job_description": "Python Developer",
         }
 
         start_response = self.client.post("/conversation/start", json=start_payload)
@@ -231,7 +208,7 @@ class TestConversationServiceIntegration:
         message_payload = {
             "session_id": "test-message-session",
             "message": "I have 5 years of Python experience",
-            "message_type": "transcript"
+            "message_type": "transcript",
         }
 
         response = self.client.post("/conversation/message", json=message_payload)
@@ -243,13 +220,12 @@ class TestConversationServiceIntegration:
         assert "response_type" in data
         assert "should_speak" in data
 
-    
     def test_send_message_no_active_conversation(self):
         """Test sending message when no conversation exists."""
         message_payload = {
             "session_id": "nonexistent-session",
             "message": "Hello",
-            "message_type": "transcript"
+            "message_type": "transcript",
         }
 
         response = self.client.post("/conversation/message", json=message_payload)
@@ -259,14 +235,10 @@ class TestConversationServiceIntegration:
         data = response.json()
         assert "detail" in data
 
-    
     def test_get_conversation_status(self):
         """Test getting status of an active conversation."""
         # Start conversation first
-        start_payload = {
-            "session_id": "test-status-session",
-            "job_description": "Java Developer"
-        }
+        start_payload = {"session_id": "test-status-session", "job_description": "Java Developer"}
 
         start_response = self.client.post("/conversation/start", json=start_payload)
         assert start_response.status_code == 200
@@ -282,7 +254,6 @@ class TestConversationServiceIntegration:
         assert "message_count" in data
         assert "last_activity" in data
 
-    
     def test_get_conversation_status_not_found(self):
         """Test getting status of non-existent conversation."""
         response = self.client.get("/conversation/status/nonexistent-session")
@@ -291,14 +262,10 @@ class TestConversationServiceIntegration:
         data = response.json()
         assert "detail" in data
 
-    
     def test_end_conversation(self):
         """Test ending an active conversation."""
         # Start conversation first
-        start_payload = {
-            "session_id": "test-end-session",
-            "job_description": "DevOps Engineer"
-        }
+        start_payload = {"session_id": "test-end-session", "job_description": "DevOps Engineer"}
 
         start_response = self.client.post("/conversation/start", json=start_payload)
         assert start_response.status_code == 200
@@ -311,7 +278,6 @@ class TestConversationServiceIntegration:
         assert "message" in data
         assert "Conversation ended successfully" in data["message"]
 
-    
     def test_end_conversation_not_found(self):
         """Test ending non-existent conversation."""
         response = self.client.post("/conversation/end/nonexistent-session")
@@ -320,12 +286,11 @@ class TestConversationServiceIntegration:
         data = response.json()
         assert "detail" in data
 
-    
     def test_analyze_sentiment_positive(self):
         """Test sentiment analysis with positive text."""
         payload = {
             "text": "I'm very excited about this opportunity and have extensive experience in Python development",
-            "context": "interview"
+            "context": "interview",
         }
 
         response = self.client.post("/conversation/analyze-sentiment", json=payload)
@@ -337,12 +302,11 @@ class TestConversationServiceIntegration:
         assert "subjectivity" in data
         assert data["sentiment"] >= 0  # Should be positive
 
-    
     def test_analyze_sentiment_negative(self):
         """Test sentiment analysis with negative text."""
         payload = {
             "text": "I'm not sure if I'm qualified for this position and lack experience in required technologies",
-            "context": "interview"
+            "context": "interview",
         }
 
         response = self.client.post("/conversation/analyze-sentiment", json=payload)
@@ -352,12 +316,11 @@ class TestConversationServiceIntegration:
         assert "sentiment" in data
         assert data["sentiment"] <= 0  # Should be negative or neutral
 
-    
     def test_analyze_sentiment_neutral(self):
         """Test sentiment analysis with neutral text."""
         payload = {
             "text": "I have worked with various programming languages including Java and C++",
-            "context": "general"
+            "context": "general",
         }
 
         response = self.client.post("/conversation/analyze-sentiment", json=payload)
@@ -368,32 +331,26 @@ class TestConversationServiceIntegration:
         # Neutral text should be close to 0
         assert -0.5 <= data["sentiment"] <= 0.5
 
-    
     def test_analyze_sentiment_empty_text(self):
         """Test sentiment analysis with empty text."""
-        payload = {
-            "text": "",
-            "context": "interview"
-        }
+        payload = {"text": "", "context": "interview"}
 
         response = self.client.post("/conversation/analyze-sentiment", json=payload)
 
         # Should handle gracefully
         assert response.status_code in [200, 422]
 
-    
     def test_invalid_json_payload(self):
         """Test handling of invalid JSON payloads."""
         response = self.client.post(
             "/conversation/generate-questions",
             content="invalid json",
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"},
         )
 
         # Should return 422 for invalid JSON
         assert response.status_code == 422
 
-    
     def test_missing_required_fields(self):
         """Test handling of missing required fields."""
         payload = {}  # Missing job_description
@@ -405,12 +362,11 @@ class TestConversationServiceIntegration:
         data = response.json()
         assert "detail" in data
 
-    
     def test_performance_question_generation(self):
         """Test performance of question generation endpoint."""
         payload = {
             "job_description": "Full Stack Developer with React and Node.js experience",
-            "num_questions": 5
+            "num_questions": 5,
         }
 
         start_time = time.time()
@@ -423,16 +379,12 @@ class TestConversationServiceIntegration:
         duration = end_time - start_time
         assert duration < 5.0, f"Request took {duration:.2f}s, expected < 5.0s"
 
-    
     def test_performance_conversation_flow(self):
         """Test performance of complete conversation flow."""
         start_time = time.time()
 
         # Start conversation
-        start_payload = {
-            "session_id": "perf-test-session",
-            "job_description": "Python Developer"
-        }
+        start_payload = {"session_id": "perf-test-session", "job_description": "Python Developer"}
         start_response = self.client.post("/conversation/start", json=start_payload)
         assert start_response.status_code == 200
 
@@ -440,7 +392,7 @@ class TestConversationServiceIntegration:
         message_payload = {
             "session_id": "perf-test-session",
             "message": "I have experience with Django and Flask",
-            "message_type": "transcript"
+            "message_type": "transcript",
         }
         message_response = self.client.post("/conversation/message", json=message_payload)
         assert message_response.status_code == 200

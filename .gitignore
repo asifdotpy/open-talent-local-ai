@@ -1,5 +1,5 @@
 ################################################################################
-# TalentAI Platform - .gitignore
+# OpenTalent Platform - .gitignore
 # Open Source Project - Best Practices Compliant
 # Last Updated: November 17, 2025
 ################################################################################
@@ -572,16 +572,31 @@ personal
 *.md:Zone.Identifier
 *:Zone.Identifier
 
-# BUT KEEP ESSENTIAL PROJECT DOCUMENTATION
-# These are explicitly ALLOWED:
-# - README.md (root and subdirectories)
-# - CONTRIBUTING.md (root and subdirectories)
-# - LICENSE.md / LICENSE
 # - SECURITY.md
 # - AGENTS.md (architecture documentation)
 # - GEMINI.md (AI assistant context)
 # - docs/** (all documentation)
+# Remove specs from allowed list - keep internal
 # - specs/** (specifications)
+
+# Global Markdown Ignore (Cleaner Public Repo)
+*.md
+!README.md
+!README_*.md
+!CONTRIBUTING.md
+!LICENSE.md
+!SECURITY.md
+!CHANGELOG.md
+!AGENTS.md
+!GEMINI.md
+!docs/**/*.md
+
+# Internal Specs and Extraction
+specs/
+endpoint-extraction-*/
+endpoint-extraction-*.log
+microservices.backup.*/
+services_backup_*/
 
 #===============================================================================
 # BUSINESS & LEGAL (Not part of codebase)

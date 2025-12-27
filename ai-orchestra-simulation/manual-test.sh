@@ -3,7 +3,7 @@
 # Manual Avatar Integration Test Script
 # Run this to verify the complete avatar interview system works
 
-echo "🎭 TALENTAI AVATAR INTEGRATION - MANUAL TEST"
+echo "🎭 OpenTalent AVATAR INTEGRATION - MANUAL TEST"
 echo "=============================================="
 echo ""
 

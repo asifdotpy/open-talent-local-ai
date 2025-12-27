@@ -1,6 +1,6 @@
 # tests/shared/performance/benchmarks.py
 """
-Performance benchmarks and thresholds for the TalentAI Platform.
+Performance benchmarks and thresholds for the OpenTalent Platform.
 All submodules should meet or exceed these performance standards.
 """
 

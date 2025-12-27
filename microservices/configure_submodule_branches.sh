@@ -11,7 +11,7 @@ while read -r key path
 do
     echo "--> Checking submodule at path: $path"
 
-    if [ "$path" = "quarkdown-specs" ] || [ "$path" = "talent-ai-microservices" ]; then
+    if [ "$path" = "quarkdown-specs" ] || [ "$path" = "open-talent-microservices" ]; then
         TARGET_BRANCH="develop"
     else
         TARGET_BRANCH="dev"

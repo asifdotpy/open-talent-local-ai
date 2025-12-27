@@ -17,7 +17,7 @@ services:
       - MAX_MODEL_MEMORY=0.8
       - TRAINING_DATA_DIR=/app/data
       - OUTPUT_DIR=/app/models/fine-tuned
-      - WANDB_PROJECT=talent-ai-granite
+      - WANDB_PROJECT=open-talent-granite
     volumes:
       - ./models:/app/models
       - ./data:/app/data

@@ -1,4 +1,4 @@
-# TalentAI - Scout Service (Talent Discovery Specialist)
+# OpenTalent - Scout Service (Talent Discovery Specialist)
 FROM python:3.11-slim
 
 # Install system dependencies

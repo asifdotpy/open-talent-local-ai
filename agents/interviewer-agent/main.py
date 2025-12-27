@@ -11,40 +11,38 @@ This agent manages the complete interview workflow:
 - Provides comprehensive assessment scores
 """
 
-import asyncio
-import logging
 import sys
 from contextlib import asynccontextmanager
-from typing import Dict, List, Optional, Any
 from datetime import datetime
 from pathlib import Path
+from typing import Any, Optional
 
-import uvicorn
-from fastapi import FastAPI, HTTPException, BackgroundTasks
-from fastapi.middleware.cors import CORSMiddleware
-import structlog
 import httpx
+import structlog
+import uvicorn
+from fastapi import BackgroundTasks, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 # Add shared modules to path
 shared_path = Path(__file__).parent.parent / "shared"
 sys.path.insert(0, str(shared_path))
 
-from models import (
-    CandidateProfile,
-    InterviewResult,
-    InterviewSession,
-    AgentMessage,
-    MessageType,
-    SourcingPipeline
-)
 from message_bus import MessageBus, Topics
 from service_clients import (
+    AvatarServiceClient,
     CandidateServiceClient,
     ConversationServiceClient,
     VoiceServiceClient,
-    AvatarServiceClient
 )
+
 from config import Config
+from models import (
+    AgentMessage,
+    CandidateProfile,
+    InterviewResult,
+    InterviewSession,
+    MessageType,
+)
 
 # Configure structured logging
 structlog.configure(
@@ -57,7 +55,7 @@ structlog.configure(
         structlog.processors.StackInfoRenderer(),
         structlog.processors.format_exc_info,
         structlog.processors.UnicodeDecoder(),
-        structlog.processors.JSONRenderer()
+        structlog.processors.JSONRenderer(),
     ],
     context_class=dict,
     logger_factory=structlog.stdlib.LoggerFactory(),
@@ -72,6 +70,7 @@ message_bus: Optional[MessageBus] = None
 config: Optional[Config] = None
 genkit_client: Optional[httpx.AsyncClient] = None
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan manager"""
@@ -80,10 +79,7 @@ async def lifespan(app: FastAPI):
     # Startup
     config = Config()
     message_bus = MessageBus()
-    genkit_client = httpx.AsyncClient(
-        base_url=config.genkit_service_url,
-        timeout=30.0
-    )
+    genkit_client = httpx.AsyncClient(base_url=config.genkit_service_url, timeout=30.0)
 
     # Connect to Redis
     await message_bus.connect()
@@ -103,11 +99,12 @@ async def lifespan(app: FastAPI):
         await message_bus.disconnect()
     logger.info("Vetta AI Interviewer Agent stopped")
 
+
 # Initialize FastAPI app
 app = FastAPI(
     title="Vetta AI - Interviewer Agent",
     description="""
-    AI-driven avatar interview conductor for TalentAI Platform.
+    AI-driven avatar interview conductor for OpenTalent Platform.
 
     **Vetta AI** manages the complete interview workflow:
     - Starts interviews based on candidate profiles
@@ -135,7 +132,7 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Add CORS middleware
@@ -147,46 +144,50 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 async def root():
     """Get service information and API documentation links."""
     return {
         "service": "Vetta AI - Interviewer Agent",
         "version": "1.0.0",
-        "description": "AI-driven avatar interview conductor for TalentAI Platform",
+        "description": "AI-driven avatar interview conductor for OpenTalent Platform",
         "documentation": {
             "swagger_ui": "/docs",
             "alternative": "/doc",
             "redoc": "/redoc",
             "openapi_json": "/openapi.json",
-            "api_summary": "/api-docs"
+            "api_summary": "/api-docs",
         },
         "endpoints": {
             "health": "/health",
             "start_interview": "POST /interviews/start",
             "get_interview": "GET /interviews/{interview_id}",
             "submit_answer": "POST /interviews/{interview_id}/answer",
-            "next_question": "GET /interviews/{interview_id}/next-question"
+            "next_question": "GET /interviews/{interview_id}/next-question",
         },
-        "active_interviews": len(active_interviews)
+        "active_interviews": len(active_interviews),
     }
+
 
 @app.get("/doc", include_in_schema=False)
 async def doc_redirect():
     """Alternative redirect to API documentation."""
     from fastapi.responses import RedirectResponse
+
     return RedirectResponse(url="/docs")
+
 
 @app.get("/api-docs", include_in_schema=False)
 async def api_docs_info():
     """Get API documentation information and available endpoints."""
     routes_info = []
     for route in app.routes:
-        if hasattr(route, 'methods') and hasattr(route, 'path'):
+        if hasattr(route, "methods") and hasattr(route, "path"):
             route_info = {
                 "path": route.path,
                 "methods": list(route.methods),
-                "name": getattr(route, 'name', 'unknown')
+                "name": getattr(route, "name", "unknown"),
             }
             routes_info.append(route_info)
 
@@ -198,7 +199,7 @@ async def api_docs_info():
         "documentation_urls": {
             "swagger_ui": "/docs",
             "redoc": "/redoc",
-            "openapi_json": "/openapi.json"
+            "openapi_json": "/openapi.json",
         },
         "active_interviews": len(active_interviews),
         "routes": routes_info,
@@ -207,12 +208,13 @@ async def api_docs_info():
             "Voice Service (TTS)",
             "Avatar Service (lip-sync)",
             "Candidate Service (profiles)",
-            "Redis Message Bus (events)"
-        ]
+            "Redis Message Bus (events)",
+        ],
     }
 
+
 # In-memory storage for active interviews (use Redis in production)
-active_interviews: Dict[str, InterviewSession] = {}
+active_interviews: dict[str, InterviewSession] = {}
 
 # Service clients
 candidate_client = CandidateServiceClient()
@@ -220,19 +222,19 @@ conversation_client = ConversationServiceClient()
 voice_client = VoiceServiceClient()
 avatar_client = AvatarServiceClient()
 
-async def call_genkit_flow(flow_name: str, input_data: Dict[str, Any]) -> Dict[str, Any]:
+
+async def call_genkit_flow(flow_name: str, input_data: dict[str, Any]) -> dict[str, Any]:
     """Call a Genkit flow via HTTP"""
     try:
         response = await genkit_client.post(
-            f"/{flow_name}",
-            json=input_data,
-            headers={"Content-Type": "application/json"}
+            f"/{flow_name}", json=input_data, headers={"Content-Type": "application/json"}
         )
         response.raise_for_status()
         return response.json()
     except Exception as e:
         logger.error("Error calling Genkit flow", flow=flow_name, error=str(e))
         raise
+
 
 async def handle_candidate_event(message: AgentMessage):
     """Handle candidate-related events"""
@@ -249,12 +251,14 @@ async def handle_candidate_event(message: AgentMessage):
     except Exception as e:
         logger.error("Error handling candidate event", error=str(e), exc_info=True)
 
+
 async def handle_interview_event(message: AgentMessage):
     """Handle interview-related events"""
     try:
         logger.info("Processed interview event", message_type=message.message_type)
     except Exception as e:
         logger.error("Error handling interview event", error=str(e), exc_info=True)
+
 
 async def start_interview_background(candidate: CandidateProfile):
     """Background task to start interview for candidate"""
@@ -270,7 +274,7 @@ async def start_interview_background(candidate: CandidateProfile):
             responses=[],
             assessment_scores={},
             created_at=datetime.now(),
-            updated_at=datetime.now()
+            updated_at=datetime.now(),
         )
 
         active_interviews[interview_id] = session
@@ -300,25 +304,31 @@ async def start_interview_background(candidate: CandidateProfile):
                 payload={
                     "interview_id": interview_id,
                     "candidate_id": candidate.id,
-                    "first_question": first_question
+                    "first_question": first_question,
                 },
-                correlation_id=candidate.id
-            )
+                correlation_id=candidate.id,
+            ),
         )
 
         logger.info("Interview started", interview_id=interview_id, candidate_id=candidate.id)
 
     except Exception as e:
-        logger.error("Error starting interview", candidate_id=candidate.id, error=str(e), exc_info=True)
+        logger.error(
+            "Error starting interview", candidate_id=candidate.id, error=str(e), exc_info=True
+        )
+
 
 async def generate_question(candidate: CandidateProfile, session: InterviewSession) -> str:
     """Generate next interview question using Genkit flow"""
     try:
-        question_data = await call_genkit_flow("generateInterviewQuestion", {
-            "candidateProfile": candidate.dict(),
-            "questionIndex": session.current_question_index,
-            "previousQuestions": session.questions_asked
-        })
+        question_data = await call_genkit_flow(
+            "generateInterviewQuestion",
+            {
+                "candidateProfile": candidate.dict(),
+                "questionIndex": session.current_question_index,
+                "previousQuestions": session.questions_asked,
+            },
+        )
 
         question = question_data["question"]
         session.questions_asked.append(question)
@@ -330,30 +340,38 @@ async def generate_question(candidate: CandidateProfile, session: InterviewSessi
         logger.error("Error generating question", error=str(e), exc_info=True)
         return "Can you tell me about your relevant experience for this position?"
 
-async def evaluate_response(candidate: CandidateProfile, session: InterviewSession,
-                          question: str, response: str) -> Dict[str, Any]:
+
+async def evaluate_response(
+    candidate: CandidateProfile, session: InterviewSession, question: str, response: str
+) -> dict[str, Any]:
     """Evaluate candidate response using Genkit flow"""
     try:
-        evaluation_data = await call_genkit_flow("evaluateInterviewResponse", {
-            "question": question,
-            "response": response,
-            "candidateProfile": candidate.dict(),
-            "interviewHistory": [
-                {
-                    "question": r["question"],
-                    "response": r["response"],
-                    "evaluation": r.get("evaluation", {})
-                } for r in session.responses[-3:]  # Last 3 responses
-            ]
-        })
+        evaluation_data = await call_genkit_flow(
+            "evaluateInterviewResponse",
+            {
+                "question": question,
+                "response": response,
+                "candidateProfile": candidate.dict(),
+                "interviewHistory": [
+                    {
+                        "question": r["question"],
+                        "response": r["response"],
+                        "evaluation": r.get("evaluation", {}),
+                    }
+                    for r in session.responses[-3:]  # Last 3 responses
+                ],
+            },
+        )
 
         # Store response
-        session.responses.append({
-            "question": question,
-            "response": response,
-            "evaluation": evaluation_data,
-            "timestamp": datetime.now()
-        })
+        session.responses.append(
+            {
+                "question": question,
+                "response": response,
+                "evaluation": evaluation_data,
+                "timestamp": datetime.now(),
+            }
+        )
 
         session.updated_at = datetime.now()
 
@@ -366,8 +384,9 @@ async def evaluate_response(candidate: CandidateProfile, session: InterviewSessi
             "feedback": "Response recorded",
             "strengths": [],
             "weaknesses": [],
-            "recommendations": []
+            "recommendations": [],
         }
+
 
 @app.get("/health")
 async def health_check():
@@ -377,8 +396,9 @@ async def health_check():
         "agent": "vetta-ai",
         "active_interviews": len(active_interviews),
         "genkit_connected": genkit_client is not None,
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
     }
+
 
 @app.post("/interviews/start")
 async def start_interview(candidate_id: str, background_tasks: BackgroundTasks):
@@ -394,12 +414,15 @@ async def start_interview(candidate_id: str, background_tasks: BackgroundTasks):
         return {
             "message": "Interview starting",
             "candidate_id": candidate_id,
-            "status": "scheduled"
+            "status": "scheduled",
         }
 
     except Exception as e:
-        logger.error("Error starting interview", candidate_id=candidate_id, error=str(e), exc_info=True)
+        logger.error(
+            "Error starting interview", candidate_id=candidate_id, error=str(e), exc_info=True
+        )
         raise HTTPException(status_code=500, detail="Failed to start interview")
+
 
 @app.get("/interviews/{interview_id}")
 async def get_interview_status(interview_id: str):
@@ -418,8 +441,9 @@ async def get_interview_status(interview_id: str):
         "responses": len(session.responses),
         "assessment_scores": session.assessment_scores,
         "created_at": session.created_at.isoformat(),
-        "updated_at": session.updated_at.isoformat()
+        "updated_at": session.updated_at.isoformat(),
     }
+
 
 @app.post("/interviews/{interview_id}/answer")
 async def submit_answer(interview_id: str, answer: str, background_tasks: BackgroundTasks):
@@ -441,9 +465,9 @@ async def submit_answer(interview_id: str, answer: str, background_tasks: Backgr
         evaluation = await evaluate_response(candidate, session, current_question, answer)
 
         # Update assessment scores
-        session.assessment_scores.update({
-            f"question_{len(session.responses)}": evaluation["score"]
-        })
+        session.assessment_scores.update(
+            {f"question_{len(session.responses)}": evaluation["score"]}
+        )
 
         # Check if interview should continue
         should_continue = await should_continue_interview(session, evaluation)
@@ -459,7 +483,7 @@ async def submit_answer(interview_id: str, answer: str, background_tasks: Backgr
             response = {
                 "message": "Answer recorded, next question sent",
                 "evaluation": evaluation,
-                "next_question": next_question
+                "next_question": next_question,
             }
         else:
             # End interview
@@ -470,11 +494,14 @@ async def submit_answer(interview_id: str, answer: str, background_tasks: Backgr
             interview_result = InterviewResult(
                 id=interview_id,
                 candidate_id=session.candidate_id,
-                overall_score=sum(session.assessment_scores.values()) / len(session.assessment_scores) if session.assessment_scores else 0,
+                overall_score=sum(session.assessment_scores.values())
+                / len(session.assessment_scores)
+                if session.assessment_scores
+                else 0,
                 question_responses=session.responses,
                 assessment_scores=session.assessment_scores,
                 final_assessment=final_assessment,
-                completed_at=datetime.now()
+                completed_at=datetime.now(),
             )
 
             # Save to candidate service
@@ -487,22 +514,25 @@ async def submit_answer(interview_id: str, answer: str, background_tasks: Backgr
                     source_agent="vetta-ai",
                     message_type=MessageType.INTERVIEW_COMPLETED,
                     payload=interview_result.dict(),
-                    correlation_id=session.candidate_id
-                )
+                    correlation_id=session.candidate_id,
+                ),
             )
 
             response = {
                 "message": "Interview completed",
                 "evaluation": evaluation,
                 "final_assessment": final_assessment,
-                "overall_score": interview_result.overall_score
+                "overall_score": interview_result.overall_score,
             }
 
         return response
 
     except Exception as e:
-        logger.error("Error processing answer", interview_id=interview_id, error=str(e), exc_info=True)
+        logger.error(
+            "Error processing answer", interview_id=interview_id, error=str(e), exc_info=True
+        )
         raise HTTPException(status_code=500, detail="Failed to process answer")
+
 
 @app.get("/interviews/{interview_id}/next-question")
 async def get_next_question(interview_id: str):
@@ -517,24 +547,32 @@ async def get_next_question(interview_id: str):
 
     return {"question": session.questions_asked[-1]}
 
-async def should_continue_interview(session: InterviewSession, evaluation: Dict) -> bool:
+
+async def should_continue_interview(session: InterviewSession, evaluation: dict) -> bool:
     """Determine if interview should continue based on evaluation"""
     score = evaluation.get("score", 5.0)
 
     # Continue if score is above threshold and not too many questions asked
     return score >= 6.0 and len(session.questions_asked) < 8
 
+
 async def generate_final_assessment(session: InterviewSession, candidate: CandidateProfile) -> str:
     """Generate final assessment using Genkit flow"""
     try:
-        assessment_data = await call_genkit_flow("generateFinalAssessment", {
-            "candidateProfile": candidate.dict(),
-            "interviewSummary": {
-                "totalQuestions": len(session.questions_asked),
-                "responses": session.responses,
-                "averageScore": sum(session.assessment_scores.values()) / len(session.assessment_scores) if session.assessment_scores else 5.0
-            }
-        })
+        assessment_data = await call_genkit_flow(
+            "generateFinalAssessment",
+            {
+                "candidateProfile": candidate.dict(),
+                "interviewSummary": {
+                    "totalQuestions": len(session.questions_asked),
+                    "responses": session.responses,
+                    "averageScore": sum(session.assessment_scores.values())
+                    / len(session.assessment_scores)
+                    if session.assessment_scores
+                    else 5.0,
+                },
+            },
+        )
 
         return f"""
 Final Assessment:
@@ -546,13 +584,15 @@ Recommendation: {assessment_data['hireRecommendation']}
 
     except Exception as e:
         logger.error("Error generating final assessment", error=str(e), exc_info=True)
-        avg_score = sum(session.assessment_scores.values()) / len(session.assessment_scores) if session.assessment_scores else 5.0
+        avg_score = (
+            sum(session.assessment_scores.values()) / len(session.assessment_scores)
+            if session.assessment_scores
+            else 5.0
+        )
         return f"Interview completed with average score of {avg_score:.1f}/10"
+
 
 if __name__ == "__main__":
     uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=config.interviewer_port if config else 8080,
-        reload=True
+        "main:app", host="0.0.0.0", port=config.interviewer_port if config else 8080, reload=True
     )

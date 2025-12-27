@@ -1,50 +1,40 @@
 """
-TalentAI Shared Infrastructure
+OpenTalent Shared Infrastructure
 Provides common models, message bus, and service clients for all agents.
 """
 
+from .config import AgentConfig, config, get_config
+from .message_bus import MessageBus, Topics
 from .models import (
-    CandidateProfile,
-    EngagementHistory,
-    MarketInsight,
     AgentMessage,
-    SourcingPipeline,
-    InterviewResult,
-    CandidateStatus,
+    CandidateProfile,
     CandidateSource,
-    MessageType,
-    MessagePriority,
-    PipelineState,
-    Skill,
-    WorkExperience,
+    CandidateStatus,
+    CompetitorIntel,
     Education,
-    SocialProfile,
+    EngagementHistory,
+    InterviewResult,
+    MarketInsight,
+    MessagePriority,
+    MessageType,
     OutreachAttempt,
     OutreachChannel,
     OutreachStatus,
+    PipelineState,
     SalaryTrend,
-    CompetitorIntel,
+    Skill,
     SkillDemand,
+    SocialProfile,
+    SourcingPipeline,
+    WorkExperience,
 )
-
-from .message_bus import (
-    MessageBus,
-    Topics,
-)
-
 from .service_clients import (
-    ConversationServiceClient,
-    VoiceServiceClient,
     AvatarServiceClient,
-    InterviewServiceClient,
+    ConversationServiceClient,
     GenkitServiceClient,
+    InterviewServiceClient,
     ServiceClients,
-)
-
-from .config import (
-    AgentConfig,
-    get_config,
-    config,
+    VoiceServiceClient,
 )
 
 __version__ = "0.1.0"
@@ -72,11 +62,9 @@ __all__ = [
     "SalaryTrend",
     "CompetitorIntel",
     "SkillDemand",
-    
     # Message Bus
     "MessageBus",
     "Topics",
-    
     # Service Clients
     "ConversationServiceClient",
     "VoiceServiceClient",
@@ -84,7 +72,6 @@ __all__ = [
     "InterviewServiceClient",
     "GenkitServiceClient",
     "ServiceClients",
-    
     # Config
     "AgentConfig",
     "get_config",

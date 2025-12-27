@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
-Simple Neo4j Data Extractor for TalentAI Platform
+Simple Neo4j Data Extractor for OpenTalent Platform
 
 Extracts basic candidate and job data from Neo4j for analysis.
 """
 
 import os
 import sys
+
 
 def get_neo4j_credentials():
     """Get Neo4j connection credentials"""
@@ -16,20 +17,22 @@ def get_neo4j_credentials():
 
     return {"uri": uri, "user": user, "password": password}
 
+
 def extract_candidates():
     """Extract candidate data (placeholder)"""
     # This is a simplified version - in real implementation would connect to Neo4j
     candidates = [
         {"name": "John Doe", "skills": ["Python", "React"]},
-        {"name": "Jane Smith", "skills": ["Java", "AWS"]}
+        {"name": "Jane Smith", "skills": ["Java", "AWS"]},
     ]
 
     return candidates
 
+
 def main():
     """Main extraction function"""
     try:
-        print("TalentAI Neo4j Extractor")
+        print("OpenTalent Neo4j Extractor")
         print("========================")
 
         # Get credentials (but don't connect in this simplified version)
@@ -49,6 +52,7 @@ def main():
     except Exception as e:
         print(f"Error: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

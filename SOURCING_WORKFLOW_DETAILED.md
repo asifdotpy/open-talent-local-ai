@@ -37,6 +37,7 @@ Results & Integration (Tool Leverage Agent)
 **Endpoint:** `POST /pipelines/start` on Scout Coordinator (Port 8090)
 
 **Request Body:**
+
 ```json
 {
   "project_id": "project_123",
@@ -55,6 +56,7 @@ Results & Integration (Tool Leverage Agent)
 #### **Step 1.2: Scout Coordinator Creates Pipeline State**
 
 **Process:**
+
 ```python
 # In start_pipeline() endpoint:
 pipeline_id = f"pipeline_{project_id}_{timestamp}"
@@ -72,11 +74,13 @@ active_pipelines[pipeline_id] = pipeline
 ```
 
 **What Happens:**
+
 - Pipeline object created and stored in memory (`active_pipelines` dict)
 - Status: `INITIATED` (ready to start scanning)
 - All metrics initialized to 0
 
 **Response to User:**
+
 ```json
 {
   "pipeline_id": "pipeline_project_123_1733740234",
@@ -100,6 +104,7 @@ active_pipelines[pipeline_id] = pipeline
 #### **Step 2.1: Scout Coordinator Publishes Pipeline Started Event**
 
 **What Happens:**
+
 ```python
 await message_bus.publish_event(
     topic=Topics.PIPELINE_EVENTS,
@@ -128,12 +133,14 @@ await message_bus.publish_event(
 **Process in `initiate_scanning()` function:**
 
 **Step 2.2a: Transition to SCANNING state**
+
 ```python
 await transition_pipeline(pipeline_id, PipelineState.SCANNING)
 # Publishes: PIPELINE_UPDATE event with state change
 ```
 
 **Step 2.2b: Publish Scanning Request to Proactive Scanning Agent**
+
 ```python
 await message_bus.publish_event(
     topic="agents:scanning",
@@ -151,6 +158,7 @@ await message_bus.publish_event(
 ```
 
 **Step 2.2c: Publish Boolean Query Generation Request**
+
 ```python
 await message_bus.publish_event(
     topic="agents:boolean",
@@ -177,6 +185,7 @@ await message_bus.publish_event(
 **Process:**
 
 **Step 2.3a: Message Bus Listener Receives Event**
+
 ```python
 async def handle_query_request(message):
     """Message arrives from Redis topic 'agents:boolean'"""
@@ -188,10 +197,11 @@ async def handle_query_request(message):
 **Step 2.3b: Generate Boolean Query for Each Platform**
 
 For **LinkedIn:**
+
 ```python
 # Extract keywords from job description
 keywords = extract_keywords(job_description)
-# Returns: 
+# Returns:
 # {
 #   "skills": ["Python", "Django", "FastAPI", "PostgreSQL", "Redis"],
 #   "titles": ["Software Engineer", "Backend Developer", "Python Developer"],
@@ -204,23 +214,25 @@ skills = '"Python" OR "FastAPI" OR "PostgreSQL" OR "Redis" OR "Django"'
 titles = '"Backend Engineer" OR "Software Engineer" OR "Python Developer"'
 query = f"({titles}) AND ({skills})"
 
-# Result: 
-# ("Backend Engineer" OR "Software Engineer" OR "Python Developer") 
+# Result:
+# ("Backend Engineer" OR "Software Engineer" OR "Python Developer")
 # AND ("Python" OR "FastAPI" OR "PostgreSQL" OR "Redis" OR "Django")
 ```
 
 For **GitHub:**
+
 ```python
 # GitHub search syntax (different from LinkedIn)
 languages = "language:python language:typescript"
 skills = "FastAPI microservices architecture"
 query = f"{skills} {languages}"
 
-# Result: 
+# Result:
 # FastAPI microservices architecture language:python language:typescript
 ```
 
 **Step 2.3c: Publish Query Generated Event**
+
 ```python
 await message_bus.publish_event(
     topic=Topics.PIPELINE_EVENTS,
@@ -248,6 +260,7 @@ await message_bus.publish_event(
 **Process:**
 
 **Step 2.4a: Message Bus Listener Receives Event**
+
 ```python
 async def handle_scanning_request(message):
     """Message from Redis topic 'agents:scanning'"""
@@ -255,7 +268,7 @@ async def handle_scanning_request(message):
     job_description = message.payload.get("job_description")
     platforms = message.payload.get("platforms", ["linkedin", "github"])
     target_count = message.payload.get("target_count", 50)
-    
+
     # Trigger scanning in background
     asyncio.create_task(
         scan_platforms(pipeline_id, job_description, platforms, target_count)
@@ -265,11 +278,12 @@ async def handle_scanning_request(message):
 **Step 2.4b: Scan Each Platform in Parallel**
 
 For **LinkedIn:**
+
 ```python
 async def scan_linkedin(pipeline_id, job_description, target):
     # In production: Use LinkedIn API with boolean query
     # In current: Mock data generation
-    
+
     for i in range(min(target, 10)):
         candidate = CandidateProfile(
             id=f"linkedin_{pipeline_id}_{i}",
@@ -292,11 +306,12 @@ async def scan_linkedin(pipeline_id, job_description, target):
 ```
 
 For **GitHub:**
+
 ```python
 async def scan_github(pipeline_id, job_description, target):
     # In production: Use GitHub API search
     # In current: Mock data generation
-    
+
     for i in range(min(target, 10)):
         candidate = CandidateProfile(
             id=f"github_{pipeline_id}_{i}",
@@ -319,6 +334,7 @@ async def scan_github(pipeline_id, job_description, target):
 **Step 2.4c: Publish Candidate Found Events**
 
 For each candidate discovered:
+
 ```python
 await message_bus.publish_event(
     topic=Topics.CANDIDATE_EVENTS,
@@ -357,6 +373,7 @@ await message_bus.publish_event(
 **Process:**
 
 **Step 3.1a: Message Listener Subscribes to Candidate Events**
+
 ```python
 # During agent startup (lifespan):
 await message_bus.subscribe(
@@ -366,12 +383,13 @@ await message_bus.subscribe(
 ```
 
 **Step 3.1b: Auto-Score New Candidates**
+
 ```python
 async def handle_scoring_request(message):
     if message.message_type == MessageType.CANDIDATE_FOUND:
         candidate_data = message.payload.get("candidate")
         pipeline_id = message.payload.get("pipeline_id")
-        
+
         # Trigger scoring in background
         asyncio.create_task(
             score_candidate(pipeline_id, candidate_data)
@@ -383,7 +401,7 @@ async def handle_scoring_request(message):
 ```python
 async def score_candidate(pipeline_id, candidate_data):
     candidate_id = candidate_data.get("id")
-    
+
     # Call Genkit service (Google AI LLM) for scoring
     score_data = await service_clients.genkit.score_candidate_quality(
         candidate_profile={
@@ -396,7 +414,7 @@ async def score_candidate(pipeline_id, candidate_data):
         },
         job_description="Senior Python Backend Developer with 5+ years"
     )
-    
+
     # Genkit returns scoring breakdown
     overall_score = score_data.get("quality_score", 0)  # 0-100
     skill_match = score_data.get("skill_match", 0)      # 0-100
@@ -408,25 +426,25 @@ async def score_candidate(pipeline_id, candidate_data):
 ```python
 async def detect_bias(candidate_data):
     bias_flags = []
-    
+
     # Check for name-based bias
     name = candidate_data.get("name", "").lower()
     if any(marker in name for marker in ["jr", "sr", "iii"]):
         # Could indicate age discrimination concerns
         bias_flags.append("potential_age_marker")
-    
+
     # Check for gender indicators
     pronouns = candidate_data.get("pronouns", "").lower()
     if pronouns:
         # Monitor gender-specific evaluation
         bias_flags.append("gender_identified")
-    
+
     # Check for location-based bias
     location = candidate_data.get("location", "")
     if location and "sf" in location.lower():
         # All candidates from same location
         bias_flags.append("geographic_clustering")
-    
+
     return bias_flags
 ```
 
@@ -477,11 +495,12 @@ await message_bus.publish_event(
 **Process:**
 
 **Step 3.2a: Coordinator Receives Scored Event**
+
 ```python
 async def handle_candidate_scored(message: AgentMessage):
     pipeline_id = message.payload.get("pipeline_id")
     quality_score = message.payload.get("quality_score", 0)
-    
+
     # If high quality candidate, trigger engagement
     if quality_score >= 70 and pipeline_id in active_pipelines:
         await trigger_engagement(pipeline_id, message.payload.get("candidate_id"))
@@ -520,6 +539,7 @@ async def trigger_engagement(pipeline_id, candidate_id):
 **Process:**
 
 **Step 4.1a: Message Listener Subscribes to Engagement Events**
+
 ```python
 # During agent startup:
 await message_bus.subscribe(
@@ -529,11 +549,12 @@ await message_bus.subscribe(
 ```
 
 **Step 4.1b: Engagement Request Received**
+
 ```python
 async def handle_engagement_request(message):
     pipeline_id = message.payload.get("pipeline_id")
     candidate_id = message.payload.get("candidate_id")
-    
+
     # Trigger engagement in background
     asyncio.create_task(
         send_outreach(pipeline_id, candidate_id)
@@ -543,6 +564,7 @@ async def handle_engagement_request(message):
 **Step 4.1c: Fetch Candidate Data (Mock Implementation)**
 
 In production, would fetch from candidate database:
+
 ```python
 candidate_data = {
     "name": "LinkedIn Candidate 0",
@@ -568,8 +590,8 @@ message_data = {
     "message": """
     Hi LinkedIn Candidate 0,
 
-    We came across your profile and were impressed by your experience as a Software Engineer 
-    with expertise in Python and Django. We're currently hiring for a Senior Backend Engineer 
+    We came across your profile and were impressed by your experience as a Software Engineer
+    with expertise in Python and Django. We're currently hiring for a Senior Backend Engineer
     position at OpenTalent, and we believe your skills would be a perfect fit.
 
     The role involves:
@@ -633,11 +655,13 @@ async def handle_outreach_sent(message: AgentMessage):
 #### **Step 4.2: Simulate Candidate Response (Real Flow Would Use Email/SMS)**
 
 **In Production:**
+
 - Candidate receives email
 - Clicks link in email → replies positively
 - Email service triggers webhook → POST to engagement API
 
 **In Current Mock:**
+
 - Candidate response simulated manually or via API
 - Would trigger: `MessageType.OUTREACH_RESPONSE` event
 
@@ -669,6 +693,7 @@ await message_bus.publish_event(
 **Process:**
 
 **Step 5.1a: Coordinator Receives Response Event**
+
 ```python
 async def handle_outreach_response(message: AgentMessage):
     pipeline_id = message.payload.get("pipeline_id")
@@ -676,7 +701,7 @@ async def handle_outreach_response(message: AgentMessage):
         # Track response
         active_pipelines[pipeline_id].candidates_responded += 1
         active_pipelines[pipeline_id].updated_at = datetime.utcnow()
-        
+
         # Trigger interview scheduling
         await trigger_interview(pipeline_id, message.payload.get("candidate_id"))
 ```
@@ -800,6 +825,7 @@ voice_response = {
 **Step 5.2f: Send Interview Question to Candidate**
 
 Frontend receives:
+
 ```json
 {
   "interview_id": "interview_linkedin_123_0_1733740251",
@@ -814,6 +840,7 @@ Frontend receives:
 ```
 
 **Frontend/Desktop App Displays:**
+
 1. 3D avatar (Three.js) with animated lip-sync
 2. Audio plays (voice service)
 3. Candidate has 2 minutes to record answer
@@ -880,7 +907,7 @@ if evaluation.get("answer_score") >= 70:
         follow_up_suggestion=evaluation.get("follow_up_question"),
         question_number=2
     )
-    
+
     # Repeat steps 5.2d-5.2f (voice + avatar + send)
 else:
     # Weak answer - redirect or skip to next topic
@@ -911,6 +938,7 @@ interview_session.response_evaluations.append({
 #### **Step 5.4: Repeat for Remaining Questions**
 
 **Process repeats for questions 2-5:**
+
 1. Generate question (or follow-up)
 2. Call avatar service (lip-sync animation)
 3. Call voice service (TTS)
@@ -932,7 +960,7 @@ interview_session.response_evaluations.append({
 
 ```python
 overall_score = sum(
-    evaluation["answer_score"] 
+    evaluation["answer_score"]
     for evaluation in interview_session.response_evaluations
 ) / len(interview_session.response_evaluations)
 
@@ -1039,7 +1067,7 @@ if pipeline_id in active_pipelines:
 ```python
 async def sync_candidate_to_ats(candidate_id, interview_result):
     """Sync candidate and interview results to ATS"""
-    
+
     # In production: Call ATS API
     ats_payload = {
         "candidate": {
@@ -1061,7 +1089,7 @@ async def sync_candidate_to_ats(candidate_id, interview_result):
         },
         "next_action": "schedule_technical_assessment"
     }
-    
+
     # Call ATS (Workable, Greenhouse, Lever, Taleo, etc.)
     response = await ats_client.post(
         "candidates/import",
@@ -1206,26 +1234,31 @@ async def sync_candidate_to_ats(candidate_id, interview_result):
 ## 🔑 Key Architectural Patterns
 
 ### **1. Event-Driven Architecture**
+
 - All agents communicate via Redis Pub/Sub
 - No direct REST calls between agents (loose coupling)
 - Message bus routes events to subscribers
 
 ### **2. State Machine (Scout Coordinator)**
+
 - Pipeline states: `INITIATED` → `SCANNING` → `SCORING` → `ENGAGING` → `INTERVIEWING` → `COMPLETED`
 - State transitions publish events that trigger downstream agents
 - Each state transition is logged and trackable
 
 ### **3. Async Task Processing**
+
 - Long-running operations run in background (`asyncio.create_task()`)
 - API endpoints return immediately with status
 - Client polls endpoint or receives webhooks for updates
 
 ### **4. Conditional Triggering**
+
 - Quality scoring triggers engagement only if score >= 70
 - Engagement triggers interview only on positive response
 - Allows filtering of low-quality candidates early
 
 ### **5. AI/LLM Integration (Genkit Bridge)**
+
 - All intelligent operations use Google Genkit:
   - Query generation (Boolean Mastery)
   - Scoring (Quality-Focused)
@@ -1235,6 +1268,7 @@ async def sync_candidate_to_ats(candidate_id, interview_result):
   - Report generation (Interviewer)
 
 ### **6. Avatar + Voice Synchronization**
+
 - Voice service generates TTS with duration
 - Avatar service creates matching animation
 - Frontend syncs both for realistic experience

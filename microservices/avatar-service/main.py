@@ -1,44 +1,46 @@
-"""
-Main application file for the TalentAI Avatar Service.
+"""Main application file for the OpenTalent Avatar Service.
 
-This service manages AI avatar interactions and rendering for the TalentAI recruitment platform.
+This service manages AI avatar interactions and rendering for the OpenTalent recruitment platform.
 Avatar and voice generation will be implemented locally in future updates.
 """
 
-from fastapi import FastAPI, Depends, HTTPException, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response, RedirectResponse
-from pydantic import BaseModel
-from httpx import AsyncClient
-import httpx
-from fastapi.staticfiles import StaticFiles
-from pathlib import Path
-from datetime import datetime
-import os
-import logging
-import sys
-import subprocess
 import json
+import logging
 import os
-import uuid
+import subprocess
+import sys
 import time
+import uuid
+from datetime import datetime
+
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel
 
 # Import from existing modules (keeping modular structure)
 try:
-    from app.routes.avatar_routes import router as avatar_router
     from app.config.settings import (
-        SERVICE_TITLE,
+        ALLOWED_ORIGINS,
         SERVICE_DESCRIPTION,
+        SERVICE_TITLE,
         SERVICE_VERSION,
-        ALLOWED_ORIGINS
     )
+    from app.routes.avatar_routes import router as avatar_router
+
     USE_EXTERNAL_MODULES = True
 except ImportError:
     # Fallback configuration if external modules are not available
-    SERVICE_TITLE = "TalentAI - Avatar Service"
+    SERVICE_TITLE = "OpenTalent - Avatar Service"
     SERVICE_DESCRIPTION = "Manages AI avatar interactions and rendering"
     SERVICE_VERSION = "1.0.0"
-    ALLOWED_ORIGINS = ["http://localhost:3000", "http://localhost:5173", "http://localhost:8080", "http://localhost:8081"]
+    ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://localhost:8080",
+        "http://localhost:8081",
+    ]
     USE_EXTERNAL_MODULES = False
 
 # External API clients removed - using local implementations only
@@ -56,27 +58,24 @@ TIMEOUT_CONFIG = {
 # Configure structured logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(sys.stdout)
-    ]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger("avatar-service")
 
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
-
     app = FastAPI(
         title=SERVICE_TITLE,
         description=f"""{SERVICE_DESCRIPTION}
-        
+
         **Capabilities:**
         - AI avatar rendering and animation
         - Lip-sync video generation
         - Voice integration with voice service
         - Real-time avatar interactions
-        
+
         **API Documentation:**
         - Interactive Swagger UI: `/docs`
         - Alternative docs URL: `/doc`
@@ -87,7 +86,7 @@ def create_app() -> FastAPI:
         version=SERVICE_VERSION,
         docs_url="/docs",
         redoc_url="/redoc",
-        openapi_url="/openapi.json"
+        openapi_url="/openapi.json",
     )
 
     # Request logging middleware
@@ -101,7 +100,9 @@ def create_app() -> FastAPI:
         response = await call_next(request)
 
         process_time = time.time() - start_time
-        logger.info(f"[{request_id}] {request.method} {request.url.path} - {response.status_code} - {process_time:.3f}s")
+        logger.info(
+            f"[{request_id}] {request.method} {request.url.path} - {response.status_code} - {process_time:.3f}s"
+        )
 
         return response
 
@@ -148,7 +149,7 @@ async def root():
     """Root endpoint for Avatar Service."""
     logger.info("Root endpoint accessed")
     return {
-        "message": "TalentAI Avatar Service",
+        "message": "OpenTalent Avatar Service",
         "status": "running",
         "version": SERVICE_VERSION,
         "description": "AI avatar rendering and future local voice integration",
@@ -157,8 +158,8 @@ async def root():
             "alternative": "/doc",
             "redoc": "/redoc",
             "openapi_json": "/openapi.json",
-            "api_summary": "/api-docs"
-        }
+            "api_summary": "/api-docs",
+        },
     }
 
 
@@ -173,25 +174,25 @@ async def api_docs_info():
     """Get API documentation information and available endpoints."""
     routes_info = []
     for route in app.routes:
-        if hasattr(route, 'methods') and hasattr(route, 'path'):
+        if hasattr(route, "methods") and hasattr(route, "path"):
             route_info = {
                 "path": route.path,
                 "methods": list(route.methods),
-                "name": getattr(route, 'name', 'unknown'),
-                "summary": getattr(route, 'summary', None) or getattr(route, 'description', None)
+                "name": getattr(route, "name", "unknown"),
+                "summary": getattr(route, "summary", None) or getattr(route, "description", None),
             }
             routes_info.append(route_info)
-    
+
     return {
-        "service": "TalentAI Avatar Service API",
+        "service": "OpenTalent Avatar Service API",
         "version": SERVICE_VERSION,
         "total_endpoints": len(routes_info),
         "documentation_urls": {
             "swagger_ui": "/docs",
             "redoc": "/redoc",
-            "openapi_json": "/openapi.json"
+            "openapi_json": "/openapi.json",
         },
-        "routes": routes_info
+        "routes": routes_info,
     }
 
 
@@ -208,8 +209,8 @@ async def health_check():
             "components": {
                 "api": "healthy",
                 "avatar_rendering": "real",  # Now using real video generation
-                "voice_integration": "active"  # Integrated with voice service
-            }
+                "voice_integration": "active",  # Integrated with voice service
+            },
         }
 
         logger.info("Health check completed successfully")
@@ -217,32 +218,38 @@ async def health_check():
 
     except Exception as e:
         logger.error(f"Health check failed: {str(e)}")
-        raise HTTPException(status_code=503, detail={
-            "status": "unhealthy",
-            "service": "avatar-service",
-            "error": str(e),
-            "timestamp": datetime.now().isoformat()
-        })
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "status": "unhealthy",
+                "service": "avatar-service",
+                "error": str(e),
+                "timestamp": datetime.now().isoformat(),
+            },
+        )
 
 
 @app.post("/render/lipsync")
 async def render_lipsync(request: RenderRequest):
-    """
-    Render avatar video with lip-sync
+    """Render avatar video with lip-sync
     Uses face.glb in production, allows model override in dev
     """
     # Call Node.js renderer
     renderer_script = os.path.join(os.path.dirname(__file__), "renderer", "render.js")
 
-    input_data = json.dumps({
-        "phonemes": request.phonemes,
-        "duration": request.duration,
-        "model": request.model,
-        "text": request.text
-    })
+    input_data = json.dumps(
+        {
+            "phonemes": request.phonemes,
+            "duration": request.duration,
+            "model": request.model,
+            "text": request.text,
+        }
+    )
 
     renderer_dir = os.path.dirname(renderer_script)
-    logger.info(f"Rendering request: text={request.text}, duration={request.duration}s, model={request.model}")
+    logger.info(
+        f"Rendering request: text={request.text}, duration={request.duration}s, model={request.model}"
+    )
 
     try:
         process = subprocess.run(
@@ -252,7 +259,7 @@ async def render_lipsync(request: RenderRequest):
             text=True,
             timeout=120,  # Increased from 30 to 120 seconds for video encoding
             cwd=renderer_dir,
-            env={**os.environ, 'SKIP_RENDERING': 'false'}  # Enable real video rendering
+            env={**os.environ, "SKIP_RENDERING": "false"}, check=False,  # Enable real video rendering
         )
     except subprocess.TimeoutExpired:
         logger.error("Renderer subprocess timed out after 120s")
@@ -270,21 +277,22 @@ async def render_lipsync(request: RenderRequest):
         raise HTTPException(status_code=500, detail="Renderer produced no output")
 
     # Extract JSON from stdout (last line, as render.js outputs console.log before final JSON)
-    lines = process.stdout.strip().split('\n')
+    lines = process.stdout.strip().split("\n")
     json_line = lines[-1] if lines else ""
-    
+
     logger.debug(f"Renderer output lines: {len(lines)}, parsing JSON from last line")
-    
+
     result = json.loads(json_line)
 
     return {
         "video_path": result["video_path"],
         "duration": result["duration"],
         "model_used": result["model"],
-        "metadata": result["metadata"]
+        "metadata": result["metadata"],
     }
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8001)

@@ -1,13 +1,13 @@
 #!/bin/bash
 
 ################################################################################
-# TalentAI Platform - Enterprise Grade Migration Verification Script
-# 
+# OpenTalent Platform - Enterprise Grade Migration Verification Script
+#
 # Purpose: Test-Driven verification framework for project reorganization
 # Version: 1.0.0
 # Date: December 5, 2025
-# 
-# This script implements comprehensive pre-migration, migration, and 
+#
+# This script implements comprehensive pre-migration, migration, and
 # post-migration validation using enterprise-grade testing patterns.
 #
 # Usage:
@@ -100,7 +100,7 @@ assert_file_exists() {
     local file=$1
     local description=$2
     ((TESTS_TOTAL++))
-    
+
     if [[ -f "$file" ]]; then
         pass "$description: $file exists"
         return 0
@@ -114,7 +114,7 @@ assert_directory_exists() {
     local dir=$1
     local description=$2
     ((TESTS_TOTAL++))
-    
+
     if [[ -d "$dir" ]]; then
         pass "$description: $dir exists"
         return 0
@@ -128,7 +128,7 @@ assert_directory_empty() {
     local dir=$1
     local description=$2
     ((TESTS_TOTAL++))
-    
+
     if [[ -d "$dir" ]]; then
         local count=$(find "$dir" -mindepth 1 -maxdepth 1 | wc -l)
         if [[ $count -eq 0 ]]; then
@@ -150,7 +150,7 @@ assert_file_count() {
     local pattern=${3:-"*"}
     local description=$4
     ((TESTS_TOTAL++))
-    
+
     if [[ -d "$dir" ]]; then
         local count=$(find "$dir" -maxdepth 1 -name "$pattern" 2>/dev/null | wc -l)
         if [[ $count -ge $expected ]]; then
@@ -170,7 +170,7 @@ assert_file_readable() {
     local file=$1
     local description=$2
     ((TESTS_TOTAL++))
-    
+
     if [[ -r "$file" ]]; then
         pass "$description: $file is readable"
         return 0
@@ -185,7 +185,7 @@ assert_contains_string() {
     local string=$2
     local description=$3
     ((TESTS_TOTAL++))
-    
+
     if grep -q "$string" "$file" 2>/dev/null; then
         pass "$description: $file contains '$string'"
         return 0
@@ -200,7 +200,7 @@ assert_not_contains_string() {
     local string=$2
     local description=$3
     ((TESTS_TOTAL++))
-    
+
     if ! grep -q "$string" "$file" 2>/dev/null; then
         pass "$description: $file does not contain '$string'"
         return 0
@@ -215,10 +215,10 @@ assert_checksum_match() {
     local file2=$2
     local description=$3
     ((TESTS_TOTAL++))
-    
+
     local sum1=$(sha256sum "$file1" 2>/dev/null | awk '{print $1}')
     local sum2=$(sha256sum "$file2" 2>/dev/null | awk '{print $1}')
-    
+
     if [[ "$sum1" == "$sum2" ]]; then
         pass "$description: checksums match"
         return 0
@@ -234,54 +234,54 @@ assert_checksum_match() {
 
 test_current_structure() {
     print_section "PRE-MIGRATION: Current Structure Analysis"
-    
+
     print_test "Checking root directory files"
     local root_markdown_count=$(find "$PROJECT_ROOT" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l)
     echo "  Found $root_markdown_count markdown files in root (target: <20)"
-    
+
     if [[ $root_markdown_count -gt 80 ]]; then
         warn "Root directory has $root_markdown_count markdown files (high clutter)"
     fi
-    
+
     print_test "Checking for misplaced files"
     assert_file_exists "$PROJECT_ROOT/vetta-granite-2b-gguf-v4.gguf" "Model file location check" || true
-    
+
     local python_scripts=$(find "$PROJECT_ROOT" -maxdepth 1 -name "*.py" 2>/dev/null | wc -l)
     echo "  Found $python_scripts Python scripts in root (target: 0)"
-    
+
     local shell_scripts=$(find "$PROJECT_ROOT" -maxdepth 1 -name "*.sh" 2>/dev/null | wc -l)
     echo "  Found $shell_scripts shell scripts in root (target: 0)"
-    
+
     ((TESTS_TOTAL++))
     pass "Current structure analyzed"
 }
 
 test_model_organization() {
     print_section "PRE-MIGRATION: Model Organization Check"
-    
+
     print_test "Checking Vetta AI documentation files"
     local vetta_docs_count=$(find "$PROJECT_ROOT" -maxdepth 1 -name "*VETTA*" -o -name "*vetta*" 2>/dev/null | wc -l)
     echo "  Found $vetta_docs_count Vetta/Granite related files in root"
-    
+
     if [[ -d "$PROJECT_ROOT/models" ]]; then
         warn "models/ directory already exists"
     else
         echo "  models/ directory needs to be created"
     fi
-    
+
     print_test "Checking notebook chunks"
     if [[ -d "$PROJECT_ROOT/notebook_chunks" ]]; then
         local notebook_count=$(find "$PROJECT_ROOT/notebook_chunks" -type f 2>/dev/null | wc -l)
         echo "  Found $notebook_count files in notebook_chunks/ (target: migrate to models/training/)"
     fi
-    
+
     ((TESTS_TOTAL++))
     pass "Model organization checked"
 }
 
 test_specification_gaps() {
     print_section "PRE-MIGRATION: Specification Completeness"
-    
+
     print_test "Checking API contracts"
     if [[ -d "$PROJECT_ROOT/specs/api-contracts" ]]; then
         local api_files=$(find "$PROJECT_ROOT/specs/api-contracts" -name "*.yaml" -o -name "*.yml" 2>/dev/null | wc -l)
@@ -293,7 +293,7 @@ test_specification_gaps() {
             pass "OpenAPI specifications partially exist"
         fi
     fi
-    
+
     print_test "Checking requirements documentation"
     if [[ -d "$PROJECT_ROOT/specs/requirements" ]]; then
         local req_files=$(find "$PROJECT_ROOT/specs/requirements" -name "*.md" 2>/dev/null | wc -l)
@@ -305,7 +305,7 @@ test_specification_gaps() {
             pass "Requirements documentation exists"
         fi
     fi
-    
+
     print_test "Checking ADRs"
     if [[ ! -d "$PROJECT_ROOT/docs/architecture/decisions" ]]; then
         echo "  ADR directory does not exist (target: create)"
@@ -323,35 +323,35 @@ test_specification_gaps() {
 
 test_documentation_inventory() {
     print_section "PRE-MIGRATION: Documentation Inventory"
-    
+
     print_test "Counting documentation files by category"
-    
+
     local markdown_files=$(find "$PROJECT_ROOT" -maxdepth 1 -name "*.md" 2>/dev/null)
-    
+
     # Count by category
     local vetta_count=$(echo "$markdown_files" | grep -ci "vetta\|granite" || true)
     local dataset_count=$(echo "$markdown_files" | grep -ci "dataset\|data" || true)
     local avatar_count=$(echo "$markdown_files" | grep -ci "avatar\|animation" || true)
     local status_count=$(echo "$markdown_files" | grep -ci "status\|report" || true)
-    
+
     echo "  Vetta/Granite docs: $vetta_count files"
     echo "  Dataset docs: $dataset_count files"
     echo "  Avatar docs: $avatar_count files"
     echo "  Status/Report docs: $status_count files"
-    
+
     ((TESTS_TOTAL+=4))
     pass "Documentation inventory complete"
 }
 
 test_dependency_analysis() {
     print_section "PRE-MIGRATION: Dependency Analysis"
-    
+
     print_test "Checking Python requirements files"
     local req_files=$(find "$PROJECT_ROOT" -name "requirements*.txt" 2>/dev/null | wc -l)
     echo "  Found $req_files requirements files"
     ((TESTS_TOTAL++))
     pass "Requirements files identified"
-    
+
     print_test "Checking docker-compose files"
     local compose_files=$(find "$PROJECT_ROOT" -name "docker-compose*.yml" 2>/dev/null | wc -l)
     echo "  Found $compose_files docker-compose files (target: consolidate to 3)"
@@ -369,7 +369,7 @@ test_dependency_analysis() {
 
 test_directory_structure() {
     print_section "POST-MIGRATION: Directory Structure Validation"
-    
+
     local required_dirs=(
         "models"
         "models/gguf"
@@ -395,7 +395,7 @@ test_directory_structure() {
         "specs/data-models"
         "examples/demos"
     )
-    
+
     for dir in "${required_dirs[@]}"; do
         assert_directory_exists "$PROJECT_ROOT/$dir" "Directory structure check"
     done
@@ -403,9 +403,9 @@ test_directory_structure() {
 
 test_file_migration() {
     print_section "POST-MIGRATION: File Migration Validation"
-    
+
     print_test "Checking model files location"
-    
+
     # GGUF model should be moved from root to models/gguf
     if [[ -f "$PROJECT_ROOT/models/gguf/vetta-granite-2b-gguf-v4.gguf" ]]; then
         pass "GGUF model moved to models/gguf/"
@@ -417,9 +417,9 @@ test_file_migration() {
     else
         fail "GGUF model not found in models/gguf/"
     fi
-    
+
     print_test "Checking notebook chunks migration"
-    
+
     if [[ -d "$PROJECT_ROOT/models/training/notebook_chunks" ]]; then
         pass "Notebook chunks moved to models/training/"
         if [[ -d "$PROJECT_ROOT/notebook_chunks" ]] && [[ $(find "$PROJECT_ROOT/notebook_chunks" -type f 2>/dev/null | wc -l) -eq 0 ]]; then
@@ -428,9 +428,9 @@ test_file_migration() {
     else
         warn "Notebook chunks not yet migrated"
     fi
-    
+
     print_test "Checking Python scripts location"
-    
+
     local root_python=$(find "$PROJECT_ROOT" -maxdepth 1 -name "*.py" 2>/dev/null | wc -l)
     if [[ $root_python -eq 0 ]]; then
         pass "No Python scripts in root"
@@ -441,22 +441,22 @@ test_file_migration() {
 
 test_documentation_migration() {
     print_section "POST-MIGRATION: Documentation Migration"
-    
+
     print_test "Checking markdown files relocated from root"
-    
+
     local root_md=$(find "$PROJECT_ROOT" -maxdepth 1 -name "*.md" 2>/dev/null | wc -l)
     if [[ $root_md -lt 20 ]]; then
         pass "Root markdown files reduced to $root_md (target: <20)"
     else
         warn "Root still contains $root_md markdown files (expected <20)"
     fi
-    
+
     print_test "Checking docs/ subdirectories populated"
-    
+
     if assert_file_exists "$PROJECT_ROOT/docs/SYSTEM_ARCHITECTURE.md" "System architecture document"; then
         assert_file_readable "$PROJECT_ROOT/docs/SYSTEM_ARCHITECTURE.md" "System architecture readability"
     fi
-    
+
     if [[ -d "$PROJECT_ROOT/docs/datasets" ]]; then
         local dataset_files=$(find "$PROJECT_ROOT/docs/datasets" -name "*.md" 2>/dev/null | wc -l)
         if [[ $dataset_files -gt 0 ]]; then
@@ -469,17 +469,17 @@ test_documentation_migration() {
 
 test_specification_completeness() {
     print_section "POST-MIGRATION: Specification Completeness"
-    
+
     print_test "Checking functional requirements"
     if assert_file_exists "$PROJECT_ROOT/specs/requirements/functional-requirements.md" "Functional requirements"; then
         assert_file_readable "$PROJECT_ROOT/specs/requirements/functional-requirements.md" "Functional requirements readability"
     fi
-    
+
     print_test "Checking user stories"
     if assert_file_exists "$PROJECT_ROOT/specs/user-stories/candidate-stories.md" "Candidate user stories"; then
         assert_file_readable "$PROJECT_ROOT/specs/user-stories/candidate-stories.md" "Candidate stories readability"
     fi
-    
+
     print_test "Checking API contracts"
     local openapi_files=$(find "$PROJECT_ROOT/specs/api-contracts/openapi" -name "*.yaml" -o -name "*.yml" 2>/dev/null | wc -l)
     if [[ $openapi_files -ge 5 ]]; then
@@ -487,7 +487,7 @@ test_specification_completeness() {
     else
         warn "OpenAPI specifications incomplete: $openapi_files files (target: 7)"
     fi
-    
+
     print_test "Checking ADRs"
     local adr_files=$(find "$PROJECT_ROOT/docs/architecture/decisions" -name "*.md" 2>/dev/null | wc -l)
     if [[ $adr_files -ge 5 ]]; then
@@ -499,26 +499,26 @@ test_specification_completeness() {
 
 test_cross_references() {
     print_section "POST-MIGRATION: Cross-Reference Validation"
-    
+
     print_test "Checking for broken links in documentation"
-    
+
     # Check if SYSTEM_ARCHITECTURE.md exists and references correct paths
     if [[ -f "$PROJECT_ROOT/docs/SYSTEM_ARCHITECTURE.md" ]]; then
         local refs=$(grep -o '\[.*\](.*\.md)' "$PROJECT_ROOT/docs/SYSTEM_ARCHITECTURE.md" 2>/dev/null | wc -l)
         echo "  Found $refs markdown links in SYSTEM_ARCHITECTURE.md"
-        
+
         # Verify a sample of links
         assert_contains_string "$PROJECT_ROOT/docs/SYSTEM_ARCHITECTURE.md" "architecture\|specification" "SYSTEM_ARCHITECTURE contains architectural references"
     fi
-    
+
     print_test "Checking README files in key directories"
-    
+
     local readme_locations=(
         "models/README.md"
         "specs/api-contracts/README.md"
         "docs/architecture/README.md"
     )
-    
+
     for readme in "${readme_locations[@]}"; do
         if [[ -f "$PROJECT_ROOT/$readme" ]]; then
             pass "README found at $readme"
@@ -530,11 +530,11 @@ test_cross_references() {
 
 test_git_status() {
     print_section "POST-MIGRATION: Git Status Check"
-    
+
     print_test "Checking for untracked files"
-    
+
     cd "$PROJECT_ROOT" || return 1
-    
+
     if git rev-parse --git-dir > /dev/null 2>&1; then
         local untracked=$(git ls-files --others --exclude-standard 2>/dev/null | wc -l)
         echo "  Untracked files: $untracked"
@@ -552,11 +552,11 @@ test_git_status() {
 
 test_migration_plan() {
     print_section "MIGRATION: Planning & Validation"
-    
+
     print_test "Generating migration plan"
-    
+
     cat > "$MIGRATION_STATE/migration-plan.md" << 'EOF'
-# TalentAI Platform Migration Plan
+# OpenTalent Platform Migration Plan
 
 ## Phase 1: Preparation (Pre-Migration)
 - [x] Analyze current structure
@@ -587,7 +587,7 @@ test_migration_plan() {
 - [ ] Update project README
 - [ ] Create rollback guide
 EOF
-    
+
     ((TESTS_TOTAL++))
     pass "Migration plan generated"
 }
@@ -598,14 +598,14 @@ EOF
 
 generate_report() {
     print_section "GENERATING MIGRATION REPORT"
-    
-    local success_rate=$((TESTS_PASSED * 100 / TESTS_TOTAL))
-    
-    cat > "$MIGRATION_REPORT" << EOF
-# TalentAI Platform Migration Verification Report
 
-**Date:** $(date '+%Y-%m-%d %H:%M:%S')  
-**Mode:** $MODE  
+    local success_rate=$((TESTS_PASSED * 100 / TESTS_TOTAL))
+
+    cat > "$MIGRATION_REPORT" << EOF
+# OpenTalent Platform Migration Verification Report
+
+**Date:** $(date '+%Y-%m-%d %H:%M:%S')
+**Mode:** $MODE
 **Project:** $PROJECT_ROOT
 
 ## Executive Summary
@@ -694,10 +694,10 @@ generate_report() {
 7. Update development workflows
 
 ---
-**Report generated by:** verify-migration.sh v1.0.0  
+**Report generated by:** verify-migration.sh v1.0.0
 **Log file:** $MIGRATION_LOG
 EOF
-    
+
     echo -e "\n${GREEN}✓ Report generated: $MIGRATION_REPORT${NC}"
 }
 
@@ -706,15 +706,15 @@ EOF
 # ============================================================================
 
 main() {
-    print_header "TalentAI Platform - Enterprise Migration Verification v1.0.0"
-    
+    print_header "OpenTalent Platform - Enterprise Migration Verification v1.0.0"
+
     # Initialize log
     > "$MIGRATION_LOG"
     log "INFO" "Verification script started in $MODE mode"
-    
+
     # Create migration state directory
     mkdir -p "$MIGRATION_STATE"
-    
+
     case "$MODE" in
         pre-migration)
             log "INFO" "Running pre-migration validation tests"
@@ -756,22 +756,22 @@ main() {
             exit 1
             ;;
     esac
-    
+
     # Print summary
     print_section "TEST SUMMARY"
     echo -e "Total Tests:  ${CYAN}$TESTS_TOTAL${NC}"
     echo -e "Passed:       ${GREEN}$TESTS_PASSED${NC}"
     echo -e "Failed:       ${RED}$TESTS_FAILED${NC}"
     echo -e "Skipped:      ${YELLOW}$TESTS_SKIPPED${NC}"
-    
+
     if [[ $TESTS_TOTAL -gt 0 ]]; then
         local success_rate=$((TESTS_PASSED * 100 / TESTS_TOTAL))
         echo -e "Success Rate: ${CYAN}${success_rate}%${NC}"
     fi
-    
+
     # Generate report
     generate_report
-    
+
     # Exit with appropriate code
     if [[ $TESTS_FAILED -eq 0 ]]; then
         echo -e "\n${GREEN}✓ All validations passed!${NC}"

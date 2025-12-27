@@ -8,7 +8,7 @@ set -e  # Exit on error
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-MICROSERVICES_DIR="$PROJECT_ROOT/talent-ai-microservices"
+MICROSERVICES_DIR="$PROJECT_ROOT/open-talent-microservices"
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -32,23 +32,23 @@ FAILED=0
 commit_gemini() {
     local service_path=$1
     local service_name=$(basename "$service_path")
-    
+
     TOTAL=$((TOTAL + 1))
-    
+
     # Check if it's a git repository
     if [ ! -d "$service_path/.git" ]; then
         echo -e "${YELLOW}⏭️  SKIP: $service_name (not a git repository)${NC}"
         SKIPPED=$((SKIPPED + 1))
         return
     fi
-    
+
     # Check if GEMINI.md exists
     if [ ! -f "$service_path/GEMINI.md" ]; then
         echo -e "${YELLOW}⏭️  SKIP: $service_name (no GEMINI.md found)${NC}"
         SKIPPED=$((SKIPPED + 1))
         return
     fi
-    
+
     # Check if GEMINI.md is already committed
     cd "$service_path"
     if ! git status --porcelain | grep -q "GEMINI.md"; then
@@ -57,10 +57,10 @@ commit_gemini() {
         cd - > /dev/null
         return
     fi
-    
+
     # Commit GEMINI.md
     echo -e "${BLUE}📝 Committing: $service_name${NC}"
-    
+
     if git add GEMINI.md && git commit -m "docs: Add GEMINI.md for AI context awareness"; then
         echo -e "${GREEN}✅ SUCCESS: $service_name${NC}"
         SUCCESS=$((SUCCESS + 1))
@@ -68,14 +68,14 @@ commit_gemini() {
         echo -e "${RED}❌ FAILED: $service_name (commit failed)${NC}"
         FAILED=$((FAILED + 1))
     fi
-    
+
     cd - > /dev/null
     echo ""
 }
 
 # Check if microservices directory exists
 if [ ! -d "$MICROSERVICES_DIR" ]; then
-    echo -e "${RED}❌ Error: talent-ai-microservices directory not found${NC}"
+    echo -e "${RED}❌ Error: open-talent-microservices directory not found${NC}"
     exit 1
 fi
 
@@ -83,7 +83,7 @@ fi
 echo -e "${BLUE}=== Processing Microservices ===${NC}"
 cd "$MICROSERVICES_DIR"
 
-for service_dir in talent-ai-*/; do
+for service_dir in open-talent-*/; do
     if [ -d "$service_dir" ]; then
         commit_gemini "$MICROSERVICES_DIR/$service_dir"
     fi
@@ -106,7 +106,7 @@ if [ $SUCCESS -gt 0 ]; then
     echo -e "  2. git add <updated-services>"
     echo -e "  3. git commit -m 'chore: Update service submodules with GEMINI.md'"
     echo -e "  4. cd $PROJECT_ROOT"
-    echo -e "  5. git add talent-ai-microservices"
+    echo -e "  5. git add open-talent-microservices"
     echo -e "  6. git commit -m 'chore: Update microservices submodule references'"
     echo ""
 fi

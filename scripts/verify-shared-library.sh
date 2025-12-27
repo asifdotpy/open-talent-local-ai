@@ -31,8 +31,8 @@ echo ""
 
 # 3. Check package.json has correct name
 echo "✓ Checking package name..."
-if grep -q '"@talent-ai/ai-orchestra-simulation"' ai-orchestra-simulation/package.json; then
-    echo "✅ PASS: Package name is @talent-ai/ai-orchestra-simulation"
+if grep -q '"@open-talent/ai-orchestra-simulation"' ai-orchestra-simulation/package.json; then
+    echo "✅ PASS: Package name is @open-talent/ai-orchestra-simulation"
 else
     echo "❌ FAILED: Package name incorrect"
     exit 1

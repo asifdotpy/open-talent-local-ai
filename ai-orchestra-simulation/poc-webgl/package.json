@@ -1,7 +1,7 @@
 {
-  "name": "talentai-webgl-r3f-poc",
+  "name": "OpenTalent-webgl-r3f-poc",
   "version": "2.0.0",
-  "description": "TalentAI WebGL Avatar POC - React Three Fiber with Ready Player Me",
+  "description": "OpenTalent WebGL Avatar POC - React Three Fiber with Ready Player Me",
   "type": "module",
   "scripts": {
     "start": "vite --host 0.0.0.0 --port 5175",
@@ -53,6 +53,6 @@
     "tts",
     "interview"
   ],
-  "author": "TalentAI Platform",
+  "author": "OpenTalent Platform",
   "license": "MIT"
 }

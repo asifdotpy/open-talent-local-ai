@@ -7,52 +7,68 @@ This script:
 2. Splits into three focused datasets:
    - vetta-interview-dataset: Interview-only data (428 examples)
    - scout-sourcing-dataset: Sourcing-only data (33 examples)
-   - talent-ai-complete-dataset: All data combined (461 examples)
+   - open-talent-complete-dataset: All data combined (461 examples)
 3. Pushes each to separate Hugging Face repositories
 """
 
 import os
+import tempfile
+from typing import Any
+
 import datasets
 from huggingface_hub import HfApi, login
-from typing import Dict, Any
-import tempfile
 
-def get_dataset_splits() -> Dict[str, Dict[str, Any]]:
+
+def get_dataset_splits() -> dict[str, dict[str, Any]]:
     """Define the three dataset splits with their configurations."""
 
     return {
         "vetta-interview": {
             "repo_id": "asifdotpy/vetta-interview-dataset",
             "categories": [
-                'behavioral', 'behavioral_interview', 'closing', 'edge_case',
-                'feedback', 'hr_interview', 'multi_turn', 'opening',
-                'technical_interview', 'technical_question'
+                "behavioral",
+                "behavioral_interview",
+                "closing",
+                "edge_case",
+                "feedback",
+                "hr_interview",
+                "multi_turn",
+                "opening",
+                "technical_interview",
+                "technical_question",
             ],
             "title": "Vetta Interview Dataset",
             "description": "Interview-focused dataset for fine-tuning Vetta (interviewer agent)",
-            "agent": "Vetta (Interviewer Agent)"
+            "agent": "Vetta (Interviewer Agent)",
         },
         "scout-sourcing": {
             "repo_id": "asifdotpy/scout-sourcing-dataset",
             "categories": [
-                'agent_coordination', 'candidate_profiling', 'candidate_sourcing',
-                'data_driven_insights', 'execution_monitoring', 'persona_adaptation',
-                'platform_navigation', 'sourcing_initiation', 'workflow_orchestration'
+                "agent_coordination",
+                "candidate_profiling",
+                "candidate_sourcing",
+                "data_driven_insights",
+                "execution_monitoring",
+                "persona_adaptation",
+                "platform_navigation",
+                "sourcing_initiation",
+                "workflow_orchestration",
             ],
             "title": "Scout Sourcing Dataset",
             "description": "Sourcing and coordination dataset for fine-tuning Scout/Sourcer agent",
-            "agent": "Scout/Sourcer Agent"
+            "agent": "Scout/Sourcer Agent",
         },
-        "talent-ai-complete": {
-            "repo_id": "asifdotpy/talent-ai-complete-dataset",
+        "open-talent-complete": {
+            "repo_id": "asifdotpy/open-talent-complete-dataset",
             "categories": None,  # All categories
-            "title": "TalentAI Complete Dataset",
+            "title": "OpenTalent Complete Dataset",
             "description": "Complete multi-agent dataset combining interview and sourcing interactions",
-            "agent": "All Agents (Combined)"
-        }
+            "agent": "All Agents (Combined)",
+        },
     }
 
-def create_dataset_readme(config: Dict[str, Any], example_count: int) -> str:
+
+def create_dataset_readme(config: dict[str, Any], example_count: int) -> str:
     """Create a README for the dataset."""
 
     return f"""# {config['title']}
@@ -68,7 +84,7 @@ def create_dataset_readme(config: Dict[str, Any], example_count: int) -> str:
 
 ## Usage
 
-This dataset is used to fine-tune language models for {config['agent'].lower()} in the TalentAI platform.
+This dataset is used to fine-tune language models for {config['agent'].lower()} in the OpenTalent platform.
 
 ## Categories
 
@@ -86,11 +102,12 @@ This dataset is used to fine-tune language models for {config['agent'].lower()} 
 - `_metadata`: Additional metadata including source information
 """
 
+
 def main():
     """Main function to split and push datasets."""
 
     # Check for HF token
-    hf_token = os.environ.get('HF_TOKEN')
+    hf_token = os.environ.get("HF_TOKEN")
     if not hf_token:
         print("❌ Error: HF_TOKEN environment variable not set")
         return
@@ -106,7 +123,7 @@ def main():
     # Load the complete dataset
     try:
         print("📥 Loading complete dataset...")
-        dataset = datasets.load_dataset("asifdotpy/vetta-multi-persona-dataset", split='train')
+        dataset = datasets.load_dataset("asifdotpy/vetta-multi-persona-dataset", split="train")
         print(f"✅ Loaded dataset with {len(dataset)} examples")
     except Exception as e:
         print(f"❌ Failed to load dataset: {e}")
@@ -121,12 +138,12 @@ def main():
         print(f"\n🔄 Processing {split_name} dataset...")
 
         try:
-            if config['categories'] is None:
+            if config["categories"] is None:
                 # Complete dataset - all examples
                 split_df = df
             else:
                 # Filtered dataset
-                split_df = df[df['category'].isin(config['categories'])]
+                split_df = df[df["category"].isin(config["categories"])]
 
             split_dataset = datasets.Dataset.from_pandas(split_df, preserve_index=False)
 
@@ -138,13 +155,13 @@ def main():
             # Push dataset
             print(f"  🚀 Pushing to {config['repo_id']}...")
             split_dataset.push_to_hub(
-                repo_id=config['repo_id'],
+                repo_id=config["repo_id"],
                 commit_message=f"Create {split_name} dataset with {len(split_dataset)} examples",
-                private=False
+                private=False,
             )
 
             # Upload README
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
                 f.write(readme_content)
                 temp_file_path = f.name
 
@@ -153,9 +170,9 @@ def main():
                 api.upload_file(
                     path_or_fileobj=temp_file_path,
                     path_in_repo="README.md",
-                    repo_id=config['repo_id'],
+                    repo_id=config["repo_id"],
                     repo_type="dataset",
-                    commit_message="Add dataset README and documentation"
+                    commit_message="Add dataset README and documentation",
                 )
             finally:
                 os.unlink(temp_file_path)
@@ -171,6 +188,7 @@ def main():
     for split_name, config in splits.items():
         print(f"  • {config['repo_id']}")
         print(f"    {config['description']}")
+
 
 if __name__ == "__main__":
     main()

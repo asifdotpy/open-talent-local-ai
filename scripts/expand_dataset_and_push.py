@@ -10,11 +10,13 @@ This script:
 """
 
 import os
+from typing import Any
+
 import datasets
 from huggingface_hub import HfApi, login
-from typing import List, Dict, Any
 
-def get_persona_examples() -> List[Dict[str, Any]]:
+
+def get_persona_examples() -> list[dict[str, Any]]:
     """Get the 4 additional persona examples from agents directory analysis."""
 
     return [
@@ -26,7 +28,7 @@ def get_persona_examples() -> List[Dict[str, Any]]:
             "domain": "human_resources",
             "expected_length": "short",
             "has_context": False,
-            "_metadata": {"source": "agents/hr_persona", "persona": "hr_interviewer"}
+            "_metadata": {"source": "agents/hr_persona", "persona": "hr_interviewer"},
         },
         {
             "instruction": "As a technical interviewer, assess this developer's understanding of system design principles.",
@@ -36,7 +38,7 @@ def get_persona_examples() -> List[Dict[str, Any]]:
             "domain": "software_engineering",
             "expected_length": "medium",
             "has_context": False,
-            "_metadata": {"source": "agents/technical_persona", "persona": "technical_interviewer"}
+            "_metadata": {"source": "agents/technical_persona", "persona": "technical_interviewer"},
         },
         {
             "instruction": "As a behavioral interviewer, explore how this candidate handles high-pressure situations.",
@@ -46,7 +48,10 @@ def get_persona_examples() -> List[Dict[str, Any]]:
             "domain": "behavioral_assessment",
             "expected_length": "medium",
             "has_context": False,
-            "_metadata": {"source": "agents/behavioral_persona", "persona": "behavioral_interviewer"}
+            "_metadata": {
+                "source": "agents/behavioral_persona",
+                "persona": "behavioral_interviewer",
+            },
         },
         {
             "instruction": "As a sourcer, evaluate this candidate profile for a senior developer position.",
@@ -56,15 +61,16 @@ def get_persona_examples() -> List[Dict[str, Any]]:
             "domain": "talent_acquisition",
             "expected_length": "short",
             "has_context": False,
-            "_metadata": {"source": "agents/sourcer_persona", "persona": "talent_sourcer"}
-        }
+            "_metadata": {"source": "agents/sourcer_persona", "persona": "talent_sourcer"},
+        },
     ]
+
 
 def main():
     """Main function to expand dataset and push to Hugging Face."""
 
     # Check for HF token
-    hf_token = os.environ.get('HF_TOKEN')
+    hf_token = os.environ.get("HF_TOKEN")
     if not hf_token:
         print("❌ Error: HF_TOKEN environment variable not set")
         print("Please set your Hugging Face API token:")
@@ -96,7 +102,7 @@ def main():
     persona_dataset = datasets.Dataset.from_list(persona_examples)
 
     # Combine datasets
-    combined_dataset = datasets.concatenate_datasets([dataset['train'], persona_dataset])
+    combined_dataset = datasets.concatenate_datasets([dataset["train"], persona_dataset])
     print(f"✅ Combined dataset now has {len(combined_dataset)} examples")
 
     # Verify the expansion
@@ -106,7 +112,7 @@ def main():
     print(f"Total: {len(combined_dataset)} examples")
 
     # Show category distribution
-    categories = combined_dataset.to_pandas()['category'].value_counts()
+    categories = combined_dataset.to_pandas()["category"].value_counts()
     print("\n📈 Category Distribution:")
     for cat, count in categories.items():
         print(f"  {cat}: {count}")
@@ -114,7 +120,7 @@ def main():
     # Push to Hugging Face
     try:
         print("\n🚀 Pushing expanded dataset to Hugging Face...")
-        
+
         # Create dataset card
         dataset_card = """# Vetta Multi-Persona Interview Dataset (Expanded)
 
@@ -137,7 +143,7 @@ This dataset contains examples of interviewer-candidate interactions across mult
 
 ## Usage
 
-This dataset is used to fine-tune language models for multi-persona interview simulations in the TalentAI platform.
+This dataset is used to fine-tune language models for multi-persona interview simulations in the OpenTalent platform.
 
 ## Columns
 
@@ -155,12 +161,13 @@ This dataset is used to fine-tune language models for multi-persona interview si
         combined_dataset.push_to_hub(
             repo_id="asifdotpy/vetta-multi-persona-dataset",
             commit_message="Expand dataset to 457 examples with persona-specific training data",
-            private=False
+            private=False,
         )
 
         # Write dataset card to temporary file and upload
         import tempfile
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.md', delete=False) as f:
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
             f.write(dataset_card)
             temp_file_path = f.name
 
@@ -171,7 +178,7 @@ This dataset is used to fine-tune language models for multi-persona interview si
                 path_in_repo="README.md",
                 repo_id="asifdotpy/vetta-multi-persona-dataset",
                 repo_type="dataset",
-                commit_message="Update dataset card for expanded version"
+                commit_message="Update dataset card for expanded version",
             )
         finally:
             os.unlink(temp_file_path)
@@ -182,6 +189,7 @@ This dataset is used to fine-tune language models for multi-persona interview si
     except Exception as e:
         print(f"❌ Failed to push dataset: {e}")
         return
+
 
 if __name__ == "__main__":
     main()

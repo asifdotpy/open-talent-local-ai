@@ -9,13 +9,13 @@ echo "Checking for remote updates in all microservice repositories..."
 echo
 
 # Loop through each directory in the current folder
-for service in talent-ai-*-service; do
+for service in open-talent-*-service; do
   if [ -d "$service/.git" ]; then
     echo "--- Checking: $service ---"
     (
       cd "$service" || exit
       git fetch --quiet
-      
+
       # Check if upstream branch is configured
       UPSTREAM=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null)
       if [ -z "$UPSTREAM" ]; then

@@ -6,9 +6,11 @@ for multiple model architectures (Granite, Llama, Mistral, etc.).
 """
 
 import os
-from typing import Dict, Any, List, Optional
 from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 import yaml
+
 
 class ModelConfig:
     """Configuration for a specific model."""
@@ -150,7 +152,7 @@ class Settings:
         # Training settings
         self.training_data_dir = Path(os.environ.get('TRAINING_DATA_DIR', '/app/data'))
         self.output_dir = Path(os.environ.get('OUTPUT_DIR', '/app/models/fine-tuned'))
-        self.wandb_project = os.environ.get('WANDB_PROJECT', 'talent-ai-granite')
+        self.wandb_project = os.environ.get('WANDB_PROJECT', 'open-talent-granite')
 
         # Load model configurations
         self.models = self._load_model_configs()
@@ -279,4 +281,4 @@ class Settings:
 
 # Global settings instance
 settings = Settings()</content>
-<parameter name="filePath">/home/asif1/talent-ai-platform/microservices/granite-interview-service/app/config/settings.py
+<parameter name="filePath">/home/asif1/open-talent-platform/microservices/granite-interview-service/app/config/settings.py

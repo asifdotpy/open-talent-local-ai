@@ -130,7 +130,7 @@ else
     exit 1
 fi
 
-log "  Remote backup available at: git@github.com:asifdotpy/talent-ai-platform.git"
+log "  Remote backup available at: git@github.com:asifdotpy/open-talent-platform.git"
 log "  Tag name: $BACKUP_TAG"
 
 # ===== PHASE 2: CREATE FRESH HISTORY =====

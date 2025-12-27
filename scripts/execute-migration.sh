@@ -1,8 +1,8 @@
 #!/bin/bash
 
 ################################################################################
-# TalentAI Platform - Safe Migration Execution Script
-# 
+# OpenTalent Platform - Safe Migration Execution Script
+#
 # Purpose: Execute project reorganization with rollback capability
 # Version: 1.0.0
 # Date: December 5, 2025
@@ -96,7 +96,7 @@ info() {
 
 create_directory_structure() {
     print_section "CREATING DIRECTORY STRUCTURE"
-    
+
     local dirs=(
         "models"
         "models/gguf"
@@ -122,7 +122,7 @@ create_directory_structure() {
         "specs/data-models"
         "examples/demos"
     )
-    
+
     for dir in "${dirs[@]}"; do
         if [[ "$DRY_RUN" == "true" ]]; then
             info "[DRY-RUN] Would create: $PROJECT_ROOT/$dir"
@@ -136,7 +136,7 @@ create_directory_structure() {
             fi
         fi
     done
-    
+
     log "INFO" "Directory structure creation complete"
 }
 
@@ -148,21 +148,21 @@ safe_move_file() {
     local source=$1
     local dest=$2
     local description=$3
-    
+
     if [[ ! -f "$source" ]]; then
         warn "Source does not exist: $source"
         return 1
     fi
-    
+
     # Create destination directory if needed
     local dest_dir=$(dirname "$dest")
     if [[ ! -d "$dest_dir" ]]; then
         mkdir -p "$dest_dir"
     fi
-    
+
     # Calculate checksum before migration
     local source_checksum=$(sha256sum "$source" | awk '{print $1}')
-    
+
     if [[ "$DRY_RUN" == "true" ]]; then
         info "[DRY-RUN] Would move: $source → $dest"
     else
@@ -172,12 +172,12 @@ safe_move_file() {
             cp "$source" "$backup_path"
             echo "backup:$source:$backup_path:$source_checksum" >> "$MANIFEST"
         fi
-        
+
         # Move file
         if mv "$source" "$dest"; then
             pass "Migrated: $description"
             echo "move:$source:$dest:$source_checksum" >> "$MANIFEST"
-            
+
             # Verify checksum after move
             local dest_checksum=$(sha256sum "$dest" | awk '{print $1}')
             if [[ "$source_checksum" == "$dest_checksum" ]]; then
@@ -202,12 +202,12 @@ safe_copy_directory() {
     local source=$1
     local dest=$2
     local description=$3
-    
+
     if [[ ! -d "$source" ]]; then
         warn "Source directory does not exist: $source"
         return 1
     fi
-    
+
     if [[ "$DRY_RUN" == "true" ]]; then
         info "[DRY-RUN] Would copy directory: $source → $dest"
     else
@@ -229,13 +229,13 @@ safe_copy_directory() {
 
 migrate_model_files() {
     print_section "MIGRATING MODEL FILES"
-    
+
     info "Moving GGUF model from root to models/gguf/"
     safe_move_file \
         "$PROJECT_ROOT/vetta-granite-2b-gguf-v4.gguf" \
         "$PROJECT_ROOT/models/gguf/vetta-granite-2b-gguf-v4.gguf" \
         "GGUF model file"
-    
+
     info "Migrating LoRA adapters"
     if [[ -d "$PROJECT_ROOT/models/lora" ]]; then
         find "$PROJECT_ROOT" -maxdepth 1 -name "*.gguf" -o -name "*.safetensors" | while read -r file; do
@@ -244,7 +244,7 @@ migrate_model_files() {
             fi
         done
     fi
-    
+
     info "Migrating notebook chunks"
     if [[ -d "$PROJECT_ROOT/notebook_chunks" ]]; then
         safe_copy_directory \
@@ -252,21 +252,21 @@ migrate_model_files() {
             "$PROJECT_ROOT/models/training/notebook_chunks" \
             "Notebook chunks directory"
     fi
-    
+
     log "INFO" "Model files migration complete"
 }
 
 migrate_documentation() {
     print_section "MIGRATING DOCUMENTATION FILES"
-    
+
     local root_dir="$PROJECT_ROOT"
-    
+
     # Migrate Vetta/Granite docs to models/docs/
     info "Migrating Vetta AI documentation"
     find "$root_dir" -maxdepth 1 -type f -name "*VETTA*" -o -name "*GRANITE*" 2>/dev/null | while read -r file; do
         safe_move_file "$file" "$root_dir/models/docs/$(basename "$file")" "Vetta AI doc: $(basename "$file")"
     done
-    
+
     # Migrate dataset docs to docs/datasets/
     info "Migrating dataset documentation"
     find "$root_dir" -maxdepth 1 -type f -name "*DATASET*" -o -name "*DATA*" 2>/dev/null | while read -r file; do
@@ -274,21 +274,21 @@ migrate_documentation() {
             safe_move_file "$file" "$root_dir/docs/datasets/$(basename "$file")" "Dataset doc: $(basename "$file")"
         fi
     done
-    
+
     # Migrate status reports to docs/status/ or archive
     info "Migrating status reports"
     find "$root_dir" -maxdepth 1 -type f \( -name "*STATUS*" -o -name "*REPORT*" -o -name "*PROGRESS*" \) 2>/dev/null | while read -r file; do
         safe_move_file "$file" "$root_dir/docs/status/$(basename "$file")" "Status report: $(basename "$file")"
     done
-    
+
     log "INFO" "Documentation migration complete"
 }
 
 migrate_scripts() {
     print_section "MIGRATING SCRIPTS"
-    
+
     local root_dir="$PROJECT_ROOT"
-    
+
     # Move Python scripts (except setup/migration related)
     info "Migrating Python scripts"
     find "$root_dir" -maxdepth 1 -type f -name "*.py" 2>/dev/null | while read -r file; do
@@ -296,7 +296,7 @@ migrate_scripts() {
             safe_move_file "$file" "$root_dir/scripts/$(basename "$file")" "Python script: $(basename "$file")"
         fi
     done
-    
+
     # Move shell scripts
     info "Migrating shell scripts"
     find "$root_dir" -maxdepth 1 -type f -name "*.sh" 2>/dev/null | while read -r file; do
@@ -304,29 +304,29 @@ migrate_scripts() {
             safe_move_file "$file" "$root_dir/scripts/$(basename "$file")" "Shell script: $(basename "$file")"
         fi
     done
-    
+
     log "INFO" "Scripts migration complete"
 }
 
 migrate_assets() {
     print_section "MIGRATING ASSETS"
-    
+
     local root_dir="$PROJECT_ROOT"
-    
+
     # Move audio files to examples/demos
     info "Migrating audio/media files"
     find "$root_dir" -maxdepth 1 -type f \( -name "*.wav" -o -name "*.mp3" -o -name "*.mp4" \) 2>/dev/null | while read -r file; do
         safe_move_file "$file" "$root_dir/examples/demos/$(basename "$file")" "Media file: $(basename "$file")"
     done
-    
+
     log "INFO" "Assets migration complete"
 }
 
 cleanup_root_directory() {
     print_section "CLEANING ROOT DIRECTORY"
-    
+
     info "Removing empty directories from root"
-    
+
     if [[ -d "$PROJECT_ROOT/notebook_chunks" ]] && [[ -z "$(find "$PROJECT_ROOT/notebook_chunks" -type f 2>/dev/null)" ]]; then
         if [[ "$DRY_RUN" == "true" ]]; then
             info "[DRY-RUN] Would remove: notebook_chunks/"
@@ -336,7 +336,7 @@ cleanup_root_directory() {
             echo "rmdir:notebook_chunks" >> "$MANIFEST"
         fi
     fi
-    
+
     log "INFO" "Root directory cleanup complete"
 }
 
@@ -346,9 +346,9 @@ cleanup_root_directory() {
 
 create_git_checkpoint() {
     print_section "CREATING GIT CHECKPOINT"
-    
+
     cd "$PROJECT_ROOT" || return 1
-    
+
     if git rev-parse --git-dir > /dev/null 2>&1; then
         if [[ "$DRY_RUN" == "false" ]]; then
             local tag="pre-migration-$(date +%Y%m%d-%H%M%S)"
@@ -365,7 +365,7 @@ create_git_checkpoint() {
 
 create_file_manifest() {
     print_section "CREATING MIGRATION MANIFEST"
-    
+
     if [[ "$DRY_RUN" == "true" ]]; then
         info "[DRY-RUN] Would create manifest: $MANIFEST"
     else
@@ -384,20 +384,20 @@ create_file_manifest() {
 
 rollback_migration() {
     print_section "ROLLING BACK MIGRATION"
-    
+
     if [[ ! -f "$MANIFEST" ]]; then
         fail "No migration manifest found - cannot rollback"
         return 1
     fi
-    
+
     info "Reading migration manifest from: $MANIFEST"
-    
+
     # Process manifest in reverse
     tac "$MANIFEST" | while read -r line; do
         if [[ "$line" =~ ^move: ]]; then
             local source=$(echo "$line" | cut -d: -f2)
             local dest=$(echo "$line" | cut -d: -f3)
-            
+
             if [[ -f "$dest" ]]; then
                 if mv "$dest" "$source"; then
                     pass "Restored: $source"
@@ -417,7 +417,7 @@ rollback_migration() {
             warn "Cannot restore directory: $dir (requires backup restoration)"
         fi
     done
-    
+
     pass "Rollback complete"
     log "INFO" "Migration rollback completed"
 }
@@ -428,7 +428,7 @@ rollback_migration() {
 
 verify_migration() {
     print_section "VERIFYING MIGRATION"
-    
+
     info "Verifying checksums"
     if [[ -f "$CHECKSUMS" ]]; then
         if sha256sum -c "$CHECKSUMS" > /dev/null 2>&1; then
@@ -438,7 +438,7 @@ verify_migration() {
             return 1
         fi
     fi
-    
+
     info "Checking for orphaned files"
     local orphaned_count=$(find "$PROJECT_ROOT" -maxdepth 1 -type f -name "*.py" -o -name "*.wav" 2>/dev/null | wc -l)
     if [[ $orphaned_count -eq 0 ]]; then
@@ -446,7 +446,7 @@ verify_migration() {
     else
         warn "Found $orphaned_count orphaned files"
     fi
-    
+
     log "INFO" "Migration verification complete"
 }
 
@@ -456,14 +456,14 @@ verify_migration() {
 
 print_summary() {
     print_section "MIGRATION SUMMARY"
-    
+
     echo -e "Files Migrated:  ${GREEN}$FILES_MIGRATED${NC}"
     echo -e "Failed:          ${RED}$FILES_FAILED${NC}"
     echo -e "Bytes Migrated:  ${CYAN}$BYTES_MIGRATED${NC}"
     echo -e "Backup Created:  ${CYAN}$BACKUP_DIR${NC}"
     echo -e "Manifest:        ${CYAN}$MANIFEST${NC}"
     echo -e "Checksums:       ${CYAN}$CHECKSUMS${NC}"
-    
+
     log "INFO" "Migration: Files=$FILES_MIGRATED Failed=$FILES_FAILED Bytes=$BYTES_MIGRATED"
 }
 
@@ -498,51 +498,51 @@ parse_args() {
 
 main() {
     parse_args "$@"
-    
-    print_header "TalentAI Platform - Safe Migration Execution v1.0.0"
-    
+
+    print_header "OpenTalent Platform - Safe Migration Execution v1.0.0"
+
     # Initialize log
     > "$MIGRATION_LOG"
     log "INFO" "Migration execution started"
     log "INFO" "Dry run: $DRY_RUN"
-    
+
     if [[ "$ROLLBACK" == "true" ]]; then
         rollback_migration
         print_summary
         exit 0
     fi
-    
+
     # Create git checkpoint
     create_git_checkpoint
-    
+
     # Create manifest
     create_file_manifest
-    
+
     if [[ "$BACKUP_ONLY" == "false" ]]; then
         # Create directory structure
         create_directory_structure
-        
+
         # Migrate files
         migrate_model_files
         migrate_documentation
         migrate_scripts
         migrate_assets
-        
+
         # Cleanup
         cleanup_root_directory
-        
+
         # Verify
         verify_migration
     fi
-    
+
     # Print summary
     print_summary
-    
+
     if [[ "$DRY_RUN" == "true" ]]; then
         warn "This was a DRY-RUN - no changes were made"
         warn "Run with --execute to perform the migration"
     fi
-    
+
     if [[ $FILES_FAILED -eq 0 ]]; then
         pass "Migration completed successfully"
         log "INFO" "Migration execution completed successfully"

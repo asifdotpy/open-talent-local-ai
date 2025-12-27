@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # ╔═══════════════════════════════════════════════════════════════════════════╗
-# ║  TalentAI - Lightweight Persona Setup & Test                          ║
+# ║  OpenTalent - Lightweight Persona Setup & Test                          ║
 # ╚═══════════════════════════════════════════════════════════════════════════╝
 
 set -e
 
-echo "🎭 TalentAI Lightweight Interviewer Personas Setup"
+echo "🎭 OpenTalent Lightweight Interviewer Personas Setup"
 echo "=================================================="
 
 # Check if Ollama is running

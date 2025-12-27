@@ -2,7 +2,7 @@
 [project]
 name = "project-service"
 version = "0.1.0"
-description = "TalentAI Project Service"
+description = "OpenTalent Project Service"
 authors = [{ name = "[TECH_LEAD]", email = "asif@mjlexecutive.com" }]
 dependencies = [
     "fastapi==0.111.0",

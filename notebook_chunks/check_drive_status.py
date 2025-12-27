@@ -17,8 +17,9 @@ USAGE IN NOTEBOOK:
 
 import os
 
+
 def check_drive_status():
-    project_dir = '/content/drive/MyDrive/talent-ai-vetta'
+    project_dir = '/content/drive/MyDrive/open-talent-vetta'
     checkpoints_dir = f'{project_dir}/checkpoints'
     models_dir = f'{project_dir}/models'
 
@@ -73,4 +74,4 @@ def check_drive_status():
 
 if __name__ == "__main__":
     check_drive_status()</content>
-<parameter name="filePath">/home/asif1/talent-ai-platform/notebook_chunks/check_drive_status.py
+<parameter name="filePath">/home/asif1/open-talent-platform/notebook_chunks/check_drive_status.py

@@ -1,20 +1,19 @@
-"""
-Tests for the current Interview Service implementation (main.py)
+"""Tests for the current Interview Service implementation (main.py)
 
 Tests room management, WebRTC streaming, transcription, and AI intelligence features.
 """
 
+from unittest.mock import MagicMock, patch
+
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import patch, MagicMock, AsyncMock
-import json
-from datetime import datetime, timedelta
 
 
 @pytest.fixture
 def client():
     """Create test client for the interview service."""
     from main import app
+
     return TestClient(app)
 
 
@@ -24,20 +23,12 @@ def sample_room_data():
     return {
         "interview_session_id": "session-123",
         "participants": [
-            {
-                "user_id": "interviewer-1",
-                "display_name": "John Interviewer",
-                "role": "interviewer"
-            },
-            {
-                "user_id": "candidate-1",
-                "display_name": "Jane Candidate",
-                "role": "candidate"
-            }
+            {"user_id": "interviewer-1", "display_name": "John Interviewer", "role": "interviewer"},
+            {"user_id": "candidate-1", "display_name": "Jane Candidate", "role": "candidate"},
         ],
         "duration_minutes": 45,
         "job_id": "job-123",
-        "job_description": "Senior Python Developer position"
+        "job_description": "Senior Python Developer position",
     }
 
 
@@ -49,7 +40,7 @@ class TestRoomManagement:
         response = client.get("/")
         assert response.status_code == 200
         data = response.json()
-        assert "TalentAI Interview Service" in data["message"]
+        assert "OpenTalent Interview Service" in data["message"]
         assert "version" in data
         assert "active_rooms" in data
 
@@ -85,7 +76,7 @@ class TestRoomManagement:
         """Test room creation fails without session ID."""
         data = {
             "participants": [{"user_id": "test", "display_name": "Test", "role": "candidate"}],
-            "duration_minutes": 30
+            "duration_minutes": 30,
         }
         response = client.post("/api/v1/rooms/create", json=data)
         assert response.status_code == 422  # Pydantic validation error
@@ -95,7 +86,7 @@ class TestRoomManagement:
         data = {
             "interview_session_id": "session-123",
             "participants": [{"user_id": "test", "display_name": "Test", "role": "candidate"}],
-            "duration_minutes": 500  # Too long
+            "duration_minutes": 500,  # Too long
         }
         response = client.post("/api/v1/rooms/create", json=data)
         assert response.status_code == 400  # Manual validation error
@@ -111,7 +102,7 @@ class TestRoomManagement:
             "participant": {
                 "user_id": "new-participant",
                 "display_name": "New User",
-                "role": "observer"
+                "role": "observer",
             }
         }
         response = client.post(f"/api/v1/rooms/{room_id}/join", json=join_data)
@@ -123,11 +114,7 @@ class TestRoomManagement:
     def test_join_nonexistent_room(self, client):
         """Test joining a room that doesn't exist."""
         join_data = {
-            "participant": {
-                "user_id": "test",
-                "display_name": "Test User",
-                "role": "candidate"
-            }
+            "participant": {"user_id": "test", "display_name": "Test User", "role": "candidate"}
         }
         response = client.post("/api/v1/rooms/nonexistent-room/join", json=join_data)
         assert response.status_code == 404
@@ -177,7 +164,7 @@ class TestRoomManagement:
 class TestWebRTCAudioStreaming:
     """Test WebRTC audio streaming endpoints."""
 
-    @patch('httpx.AsyncClient')
+    @patch("httpx.AsyncClient")
     def test_start_webrtc_streaming_success(self, mock_client, client, sample_room_data):
         """Test starting WebRTC audio streaming."""
         # Create a room first
@@ -192,8 +179,7 @@ class TestWebRTCAudioStreaming:
 
         # Start WebRTC streaming
         response = client.post(
-            f"/api/v1/rooms/{room_id}/webrtc/start",
-            params={"participant_id": "candidate-1"}
+            f"/api/v1/rooms/{room_id}/webrtc/start", params={"participant_id": "candidate-1"}
         )
         assert response.status_code == 200
         data = response.json()
@@ -203,8 +189,7 @@ class TestWebRTCAudioStreaming:
     def test_start_webrtc_nonexistent_room(self, client):
         """Test starting WebRTC in nonexistent room."""
         response = client.post(
-            "/api/v1/rooms/nonexistent/webrtc/start",
-            params={"participant_id": "test"}
+            "/api/v1/rooms/nonexistent/webrtc/start", params={"participant_id": "test"}
         )
         assert response.status_code == 404
 
@@ -253,14 +238,14 @@ class TestTranscription:
             "is_final": True,
             "words": [
                 {"word": "Hello", "start": 0.0, "end": 0.5, "confidence": 0.98},
-                {"word": "this", "start": 0.5, "end": 0.8, "confidence": 0.96}
-            ]
+                {"word": "this", "start": 0.5, "end": 0.8, "confidence": 0.96},
+            ],
         }
 
         response = client.post(
             f"/api/v1/rooms/{room_id}/transcription",
             json=segment_data,
-            params={"session_id": "session-123", "participant_id": "candidate-1"}
+            params={"session_id": "session-123", "participant_id": "candidate-1"},
         )
         assert response.status_code == 200
         data = response.json()
@@ -300,14 +285,14 @@ class TestAIIntelligence:
         room_id = create_response.json()["room_id"]
 
         # Mock conversation service
-        with patch('httpx.AsyncClient') as mock_client:
+        with patch("httpx.AsyncClient") as mock_client:
             mock_response = MagicMock()
             mock_response.status_code = 200
             mock_response.json.return_value = {
                 "question": "Can you describe your experience with Python?",
                 "difficulty": "medium",
                 "bias_score": 0.1,
-                "sentiment_context": "neutral"
+                "sentiment_context": "neutral",
             }
             mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
 
@@ -328,7 +313,7 @@ class TestAIIntelligence:
             "question_id": "q-123",
             "response_text": "I have 5 years of experience with Python and Django.",
             "question_context": "Tell me about your Python experience.",
-            "participant_id": "candidate-1"
+            "participant_id": "candidate-1",
         }
 
         response = client.post(f"/api/v1/rooms/{room_id}/analyze-response", json=analysis_data)
@@ -349,10 +334,7 @@ class TestAIIntelligence:
         adaptation_data = {
             "current_phase": "technical",
             "time_remaining_minutes": 25,
-            "performance_indicators": {
-                "sentiment_trend": "positive",
-                "quality_score": 8.5
-            }
+            "performance_indicators": {"sentiment_trend": "positive", "quality_score": 8.5},
         }
 
         response = client.post(f"/api/v1/rooms/{room_id}/adapt-interview", json=adaptation_data)
@@ -379,7 +361,7 @@ class TestAIIntelligence:
 class TestInterviewStart:
     """Test interview start endpoint."""
 
-    @patch('httpx.AsyncClient')
+    @patch("httpx.AsyncClient")
     def test_start_interview_success(self, mock_client, client, sample_room_data):
         """Test starting interview with voice service integration."""
         # Mock voice service response
@@ -395,11 +377,13 @@ class TestInterviewStart:
         assert "interview_session_id" in data
         assert "jitsi_url" in data
 
-    @patch('httpx.AsyncClient')
+    @patch("httpx.AsyncClient")
     def test_start_interview_voice_service_failure(self, mock_client, client, sample_room_data):
         """Test interview start when voice service fails (should still work)."""
         # Mock voice service failure
-        mock_client.return_value.__aenter__.return_value.post.side_effect = Exception("Voice service down")
+        mock_client.return_value.__aenter__.return_value.post.side_effect = Exception(
+            "Voice service down"
+        )
 
         response = client.post("/api/v1/interviews/start", json=sample_room_data)
         assert response.status_code == 200  # Should still succeed
@@ -424,11 +408,7 @@ class TestErrorHandling:
 
         # Try to join ended room
         join_data = {
-            "participant": {
-                "user_id": "test",
-                "display_name": "Test User",
-                "role": "candidate"
-            }
+            "participant": {"user_id": "test", "display_name": "Test User", "role": "candidate"}
         }
         response = client.post(f"/api/v1/rooms/{room_id}/join", json=join_data)
         assert response.status_code == 410  # Gone
@@ -444,7 +424,7 @@ class TestErrorHandling:
             "session_id": "session-123",
             "room_id": room_id,
             "participant_id": "candidate-1",
-            "data": {"sdp": "fake-sdp"}
+            "data": {"sdp": "fake-sdp"},
         }
 
         response = client.post(f"/api/v1/rooms/{room_id}/webrtc/signal", json=signal_data)

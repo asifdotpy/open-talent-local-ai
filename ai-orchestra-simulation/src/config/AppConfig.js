@@ -145,7 +145,7 @@ export class AppConfig {
           description: 'Animated conductor avatar',
           vertexCount: 12000,
           morphTargetCount: 0,
-          author: 'TalentAI',
+          author: 'OpenTalent',
           license: 'Proprietary'
         }
       }

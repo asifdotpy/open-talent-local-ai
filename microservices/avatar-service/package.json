@@ -1,5 +1,5 @@
 {
-  "name": "@talentai/avatar-service-renderer",
+  "name": "@OpenTalent/avatar-service-renderer",
   "version": "1.0.0",
   "description": "Node.js renderer for avatar video generation",
   "type": "module",

@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # ╔═══════════════════════════════════════════════════════════════════════════╗
-# ║  TalentAI vLLM Production Server Startup                               ║
+# ║  OpenTalent vLLM Production Server Startup                               ║
 # ╚═══════════════════════════════════════════════════════════════════════════╝
 
 set -e
 
-echo "🚀 Starting TalentAI vLLM Production Server"
+echo "🚀 Starting OpenTalent vLLM Production Server"
 echo "==========================================="
 
 # Configuration

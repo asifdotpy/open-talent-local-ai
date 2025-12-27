@@ -89,7 +89,7 @@ curl -s -X POST "${BASE_URL}/generate-outreach" \
     "candidate_name": "Sarah Chen",
     "candidate_skills": "Python, Django, AWS, Kubernetes",
     "role": "Senior Backend Engineer",
-    "company": "TalentAI"
+    "company": "OpenTalent"
   }' | jq '.'
 echo -e "${GREEN}✓ Outreach message generation works${NC}\n"
 

@@ -6,10 +6,10 @@
 # !pip install torch transformers unsloth huggingface_hub
 
 import os
-import torch
-from unsloth import FastLanguageModel
-from huggingface_hub import login, HfApi
+
 from google.colab import userdata
+from huggingface_hub import HfApi, login
+from unsloth import FastLanguageModel
 
 # 1. CONFIGURATION
 HF_USERNAME = "asifdotpy"
@@ -19,7 +19,7 @@ MERGED_REPO = f"{HF_USERNAME}/vetta-granite-2b-v3"
 VERSION = "v3"
 
 # Drive paths (persistent storage)
-models_dir = "/content/drive/MyDrive/talent-ai-vetta/models"
+models_dir = "/content/drive/MyDrive/open-talent-vetta/models"
 lora_dir = f"{models_dir}/lora"
 merged_dir = f"{models_dir}/merged"
 
@@ -34,6 +34,7 @@ if not os.path.exists(lora_dir):
 
 # Check available RAM (Colab has ~12GB, merging needs ~8GB+)
 import psutil
+
 ram_gb = psutil.virtual_memory().total / (1024**3)
 print(f"💾 Available RAM: {ram_gb:.1f}GB")
 
@@ -43,7 +44,7 @@ if ram_gb < 10:
 
 # 3. LOGIN TO HUGGING FACE
 try:
-    hf_token = userdata.get('HF_TOKEN')
+    hf_token = userdata.get("HF_TOKEN")
     login(token=hf_token)
     api = HfApi(token=hf_token)
     print("✅ Logged in to Hugging Face")
@@ -58,7 +59,7 @@ try:
         model_name=BASE_MODEL,
         max_seq_length=2048,
         load_in_4bit=False,  # Full precision for merging
-        device_map="auto",   # Use GPU
+        device_map="auto",  # Use GPU
     )
     print("✅ Base model loaded")
 except Exception as e:
@@ -73,7 +74,15 @@ try:
         lora_path=LORA_REPO,  # Load from HF
         r=16,
         lora_alpha=16,
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+        target_modules=[
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "o_proj",
+            "gate_proj",
+            "up_proj",
+            "down_proj",
+        ],
     )
     print("✅ LoRA adapters applied")
 except Exception as e:
@@ -94,14 +103,20 @@ print(f"💾 Saving merged model to Drive: {merged_dir}")
 os.makedirs(merged_dir, exist_ok=True)
 
 try:
-    model.save_pretrained(merged_dir, safe_serialization=True)  # Use safe serialization to reduce size
+    model.save_pretrained(
+        merged_dir, safe_serialization=True
+    )  # Use safe serialization to reduce size
     tokenizer.save_pretrained(merged_dir)
     print("✅ Merged model saved to Drive")
-    
+
     # Check file sizes
-    total_size = sum(os.path.getsize(os.path.join(merged_dir, f)) for f in os.listdir(merged_dir) if os.path.isfile(os.path.join(merged_dir, f)))
+    total_size = sum(
+        os.path.getsize(os.path.join(merged_dir, f))
+        for f in os.listdir(merged_dir)
+        if os.path.isfile(os.path.join(merged_dir, f))
+    )
     print(f"📏 Model size: {total_size / (1024**3):.2f} GB")
-    
+
 except Exception as e:
     print(f"❌ Failed to save merged model: {e}")
     print("💡 Alternative: Save to Colab local storage and download manually")
@@ -118,7 +133,7 @@ try:
         folder_path=merged_dir,
         repo_id=MERGED_REPO,
         repo_type="model",
-        commit_message=f"Upload merged Vetta Granite fine-tuned model {VERSION} (16-bit)"
+        commit_message=f"Upload merged Vetta Granite fine-tuned model {VERSION} (16-bit)",
     )
     print("✅ Merged model uploaded to Hugging Face")
     print(f"👉 https://huggingface.co/{MERGED_REPO}")
@@ -182,15 +197,15 @@ try:
         path_in_repo="README.md",
         repo_id=MERGED_REPO,
         repo_type="model",
-        commit_message="Add model card and usage instructions"
+        commit_message="Add model card and usage instructions",
     )
     print("✅ Model card uploaded")
 except Exception as e:
     print(f"❌ Model card upload failed: {e}")
 
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("🎉 MERGE COMPLETE!")
-print("="*60)
+print("=" * 60)
 print(f"Merged Model: https://huggingface.co/{MERGED_REPO}")
 print(f"Local Drive: {merged_dir}")
 print("\nNext: Run the GGUF conversion cell to create quantized model for Ollama.")

@@ -3,7 +3,7 @@
 ################################################################################
 # OpenTalent Project Migration Test Script - SIMPLIFIED
 # Date: December 5, 2025
-# Purpose: Validate migration from talent-ai-platform to open-talent directory
+# Purpose: Validate migration from open-talent-platform to open-talent directory
 ################################################################################
 
 # Color codes
@@ -19,7 +19,7 @@ TESTS_FAILED=0
 TESTS_SKIPPED=0
 
 # Directories
-SOURCE_DIR="/home/asif1/talent-ai-platform"
+SOURCE_DIR="/home/asif1/open-talent-platform"
 TARGET_DIR="/home/asif1/open-talent"
 TEST_LOG="${TARGET_DIR}/migration-test-results.log"
 

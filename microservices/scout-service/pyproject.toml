@@ -35,7 +35,7 @@ name = "scout-service"
 version = "0.1.0"
 description = "AI-powered talent discovery and candidate sourcing service"
 authors = [
-    {name = "TalentAI Team"}
+    {name = "OpenTalent Team"}
 ]
 dependencies = [
     "fastapi==0.104.1",

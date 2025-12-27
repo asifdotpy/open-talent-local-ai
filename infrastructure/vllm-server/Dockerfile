@@ -1,5 +1,5 @@
 # ╔═══════════════════════════════════════════════════════════════════════════╗
-# ║  TalentAI vLLM Production Server                                       ║
+# ║  OpenTalent vLLM Production Server                                       ║
 # ╚═══════════════════════════════════════════════════════════════════════════╝
 
 FROM nvidia/cuda:12.1-base-ubuntu22.04

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script completes the workspace setup by initializing each microservice
-# subdirectory, connecting it to its remote repository in the TalentAI org,
+# subdirectory, connecting it to its remote repository in the OpenTalent org,
 # and pulling down the latest code. It uses the SSH protocol for auth.
 
 # Exit immediately if a command exits with a non-zero status.
@@ -9,7 +9,7 @@ set -e
 
 # --- Configuration ---
 # The base for constructing the SSH URLs for your service repos.
-SERVICE_REPO_BASE="git@github.com:TalentAI"
+SERVICE_REPO_BASE="git@github.com:OpenTalent"
 
 
 # --- Script Execution ---

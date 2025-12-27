@@ -6,9 +6,10 @@
 # !pip install torch transformers unsloth huggingface_hub
 
 import os
-from unsloth import FastLanguageModel
-from huggingface_hub import HfApi
+
 from google.colab import userdata
+from huggingface_hub import HfApi
+from unsloth import FastLanguageModel
 
 # 1. CONFIGURATION
 HF_USERNAME = "asifdotpy"
@@ -18,7 +19,7 @@ GGUF_REPO = f"{HF_USERNAME}/vetta-granite-2b-gguf-v3"
 VERSION = "v3"
 
 # Drive paths
-models_dir = "/content/drive/MyDrive/talent-ai-vetta/models"
+models_dir = "/content/drive/MyDrive/open-talent-vetta/models"
 merged_dir = f"{models_dir}/merged"
 gguf_dir = f"{models_dir}/gguf"
 
@@ -28,10 +29,13 @@ print(f"📂 GGUF directory: {gguf_dir}")
 
 # 2. SAFETY CHECKS
 if not os.path.exists(merged_dir):
-    raise FileNotFoundError(f"❌ Merged model directory not found: {merged_dir}. Run merge cell first.")
+    raise FileNotFoundError(
+        f"❌ Merged model directory not found: {merged_dir}. Run merge cell first."
+    )
 
 # Check if merged model has files
 import os
+
 merged_files = [f for f in os.listdir(merged_dir) if os.path.isfile(os.path.join(merged_dir, f))]
 if not merged_files:
     raise FileNotFoundError(f"❌ No files found in merged directory: {merged_dir}")
@@ -40,8 +44,9 @@ print(f"✅ Found merged model with {len(merged_files)} files")
 
 # 3. LOGIN TO HUGGING FACE
 try:
-    hf_token = userdata.get('HF_TOKEN')
+    hf_token = userdata.get("HF_TOKEN")
     from huggingface_hub import login
+
     login(token=hf_token)
     api = HfApi(token=hf_token)
     print("✅ Logged in to Hugging Face")
@@ -64,7 +69,7 @@ except Exception as e:
     raise
 
 # 5. CONVERT TO GGUF
-print(f"🔄 Converting to GGUF format (Q4_K_M quantization)...")
+print("🔄 Converting to GGUF format (Q4_K_M quantization)...")
 print(f"💾 Saving GGUF to: {gguf_dir}")
 
 os.makedirs(gguf_dir, exist_ok=True)
@@ -82,7 +87,7 @@ except Exception as e:
     raise
 
 # 6. VERIFY GGUF FILES
-gguf_files = [f for f in os.listdir(gguf_dir) if f.endswith('.gguf')]
+gguf_files = [f for f in os.listdir(gguf_dir) if f.endswith(".gguf")]
 if not gguf_files:
     raise FileNotFoundError(f"❌ No GGUF files found in {gguf_dir}")
 
@@ -97,7 +102,7 @@ try:
         folder_path=gguf_dir,
         repo_id=GGUF_REPO,
         repo_type="model",
-        commit_message=f"Upload GGUF quantized model for Vetta Granite {VERSION} (Q4_K_M)"
+        commit_message=f"Upload GGUF quantized model for Vetta Granite {VERSION} (Q4_K_M)",
     )
     print("✅ GGUF model uploaded to Hugging Face")
     print(f"👉 https://huggingface.co/{GGUF_REPO}")
@@ -158,15 +163,15 @@ try:
         path_in_repo="README.md",
         repo_id=GGUF_REPO,
         repo_type="model",
-        commit_message="Add model card and usage instructions"
+        commit_message="Add model card and usage instructions",
     )
     print("✅ GGUF model card uploaded")
 except Exception as e:
     print(f"❌ GGUF model card upload failed: {e}")
 
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("🎉 GGUF CONVERSION COMPLETE!")
-print("="*60)
+print("=" * 60)
 print(f"LoRA Adapters: https://huggingface.co/{HF_USERNAME}/vetta-granite-2b-lora-{VERSION}")
 print(f"Merged Model:  https://huggingface.co/{MERGED_REPO}")
 print(f"GGUF Model:    https://huggingface.co/{GGUF_REPO}")

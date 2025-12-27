@@ -9,13 +9,13 @@ echo ""
 # Check if services are running
 echo "📋 Check Services:"
 echo "curl -s http://localhost:8002/health | jq"
-echo "curl -s http://localhost:8001/health | jq"  
+echo "curl -s http://localhost:8001/health | jq"
 echo "curl -s http://localhost:3001/health | jq"
 echo ""
 
 # Run all tests
 echo "🎯 Run All Tests:"
-echo "cd /home/asif1/talent-ai-platform && python tests/run_avatar_tests.py"
+echo "cd /home/asif1/open-talent-platform && python tests/run_avatar_tests.py"
 echo ""
 
 # Run specific test types

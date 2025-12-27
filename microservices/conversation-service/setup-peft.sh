@@ -3,7 +3,7 @@
 
 set -e
 
-echo "🔄 Setting up PEFT/LoRA model integration for TalentAI Conversation Service..."
+echo "🔄 Setting up PEFT/LoRA model integration for OpenTalent Conversation Service..."
 echo "📝 Note: Heavy computation (model packaging) should be done on Colab first!"
 
 # Check if we're in the right directory
@@ -37,10 +37,10 @@ try:
     from transformers import AutoModelForCausalLM, AutoTokenizer
     from peft import PeftModel, PeftConfig
     from app.services.modular_llm_service import LLMProvider, LLMConfig
-    
+
     print('✅ All PEFT dependencies imported successfully')
     print('✅ Modular LLM service imports working')
-    
+
 except ImportError as e:
     print(f'❌ Import failed: {e}')
     sys.exit(1)

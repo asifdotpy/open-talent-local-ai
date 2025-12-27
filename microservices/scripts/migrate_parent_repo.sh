@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script correctly initializes the current directory ('talent-ai-microservices')
+# This script correctly initializes the current directory ('open-talent-microservices')
 # as a new Git repository and pushes it for the first time to your
 # personal private repository on GitHub.
 
@@ -9,7 +9,7 @@ set -e
 
 # --- Configuration ---
 # The confirmed SSH URL for your NEW PRIVATE repository.
-NEW_PERSONAL_REPO_URL="git@github.com:tech-lead/talent-ai-microservices-management.git"
+NEW_PERSONAL_REPO_URL="git@github.com:tech-lead/open-talent-microservices-management.git"
 
 
 # --- Script Execution ---

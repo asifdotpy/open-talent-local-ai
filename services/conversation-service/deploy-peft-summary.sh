@@ -1,7 +1,7 @@
 #!/bin/bash
-# TalentAI PEFT Model Deployment Summary
+# OpenTalent PEFT Model Deployment Summary
 
-echo "🎯 TalentAI PEFT/LoRA Model Deployment Guide"
+echo "🎯 OpenTalent PEFT/LoRA Model Deployment Guide"
 echo "=========================================="
 echo ""
 

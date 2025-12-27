@@ -10,10 +10,10 @@ set -e
 
 # --- Configuration ---
 # The absolute path to your microservices directory.
-MICROSERVICES_DIR="/root/talent-ai-platform-root/talent-ai-microservices"
+MICROSERVICES_DIR="/root/open-talent-platform-root/open-talent-microservices"
 
 # The base of the new, correct URL for your repositories.
-NEW_URL_BASE="https://github.com/TalentAI"
+NEW_URL_BASE="https://github.com/OpenTalent"
 
 # --- Script Execution ---
 
@@ -44,7 +44,7 @@ for service_dir in "$MICROSERVICES_DIR"/*/; do
     # Check if the directory is a Git repository
     if [ -d ".git" ]; then
       # Construct the new repository URL
-      new_repo_url="$NEW_URL_BASE/talent-ai-$service_name.git"
+      new_repo_url="$NEW_URL_BASE/open-talent-$service_name.git"
 
       echo "  Old URL:"
       git remote -v

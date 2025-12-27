@@ -1,5 +1,4 @@
-"""
-Modular LLM Service for TalentAI Platform
+"""Modular LLM Service for OpenTalent Platform
 
 This service provides a unified interface for different LLM providers:
 - Ollama (local models like granite4:350m-h)
@@ -10,22 +9,25 @@ The service uses a strategy pattern to allow easy switching between providers
 based on configuration, with fallback mechanisms for reliability.
 """
 
-import os
+import asyncio
 import json
 import logging
-import asyncio
-from typing import Dict, Any, Optional, List, AsyncIterator
+import os
 from abc import ABC, abstractmethod
+from collections.abc import AsyncIterator
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
+from typing import Any, Optional
+
 import httpx
-from datetime import datetime, timedelta
 
 # Add PEFT and transformers imports
 try:
-    from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
-    from peft import PeftModel, PeftConfig
     import torch
+    from peft import PeftConfig, PeftModel
+    from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+
     PEFT_AVAILABLE = True
 except ImportError:
     PEFT_AVAILABLE = False
@@ -35,17 +37,21 @@ except ImportError:
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class LLMProvider(Enum):
     """Available LLM providers."""
+
     OLLAMA = "ollama"
     OPENAI = "openai"
     PEFT = "peft"  # PEFT/LoRA models
     VLLM = "vllm"  # vLLM server
     MOCK = "mock"  # For testing/development
 
+
 @dataclass
 class LLMConfig:
     """Configuration for LLM providers."""
+
     provider: LLMProvider
     model: str
     api_key: Optional[str] = None
@@ -56,15 +62,18 @@ class LLMConfig:
     fallback_provider: Optional[LLMProvider] = None
     lora_adapter: Optional[str] = None  # For vLLM LoRA adapters
 
+
 class LLMResponse:
     """Standardized response from LLM providers."""
-    def __init__(self, content: str, metadata: Dict[str, Any] = None):
+
+    def __init__(self, content: str, metadata: dict[str, Any] = None):
         self.content = content
         self.metadata = metadata or {}
         self.timestamp = datetime.now()
         self.provider_used = None
         self.tokens_used = None
         self.processing_time = None
+
 
 class BaseLLMProvider(ABC):
     """Abstract base class for LLM providers."""
@@ -79,7 +88,9 @@ class BaseLLMProvider(ABC):
         pass
 
     @abstractmethod
-    async def generate_json(self, prompt: str, schema: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:
+    async def generate_json(
+        self, prompt: str, schema: dict[str, Any] = None, **kwargs
+    ) -> dict[str, Any]:
         """Generate structured JSON output."""
         pass
 
@@ -98,6 +109,7 @@ class BaseLLMProvider(ABC):
             logger.warning(f"Health check failed for {self.__class__.__name__}: {e}")
             return False
 
+
 class OllamaProvider(BaseLLMProvider):
     """Ollama provider for local LLM models."""
 
@@ -105,7 +117,7 @@ class OllamaProvider(BaseLLMProvider):
         super().__init__(config)
         self.client = httpx.AsyncClient(
             base_url=config.base_url or "http://localhost:11434",
-            timeout=httpx.Timeout(config.timeout)
+            timeout=httpx.Timeout(config.timeout),
         )
         self.current_model = config.model  # Allow dynamic model switching
 
@@ -124,9 +136,9 @@ class OllamaProvider(BaseLLMProvider):
                 "prompt": prompt,
                 "stream": False,
                 "options": {
-                    "temperature": kwargs.get('temperature', self.config.temperature),
-                    "num_predict": kwargs.get('max_tokens', self.config.max_tokens or 2048)
-                }
+                    "temperature": kwargs.get("temperature", self.config.temperature),
+                    "num_predict": kwargs.get("max_tokens", self.config.max_tokens or 2048),
+                },
             }
 
             response = await self.client.post("/api/generate", json=payload)
@@ -143,7 +155,7 @@ class OllamaProvider(BaseLLMProvider):
             llm_response.metadata = {
                 "model": result.get("model"),
                 "done": result.get("done"),
-                "context_length": len(result.get("context", []))
+                "context_length": len(result.get("context", [])),
             }
 
             return llm_response
@@ -152,7 +164,9 @@ class OllamaProvider(BaseLLMProvider):
             logger.error(f"Ollama generation failed: {e}")
             raise
 
-    async def generate_json(self, prompt: str, schema: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:
+    async def generate_json(
+        self, prompt: str, schema: dict[str, Any] = None, **kwargs
+    ) -> dict[str, Any]:
         """Generate JSON using Ollama with format instruction."""
         system_prompt = """
         You are an AI assistant that responds only with valid JSON. Do not include any explanatory text, markdown formatting, or additional content. Your response must be parseable JSON.
@@ -179,9 +193,9 @@ class OllamaProvider(BaseLLMProvider):
                 "prompt": prompt,
                 "stream": True,
                 "options": {
-                    "temperature": kwargs.get('temperature', self.config.temperature),
-                    "num_predict": kwargs.get('max_tokens', self.config.max_tokens or 2048)
-                }
+                    "temperature": kwargs.get("temperature", self.config.temperature),
+                    "num_predict": kwargs.get("max_tokens", self.config.max_tokens or 2048),
+                },
             }
 
             async with self.client.stream("POST", "/api/generate", json=payload) as response:
@@ -201,6 +215,7 @@ class OllamaProvider(BaseLLMProvider):
             logger.error(f"Ollama streaming failed: {e}")
             raise
 
+
 class OpenAIProvider(BaseLLMProvider):
     """OpenAI provider for GPT models."""
 
@@ -211,7 +226,7 @@ class OpenAIProvider(BaseLLMProvider):
         self.client = httpx.AsyncClient(
             base_url="https://api.openai.com/v1",
             headers={"Authorization": f"Bearer {config.api_key}"},
-            timeout=httpx.Timeout(config.timeout)
+            timeout=httpx.Timeout(config.timeout),
         )
 
     async def generate(self, prompt: str, **kwargs) -> LLMResponse:
@@ -222,9 +237,9 @@ class OpenAIProvider(BaseLLMProvider):
             payload = {
                 "model": self.config.model,
                 "messages": [{"role": "user", "content": prompt}],
-                "temperature": kwargs.get('temperature', self.config.temperature),
-                "max_tokens": kwargs.get('max_tokens', self.config.max_tokens or 2048),
-                "stream": False
+                "temperature": kwargs.get("temperature", self.config.temperature),
+                "max_tokens": kwargs.get("max_tokens", self.config.max_tokens or 2048),
+                "stream": False,
             }
 
             response = await self.client.post("/chat/completions", json=payload)
@@ -243,7 +258,7 @@ class OpenAIProvider(BaseLLMProvider):
             llm_response.metadata = {
                 "model": result.get("model"),
                 "finish_reason": choice.get("finish_reason"),
-                "usage": result.get("usage", {})
+                "usage": result.get("usage", {}),
             }
 
             return llm_response
@@ -252,15 +267,17 @@ class OpenAIProvider(BaseLLMProvider):
             logger.error(f"OpenAI generation failed: {e}")
             raise
 
-    async def generate_json(self, prompt: str, schema: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:
+    async def generate_json(
+        self, prompt: str, schema: dict[str, Any] = None, **kwargs
+    ) -> dict[str, Any]:
         """Generate JSON using OpenAI with structured output."""
         try:
             payload = {
                 "model": self.config.model,
                 "messages": [{"role": "user", "content": prompt}],
-                "temperature": kwargs.get('temperature', self.config.temperature),
-                "max_tokens": kwargs.get('max_tokens', self.config.max_tokens or 2048),
-                "response_format": {"type": "json_object"} if schema else None
+                "temperature": kwargs.get("temperature", self.config.temperature),
+                "max_tokens": kwargs.get("max_tokens", self.config.max_tokens or 2048),
+                "response_format": {"type": "json_object"} if schema else None,
             }
 
             if schema:
@@ -290,9 +307,9 @@ class OpenAIProvider(BaseLLMProvider):
             payload = {
                 "model": self.config.model,
                 "messages": [{"role": "user", "content": prompt}],
-                "temperature": kwargs.get('temperature', self.config.temperature),
-                "max_tokens": kwargs.get('max_tokens', self.config.max_tokens or 2048),
-                "stream": True
+                "temperature": kwargs.get("temperature", self.config.temperature),
+                "max_tokens": kwargs.get("max_tokens", self.config.max_tokens or 2048),
+                "stream": True,
             }
 
             async with self.client.stream("POST", "/chat/completions", json=payload) as response:
@@ -314,12 +331,12 @@ class OpenAIProvider(BaseLLMProvider):
             logger.error(f"OpenAI streaming failed: {e}")
             raise
 
+
 class MockProvider(BaseLLMProvider):
     """Mock provider for testing and development."""
 
     async def generate(self, prompt: str, **kwargs) -> LLMResponse:
         """Generate mock response."""
-        import time
         await asyncio.sleep(0.1)  # Simulate processing time
 
         content = f"Mock response for prompt: {prompt[:50]}..."
@@ -328,7 +345,9 @@ class MockProvider(BaseLLMProvider):
         llm_response.processing_time = 0.1
         return llm_response
 
-    async def generate_json(self, prompt: str, schema: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:
+    async def generate_json(
+        self, prompt: str, schema: dict[str, Any] = None, **kwargs
+    ) -> dict[str, Any]:
         """Generate mock JSON response."""
         return {"mock": True, "prompt": prompt[:50], "response": "Mock JSON response"}
 
@@ -338,6 +357,7 @@ class MockProvider(BaseLLMProvider):
         for word in words:
             yield word + " "
             await asyncio.sleep(0.05)
+
 
 class PEFTProvider(BaseLLMProvider):
     """PEFT/LoRA provider for fine-tuned models."""
@@ -366,7 +386,7 @@ class PEFTProvider(BaseLLMProvider):
                     self.config.model,
                     torch_dtype=torch.float16,
                     device_map="auto",
-                    trust_remote_code=True
+                    trust_remote_code=True,
                 )
                 self.tokenizer = AutoTokenizer.from_pretrained(self.config.model)
             else:
@@ -380,7 +400,7 @@ class PEFTProvider(BaseLLMProvider):
                     base_model_name,
                     torch_dtype=torch.float16,
                     device_map="auto",
-                    trust_remote_code=True
+                    trust_remote_code=True,
                 )
 
                 # Load PEFT model (LoRA adapters)
@@ -396,7 +416,7 @@ class PEFTProvider(BaseLLMProvider):
                 max_new_tokens=self.config.max_tokens or 2048,
                 temperature=self.config.temperature,
                 do_sample=True,
-                pad_token_id=self.tokenizer.eos_token_id
+                pad_token_id=self.tokenizer.eos_token_id,
             )
 
             logger.info("✅ PEFT model loaded successfully")
@@ -411,8 +431,8 @@ class PEFTProvider(BaseLLMProvider):
 
         try:
             # Use asyncio.to_thread for CPU-bound operations
-            temperature = kwargs.get('temperature', self.config.temperature)
-            max_tokens = kwargs.get('max_tokens', self.config.max_tokens or 2048)
+            temperature = kwargs.get("temperature", self.config.temperature)
+            max_tokens = kwargs.get("max_tokens", self.config.max_tokens or 2048)
 
             # Update pipeline parameters
             self.pipeline.model.config.temperature = temperature
@@ -420,13 +440,10 @@ class PEFTProvider(BaseLLMProvider):
 
             # Generate response
             outputs = await asyncio.to_thread(
-                self.pipeline,
-                prompt,
-                return_full_text=False,
-                num_return_sequences=1
+                self.pipeline, prompt, return_full_text=False, num_return_sequences=1
             )
 
-            content = outputs[0]['generated_text']
+            content = outputs[0]["generated_text"]
             processing_time = (datetime.now() - start_time).total_seconds()
 
             llm_response = LLMResponse(content)
@@ -435,7 +452,7 @@ class PEFTProvider(BaseLLMProvider):
             llm_response.metadata = {
                 "model": self.config.model,
                 "temperature": temperature,
-                "max_tokens": max_tokens
+                "max_tokens": max_tokens,
             }
 
             return llm_response
@@ -444,7 +461,9 @@ class PEFTProvider(BaseLLMProvider):
             logger.error(f"PEFT generation failed: {e}")
             raise
 
-    async def generate_json(self, prompt: str, schema: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:
+    async def generate_json(
+        self, prompt: str, schema: dict[str, Any] = None, **kwargs
+    ) -> dict[str, Any]:
         """Generate JSON using PEFT model with format instruction."""
         system_prompt = """
         You are an AI assistant that responds only with valid JSON. Do not include any explanatory text, markdown formatting, or additional content. Your response must be parseable JSON.
@@ -466,8 +485,8 @@ class PEFTProvider(BaseLLMProvider):
     async def stream_generate(self, prompt: str, **kwargs) -> AsyncIterator[str]:
         """Stream text generation from PEFT model."""
         try:
-            temperature = kwargs.get('temperature', self.config.temperature)
-            max_tokens = kwargs.get('max_tokens', self.config.max_tokens or 2048)
+            temperature = kwargs.get("temperature", self.config.temperature)
+            max_tokens = kwargs.get("max_tokens", self.config.max_tokens or 2048)
 
             # Update pipeline parameters
             self.pipeline.model.config.temperature = temperature
@@ -476,13 +495,10 @@ class PEFTProvider(BaseLLMProvider):
             # For streaming, we'll generate in chunks
             # This is a simplified implementation - in production you'd want proper streaming
             outputs = await asyncio.to_thread(
-                self.pipeline,
-                prompt,
-                return_full_text=False,
-                num_return_sequences=1
+                self.pipeline, prompt, return_full_text=False, num_return_sequences=1
             )
 
-            content = outputs[0]['generated_text']
+            content = outputs[0]["generated_text"]
             words = content.split()
 
             for word in words:
@@ -493,6 +509,7 @@ class PEFTProvider(BaseLLMProvider):
             logger.error(f"PEFT streaming failed: {e}")
             raise
 
+
 class VLLMProvider(BaseLLMProvider):
     """vLLM provider for high-performance LLM serving."""
 
@@ -500,9 +517,9 @@ class VLLMProvider(BaseLLMProvider):
         super().__init__(config)
         self.client = httpx.AsyncClient(
             base_url=config.base_url or "http://localhost:8000/v1",
-            timeout=httpx.Timeout(config.timeout)
+            timeout=httpx.Timeout(config.timeout),
         )
-        self.lora_adapter = getattr(config, 'lora_adapter', None)
+        self.lora_adapter = getattr(config, "lora_adapter", None)
 
     async def generate(self, prompt: str, **kwargs) -> LLMResponse:
         """Generate text using vLLM server."""
@@ -512,9 +529,9 @@ class VLLMProvider(BaseLLMProvider):
             payload = {
                 "model": self.config.model,
                 "messages": [{"role": "user", "content": prompt}],
-                "temperature": kwargs.get('temperature', self.config.temperature),
-                "max_tokens": kwargs.get('max_tokens', self.config.max_tokens or 2048),
-                "stream": False
+                "temperature": kwargs.get("temperature", self.config.temperature),
+                "max_tokens": kwargs.get("max_tokens", self.config.max_tokens or 2048),
+                "stream": False,
             }
 
             # Add LoRA adapter if specified
@@ -538,7 +555,7 @@ class VLLMProvider(BaseLLMProvider):
                 "model": result.get("model"),
                 "finish_reason": choice.get("finish_reason"),
                 "usage": result.get("usage", {}),
-                "lora_adapter": self.lora_adapter
+                "lora_adapter": self.lora_adapter,
             }
 
             return llm_response
@@ -547,15 +564,17 @@ class VLLMProvider(BaseLLMProvider):
             logger.error(f"vLLM generation failed: {e}")
             raise
 
-    async def generate_json(self, prompt: str, schema: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:
+    async def generate_json(
+        self, prompt: str, schema: dict[str, Any] = None, **kwargs
+    ) -> dict[str, Any]:
         """Generate JSON using vLLM with structured output."""
         try:
             payload = {
                 "model": self.config.model,
                 "messages": [{"role": "user", "content": prompt}],
-                "temperature": kwargs.get('temperature', self.config.temperature),
-                "max_tokens": kwargs.get('max_tokens', self.config.max_tokens or 2048),
-                "response_format": {"type": "json_object"} if schema else None
+                "temperature": kwargs.get("temperature", self.config.temperature),
+                "max_tokens": kwargs.get("max_tokens", self.config.max_tokens or 2048),
+                "response_format": {"type": "json_object"} if schema else None,
             }
 
             # Add LoRA adapter if specified
@@ -589,9 +608,9 @@ class VLLMProvider(BaseLLMProvider):
             payload = {
                 "model": self.config.model,
                 "messages": [{"role": "user", "content": prompt}],
-                "temperature": kwargs.get('temperature', self.config.temperature),
-                "max_tokens": kwargs.get('max_tokens', self.config.max_tokens or 2048),
-                "stream": True
+                "temperature": kwargs.get("temperature", self.config.temperature),
+                "max_tokens": kwargs.get("max_tokens", self.config.max_tokens or 2048),
+                "stream": True,
             }
 
             # Add LoRA adapter if specified
@@ -616,10 +635,11 @@ class VLLMProvider(BaseLLMProvider):
         except Exception as e:
             logger.error(f"vLLM streaming failed: {e}")
             raise
+
     """Main service that manages multiple LLM providers with fallback support."""
 
     def __init__(self):
-        self.providers: Dict[LLMProvider, BaseLLMProvider] = {}
+        self.providers: dict[LLMProvider, BaseLLMProvider] = {}
         self.primary_provider: Optional[LLMProvider] = None
         self.fallback_provider: Optional[LLMProvider] = None
 
@@ -652,7 +672,9 @@ class VLLMProvider(BaseLLMProvider):
         """Generate text using primary provider with fallback."""
         return await self._execute_with_fallback("generate", prompt, **kwargs)
 
-    async def generate_json(self, prompt: str, schema: Dict[str, Any] = None, **kwargs) -> Dict[str, Any]:
+    async def generate_json(
+        self, prompt: str, schema: dict[str, Any] = None, **kwargs
+    ) -> dict[str, Any]:
         """Generate JSON using primary provider with fallback."""
         return await self._execute_with_fallback("generate_json", prompt, schema=schema, **kwargs)
 
@@ -681,10 +703,14 @@ class VLLMProvider(BaseLLMProvider):
                     fallback = self.providers[self.fallback_provider]
                     method = getattr(fallback, method_name)
                     result = await method(*args, **kwargs)
-                    logger.info(f"Successfully used fallback {self.fallback_provider.value} for {method_name}")
+                    logger.info(
+                        f"Successfully used fallback {self.fallback_provider.value} for {method_name}"
+                    )
                     return result
                 except Exception as fallback_e:
-                    logger.error(f"Fallback provider {self.fallback_provider.value} also failed: {fallback_e}")
+                    logger.error(
+                        f"Fallback provider {self.fallback_provider.value} also failed: {fallback_e}"
+                    )
 
             raise e
 
@@ -698,7 +724,9 @@ class VLLMProvider(BaseLLMProvider):
             method = getattr(primary, method_name)
             async for chunk in method(*args, **kwargs):
                 yield chunk
-            logger.info(f"Successfully used {self.primary_provider.value} for streaming {method_name}")
+            logger.info(
+                f"Successfully used {self.primary_provider.value} for streaming {method_name}"
+            )
         except Exception as e:
             logger.warning(f"Primary provider {self.primary_provider.value} failed: {e}")
 
@@ -709,14 +737,18 @@ class VLLMProvider(BaseLLMProvider):
                     method = getattr(fallback, method_name)
                     async for chunk in method(*args, **kwargs):
                         yield chunk
-                    logger.info(f"Successfully used fallback {self.fallback_provider.value} for streaming {method_name}")
+                    logger.info(
+                        f"Successfully used fallback {self.fallback_provider.value} for streaming {method_name}"
+                    )
                 except Exception as fallback_e:
-                    logger.error(f"Fallback provider {self.fallback_provider.value} also failed: {fallback_e}")
+                    logger.error(
+                        f"Fallback provider {self.fallback_provider.value} also failed: {fallback_e}"
+                    )
                     raise fallback_e
             else:
                 raise e
 
-    async def health_check(self) -> Dict[str, bool]:
+    async def health_check(self) -> dict[str, bool]:
         """Check health of all configured providers."""
         results = {}
         for provider_type, provider in self.providers.items():
@@ -750,8 +782,10 @@ class VLLMProvider(BaseLLMProvider):
             return ollama_provider.current_model
         return "unknown"
 
+
 # Global instance
 modular_llm_service = ModularLLMService()
+
 
 def configure_llm_service():
     """Configure the LLM service based on environment variables."""
@@ -782,8 +816,10 @@ def configure_llm_service():
         base_url=primary_base_url,
         timeout=int(os.getenv("LLM_TIMEOUT", "300")),
         temperature=float(os.getenv("LLM_TEMPERATURE", "0.7")),
-        max_tokens=int(os.getenv("LLM_MAX_TOKENS", "2048")) if os.getenv("LLM_MAX_TOKENS") else None,
-        lora_adapter=os.getenv("LLM_LORA_ADAPTER")  # LoRA adapter for vLLM
+        max_tokens=int(os.getenv("LLM_MAX_TOKENS", "2048"))
+        if os.getenv("LLM_MAX_TOKENS")
+        else None,
+        lora_adapter=os.getenv("LLM_LORA_ADAPTER"),  # LoRA adapter for vLLM
     )
 
     modular_llm_service.configure_provider(primary_config)
@@ -803,14 +839,19 @@ def configure_llm_service():
             base_url=fallback_base_url or primary_base_url,
             timeout=int(os.getenv("LLM_FALLBACK_TIMEOUT", "300")),
             temperature=float(os.getenv("LLM_FALLBACK_TEMPERATURE", "0.7")),
-            max_tokens=int(os.getenv("LLM_FALLBACK_MAX_TOKENS", "2048")) if os.getenv("LLM_FALLBACK_MAX_TOKENS") else None,
-            fallback_provider=None  # No fallback for fallback provider
+            max_tokens=int(os.getenv("LLM_FALLBACK_MAX_TOKENS", "2048"))
+            if os.getenv("LLM_FALLBACK_MAX_TOKENS")
+            else None,
+            fallback_provider=None,  # No fallback for fallback provider
         )
 
         modular_llm_service.configure_provider(fallback_config)
         primary_config.fallback_provider = fallback_provider
 
-    logger.info(f"Configured LLM service with primary: {primary_provider.value}, fallback: {fallback_provider_str or 'none'}")
+    logger.info(
+        f"Configured LLM service with primary: {primary_provider.value}, fallback: {fallback_provider_str or 'none'}"
+    )
+
 
 # Initialize on import
 configure_llm_service()

@@ -9,7 +9,7 @@ export const Header = () => {
         <div className="flex items-center justify-between mb-4">
           <Link to="/" className="flex items-center space-x-2">
             <Video className="h-8 w-8 text-blue-600" />
-            <span className="text-xl font-bold text-gray-900">TalentAI Interview</span>
+            <span className="text-xl font-bold text-gray-900">OpenTalent Interview</span>
           </Link>
 
           <ServiceStatus />

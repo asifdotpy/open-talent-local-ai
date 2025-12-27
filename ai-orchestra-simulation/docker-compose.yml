@@ -23,7 +23,7 @@ services:
       retries: 3
       start_period: 40s
     networks:
-      - talent-ai-network
+      - open-talent-network
 
   # Optional: Development service with hot reload
   ai-orchestra-dev:
@@ -44,12 +44,12 @@ services:
     profiles:
       - dev
     networks:
-      - talent-ai-network
+      - open-talent-network
 
 networks:
-  talent-ai-network:
+  open-talent-network:
     driver: bridge
-    name: talent-ai-network
+    name: open-talent-network
 
 volumes:
   logs:

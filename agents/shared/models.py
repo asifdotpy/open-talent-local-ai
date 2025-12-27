@@ -1,16 +1,18 @@
 """
-Shared data models for TalentAI agents.
+Shared data models for OpenTalent agents.
 Pydantic schemas for inter-agent communication and data exchange.
 """
 
-from pydantic import BaseModel, EmailStr, Field, validator
-from typing import List, Optional, Dict, Any
 from datetime import datetime
 from enum import Enum
+from typing import Any, Optional
+
+from pydantic import BaseModel, EmailStr, Field
 
 
 class CandidateSource(str, Enum):
     """Source of candidate discovery"""
+
     LINKEDIN = "linkedin"
     GITHUB = "github"
     STACKOVERFLOW = "stackoverflow"
@@ -23,6 +25,7 @@ class CandidateSource(str, Enum):
 
 class CandidateStatus(str, Enum):
     """Candidate pipeline status"""
+
     NEW = "new"
     SOURCED = "sourced"
     CONTACTED = "contacted"
@@ -38,6 +41,7 @@ class CandidateStatus(str, Enum):
 
 class SkillProficiency(str, Enum):
     """Skill proficiency levels"""
+
     BEGINNER = "beginner"
     INTERMEDIATE = "intermediate"
     ADVANCED = "advanced"
@@ -46,6 +50,7 @@ class SkillProficiency(str, Enum):
 
 class Skill(BaseModel):
     """Skill representation"""
+
     name: str
     proficiency_level: Optional[SkillProficiency] = None
     years_experience: Optional[int] = None
@@ -54,6 +59,7 @@ class Skill(BaseModel):
 
 class WorkExperience(BaseModel):
     """Work experience entry"""
+
     company: str
     title: str
     start_date: Optional[datetime] = None
@@ -65,6 +71,7 @@ class WorkExperience(BaseModel):
 
 class Education(BaseModel):
     """Education entry"""
+
     institution: str
     degree: str
     field_of_study: Optional[str] = None
@@ -75,6 +82,7 @@ class Education(BaseModel):
 
 class SocialProfile(BaseModel):
     """Social media profile"""
+
     platform: str
     url: str
     username: Optional[str] = None
@@ -83,50 +91,50 @@ class SocialProfile(BaseModel):
 
 class CandidateProfile(BaseModel):
     """Comprehensive candidate profile"""
+
     # Basic Information
     id: Optional[str] = None
     name: str
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
     location: Optional[str] = None
-    
+
     # Professional Data
     current_role: Optional[str] = None
     current_company: Optional[str] = None
     experience_years: Optional[int] = None
-    experience: List[WorkExperience] = Field(default_factory=list)
-    education: List[Education] = Field(default_factory=list)
-    skills: List[Skill] = Field(default_factory=list)
-    
+    experience: list[WorkExperience] = Field(default_factory=list)
+    education: list[Education] = Field(default_factory=list)
+    skills: list[Skill] = Field(default_factory=list)
+
     # Social & Portfolio
     linkedin_url: Optional[str] = None
     github_url: Optional[str] = None
     portfolio_url: Optional[str] = None
-    social_profiles: List[SocialProfile] = Field(default_factory=list)
-    
+    social_profiles: list[SocialProfile] = Field(default_factory=list)
+
     # AI-Generated Insights
     ai_summary: Optional[str] = None
     match_score: Optional[float] = Field(None, ge=0, le=100)
     quality_score: Optional[float] = Field(None, ge=0, le=100)
-    
+
     # Process Tracking
     status: CandidateStatus = CandidateStatus.NEW
     source: Optional[CandidateSource] = None
     source_notes: Optional[str] = None
-    
+
     # Metadata
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
-    
+
     class Config:
         use_enum_values = True
-        json_encoders = {
-            datetime: lambda v: v.isoformat()
-        }
+        json_encoders = {datetime: lambda v: v.isoformat()}
 
 
 class OutreachChannel(str, Enum):
     """Communication channels for outreach"""
+
     EMAIL = "email"
     LINKEDIN = "linkedin"
     WHATSAPP = "whatsapp"
@@ -135,6 +143,7 @@ class OutreachChannel(str, Enum):
 
 class OutreachStatus(str, Enum):
     """Outreach attempt status"""
+
     PENDING = "pending"
     SENT = "sent"
     DELIVERED = "delivered"
@@ -147,6 +156,7 @@ class OutreachStatus(str, Enum):
 
 class OutreachAttempt(BaseModel):
     """Single outreach attempt"""
+
     id: Optional[str] = None
     channel: OutreachChannel
     subject: Optional[str] = None
@@ -160,22 +170,24 @@ class OutreachAttempt(BaseModel):
 
 class EngagementHistory(BaseModel):
     """Complete engagement history for a candidate"""
+
     candidate_id: str
     project_id: str
     total_attempts: int = 0
-    channels_used: List[OutreachChannel] = Field(default_factory=list)
-    outreach_attempts: List[OutreachAttempt] = Field(default_factory=list)
+    channels_used: list[OutreachChannel] = Field(default_factory=list)
+    outreach_attempts: list[OutreachAttempt] = Field(default_factory=list)
     response_rate: float = Field(0.0, ge=0, le=1)
     engagement_score: Optional[float] = Field(None, ge=0, le=100)
     last_contact_date: Optional[datetime] = None
     next_followup_date: Optional[datetime] = None
-    
+
     class Config:
         use_enum_values = True
 
 
 class SalaryTrend(BaseModel):
     """Salary trend data"""
+
     job_title: str
     location: str
     min_salary: float
@@ -188,17 +200,19 @@ class SalaryTrend(BaseModel):
 
 class SkillDemand(BaseModel):
     """Skill demand data"""
+
     skill_name: str
     job_title: str
     demand_level: str  # "low", "medium", "high"
     growth_rate: float  # percentage
     avg_salary_impact: float
-    trending_frameworks: List[str] = Field(default_factory=list)
+    trending_frameworks: list[str] = Field(default_factory=list)
     last_updated: datetime = Field(default_factory=datetime.utcnow)
 
 
 class CompetitorIntel(BaseModel):
     """Competitor intelligence data"""
+
     company_name: str
     location: str
     open_positions: int = 0
@@ -211,12 +225,13 @@ class CompetitorIntel(BaseModel):
 
 class MarketInsight(BaseModel):
     """Market intelligence aggregation"""
+
     job_title: str
     location: Optional[str] = None
     industry: Optional[str] = None
-    salary_trends: List[SalaryTrend] = Field(default_factory=list)
-    competitor_data: List[CompetitorIntel] = Field(default_factory=list)
-    in_demand_skills: List[str] = Field(default_factory=list)
+    salary_trends: list[SalaryTrend] = Field(default_factory=list)
+    competitor_data: list[CompetitorIntel] = Field(default_factory=list)
+    in_demand_skills: list[str] = Field(default_factory=list)
     talent_availability: Optional[str] = None  # "high", "medium", "low"
     market_saturation: Optional[float] = Field(None, ge=0, le=1)
     generated_at: datetime = Field(default_factory=datetime.utcnow)
@@ -224,6 +239,7 @@ class MarketInsight(BaseModel):
 
 class MessageType(str, Enum):
     """Agent message types"""
+
     CANDIDATE_FOUND = "candidate_found"
     CANDIDATE_SCORED = "candidate_scored"
     OUTREACH_SENT = "outreach_sent"
@@ -242,6 +258,7 @@ class MessageType(str, Enum):
 
 class MessagePriority(str, Enum):
     """Message priority levels"""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -250,21 +267,23 @@ class MessagePriority(str, Enum):
 
 class AgentMessage(BaseModel):
     """Inter-agent communication message"""
+
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     source_agent: str
     target_agent: Optional[str] = None  # None = broadcast
     message_type: MessageType
-    payload: Dict[str, Any]
+    payload: dict[str, Any]
     priority: MessagePriority = MessagePriority.MEDIUM
     correlation_id: Optional[str] = None
     trace_id: Optional[str] = None
-    
+
     class Config:
         use_enum_values = True
 
 
 class PipelineState(str, Enum):
     """Sourcing pipeline states"""
+
     INITIATED = "initiated"
     SCANNING = "scanning"
     SCORING = "scoring"
@@ -277,11 +296,12 @@ class PipelineState(str, Enum):
 
 class SourcingPipeline(BaseModel):
     """Sourcing pipeline state"""
+
     id: str
     project_id: str
     job_description: str
     state: PipelineState = PipelineState.INITIATED
-    active_agents: List[str] = Field(default_factory=list)
+    active_agents: list[str] = Field(default_factory=list)
     candidates_found: int = 0
     candidates_contacted: int = 0
     candidates_responded: int = 0
@@ -290,23 +310,24 @@ class SourcingPipeline(BaseModel):
     started_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     completed_at: Optional[datetime] = None
-    
+
     class Config:
         use_enum_values = True
 
 
 class InterviewResult(BaseModel):
     """Interview results from Vetta AI"""
+
     session_id: str
     candidate_id: str
     project_id: str
-    questions: List[Dict[str, Any]]
-    responses: List[Dict[str, Any]]
+    questions: list[dict[str, Any]]
+    responses: list[dict[str, Any]]
     overall_score: float = Field(..., ge=0, le=100)
     technical_score: Optional[float] = Field(None, ge=0, le=100)
     communication_score: Optional[float] = Field(None, ge=0, le=100)
     cultural_fit_score: Optional[float] = Field(None, ge=0, le=100)
     recommendation: str  # "hire", "maybe", "reject"
-    key_insights: List[str] = Field(default_factory=list)
-    red_flags: List[str] = Field(default_factory=list)
+    key_insights: list[str] = Field(default_factory=list)
+    red_flags: list[str] = Field(default_factory=list)
     conducted_at: datetime = Field(default_factory=datetime.utcnow)

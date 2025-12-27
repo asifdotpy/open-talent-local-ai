@@ -1,5 +1,5 @@
 {
-  "name": "@talent-ai/ai-orchestra-simulation",
+  "name": "@open-talent/ai-orchestra-simulation",
   "version": "1.0.0",
   "description": "AI Orchestra - Real-Time Vectorial Facial Animation Engine",
   "main": "index.js",

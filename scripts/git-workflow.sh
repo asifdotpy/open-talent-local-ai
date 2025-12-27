@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# TalentAI Platform - Git Workflow Helper
+# OpenTalent Platform - Git Workflow Helper
 # This script provides shortcuts for common Git operations
 
 set -e
 
-REPO_URL="https://github.com/asifdotpy/talent-ai-platform"
+REPO_URL="https://github.com/asifdotpy/open-talent-platform"
 MAIN_BRANCH="main"
 DEVELOP_BRANCH="develop"
 
@@ -151,7 +151,7 @@ clean_workspace() {
 
 # Show usage
 usage() {
-    echo "TalentAI Platform - Git Workflow Helper"
+    echo "OpenTalent Platform - Git Workflow Helper"
     echo ""
     echo "Usage: $0 <command>"
     echo ""

@@ -1,4 +1,4 @@
-# TalentAI Interview Service - Python Dependencies
+# OpenTalent Interview Service - Python Dependencies
 
 fastapi==0.111.0
 uvicorn==0.30.1

@@ -26,8 +26,8 @@ export class WebRTCClient {
 
     this.pc.onicecandidate = (e) => {
       if (e.candidate) {
-        this._send({ 
-          type: 'ice_candidate', 
+        this._send({
+          type: 'ice_candidate',
           candidate: {
             candidate: e.candidate.candidate,
             sdpMid: e.candidate.sdpMid,
@@ -57,7 +57,7 @@ export class WebRTCClient {
     };
 
     // Create our outbound data channel for control/transcripts
-    this.dataChannel = this.pc.createDataChannel('talentai');
+    this.dataChannel = this.pc.createDataChannel('OpenTalent');
 
     // Check if microphone capture is enabled (for lip-sync testing, we may not need it)
     const enableMicrophone = this.config.features?.enableMicrophoneCapture !== false;

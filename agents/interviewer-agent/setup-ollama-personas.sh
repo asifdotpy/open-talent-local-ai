@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # ╔═══════════════════════════════════════════════════════════════════════════╗
-# ║  TalentAI - Ollama Multi-Persona Interviewer Setup                     ║
+# ║  OpenTalent - Ollama Multi-Persona Interviewer Setup                     ║
 # ╚═══════════════════════════════════════════════════════════════════════════╝
 
 set -e
 
-echo "🤖 Setting up Ollama Multi-Persona Interviewers for TalentAI"
+echo "🤖 Setting up Ollama Multi-Persona Interviewers for OpenTalent"
 echo "============================================================"
 
 # Check if Ollama is installed

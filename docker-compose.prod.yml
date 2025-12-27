@@ -4,17 +4,17 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: talent-ai-postgres
+    container_name: open-talent-postgres
     environment:
-      POSTGRES_USER: talentai
+      POSTGRES_USER: OpenTalent
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: talentai
+      POSTGRES_DB: OpenTalent
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U talentai -d talentai"]
+      test: ["CMD-SHELL", "pg_isready -U OpenTalent -d OpenTalent"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -25,7 +25,7 @@ services:
     build:
       context: ./ai-orchestra-simulation
       dockerfile: Dockerfile
-    container_name: talent-ai-avatar-renderer
+    container_name: open-talent-avatar-renderer
     ports:
       - "3001:3001"
     environment:
@@ -46,11 +46,11 @@ services:
     build:
       context: ./microservices/interview-service
       dockerfile: Dockerfile
-    container_name: talent-ai-interview-service
+    container_name: open-talent-interview-service
     ports:
       - "8004:80"
     environment:
-      - DATABASE_URL=postgresql://talentai:talentai123@postgres:5432/talentai
+      - DATABASE_URL=postgresql://OpenTalent:OpenTalent123@postgres:5432/OpenTalent
       - VOICE_SERVICE_URL=http://voice-service:80
       - CONVERSATION_SERVICE_URL=http://conversation-service:80
       - AVATAR_SERVICE_URL=http://avatar-renderer:3001
@@ -73,7 +73,7 @@ services:
     build:
       context: ./microservices/voice-service
       dockerfile: Dockerfile
-    container_name: talent-ai-voice-service
+    container_name: open-talent-voice-service
     ports:
       - "8002:80"
     environment:
@@ -92,7 +92,7 @@ services:
     build:
       context: ./microservices/conversation-service
       dockerfile: Dockerfile
-    container_name: talent-ai-conversation-service
+    container_name: open-talent-conversation-service
     ports:
       - "8003:80"
     environment:
@@ -110,7 +110,7 @@ services:
   # Ollama Service for AI Models
   ollama:
     image: ollama/ollama:latest
-    container_name: talent-ai-ollama
+    container_name: open-talent-ollama
     ports:
       - "11434:11434"
     volumes:

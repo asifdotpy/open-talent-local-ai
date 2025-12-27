@@ -5,18 +5,21 @@ Fix Vetta Dataset Schema on Hugging Face - Remove incompatible personas config
 
 import os
 from pathlib import Path
+
 from huggingface_hub import HfApi
+
 
 def load_env_file():
     """Load environment variables from .env file if it exists."""
     env_file = Path(".env")
     if env_file.exists():
-        with open(env_file, 'r') as f:
+        with open(env_file) as f:
             for line in f:
                 line = line.strip()
-                if line and not line.startswith('#'):
-                    key, value = line.split('=', 1)
+                if line and not line.startswith("#"):
+                    key, value = line.split("=", 1)
                     os.environ[key.strip()] = value.strip().strip("'\"")
+
 
 def main():
     # Load .env file if it exists
@@ -32,7 +35,7 @@ def main():
         exit(1)
 
     api = HfApi()
-    repo_id = 'asifdotpy/vetta-multi-persona-dataset'
+    repo_id = "asifdotpy/vetta-multi-persona-dataset"
 
     dataset_card = """---
 dataset_info:
@@ -72,7 +75,7 @@ dataset_info:
 
 ## Overview
 
-The Vetta Multi-Persona Dataset is a comprehensive instruction-tuning dataset designed to train AI models for multi-role orchestration within the TalentAI platform. This dataset transforms a single-purpose interview AI into a versatile platform orchestrator capable of handling the entire hiring workflow.
+The Vetta Multi-Persona Dataset is a comprehensive instruction-tuning dataset designed to train AI models for multi-role orchestration within the OpenTalent platform. This dataset transforms a single-purpose interview AI into a versatile platform orchestrator capable of handling the entire hiring workflow.
 
 ## Dataset Details
 
@@ -195,7 +198,7 @@ trainer.train()
 ### Primary Use Cases
 - **Fine-tuning LLMs** for multi-role AI assistants in HR/recruiting
 - **Research** in persona-based AI systems and role adaptation
-- **Platform Integration** for TalentAI and similar HR platforms
+- **Platform Integration** for OpenTalent and similar HR platforms
 - **Benchmarking** multi-persona AI capabilities
 
 ### Out-of-Scope Use
@@ -251,16 +254,19 @@ This dataset is released under the Apache 2.0 License.
 For questions or contributions, please contact the maintainer at the Hugging Face repository.
 """
 
-    print('Re-uploading dataset card with corrected schema...')
+    print("Re-uploading dataset card with corrected schema...")
     api.upload_file(
         path_or_fileobj=dataset_card.encode(),
-        path_in_repo='README.md',
+        path_in_repo="README.md",
         repo_id=repo_id,
-        repo_type='dataset',
-        commit_message='Fix dataset schema: remove incompatible personas config, update metadata structure'
+        repo_type="dataset",
+        commit_message="Fix dataset schema: remove incompatible personas config, update metadata structure",
     )
-    print('✅ Dataset card updated with complete schema!')
-    print('🔗 Check the dataset viewer: https://huggingface.co/datasets/asifdotpy/vetta-multi-persona-dataset')
+    print("✅ Dataset card updated with complete schema!")
+    print(
+        "🔗 Check the dataset viewer: https://huggingface.co/datasets/asifdotpy/vetta-multi-persona-dataset"
+    )
+
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,4 @@
-# TalentAI Shared Infrastructure Dependencies
+# OpenTalent Shared Infrastructure Dependencies
 
 # Core
 pydantic>=2.0.0

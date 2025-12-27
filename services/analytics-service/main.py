@@ -1,47 +1,48 @@
-from fastapi import FastAPI, HTTPException
-from typing import List, Dict, Any
-import json
 from datetime import datetime
+
+from fastapi import FastAPI, HTTPException
 from textblob import TextBlob
 
 from schemas import (
-    SentimentAnalysisRequest,
-    SentimentAnalysis,
-    ResponseQualityRequest,
-    ResponseQuality,
-    BiasDetectionRequest,
     BiasDetection,
-    ExpertiseAssessmentRequest,
+    BiasDetectionRequest,
     ExpertiseAssessment,
-    InterviewPerformanceRequest,
-    InterviewPerformance,
-    IntelligenceReportRequest,
+    ExpertiseAssessmentRequest,
     IntelligenceReport,
+    IntelligenceReportRequest,
+    InterviewPerformance,
+    InterviewPerformanceRequest,
+    MetricPoint,
     MetricsResponse,
     MetricsTimeSeriesResponse,
-    MetricPoint,
     ReportCreateRequest,
-    ReportResponse,
     ReportExportResponse,
-    HealthResponse,
+    ReportResponse,
+    ResponseQuality,
+    ResponseQualityRequest,
+    SentimentAnalysis,
+    SentimentAnalysisRequest,
 )
 
 # FastAPI app
 app = FastAPI(
-    title="TalentAI Analytics Service API",
+    title="OpenTalent Analytics Service API",
     description="AI-powered analytics and intelligence service for interview analysis",
-    version="1.0.0"
+    version="1.0.0",
 )
+
 
 @app.get("/")
 async def root():
     """Root endpoint for the Analytics Service."""
-    return {"message": "TalentAI Analytics Service - AI Interview Intelligence"}
+    return {"message": "OpenTalent Analytics Service - AI Interview Intelligence"}
+
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
     return {"status": "healthy", "service": "analytics"}
+
 
 # --- Sentiment Analysis ---
 @app.post("/api/v1/analyze/sentiment", response_model=SentimentAnalysis)
@@ -75,10 +76,11 @@ async def analyze_sentiment(request: SentimentAnalysisRequest):
             confidence=0.8,
             emotion=emotion,
             intensity=abs(polarity),
-            keywords=keywords[:5]
+            keywords=keywords[:5],
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Sentiment analysis failed: {str(e)}")
+
 
 # --- Response Quality Analysis ---
 @app.post("/api/v1/analyze/quality", response_model=ResponseQuality)
@@ -91,10 +93,14 @@ async def analyze_response_quality(request: ResponseQualityRequest):
         # Relevance check (simple keyword matching)
         question_keywords = set(request.question_context.lower().split())
         response_keywords = set(request.response_text.lower().split())
-        relevance_score = len(question_keywords.intersection(response_keywords)) / max(len(question_keywords), 1) * 2.5
+        relevance_score = (
+            len(question_keywords.intersection(response_keywords))
+            / max(len(question_keywords), 1)
+            * 2.5
+        )
 
         # Clarity assessment (sentence structure)
-        sentences = request.response_text.split('.')
+        sentences = request.response_text.split(".")
         avg_sentence_length = sum(len(s.split()) for s in sentences) / max(len(sentences), 1)
         clarity_score = max(0, 2.5 - abs(avg_sentence_length - 15) / 10)
 
@@ -109,11 +115,18 @@ async def analyze_response_quality(request: ResponseQualityRequest):
             relevance=relevance_score / 2.5,
             clarity=clarity_score / 2.5,
             technical_accuracy=technical_score / 2.5,
-            strengths=["Good length" if length_score > 2 else "", "Relevant content" if relevance_score > 2 else ""],
-            improvements=["Add more detail" if length_score < 1.5 else "", "Improve clarity" if clarity_score < 1.5 else ""]
+            strengths=[
+                "Good length" if length_score > 2 else "",
+                "Relevant content" if relevance_score > 2 else "",
+            ],
+            improvements=[
+                "Add more detail" if length_score < 1.5 else "",
+                "Improve clarity" if clarity_score < 1.5 else "",
+            ],
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Quality analysis failed: {str(e)}")
+
 
 # --- Bias Detection ---
 @app.post("/api/v1/analyze/bias", response_model=BiasDetection)
@@ -167,10 +180,11 @@ async def detect_bias(request: BiasDetectionRequest):
             flags=bias_flags,
             severity=severity,
             categories=categories,
-            recommendations=recommendations
+            recommendations=recommendations,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Bias detection failed: {str(e)}")
+
 
 # --- Expertise Assessment ---
 @app.post("/api/v1/analyze/expertise", response_model=ExpertiseAssessment)
@@ -184,7 +198,7 @@ async def assess_expertise(request: ExpertiseAssessmentRequest):
             "javascript": ["javascript", "react", "node", "typescript", "vue"],
             "database": ["sql", "postgresql", "mongodb", "redis", "mysql"],
             "cloud": ["aws", "azure", "gcp", "docker", "kubernetes"],
-            "system_design": ["architecture", "scalability", "microservices", "api"]
+            "system_design": ["architecture", "scalability", "microservices", "api"],
         }
 
         for category, keywords in skill_keywords.items():
@@ -196,7 +210,7 @@ async def assess_expertise(request: ExpertiseAssessmentRequest):
             "beginner": ["learning", "basic", "introduction", "tutorial"],
             "intermediate": ["experience", "worked on", "implemented", "developed"],
             "advanced": ["architected", "led", "optimized", "scaled"],
-            "expert": ["designed systems", "mentored", "innovated", "pioneered"]
+            "expert": ["designed systems", "mentored", "innovated", "pioneered"],
         }
 
         expertise_scores = {level: 0 for level in experience_indicators.keys()}
@@ -214,12 +228,9 @@ async def assess_expertise(request: ExpertiseAssessmentRequest):
             level = max(expertise_scores, key=expertise_scores.get)
 
         # Estimate years of experience
-        years_estimate = {
-            "beginner": 1,
-            "intermediate": 3,
-            "advanced": 5,
-            "expert": 8
-        }.get(level, 3)
+        years_estimate = {"beginner": 1, "intermediate": 3, "advanced": 5, "expert": 8}.get(
+            level, 3
+        )
 
         # Knowledge gaps
         knowledge_gaps = []
@@ -231,10 +242,11 @@ async def assess_expertise(request: ExpertiseAssessmentRequest):
             confidence=0.7,
             technical_skills=technical_skills,
             knowledge_gaps=knowledge_gaps,
-            experience_years=years_estimate
+            experience_years=years_estimate,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Expertise assessment failed: {str(e)}")
+
 
 # --- Interview Performance Analysis ---
 @app.post("/api/v1/analyze/performance", response_model=InterviewPerformance)
@@ -249,20 +261,32 @@ async def analyze_interview_performance(request: InterviewPerformanceRequest):
                 expertise_level="unknown",
                 bias_incidents=0,
                 quality_trend="unknown",
-                recommendations=["Continue with standard interview process"]
+                recommendations=["Continue with standard interview process"],
             )
 
         # Calculate averages
-        avg_sentiment = sum(a.get("sentiment", {}).get("polarity", 0) for a in analyses) / len(analyses)
-        avg_quality = sum(a.get("quality", {}).get("overall_score", 5) for a in analyses) / len(analyses)
+        avg_sentiment = sum(a.get("sentiment", {}).get("polarity", 0) for a in analyses) / len(
+            analyses
+        )
+        avg_quality = sum(a.get("quality", {}).get("overall_score", 5) for a in analyses) / len(
+            analyses
+        )
         total_bias = sum(len(a.get("bias_detection", {}).get("flags", [])) for a in analyses)
 
         # Determine trends
-        sentiment_trend = "positive" if avg_sentiment > 0.2 else "negative" if avg_sentiment < -0.2 else "neutral"
-        quality_trend = "improving" if avg_quality > 7 else "declining" if avg_quality < 5 else "stable"
+        sentiment_trend = (
+            "positive" if avg_sentiment > 0.2 else "negative" if avg_sentiment < -0.2 else "neutral"
+        )
+        quality_trend = (
+            "improving" if avg_quality > 7 else "declining" if avg_quality < 5 else "stable"
+        )
 
         # Expertise level (use latest assessment)
-        expertise_level = analyses[-1].get("expertise_assessment", {}).get("level", "unknown") if analyses else "unknown"
+        expertise_level = (
+            analyses[-1].get("expertise_assessment", {}).get("level", "unknown")
+            if analyses
+            else "unknown"
+        )
 
         overall_score = (avg_quality + (1 - total_bias * 0.1) * 10) / 2
 
@@ -272,10 +296,14 @@ async def analyze_interview_performance(request: InterviewPerformanceRequest):
             expertise_level=expertise_level,
             bias_incidents=total_bias,
             quality_trend=quality_trend,
-            recommendations=["Continue monitoring candidate responses", "Adjust question difficulty as needed"]
+            recommendations=[
+                "Continue monitoring candidate responses",
+                "Adjust question difficulty as needed",
+            ],
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Performance analysis failed: {str(e)}")
+
 
 # --- Intelligence Report Generation ---
 @app.post("/api/v1/analyze/report", response_model=IntelligenceReport)
@@ -293,38 +321,62 @@ async def generate_intelligence_report(request: IntelligenceReportRequest):
                 expertise_evaluation={"level": "unknown"},
                 quality_metrics={"average_score": 0},
                 recommendations=["Insufficient data for analysis"],
-                interview_effectiveness=5.0
+                interview_effectiveness=5.0,
             )
 
         # Summary statistics
         total_responses = len(responses)
-        avg_quality = sum(a.get("quality", {}).get("overall_score", 5) for a in analyses) / len(analyses)
-        avg_sentiment = sum(a.get("sentiment", {}).get("polarity", 0) for a in analyses) / len(analyses)
+        avg_quality = sum(a.get("quality", {}).get("overall_score", 5) for a in analyses) / len(
+            analyses
+        )
+        avg_sentiment = sum(a.get("sentiment", {}).get("polarity", 0) for a in analyses) / len(
+            analyses
+        )
 
         # Sentiment analysis summary
         sentiment_distribution = {
-            "positive": len([a for a in analyses if a.get("sentiment", {}).get("polarity", 0) > 0.2]),
-            "neutral": len([a for a in analyses if -0.2 <= a.get("sentiment", {}).get("polarity", 0) <= 0.2]),
-            "negative": len([a for a in analyses if a.get("sentiment", {}).get("polarity", 0) < -0.2])
+            "positive": len(
+                [a for a in analyses if a.get("sentiment", {}).get("polarity", 0) > 0.2]
+            ),
+            "neutral": len(
+                [a for a in analyses if -0.2 <= a.get("sentiment", {}).get("polarity", 0) <= 0.2]
+            ),
+            "negative": len(
+                [a for a in analyses if a.get("sentiment", {}).get("polarity", 0) < -0.2]
+            ),
         }
 
         # Bias report
-        total_bias_incidents = sum(len(a.get("bias_detection", {}).get("flags", [])) for a in analyses)
+        total_bias_incidents = sum(
+            len(a.get("bias_detection", {}).get("flags", [])) for a in analyses
+        )
         bias_categories = {}
         for a in analyses:
             for category in a.get("bias_detection", {}).get("categories", []):
                 bias_categories[category] = bias_categories.get(category, 0) + 1
 
         # Expertise evaluation
-        expertise_levels = [a.get("expertise_assessment", {}).get("level", "unknown") for a in analyses]
-        most_common_expertise = max(set(expertise_levels), key=expertise_levels.count) if expertise_levels else "unknown"
+        expertise_levels = [
+            a.get("expertise_assessment", {}).get("level", "unknown") for a in analyses
+        ]
+        most_common_expertise = (
+            max(set(expertise_levels), key=expertise_levels.count)
+            if expertise_levels
+            else "unknown"
+        )
 
         # Quality metrics
         quality_trends = {
-            "completeness": sum(a.get("quality", {}).get("completeness", 0.5) for a in analyses) / len(analyses),
-            "relevance": sum(a.get("quality", {}).get("relevance", 0.5) for a in analyses) / len(analyses),
-            "clarity": sum(a.get("quality", {}).get("clarity", 0.5) for a in analyses) / len(analyses),
-            "technical_accuracy": sum(a.get("quality", {}).get("technical_accuracy", 0.5) for a in analyses) / len(analyses)
+            "completeness": sum(a.get("quality", {}).get("completeness", 0.5) for a in analyses)
+            / len(analyses),
+            "relevance": sum(a.get("quality", {}).get("relevance", 0.5) for a in analyses)
+            / len(analyses),
+            "clarity": sum(a.get("quality", {}).get("clarity", 0.5) for a in analyses)
+            / len(analyses),
+            "technical_accuracy": sum(
+                a.get("quality", {}).get("technical_accuracy", 0.5) for a in analyses
+            )
+            / len(analyses),
         }
 
         # Generate recommendations
@@ -347,41 +399,90 @@ async def generate_intelligence_report(request: IntelligenceReportRequest):
                 "total_responses": total_responses,
                 "average_quality": round(avg_quality, 2),
                 "average_sentiment": round(avg_sentiment, 2),
-                "duration_minutes": (datetime.now() - datetime.fromisoformat(request.room_created_at)).total_seconds() / 60
+                "duration_minutes": (
+                    datetime.now() - datetime.fromisoformat(request.room_created_at)
+                ).total_seconds()
+                / 60,
             },
             sentiment_analysis={
-                "overall_sentiment": "positive" if avg_sentiment > 0.2 else "negative" if avg_sentiment < -0.2 else "neutral",
+                "overall_sentiment": "positive"
+                if avg_sentiment > 0.2
+                else "negative"
+                if avg_sentiment < -0.2
+                else "neutral",
                 "distribution": sentiment_distribution,
-                "emotional_intensity": sum(a.get("sentiment", {}).get("intensity", 0) for a in analyses) / len(analyses)
+                "emotional_intensity": sum(
+                    a.get("sentiment", {}).get("intensity", 0) for a in analyses
+                )
+                / len(analyses),
             },
             bias_report={
                 "total_incidents": total_bias_incidents,
                 "categories": bias_categories,
                 "severity_distribution": {
-                    "low": len([a for a in analyses if a.get("bias_detection", {}).get("severity", "low") == "low"]),
-                    "medium": len([a for a in analyses if a.get("bias_detection", {}).get("severity", "low") == "medium"]),
-                    "high": len([a for a in analyses if a.get("bias_detection", {}).get("severity", "low") == "high"])
-                }
+                    "low": len(
+                        [
+                            a
+                            for a in analyses
+                            if a.get("bias_detection", {}).get("severity", "low") == "low"
+                        ]
+                    ),
+                    "medium": len(
+                        [
+                            a
+                            for a in analyses
+                            if a.get("bias_detection", {}).get("severity", "low") == "medium"
+                        ]
+                    ),
+                    "high": len(
+                        [
+                            a
+                            for a in analyses
+                            if a.get("bias_detection", {}).get("severity", "low") == "high"
+                        ]
+                    ),
+                },
             },
             expertise_evaluation={
                 "level": most_common_expertise,
-                "technical_skills_identified": list(set(skill for a in analyses for skill in a.get("expertise_assessment", {}).get("technical_skills", []))),
-                "average_experience_years": sum(a.get("expertise_assessment", {}).get("experience_years", 0) or 0 for a in analyses) / len(analyses)
+                "technical_skills_identified": list(
+                    set(
+                        skill
+                        for a in analyses
+                        for skill in a.get("expertise_assessment", {}).get("technical_skills", [])
+                    )
+                ),
+                "average_experience_years": sum(
+                    a.get("expertise_assessment", {}).get("experience_years", 0) or 0
+                    for a in analyses
+                )
+                / len(analyses),
             },
             quality_metrics={
                 "average_score": round(avg_quality, 2),
                 "trends": quality_trends,
                 "strengths_distribution": {
-                    "high_quality": len([a for a in analyses if a.get("quality", {}).get("overall_score", 5) >= 8]),
-                    "medium_quality": len([a for a in analyses if 6 <= a.get("quality", {}).get("overall_score", 5) < 8]),
-                    "low_quality": len([a for a in analyses if a.get("quality", {}).get("overall_score", 5) < 6])
-                }
+                    "high_quality": len(
+                        [a for a in analyses if a.get("quality", {}).get("overall_score", 5) >= 8]
+                    ),
+                    "medium_quality": len(
+                        [
+                            a
+                            for a in analyses
+                            if 6 <= a.get("quality", {}).get("overall_score", 5) < 8
+                        ]
+                    ),
+                    "low_quality": len(
+                        [a for a in analyses if a.get("quality", {}).get("overall_score", 5) < 6]
+                    ),
+                },
             },
             recommendations=recommendations,
-            interview_effectiveness=round(effectiveness, 2)
+            interview_effectiveness=round(effectiveness, 2),
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Report generation failed: {str(e)}")
+
 
 # --- Analytics & Reporting Endpoints (minimal stubs to satisfy contract) ---
 @app.get("/api/v1/analytics/interviews", response_model=MetricsResponse)
@@ -472,8 +573,11 @@ async def export_report(report_id: str):
         expires_at=datetime.utcnow(),
     )
 
+
 if __name__ == "__main__":
-    import uvicorn
     import os
+
+    import uvicorn
+
     port = int(os.environ.get("PORT", 8005))
     uvicorn.run(app, host="0.0.0.0", port=port)

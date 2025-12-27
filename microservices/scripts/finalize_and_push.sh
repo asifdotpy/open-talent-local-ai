@@ -8,13 +8,13 @@ set -e
 
 # --- Configuration ---
 # The absolute path to your microservices directory.
-MICROSERVICES_DIR="/root/talent-ai-platform-root/talent-ai-microservices"
+MICROSERVICES_DIR="/root/open-talent-platform-root/open-talent-microservices"
 
 # The commit message to be used for these maintenance changes.
 COMMIT_MESSAGE="chore: Update Git remotes and add utility scripts"
 
 # The log file for this operation.
-LOG_FILE="/root/talent-ai-platform-root/talent-ai-microservices/push_log_$(date +%Y-%m-%d_%H-%M-%S).txt"
+LOG_FILE="/root/open-talent-platform-root/open-talent-microservices/push_log_$(date +%Y-%m-%d_%H-%M-%S).txt"
 
 # --- Script Execution ---
 

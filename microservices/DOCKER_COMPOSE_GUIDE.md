@@ -1,6 +1,6 @@
 # Docker Compose Quick Start Guide
 
-**Updated:** December 14, 2025  
+**Updated:** December 14, 2025
 **Status:** ✅ Ready to Deploy
 
 ---
@@ -23,18 +23,22 @@ docker compose up -d
 ## 📋 What Each Command Does
 
 ### Step 1: Navigate to Microservices
+
 ```bash
 cd /home/asif1/open-talent/microservices
 ```
+
 - Changes to the directory containing `docker-compose.yml`
 - All relative paths in docker-compose will be resolved from here
 
 ### Step 2: Start Services with Docker Compose
+
 ```bash
 docker compose up -d
 ```
 
 **Key Points:**
+
 - Uses `docker compose` (not `docker-compose`) - modern Docker CLI
 - `-d` flag runs containers in background (detached mode)
 - Automatically:
@@ -45,9 +49,10 @@ docker compose up -d
   - Applies health checks
 
 **Expected Output:**
+
 ```
 [+] Running 14/14
- ✓ Network talentai-network  Created                                          0.3s
+ ✓ Network OpenTalent-network  Created                                          0.3s
  ✓ Container talent-ollama    Started                                          1.2s
  ✓ Container talent-conversation-service  Started                             3.5s
  ✓ Container talent-interview-service     Started                             2.1s
@@ -58,16 +63,18 @@ docker compose up -d
  ✓ Container talent-desktop-integration   Started                             2.5s
  ✓ Container talent-security-service      Started                             2.1s
  ✓ Container talent-notification-service  Started                             2.2s
- ✓ Container talent-ai-auditing-service   Started                             2.3s
+ ✓ Container open-talent-auditing-service   Started                             2.3s
  ✓ Container talent-explainability-service Started                             2.2s
 ```
 
 ### Step 3: Verify Services are Online
+
 ```bash
 ./verify-services.sh
 ```
 
 **What It Tests:**
+
 1. **Port Connectivity** - All 14 services responding on their ports
 2. **Health Endpoints** - Service-specific /health checks
 3. **Functional Tests** - Model availability, API endpoints
@@ -75,6 +82,7 @@ docker compose up -d
 5. **Performance** - Response times (baseline)
 
 **Example Output:**
+
 ```
 [INFO] Pre-flight checks...
 [✓ PASS] Docker is installed
@@ -129,11 +137,13 @@ Ollama (foundation)
 ## 🛠️ Common Commands
 
 ### View Running Services
+
 ```bash
 docker compose ps
 ```
 
 ### View Service Logs
+
 ```bash
 # All services
 docker compose logs -f
@@ -146,6 +156,7 @@ docker compose logs --tail=100 conversation-service
 ```
 
 ### Stop Services
+
 ```bash
 # Stop (keep containers)
 docker compose stop
@@ -155,6 +166,7 @@ docker compose stop interview-service
 ```
 
 ### Stop & Remove Everything
+
 ```bash
 # Remove containers but keep volumes
 docker compose down
@@ -164,11 +176,13 @@ docker compose down -v
 ```
 
 ### Restart a Service
+
 ```bash
 docker compose restart interview-service
 ```
 
 ### Rebuild a Service
+
 ```bash
 docker compose up -d --build conversation-service
 ```
@@ -178,6 +192,7 @@ docker compose up -d --build conversation-service
 ## 🔧 Troubleshooting
 
 ### Service Won't Start
+
 ```bash
 # Check logs
 docker compose logs <service-name>
@@ -190,6 +205,7 @@ docker stats
 ```
 
 ### Port Already in Use
+
 ```bash
 # Find what's using the port
 lsof -i :<port-number>
@@ -201,9 +217,10 @@ kill -9 <PID>
 ```
 
 ### Network Issues
+
 ```bash
 # Check network
-docker network inspect talentai-network
+docker network inspect OpenTalent-network
 
 # Services can't reach each other:
 # Make sure hostname matches service name in docker-compose.yml
@@ -211,6 +228,7 @@ docker network inspect talentai-network
 ```
 
 ### Ollama Model Not Downloading
+
 ```bash
 # Check Ollama logs
 docker compose logs ollama
@@ -223,6 +241,7 @@ docker compose exec ollama ollama list
 ```
 
 ### Verification Script Fails
+
 ```bash
 # Run with verbose output
 bash -x ./verify-services.sh
@@ -250,6 +269,7 @@ curl http://localhost:8000/health
 ## 🔌 API Endpoints After Startup
 
 ### Gateway (Single Entry Point)
+
 ```
 http://localhost:8009/health          # Health status
 http://localhost:8009/api/v1/models   # Available models
@@ -257,6 +277,7 @@ http://localhost:8009/api/v1/interviews/start  # Start interview
 ```
 
 ### Individual Services
+
 ```
 http://localhost:11434/api/tags              # Ollama models
 http://localhost:8000/health                 # Scout
@@ -280,11 +301,13 @@ http://localhost:8013/health                 # Explainability
 After services are running:
 
 1. **Verify with Script**
+
    ```bash
    ./verify-services.sh
    ```
 
 2. **Reload Desktop App**
+
    ```bash
    cd /home/asif1/open-talent/desktop-app
    npm run dev
@@ -301,6 +324,7 @@ After services are running:
    - Check results generation
 
 5. **Monitor Logs During Test**
+
    ```bash
    # In separate terminal
    docker compose logs -f
@@ -311,11 +335,13 @@ After services are running:
 ## 📝 Configuration Files
 
 ### Main Configuration
+
 - `docker-compose.yml` - Service definitions, ports, volumes, networks
 - Dockerfile in each service directory - Container image definitions
 - `.env` files (optional) - Environment variable overrides
 
 ### Key Environment Variables
+
 ```yaml
 PYTHONPATH: /app                           # Python import path
 OLLAMA_HOST: http://ollama:11434           # Ollama endpoint
@@ -330,11 +356,13 @@ GATEWAY_PORT: 8009
 ## 🚨 Emergency Commands
 
 ### Kill All Services
+
 ```bash
 docker compose down -v --remove-orphans
 ```
 
 ### Clean Everything (Fresh Start)
+
 ```bash
 docker compose down -v
 docker system prune -a --volumes
@@ -342,6 +370,7 @@ docker compose up -d
 ```
 
 ### Full System Reset
+
 ```bash
 # Kill docker daemon
 sudo systemctl restart docker
@@ -356,25 +385,27 @@ docker compose up -d
 ## 📞 Support
 
 ### Check Status
+
 - Run `./verify-services.sh` to see what's working
 - Check `docker compose logs` for error messages
 - Use `docker compose ps` to see container states
 
 ### Debug Individual Service
+
 ```bash
 docker compose logs <service-name> --tail=50
 docker compose exec <service-name> /bin/bash
 ```
 
 ### Review Configuration
+
 ```bash
 docker inspect <container-name>
-docker network inspect talentai-network
+docker network inspect OpenTalent-network
 ```
 
 ---
 
-**Status:** ✅ Ready to Deploy  
-**Last Updated:** December 14, 2025  
+**Status:** ✅ Ready to Deploy
+**Last Updated:** December 14, 2025
 **Verified with:** Docker 24.0+, docker compose 2.20+
-

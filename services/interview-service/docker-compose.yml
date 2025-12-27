@@ -100,7 +100,7 @@ services:
       - FIRST_SUPERUSER=admin@gmail.com
       - FIRST_SUPERUSER_PASSWORD=${FIRST_SUPERUSER_PASSWORD}
       - ENVIRONMENT=local
-      - PROJECT_NAME="TalentAI - Interview (Engagement) Service"
+      - PROJECT_NAME="OpenTalent - Interview (Engagement) Service"
       - STACK_NAME="interview-service"
       - BACKEND_CORS_ORIGINS="http://localhost,http://localhost:5173,https://localhost,https://localhost:5173,http://localhost.tiangolo.com"
       # vLLM and Qdrant configuration

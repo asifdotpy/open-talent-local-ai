@@ -104,6 +104,7 @@ We use **Conventional Commits** format:
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -113,6 +114,7 @@ We use **Conventional Commits** format:
 - `chore`: Maintenance tasks
 
 **Examples:**
+
 ```bash
 git commit -m "feat(agents): add boolean mastery agent for query generation"
 git commit -m "fix(interview-service): resolve WebRTC signaling timeout"
@@ -247,6 +249,7 @@ logger.critical("Redis connection lost, cannot process candidates")
 ```
 
 **Never log sensitive information:**
+
 - ❌ API keys, passwords, tokens
 - ❌ Personal candidate data (full names, emails, phone numbers)
 - ❌ Salary information
@@ -383,6 +386,7 @@ tests/
 ### Code Documentation
 
 **Required Documentation:**
+
 - README.md in every service/agent directory
 - Docstrings for all public functions and classes
 - Inline comments for complex logic
@@ -406,6 +410,7 @@ Every agent and service should have a README with:
 ### Updating Documentation
 
 When adding features:
+
 - ✅ Update service README
 - ✅ Update API specs in `docs/api-specs/`
 - ✅ Add/update examples in code
@@ -498,23 +503,27 @@ The repository contains multiple `docker-compose.yml` files for different purpos
 ### Starting Services
 
 **Start all services (recommended for full platform):**
+
 ```bash
 docker-compose -f config/docker-compose.yml up -d
 ```
 
 **Start only agents:**
+
 ```bash
 cd agents
 docker-compose up -d
 ```
 
 **Start only microservices:**
+
 ```bash
 cd microservices
 docker-compose up -d
 ```
 
 **Start specific service:**
+
 ```bash
 docker-compose -f config/docker-compose.yml up -d interview-service
 ```
@@ -567,12 +576,14 @@ docker-compose -f config/docker-compose.yml stop interview-service
 ### Creating a New Agent
 
 1. **Create directory structure:**
+
 ```bash
 mkdir -p agents/your-agent-name
 cd agents/your-agent-name
 ```
 
 2. **Create required files:**
+
 ```
 your-agent-name/
 ├── main.py              # Entry point with FastAPI app
@@ -588,6 +599,7 @@ your-agent-name/
 ```
 
 3. **Use shared infrastructure:**
+
 ```python
 from shared.models import AgentMessage, CandidateProfile
 from shared.message_bus import MessageBus
@@ -595,6 +607,7 @@ from shared.service_clients import ServiceClient
 ```
 
 4. **Implement event handling:**
+
 ```python
 async def handle_message(message: AgentMessage):
     """Process incoming messages from Redis."""
@@ -605,6 +618,7 @@ async def handle_message(message: AgentMessage):
 ```
 
 5. **Add health endpoint:**
+
 ```python
 @app.get("/health")
 async def health():
@@ -635,6 +649,7 @@ async def health():
 Follow the same pattern as existing services:
 
 1. **Directory structure:**
+
 ```
 service-name/
 ├── main.py              # FastAPI application
@@ -654,12 +669,14 @@ service-name/
 ```
 
 2. **Use consistent patterns:**
+
 - FastAPI for REST APIs
 - Pydantic for validation
 - SQLAlchemy for database access (if needed)
 - Async/await for I/O operations
 
 3. **Add OpenAPI documentation:**
+
 ```python
 from fastapi import FastAPI
 

@@ -1,10 +1,10 @@
 #!/bin/bash
-# TalentAI Platform - Service Startup Test Script
+# OpenTalent Platform - Service Startup Test Script
 # Tests that all services can start without model execution
 
 set -e
 
-echo "🧪 Testing TalentAI Platform Service Startup..."
+echo "🧪 Testing OpenTalent Platform Service Startup..."
 
 # Colors for output
 RED='\033[0;31m'
@@ -99,7 +99,7 @@ if [ ${#failed_services[@]} -eq 0 ]; then
     echo ""
     echo "🎯 Demo Services Status (Oct 10):"
     echo "✅ Conversation Service: AI question generation"
-    echo "✅ Voice Service: STT/TTS processing"  
+    echo "✅ Voice Service: STT/TTS processing"
     echo "✅ Agent Agent Service: Orchestration & avatar generation"
     echo "✅ Avatar Service: Local SadTalker implementation"
     echo ""

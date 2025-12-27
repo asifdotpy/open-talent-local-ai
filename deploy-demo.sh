@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# TalentAI MVP Demo Deployment Script
+# OpenTalent MVP Demo Deployment Script
 # This script deploys all services for client demos
 
 set -e
 
-echo "🎯 TalentAI MVP Demo Deployment"
+echo "🎯 OpenTalent MVP Demo Deployment"
 echo "================================="
 
 # Colors for output
@@ -68,7 +68,7 @@ cleanup() {
     docker compose -f docker-compose.prod.yml down --volumes --remove-orphans 2>/dev/null || true
 
     # Remove specific containers if they exist
-    docker rm -f talent-ai-postgres talent-ai-avatar-renderer talent-ai-interview-service talent-ai-voice-service talent-ai-conversation-service talent-ai-ollama 2>/dev/null || true
+    docker rm -f open-talent-postgres open-talent-avatar-renderer open-talent-interview-service open-talent-voice-service open-talent-conversation-service open-talent-ollama 2>/dev/null || true
 
     print_success "Cleanup completed"
 }
@@ -167,7 +167,7 @@ show_status() {
 
 # Main deployment function
 main() {
-    echo "Starting TalentAI MVP deployment..."
+    echo "Starting OpenTalent MVP deployment..."
 
     check_docker
     check_resources

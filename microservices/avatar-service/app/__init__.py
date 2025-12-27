@@ -1,1 +1,1 @@
-# TalentAI Avatar Service Package
+# OpenTalent Avatar Service Package

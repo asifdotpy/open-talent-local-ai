@@ -24,8 +24,8 @@ echo "Reference service for file structure: $REFERENCE_SERVICE"
 echo "Expected files/directories: ${EXPECTED_FILES[@]}"
 echo ""
 
-# Loop through each subdirectory that starts with 'talent-ai-'
-for service_dir in talent-ai-*/; do
+# Loop through each subdirectory that starts with 'open-talent-'
+for service_dir in open-talent-*/; do
   if [ -d "$service_dir" ]; then
     service_name=$(basename "$service_dir")
     echo "--- Checking service: $service_name ---"

@@ -5,10 +5,10 @@ set -e
 
 # --- Configuration ---
 # Define the absolute path to your microservices directory.
-MICROSERVICES_DIR="/root/talent-ai-platform-root/talent-ai-microservices"
+MICROSERVICES_DIR="/root/open-talent-platform-root/open-talent-microservices"
 
 # Define the log file path. The script will create this file and append logs to it.
-LOG_FILE="/root/talent-ai-platform-root/talent-ai-microservices/deployment_log_$(date +%Y-%m-%d_%H-%M-%S).txt"
+LOG_FILE="/root/open-talent-platform-root/open-talent-microservices/deployment_log_$(date +%Y-%m-%d_%H-%M-%S).txt"
 
 # --- Script Execution ---
 

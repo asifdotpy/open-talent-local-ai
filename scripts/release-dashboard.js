@@ -14,7 +14,7 @@ class ReleaseDashboard {
       try {
         const releases = await this.octokit.repos.listReleases({
           owner: 'asifdotpy',
-          repo: `talent-ai-${submodule}`
+          repo: `open-talent-${submodule}`
         });
 
         status[submodule] = {

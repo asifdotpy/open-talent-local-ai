@@ -5,7 +5,6 @@ Adds /docs, /doc, /api-docs, /openapi.json endpoints with proper configuration.
 """
 
 import re
-import sys
 from pathlib import Path
 
 OPENAPI_ENDPOINTS = '''
@@ -30,7 +29,7 @@ async def api_docs_info():
                 "summary": getattr(route, 'summary', None) or getattr(route, 'description', None)
             }
             routes_info.append(route_info)
-    
+
     return {
         "service": "{service_name}",
         "version": "{version}",
@@ -47,18 +46,18 @@ async def api_docs_info():
 
 def update_fastapi_config(content: str, service_name: str) -> str:
     """Update FastAPI() initialization to include OpenAPI URLs"""
-    
+
     # Pattern to match FastAPI initialization
     pattern = r'(app\s*=\s*FastAPI\s*\(\s*title\s*=\s*["\']([^"\']+)["\'])'
-    
+
     def replacer(match):
         title = match.group(2)
         # Build enhanced FastAPI config
         return f'''app = FastAPI(
     title="{title}",
     description="""
-    {service_name} - TalentAI Platform
-    
+    {service_name} - OpenTalent Platform
+
     **API Documentation:**
     - Interactive Swagger UI: `/docs`
     - Alternative docs URL: `/doc`
@@ -70,95 +69,96 @@ def update_fastapi_config(content: str, service_name: str) -> str:
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json"'''
-    
+
     return re.sub(pattern, replacer, content, count=1)
 
 
 def update_root_endpoint(content: str) -> str:
     """Add documentation links to root endpoint"""
-    
+
     # Find root endpoint and add documentation section
     pattern = r'(@app\.get\(["\']\/["\']\)[^}]+return\s*\{[^}]+)(\})'
-    
+
     def replacer(match):
         before_close = match.group(1)
         # Check if documentation already exists
-        if 'documentation' in before_close:
+        if "documentation" in before_close:
             return match.group(0)
-        
+
         # Add documentation section before closing brace
-        return before_close + ''',
+        return (
+            before_close
+            + """,
         "documentation": {
             "swagger_ui": "/docs",
             "alternative": "/doc",
             "redoc": "/redoc",
             "openapi_json": "/openapi.json",
             "api_summary": "/api-docs"
-        }''' + match.group(2)
-    
+        }"""
+            + match.group(2)
+        )
+
     return re.sub(pattern, replacer, content, flags=re.DOTALL)
 
 
 def add_openapi_endpoints(content: str, service_name: str, version: str) -> str:
     """Add OpenAPI documentation endpoints if not present"""
-    
+
     # Check if endpoints already exist
-    if '/api-docs' in content and 'api_docs_info' in content:
+    if "/api-docs" in content and "api_docs_info" in content:
         return content
-    
+
     # Find the first @app.get after root to insert endpoints
     # Look for health endpoint or first endpoint after root
     pattern = r'(@app\.get\(["\']\/["\']\)[^\n]+\n[^@]+)(@app\.get\(["\']\/health["\']\))'
-    
-    endpoints = OPENAPI_ENDPOINTS.format(
-        service_name=service_name,
-        version=version
-    )
-    
+
+    endpoints = OPENAPI_ENDPOINTS.format(service_name=service_name, version=version)
+
     def replacer(match):
-        return match.group(1) + endpoints + '\n\n' + match.group(2)
-    
+        return match.group(1) + endpoints + "\n\n" + match.group(2)
+
     result = re.sub(pattern, replacer, content, count=1, flags=re.DOTALL)
-    
+
     # If health endpoint not found, try to find any second endpoint
     if result == content:
         pattern = r'(@app\.get\(["\']\/["\']\)[^\n]+\n(?:.*?\n)*?.*?async def[^\n]+\n(?:.*?\n)*?.*?return[^\n]+\n[^\n]+\n)(@app\.(get|post|put|delete|patch)\()'
         result = re.sub(pattern, replacer, content, count=1, flags=re.DOTALL)
-    
+
     return result
 
 
 def process_file(file_path: Path, service_name: str):
     """Process a single file to add OpenAPI documentation"""
     print(f"Processing {file_path}...")
-    
+
     try:
         content = file_path.read_text()
-        
+
         # Skip if already has api-docs endpoint
-        if 'api_docs_info' in content and '/api-docs' in content:
-            print(f"  ✓ Already has OpenAPI endpoints, skipping")
+        if "api_docs_info" in content and "/api-docs" in content:
+            print("  ✓ Already has OpenAPI endpoints, skipping")
             return True
-        
+
         # Extract version if possible
         version_match = re.search(r'version\s*=\s*["\']([^"\']+)["\']', content)
         version = version_match.group(1) if version_match else "1.0.0"
-        
+
         # Apply transformations
         original_content = content
         content = update_fastapi_config(content, service_name)
         content = update_root_endpoint(content)
         content = add_openapi_endpoints(content, service_name, version)
-        
+
         # Only write if changes were made
         if content != original_content:
             file_path.write_text(content)
-            print(f"  ✓ Updated with OpenAPI documentation")
+            print("  ✓ Updated with OpenAPI documentation")
             return True
         else:
-            print(f"  ℹ No changes needed")
+            print("  ℹ No changes needed")
             return False
-            
+
     except Exception as e:
         print(f"  ✗ Error: {e}")
         return False
@@ -167,7 +167,7 @@ def process_file(file_path: Path, service_name: str):
 def main():
     """Main execution"""
     base_path = Path(__file__).parent.parent
-    
+
     # Define services to update
     services = [
         # Agents
@@ -178,7 +178,6 @@ def main():
         ("agents/tool-leverage-agent/main.py", "Tool Leverage Agent"),
         ("agents/quality-focused-agent/main.py", "Quality-Focused Agent"),
         ("agents/interviewer-agent/main.py", "Interviewer Agent"),
-        
         # Microservices
         ("microservices/interview-service/main.py", "Interview Service"),
         ("microservices/sourcer-service/main.py", "Sourcer Service"),
@@ -190,21 +189,21 @@ def main():
         ("microservices/ai-auditing-service/main.py", "AI Auditing Service"),
         ("microservices/explainability-service/main.py", "Explainability Service"),
     ]
-    
+
     print("Adding OpenAPI documentation endpoints to services...\n")
-    
+
     updated_count = 0
     skipped_count = 0
     error_count = 0
-    
+
     for relative_path, service_name in services:
         file_path = base_path / relative_path
-        
+
         if not file_path.exists():
             print(f"⚠ {file_path} not found, skipping")
             skipped_count += 1
             continue
-        
+
         result = process_file(file_path, service_name)
         if result:
             updated_count += 1
@@ -212,9 +211,9 @@ def main():
             error_count += 1
         else:
             skipped_count += 1
-    
+
     print(f"\n{'='*60}")
-    print(f"Summary:")
+    print("Summary:")
     print(f"  Updated: {updated_count}")
     print(f"  Skipped: {skipped_count}")
     print(f"  Errors: {error_count}")

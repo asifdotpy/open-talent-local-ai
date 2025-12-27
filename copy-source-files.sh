@@ -14,7 +14,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # Directories
-SOURCE_DIR="/home/asif1/talent-ai-platform"
+SOURCE_DIR="/home/asif1/open-talent-platform"
 TARGET_DIR="/home/asif1/open-talent"
 COPY_LOG="${TARGET_DIR}/migration-copy.log"
 
@@ -123,14 +123,14 @@ copy_files_by_extension() {
     local ext=$1
     local desc=$2
     local count=0
-    
+
     log_info "Copying $desc files..."
     while IFS= read -r file; do
         mkdir -p "$(dirname "${TARGET_DIR}/${file#$SOURCE_DIR/}")"
         cp "$file" "${TARGET_DIR}/${file#$SOURCE_DIR/}" 2>/dev/null || true
         ((count++))
     done < <(find "$SOURCE_DIR" -name "*$ext" -type f ! -path '*/.git/*' ! -path '*/node_modules/*' ! -path '*/__pycache__/*' ! -path '*/.pytest_cache/*' ! -path '*/build/*' ! -path '*/dist/*' ! -path '*/.egg-info/*')
-    
+
     log_success "Copied $count $desc files"
 }
 

@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# TalentAI Platform - Quick Setup Script
+# OpenTalent Platform - Quick Setup Script
 # One-command setup for local development
 
 set -e  # Exit on error
 
-echo "🚀 TalentAI Platform Setup"
+echo "🚀 OpenTalent Platform Setup"
 echo "=========================="
 echo ""
 
@@ -35,19 +35,19 @@ if [ ! -f .env ]; then
     cp .env.example .env
     echo "✅ .env file created. Please edit with your configuration."
     echo ""
-    
+
     # Generate random passwords
     POSTGRES_PASSWORD=$(openssl rand -base64 32)
     REDIS_PASSWORD=$(openssl rand -base64 32)
     MINIO_PASSWORD=$(openssl rand -base64 32)
     JWT_SECRET=$(openssl rand -base64 32)
-    
+
     # Update .env with generated passwords
     sed -i "s/POSTGRES_PASSWORD=changeme_secure_password_here/POSTGRES_PASSWORD=$POSTGRES_PASSWORD/" .env
     sed -i "s/REDIS_PASSWORD=changeme_redis_password/REDIS_PASSWORD=$REDIS_PASSWORD/" .env
     sed -i "s/MINIO_ROOT_PASSWORD=changeme_minio_password/MINIO_ROOT_PASSWORD=$MINIO_PASSWORD/" .env
     sed -i "s/JWT_SECRET_KEY=changeme_jwt_secret_key_32_chars_min/JWT_SECRET_KEY=$JWT_SECRET/" .env
-    
+
     echo "🔐 Generated secure passwords in .env"
 else
     echo "ℹ️  Using existing .env file"
@@ -82,7 +82,7 @@ sleep 10
 echo "🤖 Pulling Ollama model (llama3.1:8b)..."
 docker compose up -d ollama
 sleep 5
-docker exec talentai-ollama ollama pull llama3.1:8b || echo "⚠️  Ollama model download failed. Will retry later."
+docker exec OpenTalent-ollama ollama pull llama3.1:8b || echo "⚠️  Ollama model download failed. Will retry later."
 
 # Start all services
 echo "🎯 Starting all services..."

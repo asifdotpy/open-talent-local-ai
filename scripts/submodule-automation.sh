@@ -368,7 +368,7 @@ main() {
 
 # Run main function with all arguments
 main "$@"</content>
-<parameter name="filePath">/home/asif1/talent-ai-platform/scripts/submodule-automation.sh}
+<parameter name="filePath">/home/asif1/open-talent-platform/scripts/submodule-automation.sh}
 
 # Run main function with all arguments
 main "$@"

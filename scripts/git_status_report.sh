@@ -1,17 +1,17 @@
 #!/bin/bash
 
-echo "--- Git Status Report for talent-ai-platform and its Submodules ---"
+echo "--- Git Status Report for open-talent-platform and its Submodules ---"
 echo "Generated: $(date)"
 echo ""
 
 # Function to determine expected branch
 get_expected_branch() {
     local repo_name="$1"
-    if [[ "$repo_name" == "talent-ai-interview-service" || "$repo_name" == "talent-ai-avatar-service" ]]; then
+    if [[ "$repo_name" == "open-talent-interview-service" || "$repo_name" == "open-talent-avatar-service" ]]; then
         echo "main"
-    elif [[ "$repo_name" == "talent-ai-infrastructure" || "$repo_name" == "quarkdown-specs" || "$repo_name" == "talent-ai-landing-page" || "$repo_name" == "talent-ai-mini" ]]; then
+    elif [[ "$repo_name" == "open-talent-infrastructure" || "$repo_name" == "quarkdown-specs" || "$repo_name" == "open-talent-landing-page" || "$repo_name" == "open-talent-mini" ]]; then
         echo "main" # Assuming these top-level submodules also follow main
-    elif [[ "$repo_name" == "talent-ai-microservices" ]]; then
+    elif [[ "$repo_name" == "open-talent-microservices" ]]; then
         echo "main" # The microservices *parent* submodule is on main
     else
         echo "dev" # Default for other microservices
@@ -22,7 +22,7 @@ get_expected_branch() {
 check_repo_status() {
     local repo_path="$1"
     local repo_name="$2"
-    local is_microservice_nested="$3" # "true" if nested under talent-ai-microservices
+    local is_microservice_nested="$3" # "true" if nested under open-talent-microservices
 
     echo "### Repository: $repo_name ($repo_path)"
     if [ -d "$repo_path" ]; then
@@ -36,7 +36,7 @@ check_repo_status() {
                 expected_branch=""
                 if [ "$is_microservice_nested" == "true" ]; then
                     expected_branch=$(get_expected_branch "$repo_name")
-                elif [[ "$repo_name" == "talent-ai-infrastructure" || "$repo_name" == "quarkdown-specs" || "$repo_name" == "talent-ai-landing-page" || "$repo_name" == "talent-ai-mini" || "$repo_name" == "talent-ai-microservices" ]]; then
+                elif [[ "$repo_name" == "open-talent-infrastructure" || "$repo_name" == "quarkdown-specs" || "$repo_name" == "open-talent-landing-page" || "$repo_name" == "open-talent-mini" || "$repo_name" == "open-talent-microservices" ]]; then
                     expected_branch="main" # Top-level submodules
                 else
                     expected_branch="main" # Default for main repo
@@ -59,8 +59,8 @@ check_repo_status() {
     fi
 }
 
-# Check main talent-ai-platform repository
-check_repo_status "." "talent-ai-platform" "false"
+# Check main open-talent-platform repository
+check_repo_status "." "open-talent-platform" "false"
 
 # Check top-level submodules
 echo "## Top-Level Submodules:"
@@ -71,10 +71,10 @@ git submodule status | while read -r line ; do
 done
 
 # Check microservices submodules
-echo "## Microservices Submodules (within talent-ai-microservices/):"
-if [ -d "talent-ai-microservices" ]; then
+echo "## Microservices Submodules (within open-talent-microservices/):"
+if [ -d "open-talent-microservices" ]; then
     (
-        cd talent-ai-microservices || exit
+        cd open-talent-microservices || exit
         git submodule status | while read -r line ; do
             repo_path=$(echo "$line" | awk '{print $2}')
             repo_name=$(basename "$repo_path")
@@ -82,7 +82,7 @@ if [ -d "talent-ai-microservices" ]; then
         done
     )
 else
-    echo "Error: talent-ai-microservices directory not found."
+    echo "Error: open-talent-microservices directory not found."
 fi
 
 echo "--- Report End ---"

@@ -1,5 +1,5 @@
 /**
- * TalentAI React Three Fiber Avatar POC
+ * OpenTalent React Three Fiber Avatar POC
  *
  * Integrates:
  * - React Three Fiber (declarative 3D)
@@ -57,7 +57,7 @@ function Controls() {
       overflowY: 'auto'
     }}>
       <h2 style={{ margin: '0 0 15px 0', fontSize: '24px' }}>
-        TalentAI Interview Avatar
+        OpenTalent Interview Avatar
       </h2>
 
       {/* Avatar Selector */}

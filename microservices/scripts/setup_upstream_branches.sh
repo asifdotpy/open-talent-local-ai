@@ -9,7 +9,7 @@ echo "Setting up upstream branches for all microservice repositories..."
 echo
 
 # Loop through each directory in the current folder
-for service in talent-ai-*-service; do
+for service in open-talent-*-service; do
   if [ -d "$service/.git" ]; then
     echo "--- Setting up: $service ---"
     (

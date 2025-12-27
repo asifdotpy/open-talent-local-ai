@@ -10,7 +10,7 @@ echo "Rolling back $SUBMODULE to $TARGET_VERSION"
 kubectl scale deployment $SUBMODULE --replicas=0
 
 # Deploy previous version
-kubectl set image deployment/$SUBMODULE app=talent-ai/$SUBMODULE:$TARGET_VERSION
+kubectl set image deployment/$SUBMODULE app=open-talent/$SUBMODULE:$TARGET_VERSION
 
 # Scale back up
 kubectl scale deployment $SUBMODULE --replicas=3

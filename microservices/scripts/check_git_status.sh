@@ -6,7 +6,7 @@ set -e
 # --- Configuration ---
 # Define the absolute path to your microservices directory.
 # !!! IMPORTANT: Make sure this path is correct for your system. !!!
-MICROSERVICES_DIR="/root/talent-ai-platform-root/talent-ai-microservices"
+MICROSERVICES_DIR="/root/open-talent-platform-root/open-talent-microservices"
 
 # --- Script Execution ---
 

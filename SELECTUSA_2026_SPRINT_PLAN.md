@@ -1,8 +1,8 @@
 # SelectUSA Tech Pitch Competition 2026 - 21-Day Sprint Plan
 
-> **Application Deadline:** December 31, 2025, 11:59 PM BST  
-> **Sprint Start:** December 10, 2025  
-> **Days Available:** 21 days  
+> **Application Deadline:** December 31, 2025, 11:59 PM BST
+> **Sprint Start:** December 10, 2025
+> **Days Available:** 21 days
 > **Goal:** Submit compelling application with working MVP demo
 
 ## 🎯 Sprint Objectives
@@ -18,14 +18,16 @@
 ## 📅 Week 1: Build MVP Demo (Dec 10-17)
 
 ### Day 1-2 (Dec 10-11): Development Environment Setup ✅ COMPLETE
-**Owner:** Technical Lead  
-**Time Budget:** 16 hours total  
-**Status:** ✅ FINISHED - December 10, 2025, 22:35 UTC  
-**Verification Report:** [DAY1-2_VERIFICATION_REPORT.md](DAY1-2_VERIFICATION_REPORT.md)  
-**Files Created/Modified:** 15+ files  
+
+**Owner:** Technical Lead
+**Time Budget:** 16 hours total
+**Status:** ✅ FINISHED - December 10, 2025, 22:35 UTC
+**Verification Report:** [DAY1-2_VERIFICATION_REPORT.md](DAY1-2_VERIFICATION_REPORT.md)
+**Files Created/Modified:** 15+ files
 **Code Lines Written:** 628 lines (core code) + 1000+ lines (documentation)
 
 **Tasks:**
+
 - [x] Set up Electron project structure
   - [x] Initialize `desktop-app/` directory with Electron boilerplate
   - [x] Configure React for renderer process
@@ -37,6 +39,7 @@
   - [x] Test Ollama API with curl commands
   - [x] Document model performance (latency, RAM usage)
 - [x] Create basic project structure
+
   ```
   desktop-app/
   ├── src/
@@ -46,6 +49,7 @@
   ├── package.json        # ✅
   └── README.md           # ✅
   ```
+
 - [x] **BONUS:** Custom model integration
   - [x] Created model-config.ts with 4 models
   - [x] Implemented model selection UI
@@ -53,9 +57,10 @@
   - [x] Updated interview service to use Granite 2B by default
   - [x] Created comprehensive documentation (400+ lines)
 
-**Deliverable:** Development environment running with Electron + Ollama + Custom model system ready  
-**Completion Date:** December 10, 2025 (22:35 UTC)  
+**Deliverable:** Development environment running with Electron + Ollama + Custom model system ready
+**Completion Date:** December 10, 2025 (22:35 UTC)
 **Accomplishments:**
+
 - ✅ Ollama running on localhost:11434
 - ✅ llama3.2:1b (1.3GB) loaded and verified
 - ✅ TypeScript compilation successful (15 files)
@@ -68,12 +73,14 @@
 ---
 
 ### Day 3-4 (Dec 12-13): Quality Testing & Model Download ✅ COMPLETED - December 13, 2025
-**Owner:** Technical Lead  
-**Time Budget:** 16 hours total  
-**Status:** ✅ FINISHED (pivoted to microservices-first integration)  
+
+**Owner:** Technical Lead
+**Time Budget:** 16 hours total
+**Status:** ✅ FINISHED (pivoted to microservices-first integration)
 **Completion Evidence:** `e064444` commit (Phase 0A-0B), tests passing (6/6 gateway, 5/5 desktop integration)
 
 **Actual Work Completed (Pivot):**
+
 - Built Desktop Integration Service gateway (FastAPI on 8009) with health aggregation, models, interviews, dashboard
 - Wired desktop app via `IntegrationInterviewService` with auto-fallback to Ollama; service mode display added
 - Fixed critical issues: Granite Interview port 8005, Ollama health endpoint `/api/tags`
@@ -81,28 +88,32 @@
 - Authored architecture docs (`INTEGRATION_SERVICE_ARCHITECTURE.md`, Phase 0A/0B completion notes, QUICK_START)
 
 **Deferred Items (to carry forward):**
+
 - Granite 2B model download/validation and role-based interview quality tests
 - UI/UX verification and performance profiling for Granite 2B flow
 
 **Outcome:** Integration layer and desktop wiring are demo-ready; microservices alignment verified.
 
----  
-**Scheduled:** Dec 14-15, 9:00 AM  
-**Prerequisite:** Day 3-4 testing complete + verification report approved  
+---
+**Scheduled:** Dec 14-15, 9:00 AM
+**Prerequisite:** Day 3-4 testing complete + verification report approved
 **Files to Monitor:**
-  - `desktop-app/src/renderer/InterviewApp.tsx` (enhancements)
-  - `desktop-app/src/renderer/InterviewApp.css` (styling updates)
-  - Create: `DAY5-6_VERIFICATION_REPORT.md` (UI polish checklist)
+
+- `desktop-app/src/renderer/InterviewApp.tsx` (enhancements)
+- `desktop-app/src/renderer/InterviewApp.css` (styling updates)
+- Create: `DAY5-6_VERIFICATION_REPORT.md` (UI polish checklist)
 
 ### Day 5-6 (Dec 14-15): Integration Hardening & UI Polish ✅ COMPLETE
-**Owner:** Technical Lead  
-**Time Budget:** 16 hours total  
+
+**Owner:** Technical Lead
+**Time Budget:** 16 hours total
 **Status:** ✅ FINISHED - December 14, 2025
-**Verification Report:** [DAY5-6_UI_INTEGRATION_REPORT.md](DAY5-6_UI_INTEGRATION_REPORT.md)  
-**Quick Reference:** [DAY5-6_QUICK_SUMMARY.md](DAY5-6_QUICK_SUMMARY.md)  
+**Verification Report:** [DAY5-6_UI_INTEGRATION_REPORT.md](DAY5-6_UI_INTEGRATION_REPORT.md)
+**Quick Reference:** [DAY5-6_QUICK_SUMMARY.md](DAY5-6_QUICK_SUMMARY.md)
 **Sprint Status:** [SELECTUSA_DAY5-6_STATUS.md](SELECTUSA_DAY5-6_STATUS.md)
 
 **Tasks:**
+
 - [x] Create ServiceStatus component for real-time health monitoring
   - [x] React component showing online/degraded/offline status
   - [x] Service count display (X/Y online)
@@ -148,7 +159,8 @@
   - [x] Quick reference summary
   - [x] Sprint status update
 
-**Deliverables:** 
+**Deliverables:**
+
 - ✅ React dashboard fully integrated with gateway
 - ✅ Real-time service health monitoring in header
 - ✅ Professional error handling (3-tier system)
@@ -157,6 +169,7 @@
 - ✅ Production-ready UI
 
 **Key Achievements:**
+
 - ✅ ServiceStatus component created (real-time monitoring)
 - ✅ Header enhanced with health display
 - ✅ interviewStore fully migrated to gateway API
@@ -167,6 +180,7 @@
 - ✅ Comprehensive documentation provided
 
 **Demo-Ready Features:**
+
 - Interview form with validation
 - Real-time service health monitoring
 - Graceful error handling
@@ -181,10 +195,12 @@
 **Context:** Core React screens exist; gateway + desktop wiring are live. Focus shifts to leveraging the new integration layer plus light UI polish.
 
 **Prerequisites:**
+
 - Ensure integration service running (`./start.sh` on port 8009) and desktop app can connect
 - Optionally pull Granite 2B model for quality tests (`./setup-models.sh`, `ollama list`)
 
 **Main Tasks for Days 5-6 (updated):**
+
 - [ ] End-to-end validation through gateway (start interview → respond → summary) with fallback disabled/enabled
 - [ ] Add 1-2 proxied endpoints (voice TTS or analytics sentiment) to prove microservices breadth
 - [ ] UI polish: improve error messaging, loading states, and service-mode indicator clarity
@@ -195,16 +211,19 @@
 ---
 
 ### Day 7 (Dec 16): Professional Demo Video Recording & Polish ⏳ NEXT
-**Owner:** Technical Lead + Marketing  
-**Time Budget:** 8 hours  
+
+**Owner:** Technical Lead + Marketing
+**Time Budget:** 8 hours
 **Status:** ⏳ READY TO START
-**Prerequisites:** 
+**Prerequisites:**
+
 - ✅ Gateway running on port 8009
 - ✅ Dashboard fully integrated with ServiceStatus
 - ✅ End-to-end interview flow tested
 - ✅ Error handling verified
 
 **Tasks:**
+
 - [ ] Record demo video (3-5 minutes)
   - [ ] Script: Problem → Solution → Demo → Impact
   - [ ] Scene 1 (30s): Introduce problem
@@ -239,9 +258,11 @@
 ---
 
 ### Day 7 Evening (Dec 16): Week 1 Review
+
 **Time Budget:** 2 hours
 
 **Tasks:**
+
 - [ ] Test full demo end-to-end
 - [ ] Identify bugs or missing features
 - [ ] Review ServiceStatus real-time monitoring in header
@@ -256,19 +277,22 @@
 **Context:** You have trained a custom 2B Granite model (`asifdotpy/vetta-granite-2b-gguf-v4`) on interview datasets. This alternative track trains the smaller 350M variant to show model diversity and speed improvements.
 
 **Decision Point:** Choose ONE path:
+
 - **Path A (Recommended):** Days 5-6 UI Development → Use trained 2B model in demo (highest quality)
 - **Path B (Optional):** Days 5-6 Train 350M → Use both 2B and 350M in demo (shows versatility, takes longer)
 
 **If choosing Path B, replace Days 5-6 with:**
 
 ### Days 5-6 Alternative (Dec 14-15): Train Custom Granite-350M Model
-**Owner:** ML Engineer  
-**Time Budget:** 16 hours total  
+
+**Owner:** ML Engineer
+**Time Budget:** 16 hours total
 **Prerequisites:** Ollama running, HuggingFace CLI configured
 
 **Tasks:**
 
 #### Part 1: Data Preparation (3 hours)
+
 - [ ] Load interview datasets from HuggingFace
   - [ ] `asifdotpy/vetta-interview-dataset-enhanced` (primary dataset, 476 downloads)
   - [ ] `asifdotpy/vetta-multi-persona-dataset` (alternative persona data, 461 downloads)
@@ -280,6 +304,7 @@
   - [ ] Create train/validation split (80/20)
 
 #### Part 2: Model Fine-tuning (10 hours)
+
 - [ ] Download Granite-350M base model
   - [ ] `huggingface-hub` download: `ibm-granite/granite-3b-code-base`
   - [ ] Convert to GGUF format for Ollama compatibility
@@ -296,6 +321,7 @@
   - [ ] Measure latency on 350M model vs 2B (should be ~30% faster)
 
 #### Part 3: Integration (2 hours)
+
 - [ ] Convert trained 350M to Ollama format
   - [ ] Package as `vetta-granite-350m-trained` (local model)
   - [ ] Create Modelfile for Ollama
@@ -315,6 +341,7 @@
 **Deliverable:** Two trained models (350M + 2B) running in desktop app with model switching demo
 
 **If Path B chosen:**
+
 - Days 5-6 spend: 16 hours training 350M
 - Days 3-4 moved to: Use generic 1B model or mock 2B responses during UI development
 - Day 7 timing: Extended to 4 hours (more complex demo with model switching)
@@ -327,15 +354,17 @@
 ## �📊 Week 2: Market Research & Business Strategy (Dec 17-24)
 
 ### Day 8-9 (Dec 17-18): US Market Research
-**Owner:** Business Strategy Lead  
-**Time Budget:** 16 hours total  
-**Scheduled:** Dec 17-18, 9:00 AM  
-**Prerequisite:** Day 7 demo video complete  
-**Output File:** `MARKET_RESEARCH.md` (create in root)  
-**Data Sources:** Gartner, IDC, Statista, industry reports  
+
+**Owner:** Business Strategy Lead
+**Time Budget:** 16 hours total
+**Scheduled:** Dec 17-18, 9:00 AM
+**Prerequisite:** Day 7 demo video complete
+**Output File:** `MARKET_RESEARCH.md` (create in root)
+**Data Sources:** Gartner, IDC, Statista, industry reports
 **Create:** `DAY8-9_MARKET_RESEARCH_REPORT.md` (with citations)
 
 **Tasks:**
+
 - [ ] Total Addressable Market (TAM) analysis
   - [ ] Research US HR tech market size (sources: Gartner, IDC, Statista)
   - [ ] Focus on interview/assessment tech segment
@@ -358,15 +387,17 @@
 ---
 
 ### Day 10-11 (Dec 19-20): Competitive Analysis
-**Owner:** Business Strategy Lead  
-**Time Budget:** 16 hours total  
-**Scheduled:** Dec 19-20, 9:00 AM  
-**Prerequisite:** Day 8-9 market research complete  
-**Output File:** `COMPETITIVE_ANALYSIS.md` (create in root)  
-**Deliverable:** Competitor matrix spreadsheet (competitor-analysis.xlsx)  
+
+**Owner:** Business Strategy Lead
+**Time Budget:** 16 hours total
+**Scheduled:** Dec 19-20, 9:00 AM
+**Prerequisite:** Day 8-9 market research complete
+**Output File:** `COMPETITIVE_ANALYSIS.md` (create in root)
+**Deliverable:** Competitor matrix spreadsheet (competitor-analysis.xlsx)
 **Create:** `DAY10-11_COMPETITIVE_ANALYSIS_REPORT.md`
 
 **Tasks:**
+
 - [ ] Identify top 10 competitors
   - [ ] **Cloud-based AI interview platforms:**
     - HireVue (market leader, $93M funding)
@@ -402,17 +433,20 @@
 ---
 
 ### Day 12-13 (Dec 21-22): Business Model & Pricing Strategy
-**Owner:** Business Strategy Lead  
-**Time Budget:** 16 hours total  
-**Scheduled:** Dec 21-22, 9:00 AM  
-**Prerequisite:** Day 10-11 competitive analysis complete  
+
+**Owner:** Business Strategy Lead
+**Time Budget:** 16 hours total
+**Scheduled:** Dec 21-22, 9:00 AM
+**Prerequisite:** Day 10-11 competitive analysis complete
 **Output Files:**
-  - `BUSINESS_MODEL.md` (create in root)
-  - `financial-projections.xlsx` (3-year model)
-  - `pricing-strategy.md` (freemium breakdown)  
+
+- `BUSINESS_MODEL.md` (create in root)
+- `financial-projections.xlsx` (3-year model)
+- `pricing-strategy.md` (freemium breakdown)
 **Create:** `DAY12-13_BUSINESS_MODEL_REPORT.md`
 
 **Tasks:**
+
 - [ ] Define revenue model
   - [ ] **Freemium Model:**
     - **Free Tier:** Individual users, 10 interviews/month, Granite-350M only
@@ -442,23 +476,26 @@
     - $50k: Marketing (content, ads, conferences)
     - $25k: Development (desktop app polish, features)
     - $25k: Operations & runway
-  
-**Scheduled:** Dec 23, 9:00 AM  
-**Prerequisite:** Day 12-13 business model complete  
+
+**Scheduled:** Dec 23, 9:00 AM
+**Prerequisite:** Day 12-13 business model complete
 **Output Files:**
-  - `US_MARKET_ENTRY_PLAN.md` (create in root)
-  - `us-expansion-timeline.md` (12-month roadmap)
-  - `regulatory-requirements.md` (SOC2, CCPA, GDPR checklist)  
+
+- `US_MARKET_ENTRY_PLAN.md` (create in root)
+- `us-expansion-timeline.md` (12-month roadmap)
+- `regulatory-requirements.md` (SOC2, CCPA, GDPR checklist)
 **Create:** `DAY14_MARKET_ENTRY_REPORT.md`
 **Deliverable:** Business model canvas + financial projections (3-year)
 
 ---
 
 ### Day 14 (Dec 23): US Market Entry Strategy
-**Owner:** Business Strategy Lead  
+
+**Owner:** Business Strategy Lead
 **Time Budget:** 8 hours
 
 **Tasks:**
+
 - [ ] Location selection
   - [ ] **Top 3 cities:**
     1. **Austin, TX** (preferred)
@@ -496,28 +533,32 @@
 ---
 
 ### Day 14 Evening (Dec 23): Week 2 Review
+
 **Time Budget:** 2 hours
 
 **Tasks:**
+
 - [ ] Consolidate all research documents
 - [ ] Create master spreadsheet with all data (TAM/SAM/SOM, competitors, pricing)
 - [ ] Identify gaps in research
 - [ ] Plan Week 3 application writing
-  
-**Scheduled:** Dec 24-25, 9:00 AM  
-**Prerequisite:** All market research + business strategy complete  
-**Output File:** `APPLICATION_RESPONSES.md` (create in root with WHAT/WHY/HOW/WHEN-WHERE/WHO sections)  
-**Deliverable:** 2,500-3,500 words of polished responses  
+
+**Scheduled:** Dec 24-25, 9:00 AM
+**Prerequisite:** All market research + business strategy complete
+**Output File:** `APPLICATION_RESPONSES.md` (create in root with WHAT/WHY/HOW/WHEN-WHERE/WHO sections)
+**Deliverable:** 2,500-3,500 words of polished responses
 **Create:** `DAY15-16_APPLICATION_RESPONSES_DRAFT.md`
 ---
 
 ## 🎬 Week 3: Application Preparation & Submission (Dec 24-31)
 
 ### Day 15-16 (Dec 24-25): Draft Application Responses
-**Owner:** Business Strategy Lead + Technical Lead  
+
+**Owner:** Business Strategy Lead + Technical Lead
 **Time Budget:** 16 hours total
 
 **Tasks:**
+
 - [ ] **WHAT: Product/Service Description** (500-700 words)
   - [ ] 4P Marketing Mix:
     - **Product:** Desktop AI interview platform, 100% local processing
@@ -596,14 +637,14 @@
       - Accomplishments: Built OpenTalent MVP, [other achievements]
     - [If you have co-founders or advisors, list them]
     - **Hiring plan:** Seeking US-based co-founder (Sales/Partnerships) during Summit
-  - [ ] Why qualified:  
-**Scheduled:** Dec 26-27, 9:00 AM  
-**Prerequisite:** Application responses drafted + all research complete  
+  - [ ] Why qualified:
+**Scheduled:** Dec 26-27, 9:00 AM
+**Prerequisite:** Application responses drafted + all research complete
 **Output Files:**
   - `pitch-deck.pdf` (export from PowerPoint/Google Slides)
-  - `pitch-deck.pptx` or Google Slides link  
-  - `PITCH_DECK_OUTLINE.md` (slide-by-slide notes)  
-**Deliverable:** 10-12 professional slides with visuals  
+  - `pitch-deck.pptx` or Google Slides link
+  - `PITCH_DECK_OUTLINE.md` (slide-by-slide notes)
+**Deliverable:** 10-12 professional slides with visuals
 **Create:** `DAY17-18_PITCH_DECK_REPORT.md`
     - Deep technical expertise in AI (Granite models, Ollama, local AI deployment)
     - Understanding of HR tech pain points (privacy, cost, compliance)
@@ -615,10 +656,12 @@
 ---
 
 ### Day 17-18 (Dec 26-27): Create Pitch Deck
-**Owner:** Business Strategy Lead  
+
+**Owner:** Business Strategy Lead
 **Time Budget:** 16 hours total
 
 **Tasks:**
+
 - [ ] Build 10-12 slide pitch deck
   - [ ] **Slide 1: Title**
     - OpenTalent logo
@@ -654,9 +697,9 @@
   - [ ] **Slide 9: Traction & Roadmap**
     - Current: MVP built, demo ready
     - Q1 2026: 10 pilot customers
-    - Q2 2026: US launch, first  
-**Scheduled:** Dec 28-29, 9:00 AM  
-**Prerequisite:** Application responses + pitch deck complete  
+    - Q2 2026: US launch, first
+**Scheduled:** Dec 28-29, 9:00 AM
+**Prerequisite:** Application responses + pitch deck complete
 **Checklist Items:**
   - [ ] Final review all written responses (grammar, spelling, clarity)
   - [ ] Get feedback from 2-3 mentors/advisors
@@ -665,8 +708,8 @@
   - [ ] Finalize financial projections spreadsheet
   - [ ] Practice 5-minute pitch (record and review)
   - [ ] Test all links and file downloads
-  - [ ] Create backup copies of all materials  
-**Output File:** `DAY19-20_FINAL_CHECKLIST.md` (verification report)  
+  - [ ] Create backup copies of all materials
+**Output File:** `DAY19-20_FINAL_CHECKLIST.md` (verification report)
 **Create:** `SUBMISSION_PACKAGE_MANIFEST.md` (complete file inventory) revenue
     - Q3 2026: 50 customers, break-even
   - [ ] **Slide 10: Team**
@@ -686,10 +729,12 @@
 ---
 
 ### Day 19-20 (Dec 28-29): Polish & Review
-**Owner:** Full Team  
+
+**Owner:** Full Team
 **Time Budget:** 16 hours total
 
 **Tasks:**
+
 - [ ] Refine application responses
   - [ ] Edit for clarity and conciseness
   - [ ] Check grammar and spelling
@@ -698,10 +743,10 @@
 - [ ] Finalize demo video
   - [ ] Re-record if needed (based on Week 1 feedback)
   - [ ] Add captions
-  - [ ] Compress for upload  
-**Scheduled:** Dec 30-31, 12:00 PM (BST)  
-**Deadline:** Dec 31, 2025, 11:59 PM BST ⏰ **CRITICAL**  
-**Output File:** Confirmation email + screenshot of submission  
+  - [ ] Compress for upload
+**Scheduled:** Dec 30-31, 12:00 PM (BST)
+**Deadline:** Dec 31, 2025, 11:59 PM BST ⏰ **CRITICAL**
+**Output File:** Confirmation email + screenshot of submission
 **Create:** `SUBMISSION_CONFIRMATION.md` (proof of submission) (YouTube, Vimeo)
   - [ ] Test playback on different devices
 - [ ] Prepare supporting materials
@@ -729,10 +774,12 @@
 ---
 
 ### Day 21 (Dec 30-31): Final Submission
-**Owner:** Full Team  
+
+**Owner:** Full Team
 **Time Budget:** 8-12 hours
 
 **Tasks:**
+
 - [ ] **December 30 (Buffer Day):**
   - [ ] Final review of all materials
   - [ ] Test all links (demo video, pitch deck)
@@ -759,18 +806,21 @@
 ## 📈 Success Metrics
 
 ### MVP Demo Quality
+
 - [ ] Desktop app launches without errors
 - [ ] Interview completes end-to-end (5 questions)
 - [ ] AI responses are relevant and professional
 - [ ] Demo video is clear and compelling (3-5 minutes)
 
 ### Application Completeness
+
 - [ ] All sections answered thoroughly (500-700 words each)
 - [ ] Market research is data-driven (sources cited)
 - [ ] Business model is realistic (unit economics make sense)
 - [ ] US entry strategy is specific (timeline, location, steps)
 
 ### Supporting Materials
+
 - [ ] Pitch deck is professional (10-12 slides)
 - [ ] At least 1-2 letters of intent from potential customers
 - [ ] Financial projections are reasonable (conservative assumptions)
@@ -780,6 +830,7 @@
 ## ⚠️ Risk Mitigation
 
 ### Technical Risks
+
 | Risk | Mitigation |
 |------|------------|
 | Ollama integration issues | Test on Day 1-2, have fallback plan (OpenAI API for demo only) |
@@ -788,6 +839,7 @@
 | Demo video looks unprofessional | Use screen recording software (OBS, Loom), edit with DaVinci Resolve |
 
 ### Business Risks
+
 | Risk | Mitigation |
 |------|------------|
 | Market research incomplete | Use publicly available reports (Gartner, Statista), cite sources |
@@ -796,6 +848,7 @@
 | Funding ask too high/low | Research comparable seed rounds in HR tech, target $100k-250k |
 
 ### Timeline Risks
+
 | Risk | Mitigation |
 |------|------------|
 | Fall behind schedule | Daily check-ins, prioritize ruthlessly, cut non-essential features |
@@ -807,12 +860,14 @@
 ## 🎯 Daily Standup Format
 
 **Each day at 9:00 AM:**
+
 1. What did I accomplish yesterday?
 2. What am I working on today?
 3. What blockers do I have?
 4. Am I on track for this week's deliverable?
 
 **Each week on Sunday evening:**
+
 1. Review week's deliverables
 2. Identify what's incomplete
 3. Adjust next week's plan if needed
@@ -822,12 +877,14 @@
 ## 📞 Support & Resources
 
 ### Technical Resources
-- **Ollama Documentation:** https://ollama.ai/docs
-- **Electron Documentation:** https://www.electronjs.org/docs
-- **Granite Model:** https://huggingface.co/ibm/granite-4 (or check Ollama library)
-- **React:** https://react.dev
+
+- **Ollama Documentation:** <https://ollama.ai/docs>
+- **Electron Documentation:** <https://www.electronjs.org/docs>
+- **Granite Model:** <https://huggingface.co/ibm/granite-4> (or check Ollama library)
+- **React:** <https://react.dev>
 
 ### Business Resources
+
 - **HR Tech Market Reports:**
   - Gartner HR Tech Market Guide
   - IDC HR Tech Spending Forecast
@@ -842,6 +899,7 @@
   - SOC2 checklist (Vanta, Drata)
 
 ### Application Resources
+
 - **SelectUSA Application Portal:** [Link provided in call for applications]
 - **Sample Pitch Decks:** YC Demo Day decks, Sequoia pitch deck template
 - **Video Editing:** DaVinci Resolve (free), iMovie (Mac), OBS Studio (screen recording)
@@ -851,12 +909,14 @@
 ## 🚀 Post-Submission Plan (January 2026)
 
 **If shortlisted (invited to workshop on Jan 27):**
+
 - [ ] Prepare 10-minute pitch presentation
 - [ ] Refine demo based on feedback
 - [ ] Research judging panel (LinkedIn stalking for personalization)
 - [ ] Book travel to Dhaka (if not already there)
 
 **If not shortlisted:**
+
 - [ ] Request feedback from organizers
 - [ ] Continue development (use MVP as foundation)
 - [ ] Apply lessons learned to other pitch competitions
@@ -867,6 +927,7 @@
 ## 💪 Motivation & Mindset
 
 **Remember:**
+
 - You're competing against other early-stage startups, not perfect companies
 - The judges want to see **potential**, not polish
 - Your privacy-first approach is genuinely differentiated
@@ -874,6 +935,7 @@
 - **Ship the MVP, perfect it later**
 
 **Daily affirmations:**
+
 - "I'm building something that solves a real problem"
 - "Privacy is a feature, not a bug"
 - "Done is better than perfect"
@@ -884,6 +946,7 @@
 **Now go build! The clock is ticking. 21 days to change your trajectory.**
 
 **Next Steps:**
+
 1. Read this plan top to bottom
 2. Block out time on your calendar for each day's tasks
 3. Start Day 1 tasks TODAY (Electron + Ollama setup)

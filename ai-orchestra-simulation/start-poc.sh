@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# TalentAI WebGL POC - Quick Start Script
+# OpenTalent WebGL POC - Quick Start Script
 # Automatically sets up and runs the POC environment
 
 set -e
 
-echo "🚀 TalentAI WebGL Avatar POC - Quick Start"
+echo "🚀 OpenTalent WebGL Avatar POC - Quick Start"
 echo "=========================================="
 echo ""
 

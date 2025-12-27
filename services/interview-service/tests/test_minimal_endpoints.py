@@ -14,6 +14,7 @@ from fastapi.testclient import TestClient
 def client():
     # Import FastAPI app from the local service module
     from main import app
+
     return TestClient(app)
 
 
@@ -39,7 +40,7 @@ def test_health_and_root(client: TestClient):
 
     r = client.get("/")
     assert r.status_code == 200
-    assert "TalentAI Interview Service" in r.json().get("message", "")
+    assert "OpenTalent Interview Service" in r.json().get("message", "")
 
 
 def test_room_create_and_status_minimal(client: TestClient):

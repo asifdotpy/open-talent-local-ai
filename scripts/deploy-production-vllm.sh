@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # ╔═══════════════════════════════════════════════════════════════════════════╗
-# ║  TalentAI Production Deployment - vLLM + Conversation Service          ║
+# ║  OpenTalent Production Deployment - vLLM + Conversation Service          ║
 # ╚═══════════════════════════════════════════════════════════════════════════╝
 
 set -e
 
-echo "🚀 Deploying TalentAI Production Stack with vLLM"
+echo "🚀 Deploying OpenTalent Production Stack with vLLM"
 echo "================================================="
 
 # Configuration
@@ -81,7 +81,7 @@ build_vllm_server() {
     cd "$VLLM_DIR"
 
     # Build the Docker image
-    docker build -t talentai-vllm-server .
+    docker build -t OpenTalent-vllm-server .
 
     log_info "vLLM server image built successfully"
 }
@@ -141,7 +141,7 @@ volumes:
 
 networks:
   default:
-    name: talentai-network
+    name: OpenTalent-network
 EOF
 
     # Start services
@@ -247,7 +247,7 @@ show_status() {
 
 # Main deployment flow
 main() {
-    log_info "Starting TalentAI production deployment..."
+    log_info "Starting OpenTalent production deployment..."
 
     check_dependencies
     setup_environment
@@ -257,7 +257,7 @@ main() {
     test_deployment
     show_status
 
-    log_info "🎉 TalentAI production deployment completed successfully!"
+    log_info "🎉 OpenTalent production deployment completed successfully!"
     log_info "Your AI interviewer platform is now running with vLLM!"
 }
 

@@ -2,8 +2,8 @@
 
 set -e
 
-IMAGE_NAME="talent-ai-auditing-service-local:latest"
-CONTAINER_NAME="talent-ai-auditing-service-test"
+IMAGE_NAME="open-talent-auditing-service-local:latest"
+CONTAINER_NAME="open-talent-auditing-service-test"
 PORT=8080 # Use a different port for local testing to avoid conflicts
 
 echo "--- Building Docker image with Docker ---"
