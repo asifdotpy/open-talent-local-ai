@@ -55,7 +55,7 @@ const Icons = {
 }
 
 // GitHub and Download URLs
-const GITHUB_URL = "https://github.com/asifdotpy/open-talent"
+const GITHUB_URL = "https://github.com/asifdotpy/open-talent-local-ai"
 const DOWNLOAD_URLS = {
     windows: "#download-windows",
     mac: "#download-mac",
@@ -324,7 +324,7 @@ function App() {
                     </div>
 
                     <p className="mt-8 text-slate-500">
-                        Or build from source: <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:underline">github.com/asifdotpy/open-talent</a>
+                        Or build from source: <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:underline">github.com/asifdotpy/open-talent-local-ai</a>
                     </p>
                 </div>
             </section>
