@@ -75,6 +75,23 @@ export function ProgressPanel({ pipeline, agentHealth }: ProgressPanelProps) {
                 <span className="progress-percentage">{progress}%</span>
             </div>
 
+            {/* Outreach Progress Tracker */}
+            {(pipeline.status === 'enriching' || pipeline.status === 'completed') && (
+                <div className="enrichment-stats">
+                    <h3>📢 Engagement Progress</h3>
+                    <div className="stat-grid">
+                        <div className="stat-item">
+                            <span className="stat-label">Outreach Sent</span>
+                            <span className="stat-value">0</span>
+                        </div>
+                        <div className="stat-item">
+                            <span className="stat-label">Response Rate</span>
+                            <span className="stat-value">0%</span>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="activity-feed">
                 <h4>Recent Activity</h4>
                 {activities.length === 0 ? (

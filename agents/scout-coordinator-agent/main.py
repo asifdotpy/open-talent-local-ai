@@ -11,7 +11,13 @@ from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import Optional
 
-from fastapi import BackgroundTasks, FastAPI, HTTPException
+from fastapi import (
+    BackgroundTasks,
+    FastAPI,
+    HTTPException,
+    WebSocket,
+    WebSocketDisconnect,
+)
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -38,6 +44,7 @@ logger = logging.getLogger(__name__)
 # Global instances
 message_bus: Optional[MessageBus] = None
 active_pipelines: dict[str, SourcingPipeline] = {}
+active_connections: list[WebSocket] = []
 
 # Configuration
 config = get_config()
@@ -156,6 +163,33 @@ async def handle_agent_event(message: AgentMessage):
             await handle_market_insight(message)
     except Exception as e:
         logger.error(f"Error handling event: {e}")
+
+    # Broadcast event to all connected WebSockets
+    await broadcast_event(message)
+
+
+async def broadcast_event(message: AgentMessage):
+    """Broadcast event to all connected clients"""
+    if not active_connections:
+        return
+
+    dead_connections = []
+    for connection in active_connections:
+        try:
+            await connection.send_json(
+                {
+                    "type": message.message_type.value
+                    if hasattr(message.message_type, "value")
+                    else str(message.message_type),
+                    "payload": message.payload,
+                    "timestamp": datetime.utcnow().isoformat(),
+                }
+            )
+        except Exception:
+            dead_connections.append(connection)
+
+    for dead in dead_connections:
+        active_connections.remove(dead)
 
 
 async def handle_candidate_found(message: AgentMessage):
@@ -323,6 +357,22 @@ async def trigger_interview(pipeline_id: str, candidate_id: str):
             "timestamp": datetime.utcnow().isoformat(),
         },
     )
+
+
+# WebSocket Endpoint
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    """WebSocket endpoint for real-time updates"""
+    await websocket.accept()
+    active_connections.append(websocket)
+    logger.info(f"New client connected. Total clients: {len(active_connections)}")
+    try:
+        while True:
+            # Keep connection alive
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        active_connections.remove(websocket)
+        logger.info(f"Client disconnected. Total clients: {len(active_connections)}")
 
 
 # API Endpoints
