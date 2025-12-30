@@ -1,0 +1,489 @@
+/* Search Prompt Styles */
+.search-prompt {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.search-prompt h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #1f2937;
+}
+
+.prompt-textarea {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    resize: vertical;
+    transition: border-color 0.2s;
+}
+
+.prompt-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.prompt-textarea:disabled {
+    background-color: #f9fafb;
+    cursor: not-allowed;
+}
+
+.tool-selection {
+    margin: 24px 0;
+}
+
+.tool-selection h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #374151;
+}
+
+.tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+}
+
+.tool-checkbox {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tool-checkbox:hover {
+    border-color: #3b82f6;
+    background-color: #f9fafb;
+}
+
+.tool-checkbox input[type="checkbox"] {
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.tool-name {
+    font-weight: 500;
+    color: #1f2937;
+    margin-bottom: 4px;
+}
+
+.tool-desc {
+    font-size: 13px;
+    color: #6b7280;
+    margin-left: 24px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.badge.free {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.badge.paid {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.search-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.search-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.search-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.search-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.search-btn.loading {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+}
+
+.search-btn .spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.search-info {
+    margin-top: 16px;
+    padding: 12px;
+    background-color: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    border-radius: 4px;
+}
+
+.search-info p {
+    margin: 0;
+    color: #1e40af;
+    font-size: 14px;
+}
+
+/* Progress Panel Styles */
+.progress-panel {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.progress-panel h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #1f2937;
+}
+
+.no-search {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6b7280;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background-color: #f9fafb;
+    border-radius: 8px;
+}
+
+.status-emoji {
+    font-size: 24px;
+}
+
+.status-text {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.status-scanning {
+    color: #2563eb;
+}
+
+.status-enriching {
+    color: #7c3aed;
+}
+
+.status-scoring {
+    color: #f59e0b;
+}
+
+.status-completed {
+    color: #10b981;
+}
+
+.status-failed {
+    color: #ef4444;
+}
+
+.status-pending {
+    color: #6b7280;
+}
+
+.progress-bar-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 12px;
+    background-color: #e5e7eb;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    transition: width 0.5s ease-out;
+    border-radius: 6px;
+}
+
+.progress-scanning {
+    background: linear-gradient(90deg, #3b82f6, #2563eb);
+}
+
+.progress-enriching {
+    background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+}
+
+.progress-scoring {
+    background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.progress-completed {
+    background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.progress-failed {
+    background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.progress-pending {
+    background: #9ca3af;
+}
+
+.progress-percentage {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    min-width: 45px;
+}
+
+.activity-feed {
+    margin-bottom: 20px;
+}
+
+.activity-feed h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #374151;
+}
+
+.no-activities {
+    text-align: center;
+    color: #9ca3af;
+    font-size: 14px;
+    padding: 20px;
+}
+
+.activities-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background-color: #f9fafb;
+    font-size: 14px;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.activity-time {
+    color: #6b7280;
+    font-size: 12px;
+    min-width: 60px;
+}
+
+.activity-icon {
+    font-size: 16px;
+}
+
+.activity-message {
+    flex: 1;
+    color: #1f2937;
+}
+
+.activity-success {
+    border-left: 3px solid #10b981;
+}
+
+.activity-info {
+    border-left: 3px solid #3b82f6;
+}
+
+.activity-warning {
+    border-left: 3px solid #f59e0b;
+}
+
+.activity-error {
+    border-left: 3px solid #ef4444;
+}
+
+.agent-health h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #374151;
+}
+
+.agents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+}
+
+.agent-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.agent-healthy {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.agent-unhealthy {
+    background-color: #fed7aa;
+    color: #92400e;
+}
+
+.agent-unreachable {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.agent-unknown {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+
+.agent-name {
+    font-weight: 500;
+}
+
+.error-message,
+.success-message {
+    padding: 12px;
+    border-radius: 6px;
+    margin-top: 16px;
+    font-size: 14px;
+}
+
+.error-message {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+}
+
+.success-message {
+    background-color: #d1fae5;
+    color: #065f46;
+    border-left: 4px solid #10b981;
+}
+
+/* General Layout Styles */
+.main-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.header {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    color: white;
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.logo h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.tagline {
+    margin: 4px 0 0 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.status-indicator {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.status-indicator.online {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #d1fae5;
+}
+
+.status-indicator.offline {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #fee2e2;
+}
+
+.status-indicator.warning {
+    background-color: rgba(245, 158, 11, 0.2);
+    color: #fef3c7;
+}
+
+.footer {
+    text-align: center;
+    padding: 16px;
+    color: #6b7280;
+    font-size: 14px;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 40px;
+}

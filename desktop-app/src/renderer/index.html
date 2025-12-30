@@ -1,105 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenTalent - Privacy-First AI Interviews</title>
+  <title>OpenTalent - AI-Powered Recruiting</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
   <div id="app">
     <!-- Header -->
     <header class="header">
       <div class="logo">
-        <h1>🎯 OpenTalent</h1>
-        <p class="tagline">Privacy-First AI Interviews</p>
+        <h1>🎯 OpenTalent Recruiter</h1>
+        <p class="tagline">AI-Powered Candidate Discovery</p>
       </div>
       <div class="status">
-        <span id="ollama-status" class="status-indicator">⚪ Checking Ollama...</span>
+        <span id="agent-status" class="status-indicator">⚪ Checking agents...</span>
       </div>
     </header>
 
     <!-- Main Content -->
     <main class="main-content">
-      <!-- Welcome Screen -->
-      <div id="welcome-screen" class="screen active">
-        <div class="welcome-card">
-          <h2>Welcome to OpenTalent</h2>
-          <p>Select an interview role to begin your practice session</p>
-          
-          <div class="model-selector">
-            <label for="model-select">AI Model:</label>
-            <select id="model-select">
-              <option value="">Loading models...</option>
-            </select>
+      <!-- Recruiting Dashboard (Coming Soon) -->
+      <div id="recruiting-dashboard" class="screen active">
+        <div class="placeholder-card">
+          <h2>🚀 Recruiting Dashboard</h2>
+          <p class="construction-notice">
+            We're transforming OpenTalent into a powerful recruiting platform!
+          </p>
+
+          <div class="mockup-preview">
+            <img
+              src="../../../.gemini/antigravity/brain/27fc7c0b-f5f3-4c25-920c-88b88a81404a/recruiting_dashboard_mockup_1767111902987.png"
+              alt="Recruiting Dashboard Mockup"
+              style="max-width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
           </div>
 
-          <div class="role-selector">
-            <button class="role-btn" data-role="Software Engineer">
-              <span class="role-icon">💻</span>
-              <span class="role-title">Software Engineer</span>
-              <span class="role-desc">Technical interview with coding questions</span>
-            </button>
-            <button class="role-btn" data-role="Product Manager">
-              <span class="role-icon">📊</span>
-              <span class="role-title">Product Manager</span>
-              <span class="role-desc">Strategy and stakeholder management</span>
-            </button>
-            <button class="role-btn" data-role="Data Analyst">
-              <span class="role-icon">📈</span>
-              <span class="role-title">Data Analyst</span>
-              <span class="role-desc">SQL, statistics, and data visualization</span>
-            </button>
+          <div class="feature-list">
+            <h3>Coming Soon:</h3>
+            <ul>
+              <li>✅ ChatGPT-like candidate search prompt</li>
+              <li>✅ Multi-tool sourcing (GitHub, Stack Overflow, LinkedIn)</li>
+              <li>✅ Real-time candidate enrichment</li>
+              <li>✅ AI-powered candidate scoring</li>
+              <li>✅ Pre-interview email templates</li>
+              <li>✅ WhatsApp integration</li>
+            </ul>
           </div>
-        </div>
-      </div>
 
-      <!-- Interview Screen -->
-      <div id="interview-screen" class="screen">
-        <div class="interview-container">
-          <div class="interview-header">
-            <h3 id="interview-role">Software Engineer Interview</h3>
-            <div class="interview-controls">
-              <button id="end-interview-btn" class="btn-secondary">End Interview</button>
+          <div class="backend-status">
+            <h3>Backend Status:</h3>
+            <div class="status-grid">
+              <div class="status-item">
+                <span class="status-icon">🟢</span>
+                <span>Scout Coordinator Agent</span>
+              </div>
+              <div class="status-item">
+                <span class="status-icon">🟢</span>
+                <span>Data Enrichment Agent</span>
+              </div>
+              <div class="status-item">
+                <span class="status-icon">🟢</span>
+                <span>Quality Scoring Agent</span>
+              </div>
+              <div class="status-item">
+                <span class="status-icon">🟡</span>
+                <span>UI Integration (In Progress)</span>
+              </div>
             </div>
           </div>
 
-          <div id="conversation" class="conversation">
-            <!-- Messages will be added here dynamically -->
+          <div class="implementation-progress">
+            <h3>Week 1 Progress:</h3>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 15%;"></div>
+            </div>
+            <p>15% - UI Foundation (Day 1-2)</p>
           </div>
-
-          <div class="input-area">
-            <textarea 
-              id="user-input" 
-              placeholder="Type your answer here..." 
-              rows="3"
-            ></textarea>
-            <button id="send-btn" class="btn-primary">Send Answer</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Results Screen -->
-      <div id="results-screen" class="screen">
-        <div class="results-card">
-          <h2>Interview Complete</h2>
-          <p>Thank you for completing the interview!</p>
-          
-          <div id="conversation-summary" class="conversation-summary">
-            <!-- Conversation history will be shown here -->
-          </div>
-
-          <button id="new-interview-btn" class="btn-primary">Start New Interview</button>
         </div>
       </div>
     </main>
 
     <!-- Footer -->
     <footer class="footer">
-      <p>🔒 All processing happens locally on your device. No data is sent to the cloud.</p>
+      <p>🔒 Private recruiting platform. All data processing happens locally.</p>
     </footer>
   </div>
 
   <script src="app.js"></script>
 </body>
+
 </html>
