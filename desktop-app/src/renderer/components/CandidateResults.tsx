@@ -194,104 +194,104 @@ export function CandidateResults({ candidates, onInterviewClick, onOutreachClick
                                         className="btn-view"
                                         style={{ backgroundColor: '#f0f9ff', color: '#0369a1', borderColor: '#bae6fd' }}
                                         title="Find contact info via ContactOut/SalesQL"
-                                    ) : (
-                                <span>Enrich</span>
-                                    )}
-                            </button>
-                            {onOutreachClick && (
-                                <button
-                                    onClick={() => onOutreachClick(candidate)}
-                                    className="btn-view"
-                                    style={{ backgroundColor: '#e0f2fe', color: '#0369a1' }}
-                                >
-                                    Outreach
-                                </button>
-                            )}
-                            {onInterviewClick && (
-                                <button
-                                    onClick={() => onInterviewClick(candidate)}
-                                    className="btn-interview"
-                                >
-                                    Schedule Interview
-                                </button>
-                            )}
-                        </div>
-                        </div>
-            ))}
-        </div>
-    )
-}
-
-{/* Candidate Detail Modal */ }
-{
-    selectedCandidate && (
-        <div className="modal-overlay" onClick={() => setSelectedCandidate(null)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                <button
-                    className="modal-close"
-                    onClick={() => setSelectedCandidate(null)}
-                >
-                    ✕
-                </button>
-
-                <div className="modal-header">
-                    {selectedCandidate.avatar_url ? (
-                        <img
-                            src={selectedCandidate.avatar_url}
-                            alt={selectedCandidate.name}
-                            className="avatar-large"
-                        />
-                    ) : (
-                        <div className="avatar-placeholder-large">
-                            {selectedCandidate.name.charAt(0).toUpperCase()}
-                        </div>
-                    )}
-                    <div>
-                        <h2>{selectedCandidate.name}</h2>
-                        {selectedCandidate.headline && (
-                            <p className="headline">{selectedCandidate.headline}</p>
-                        )}
-                        <div className={`score-badge-large ${getScoreColor(selectedCandidate.score)}`}>
-                            Score: {selectedCandidate.score}/100
-                        </div>
-                    </div>
-                </div>
-
-                {selectedCandidate.bio && (
-                    <div className="modal-section">
-                        <h3>About</h3>
-                        <p>{selectedCandidate.bio}</p>
-                    </div>
-                )}
-
-                {selectedCandidate.experience && selectedCandidate.experience.length > 0 && (
-                    <div className="modal-section">
-                        <h3>Experience</h3>
-                        {selectedCandidate.experience.map((exp, idx) => (
-                            <div key={idx} className="experience-item">
-                                <strong>{exp.title}</strong> at {exp.company}
-                                <span className="duration">{exp.duration}</span>
+                                    >
+                                        Enrich
+                                    </button>
+                                )}
+                                {onOutreachClick && (
+                                    <button
+                                        onClick={() => onOutreachClick(candidate)}
+                                        className="btn-view"
+                                        style={{ backgroundColor: '#e0f2fe', color: '#0369a1' }}
+                                    >
+                                        Outreach
+                                    </button>
+                                )}
+                                {onInterviewClick && (
+                                    <button
+                                        onClick={() => onInterviewClick(candidate)}
+                                        className="btn-interview"
+                                    >
+                                        Schedule Interview
+                                    </button>
+                                )}
                             </div>
-                        ))}
-                    </div>
-                )}
+                        </div>
+                    ))}
+                </div>
+            )
+            }
 
-                {selectedCandidate.skills && selectedCandidate.skills.length > 0 && (
-                    <div className="modal-section">
-                        <h3>Skills</h3>
-                        <div className="skills">
-                            {selectedCandidate.skills.map((skill, idx) => (
-                                <span key={idx} className="skill-tag">
-                                    {skill}
-                                </span>
-                            ))}
+            {/* Candidate Detail Modal */}
+            {
+                selectedCandidate && (
+                    <div className="modal-overlay" onClick={() => setSelectedCandidate(null)}>
+                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                            <button
+                                className="modal-close"
+                                onClick={() => setSelectedCandidate(null)}
+                            >
+                                ✕
+                            </button>
+
+                            <div className="modal-header">
+                                {selectedCandidate.avatar_url ? (
+                                    <img
+                                        src={selectedCandidate.avatar_url}
+                                        alt={selectedCandidate.name}
+                                        className="avatar-large"
+                                    />
+                                ) : (
+                                    <div className="avatar-placeholder-large">
+                                        {selectedCandidate.name.charAt(0).toUpperCase()}
+                                    </div>
+                                )}
+                                <div>
+                                    <h2>{selectedCandidate.name}</h2>
+                                    {selectedCandidate.headline && (
+                                        <p className="headline">{selectedCandidate.headline}</p>
+                                    )}
+                                    <div className={`score-badge-large ${getScoreColor(selectedCandidate.score)}`}>
+                                        Score: {selectedCandidate.score}/100
+                                    </div>
+                                </div>
+                            </div>
+
+                            {selectedCandidate.bio && (
+                                <div className="modal-section">
+                                    <h3>About</h3>
+                                    <p>{selectedCandidate.bio}</p>
+                                </div>
+                            )}
+
+                            {selectedCandidate.experience && selectedCandidate.experience.length > 0 && (
+                                <div className="modal-section">
+                                    <h3>Experience</h3>
+                                    {selectedCandidate.experience.map((exp, idx) => (
+                                        <div key={idx} className="experience-item">
+                                            <strong>{exp.title}</strong> at {exp.company}
+                                            <span className="duration">{exp.duration}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {selectedCandidate.skills && selectedCandidate.skills.length > 0 && (
+                                <div className="modal-section">
+                                    <h3>Skills</h3>
+                                    <div className="skills">
+                                        {selectedCandidate.skills.map((skill, idx) => (
+                                            <span key={idx} className="skill-tag">
+                                                {skill}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
-                )}
-            </div>
-        </div>
-    )
-}
+                )
+            }
         </div >
     );
 }
