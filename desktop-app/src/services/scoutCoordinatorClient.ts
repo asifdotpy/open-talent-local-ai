@@ -5,14 +5,15 @@
  * for candidate sourcing pipeline management.
  */
 
-const SCOUT_COORDINATOR_URL = process.env.REACT_APP_SCOUT_COORDINATOR_URL || 'http://localhost:8095';
+const SCOUT_COORDINATOR_URL = process.env.REACT_APP_SCOUT_COORDINATOR_URL || 'http://localhost:8090';
 
 export interface PipelineConfig {
-    jobDescription: string;
-    location?: string;
-    skills?: string[];
-    tools: string[]; // ['github', 'stackoverflow', 'googleXray', 'contactout', 'salesql']
-    userId?: string;
+    project_id: string;
+    job_description: string;
+    job_title?: string;
+    target_platforms?: string[];
+    num_candidates_target?: number;
+    priority?: string;
 }
 
 export interface PipelineResponse {
@@ -91,16 +92,10 @@ export class ScoutCoordinatorClient {
      */
     async createPipeline(config: PipelineConfig): Promise<PipelineResponse> {
         try {
-            const response = await fetch(`${this.baseUrl}/pipelines/create`, {
+            const response = await fetch(`${this.baseUrl}/pipelines/start`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    job_description: config.jobDescription,
-                    location: config.location,
-                    required_skills: config.skills || [],
-                    sourcing_methods: config.tools,
-                    user_id: config.userId || 'desktop_user',
-                }),
+                body: JSON.stringify(config),
             });
 
             if (!response.ok) {
@@ -120,7 +115,7 @@ export class ScoutCoordinatorClient {
      */
     async getPipelineStatus(pipelineId: string): Promise<PipelineStatus> {
         try {
-            const response = await fetch(`${this.baseUrl}/pipelines/${pipelineId}/status`);
+            const response = await fetch(`${this.baseUrl}/pipelines/${pipelineId}`);
 
             if (!response.ok) {
                 throw new Error(`Failed to get status: ${response.statusText}`);

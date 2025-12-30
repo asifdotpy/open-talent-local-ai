@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { SearchPrompt } from './components/SearchPrompt';
 import { ProgressPanel } from './components/ProgressPanel';
+import { scoutCoordinator } from '../services/scoutCoordinatorClient';
+import { jobDescriptionParser } from '../services/jobDescriptionParser';
 import './components/components.css';
 
 interface Pipeline {
@@ -33,21 +35,16 @@ export function RecruiterApp() {
         return () => clearInterval(interval);
     }, []);
 
-    // Mock agent health check (will be replaced with real API call)
+    // Real agent health check
     const checkAgentHealth = async () => {
         try {
-            // TODO: Replace with actual scout-coordinator-agent health check
-            // const response = await fetch('http://localhost:8095/agents/health');
-            // const data = await response.json();
-
-            // Mock data for now
-            setAgentHealth({
-                'scout-coordinator': 'healthy',
-                'data-enrichment': 'healthy',
-                'quality-focused': 'healthy',
-                'proactive-scanning': 'healthy',
-                'boolean-mastery': 'healthy'
-            });
+            const health = await scoutCoordinator.getAgentHealth();
+            // Transform to simple status format
+            const simpleHealth: AgentHealth = {};
+            for (const [name, info] of Object.entries(health)) {
+                simpleHealth[name] = info.status;
+            }
+            setAgentHealth(simpleHealth);
         } catch (error) {
             console.error('Agent health check failed:', error);
             setAgentHealth({
@@ -60,92 +57,118 @@ export function RecruiterApp() {
         console.log('Starting search:', { prompt, tools });
         setIsSearching(true);
 
-        // Initialize pipeline
-        setPipeline({
-            status: 'pending',
-            progress: 0,
-            activities: [{
-                timestamp: new Date().toLocaleTimeString(),
-                type: 'info',
-                icon: '🚀',
-                message: 'Search initiated'
-            }]
-        });
+        try {
+            // Parse job description
+            const jobData = await jobDescriptionParser.parsePrompt(prompt);
+            console.log('Parsed job data:', jobData);
 
-        // TODO: Replace with actual scout-coordinator-agent API call
-        // Mock pipeline simulation for now
-        simulatePipeline(prompt, tools);
+            // Map tool names to platforms
+            const platformMap: { [key: string]: string } = {
+                'github': 'github',
+                'stackoverflow': 'stackoverflow',
+                'googleXray': 'linkedin',
+                'contactout': 'linkedin',
+                'salesql': 'linkedin'
+            };
+            const platforms = [...new Set(tools.map(t => platformMap[t] || 'linkedin'))];
+
+            // Create pipeline
+            const pipelineResponse = await scoutCoordinator.createPipeline({
+                project_id: `desktop_${Date.now()}`,
+                job_description: prompt,
+                job_title: jobData.job_title,
+                target_platforms: platforms,
+                num_candidates_target: 50,
+                priority: 'medium'
+            });
+
+            console.log('Pipeline created:', pipelineResponse.pipeline_id);
+
+            // Initialize pipeline UI state
+            setPipeline({
+                id: pipelineResponse.pipeline_id,
+                status: 'scanning',
+                progress: 0,
+                activities: [{
+                    timestamp: new Date().toLocaleTimeString(),
+                    type: 'info',
+                    icon: '🚀',
+                    message: 'Pipeline started'
+                }]
+            });
+
+            // Start polling for status
+            pollPipelineStatus(pipelineResponse.pipeline_id);
+
+        } catch (error) {
+            console.error('Search failed:', error);
+            setPipeline({
+                status: 'failed',
+                progress: 0,
+                activities: [{
+                    timestamp: new Date().toLocaleTimeString(),
+                    type: 'error',
+                    icon: '❌',
+                    message: `Search failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+                }]
+            });
+            setIsSearching(false);
+        }
     };
 
-    // Mock pipeline simulation (will be replaced with WebSocket updates)
-    const simulatePipeline = (prompt: string, tools: string[]) => {
-        setTimeout(() => {
-            setPipeline(prev => prev ? {
-                ...prev,
-                status: 'scanning',
-                progress: 25,
-                activities: [
-                    ...prev.activities,
-                    {
-                        timestamp: new Date().toLocaleTimeString(),
-                        type: 'info',
-                        icon: '🔍',
-                        message: `Scanning ${tools.length} sources...`
-                    }
-                ]
-            } : null);
-        }, 1000);
+    // Poll pipeline status from scout-coordinator
+    const pollPipelineStatus = async (pipelineId: string) => {
+        const pollInterval = setInterval(async () => {
+            try {
+                const status = await scoutCoordinator.getPipelineStatus(pipelineId);
+                console.log('Pipeline status:', status);
 
-        setTimeout(() => {
-            setPipeline(prev => prev ? {
-                ...prev,
-                progress: 50,
-                activities: [
-                    ...prev.activities,
-                    {
-                        timestamp: new Date().toLocaleTimeString(),
-                        type: 'success',
-                        icon: '✅',
-                        message: 'Found 12 potential candidates'
-                    }
-                ]
-            } : null);
-        }, 3000);
+                // Map backend state to UI state
+                const stateMap: { [key: string]: Pipeline['status'] } = {
+                    'initiated': 'pending',
+                    'scanning': 'scanning',
+                    'scoring': 'scoring',
+                    'engaging': 'enriching',
+                    'interviewing': 'enriching',
+                    'completed': 'completed',
+                    'failed': 'failed',
+                    'paused': 'pending'
+                };
 
-        setTimeout(() => {
-            setPipeline(prev => prev ? {
-                ...prev,
-                status: 'enriching',
-                progress: 75,
-                activities: [
-                    ...prev.activities,
-                    {
-                        timestamp: new Date().toLocaleTimeString(),
-                        type: 'info',
-                        icon: '📊',
-                        message: 'Enriching candidate profiles...'
-                    }
-                ]
-            } : null);
-        }, 5000);
+                const uiStatus = stateMap[status.state.toLowerCase()] || 'pending';
 
+                setPipeline(prev => ({
+                    ...prev,
+                    id: pipelineId,
+                    status: uiStatus,
+                    progress: status.progress_percentage,
+                    activities: [
+                        ...(prev?.activities || []),
+                        {
+                            timestamp: new Date().toLocaleTimeString(),
+                            type: 'info',
+                            icon: uiStatus === 'completed' ? '🎉' : '🔄',
+                            message: `${status.state}: ${status.candidates_found} candidates found`
+                        }
+                    ]
+                }));
+
+                // Stop polling if completed or failed
+                if (status.state === 'completed' || status.state === 'failed') {
+                    clearInterval(pollInterval);
+                    setIsSearching(false);
+                }
+
+            } catch (error) {
+                console.error('Status poll error:', error);
+            }
+        }, 2000); // Poll every 2 seconds
+
+        // Timeout after 5 minutes
         setTimeout(() => {
-            setPipeline(prev => prev ? {
-                ...prev,
-                status: 'completed',
-                progress: 100,
-                activities: [
-                    ...prev.activities,
-                    {
-                        timestamp: new Date().toLocaleTimeString(),
-                        type: 'success',
-                        icon: '🎉',
-                        message: 'Search completed! Found 12 candidates'
-                    }
-                ]
-            } : null);
+            clearInterval(pollInterval);
             setIsSearching(false);
-        }, 7000);
+        }, 300000);
     };
 
     return (
@@ -157,7 +180,7 @@ export function RecruiterApp() {
                 </div>
                 <div className="status">
                     <span className={`status-indicator ${Object.values(agentHealth).every(h => h === 'healthy') ? 'online' :
-                            Object.values(agentHealth).some(h => h === 'healthy') ? 'warning' : 'offline'
+                        Object.values(agentHealth).some(h => h === 'healthy') ? 'warning' : 'offline'
                         }`}>
                         {Object.values(agentHealth).filter(h => h === 'healthy').length} / {Object.keys(agentHealth).length} Agents Online
                     </span>
