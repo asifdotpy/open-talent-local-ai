@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Talent - Logo Concepts (V2)</title>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #312e81;
+            font-weight: 600;
+        }
+        p {
+            color: #3730a3;
+            font-size: 1.1rem;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px H12px rgba(0,0,0,0.08);
+            padding: 30px;
+            width: 300px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        .card h2 {
+            font-size: 1.2rem;
+            color: #3730a3;
+            margin-bottom: 25px;
+        }
+        .logo {
+            height: 120px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #312e81;
+        }
+        .accent-text {
+            color: #06b6d4;
+        }
+    </style>
+</head>
+<body>
+    <h1>Logo Concepts - Round 2</h1>
+    <p>Using the project's color palette and focusing on a clean, professional, and easy-to-understand design.</p>
+    <div class="container">
+
+        <!-- Concept 1: Geometric Initials -->
+        <div class="card">
+            <h2>Concept 1: Geometric Initials</h2>
+            <div class="logo">
+                <svg width="120" height="100" viewBox="0 0 120 100">
+                    <!-- The 'O' -->
+                    <circle cx="50" cy="50" r="36" fill="none" stroke="#4338ca" stroke-width="12"/>
+                    <!-- The 'T' -->
+                    <path d="M 90,50 L 110,50" fill="none" stroke="#06b6d4" stroke-width="12" stroke-linecap="round"/>
+                    <path d="M 72,20 L 72,80" fill="none" stroke="#4338ca" stroke-width="12" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="logo-text">Open<span class="accent-text">Talent</span></div>
+        </div>
+
+        <!-- Concept 2: The Gateway -->
+        <div class="card">
+            <h2>Concept 2: The Gateway</h2>
+            <div class="logo">
+                 <svg width="100" height="100" viewBox="0 0 100 100">
+                    <defs>
+                        <linearGradient id="grad-primary" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#4f46e5;" />
+                            <stop offset="100%" style="stop-color:#312e81;" />
+                        </linearGradient>
+                    </defs>
+                    <!-- The 'O' as an arch/gateway -->
+                    <path d="M 20,80 A 30,30 0 0,1 80,80 L 80,50 A 30,30 0 1,0 20,50 Z" fill="url(#grad-primary)"/>
+                    <!-- The 'T' as a path/person -->
+                    <circle cx="50" cy="50" r="8" fill="#06b6d4"/>
+                    <rect x="46" y="55" width="8" height="20" fill="#06b6d4" rx="4"/>
+                </svg>
+            </div>
+            <div class="logo-text">Open<span class="accent-text">Talent</span></div>
+        </div>
+
+        <!-- Concept 3: The Focus -->
+        <div class="card">
+            <h2>Concept 3: The Focus</h2>
+            <div class="logo">
+                <svg width="100" height="100" viewBox="0 0 100 100">
+                    <!-- Magnifying glass shape -->
+                    <circle cx="45" cy="45" r="28" fill="none" stroke="#4338ca" stroke-width="10"/>
+                    <line x1="65" y1="65" x2="85" y2="85" stroke="#4338ca" stroke-width="10" stroke-linecap="round"/>
+                    <!-- The 'T' for Talent inside -->
+                    <path d="M 35,35 H 55 M 45,35 V 60" stroke="#06b6d4" stroke-width="10" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <div class="logo-text">Open<span class="accent-text">Talent</span></div>
+        </div>
+
+    </div>
+</body>
+</html>

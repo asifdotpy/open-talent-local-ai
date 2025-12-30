@@ -1,9 +1,5 @@
-/**
- * GitHub platform scanning flow.
- * Modular plugin for discovering developers based on repositories and activity.
- */
-
 import { z } from 'zod';
+import axios from 'axios'; // Added axios import
 
 // GitHub scan request schema
 export const GitHubScanRequestSchema = z.object({
@@ -53,6 +49,42 @@ export const GitHubScanResponseSchema = z.object({
   error: z.string().optional(),
 });
 
+async function enrichViaGitHub(url: string): Promise<z.infer<typeof GitHubProfileSchema>> {
+  if (!url.includes('github.com')) {
+    throw new Error('Not a GitHub URL');
+  }
+
+  const username = url.split('/').pop();
+  const response = await axios.get(`https://api.github.com/users/${username}`);
+
+  if (response.status !== 200) {
+    throw new Error(`GitHub API error: ${response.status}`);
+  }
+
+  const data = response.data;
+  const profile: z.infer<typeof GitHubProfileSchema> = {
+    username: data.login,
+    profileUrl: data.html_url,
+    name: data.name,
+    bio: data.bio,
+    location: data.location,
+    email: data.email,
+    company: data.company,
+    followers: data.followers,
+    following: data.following,
+    publicRepos: data.public_repos,
+    topRepositories: [], // This would require another API call
+    languages: [], // This would require another API call
+    contributions: {
+      lastYear: 0, // This would require another API call
+      longestStreak: 0, // This would require another API call
+    },
+    scannedAt: new Date().toISOString(),
+  };
+
+  return profile;
+}
+
 /**
  * GitHub scanning flow implementation.
  * Integrates with GitHub API to find developers.
@@ -61,58 +93,31 @@ export async function scanGitHub(
   request: z.infer<typeof GitHubScanRequestSchema>
 ): Promise<z.infer<typeof GitHubScanResponseSchema>> {
   const startTime = Date.now();
-  
+
   try {
-    // TODO: Implement actual GitHub API integration
     console.log(`Scanning GitHub with query: ${request.searchQuery}`);
-    
-    // Mock developers for demonstration
-    const mockDevelopers: z.infer<typeof GitHubProfileSchema>[] = [
-      {
-        username: 'johndeveloper',
-        profileUrl: 'https://github.com/johndeveloper',
-        name: 'John Developer',
-        bio: 'Full-stack developer passionate about open source',
-        location: 'Seattle, WA',
-        email: 'john@example.com',
-        company: '@TechCorp',
-        followers: 250,
-        following: 100,
-        publicRepos: 45,
-        topRepositories: [
-          {
-            name: 'awesome-project',
-            description: 'An awesome web application',
-            language: 'TypeScript',
-            stars: 1200,
-            forks: 150,
-            url: 'https://github.com/johndeveloper/awesome-project',
-          },
-          {
-            name: 'python-utils',
-            description: 'Utility library for Python',
-            language: 'Python',
-            stars: 800,
-            forks: 90,
-            url: 'https://github.com/johndeveloper/python-utils',
-          },
-        ],
-        languages: ['TypeScript', 'Python', 'JavaScript', 'Go', 'Rust'],
-        contributions: {
-          lastYear: 1250,
-          longestStreak: 45,
-        },
-        scannedAt: new Date().toISOString(),
-      },
-    ];
-    
+
+    // For now, we'll just enrich a single profile from the search query if it's a URL
+    // A real implementation would use the GitHub search API
+    if (request.searchQuery.includes('github.com')) {
+      const developer = await enrichViaGitHub(request.searchQuery);
+      const scanDuration = Date.now() - startTime;
+      return {
+        platform: 'github',
+        searchQuery: request.searchQuery,
+        totalResults: 1,
+        developers: [developer],
+        scanDuration,
+      };
+    }
+
+    // Fallback to empty array if no URL and no proper search implementation
     const scanDuration = Date.now() - startTime;
-    
     return {
       platform: 'github',
       searchQuery: request.searchQuery,
-      totalResults: mockDevelopers.length,
-      developers: mockDevelopers.slice(0, request.maxResults),
+      totalResults: 0,
+      developers: [],
       scanDuration,
     };
   } catch (error) {

@@ -1,9 +1,5 @@
-/**
- * Stack Overflow platform scanning flow.
- * Modular plugin for finding experts based on reputation and tags.
- */
-
 import { z } from 'zod';
+import axios from 'axios';
 
 // Stack Overflow scan request schema
 export const StackOverflowScanRequestSchema = z.object({
@@ -54,6 +50,49 @@ export const StackOverflowScanResponseSchema = z.object({
   error: z.string().optional(),
 });
 
+async function enrichViaStackOverflow(query: string): Promise<z.infer<typeof StackOverflowProfileSchema>> {
+  const baseUrl = 'https://api.stackexchange.com/2.3';
+
+  let userUrl: string;
+  if (/^\d+$/.test(query)) {
+    userUrl = `${baseUrl}/users/${query}?site=stackoverflow`;
+  } else {
+    const searchUrl = `${baseUrl}/users?order=desc&sort=reputation&inname=${query}&site=stackoverflow`;
+    const searchResponse = await axios.get(searchUrl);
+    if (searchResponse.status !== 200 || !searchResponse.data.items || searchResponse.data.items.length === 0) {
+      throw new Error(`No Stack Overflow users found for: ${query}`);
+    }
+    const userId = searchResponse.data.items[0].user_id;
+    userUrl = `${baseUrl}/users/${userId}?site=stackoverflow`;
+  }
+
+  const response = await axios.get(userUrl);
+
+  if (response.status !== 200 || !response.data.items || response.data.items.length === 0) {
+    throw new Error(`Stack Overflow API error: ${response.status}`);
+  }
+
+  const data = response.data.items[0];
+  const profile: z.infer<typeof StackOverflowProfileSchema> = {
+    userId: data.user_id,
+    displayName: data.display_name,
+    profileUrl: data.link,
+    location: data.location,
+    reputation: data.reputation,
+    badgeCounts: data.badge_counts,
+    topTags: [], // This would require another API call
+    questionCount: data.question_count,
+    answerCount: data.answer_count,
+    acceptRate: data.accept_rate,
+    topPosts: [], // This would require another API call
+    websiteUrl: data.website_url,
+    githubProfile: undefined, // Not available in this API response
+    scannedAt: new Date().toISOString(),
+  };
+
+  return profile;
+}
+
 /**
  * Stack Overflow scanning flow implementation.
  * Integrates with Stack Overflow API to find experts.
@@ -62,58 +101,21 @@ export async function scanStackOverflow(
   request: z.infer<typeof StackOverflowScanRequestSchema>
 ): Promise<z.infer<typeof StackOverflowScanResponseSchema>> {
   const startTime = Date.now();
-  
+
   try {
-    // TODO: Implement actual Stack Overflow API integration
     console.log(`Scanning Stack Overflow for tags: ${request.tags.join(', ')}`);
-    
-    // Mock users for demonstration
-    const mockUsers: z.infer<typeof StackOverflowProfileSchema>[] = [
-      {
-        userId: 12345,
-        displayName: 'ExpertDev',
-        profileUrl: 'https://stackoverflow.com/users/12345/expertdev',
-        location: 'Austin, TX',
-        reputation: 15000,
-        badgeCounts: {
-          gold: 5,
-          silver: 25,
-          bronze: 100,
-        },
-        topTags: [
-          { tagName: 'python', score: 450, postCount: 150 },
-          { tagName: 'django', score: 320, postCount: 100 },
-          { tagName: 'postgresql', score: 210, postCount: 75 },
-        ],
-        questionCount: 50,
-        answerCount: 300,
-        acceptRate: 85,
-        topPosts: [
-          {
-            title: 'How to optimize Django ORM queries',
-            score: 245,
-            url: 'https://stackoverflow.com/q/1234567',
-            tags: ['python', 'django', 'optimization'],
-          },
-        ],
-        websiteUrl: 'https://expertdev.io',
-        githubProfile: 'https://github.com/expertdev',
-        scannedAt: new Date().toISOString(),
-      },
-    ];
-    
-    // Filter by reputation
-    const filteredUsers = mockUsers.filter(
-      user => user.reputation >= request.minReputation
-    );
-    
+
+    // A real implementation would use the /users endpoint with the `tagged` parameter
+    // For now, we'll just enrich a single user if a tag is provided as a search term
+    const users = await Promise.all(request.tags.map(tag => enrichViaStackOverflow(tag)));
+
     const scanDuration = Date.now() - startTime;
-    
+
     return {
       platform: 'stackoverflow',
       tags: request.tags,
-      totalResults: filteredUsers.length,
-      users: filteredUsers.slice(0, request.maxResults),
+      totalResults: users.length,
+      users: users,
       scanDuration,
     };
   } catch (error) {

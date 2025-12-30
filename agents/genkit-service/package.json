@@ -15,8 +15,10 @@
     "@genkit-ai/flow": "^0.5.17",
     "@genkit-ai/google-genai": "^1.22.0",
     "@types/node": "^24.9.2",
+    "axios": "^1.13.2",
     "genkit": "^1.22.0",
     "ioredis": "^5.8.2",
+    "playwright": "^1.57.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   },

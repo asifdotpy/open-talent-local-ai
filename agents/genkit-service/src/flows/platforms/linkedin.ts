@@ -1,9 +1,5 @@
-/**
- * LinkedIn platform scanning flow.
- * Modular plugin for scanning LinkedIn profiles based on search criteria.
- */
-
 import { z } from 'zod';
+import { chromium } from 'playwright';
 
 // LinkedIn scan request schema
 export const LinkedInScanRequestSchema = z.object({
@@ -53,6 +49,78 @@ export const LinkedInScanResponseSchema = z.object({
   error: z.string().optional(),
 });
 
+async function enrichViaGoogleXray(name: string, location?: string): Promise<z.infer<typeof LinkedInProfileSchema>> {
+  const query = `"${name}" ${location || ''} site:linkedin.com/in`;
+  const searchUrl = `https://www.google.com/search?q=${query}&num=10`;
+
+  const browser = await chromium.launch({
+    headless: true,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-first-run',
+      '--no-zygote',
+      '--single-process',
+      '--disable-gpu',
+    ],
+  });
+
+  try {
+    const context = await browser.newContext({
+      userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    });
+    const page = await context.newPage();
+
+    await page.goto(searchUrl, { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('div.g, div[data-ved]', { timeout: 15000 });
+
+    const linkedinLinks = await page.$$('a[href*="linkedin.com/in"]');
+
+    if (linkedinLinks.length > 0) {
+      let profileUrl = await linkedinLinks[0].getAttribute('href');
+
+      if (profileUrl) {
+        if (profileUrl.includes('url=')) {
+          profileUrl = new URL(profileUrl, searchUrl).searchParams.get('url') || profileUrl;
+        }
+
+        await page.goto(profileUrl, { waitUntil: 'domcontentloaded' });
+        await page.waitForLoadState('networkidle', { timeout: 10000 });
+
+        const nameElement = await page.$('h1.text-heading-xlarge, h1[data-test-id="hero__page__title"]');
+        const headlineElement = await page.$('.text-body-medium, .pv-text-details__left-panel .text-body-medium');
+        const locationElement = await page.$('.text-body-small.inline.t-black--light.break-words, .pv-text-details__left-panel .text-body-small');
+
+        const fullName = nameElement ? await nameElement.textContent() : name;
+        const headline = headlineElement ? await headlineElement.textContent() : null;
+        const scrapedLocation = locationElement ? await locationElement.textContent() : null;
+
+        const profile: z.infer<typeof LinkedInProfileSchema> = {
+          profileUrl,
+          fullName: fullName || name,
+          headline: headline || '',
+          location: scrapedLocation || undefined,
+          currentPosition: undefined, // This would require more complex scraping
+          experience: [], // This would require more complex scraping
+          education: [], // This would require more complex scraping
+          skills: [], // This would require more complex scraping
+          summary: undefined, // This would require more complex scraping
+          connections: undefined, // This would require more complex scraping
+          scannedAt: new Date().toISOString(),
+        };
+
+        return profile;
+      }
+    }
+
+    throw new Error(`No LinkedIn profiles found in Google search for: ${name}`);
+  } finally {
+    await browser.close();
+  }
+}
+
 /**
  * LinkedIn scanning flow implementation.
  * This would integrate with LinkedIn API or scraping service.
@@ -61,60 +129,19 @@ export async function scanLinkedIn(
   request: z.infer<typeof LinkedInScanRequestSchema>
 ): Promise<z.infer<typeof LinkedInScanResponseSchema>> {
   const startTime = Date.now();
-  
+
   try {
-    // TODO: Implement actual LinkedIn API integration
-    // For now, this is a mock implementation
     console.log(`Scanning LinkedIn with query: ${request.searchQuery}`);
-    
-    // Mock profiles for demonstration
-    const mockProfiles: z.infer<typeof LinkedInProfileSchema>[] = [
-      {
-        profileUrl: 'https://linkedin.com/in/sample-profile-1',
-        fullName: 'Jane Doe',
-        headline: 'Senior Software Engineer at Tech Corp',
-        location: 'San Francisco, CA',
-        currentPosition: {
-          title: 'Senior Software Engineer',
-          company: 'Tech Corp',
-          duration: '2 years',
-        },
-        experience: [
-          {
-            title: 'Senior Software Engineer',
-            company: 'Tech Corp',
-            duration: '2020 - Present',
-            description: 'Leading backend development team',
-          },
-          {
-            title: 'Software Engineer',
-            company: 'Startup Inc',
-            duration: '2018 - 2020',
-            description: 'Full-stack development',
-          },
-        ],
-        education: [
-          {
-            institution: 'University of Technology',
-            degree: 'Bachelor of Science',
-            field: 'Computer Science',
-            year: '2018',
-          },
-        ],
-        skills: ['Python', 'JavaScript', 'React', 'Node.js', 'PostgreSQL'],
-        summary: 'Experienced software engineer with expertise in full-stack development',
-        connections: 500,
-        scannedAt: new Date().toISOString(),
-      },
-    ];
-    
+
+    const profile = await enrichViaGoogleXray(request.searchQuery, request.location);
+
     const scanDuration = Date.now() - startTime;
-    
+
     return {
       platform: 'linkedin',
       searchQuery: request.searchQuery,
-      totalResults: mockProfiles.length,
-      profiles: mockProfiles.slice(0, request.maxResults),
+      totalResults: 1,
+      profiles: [profile],
       scanDuration,
     };
   } catch (error) {

@@ -325,6 +325,26 @@ function RecruiterAppContent() {
                 {candidates.length > 0 && (
                     <CandidateResults
                         candidates={candidates}
+                        onEnrichClick={async (candidate) => {
+                            if (!candidate.linkedin_url) {
+                                addToast('No LinkedIn URL found for enrichment', 'warning');
+                                return;
+                            }
+                            addToast(`Enriching contact info for ${candidate.name}...`, 'info');
+                            try {
+                                const enriched = await enrichmentClient.enrichCandidate(candidate.id, candidate.linkedin_url);
+                                if (enriched.email || enriched.phone) {
+                                    setCandidates(prev => prev.map(c =>
+                                        c.id === candidate.id ? { ...c, bio: `${c.bio}\n\n[Enriched info from ${enriched.source}]\nEmail: ${enriched.email}\nPhone: ${enriched.phone}` } : c
+                                    ));
+                                    addToast(`Enrichment successful for ${candidate.name}!`, 'success');
+                                } else {
+                                    addToast('No new contact info found.', 'info');
+                                }
+                            } catch (error) {
+                                addToast('Enrichment failed. Check your API keys.', 'error');
+                            }
+                        }}
                         onOutreachClick={(candidate) => setOutreachCandidate(candidate)}
                         onInterviewClick={(candidate) => {
                             console.log('Schedule interview for:', candidate);

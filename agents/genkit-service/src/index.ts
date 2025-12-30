@@ -2,6 +2,7 @@ import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 import { startFlowServer } from '@genkit-ai/express';
 import { z } from 'zod';
+import { platformRegistry, PlatformScanRequestSchema } from './flows/platforms/registry';
 
 // Configure Genkit with Google AI
 const ai = genkit({
@@ -392,7 +393,7 @@ Experience: ${candidateProfile.experience}
 Interview Summary:
 - Questions Asked: ${interviewSummary.totalQuestions}
 - Average Score: ${interviewSummary.averageScore}/10
-- Response Details: ${interviewSummary.responses.map(r => 
+- Response Details: ${interviewSummary.responses.map(r =>
     `Q: ${r.question}\nA: ${r.response}\nScore: ${r.evaluation.score}`
   ).join('\n\n')}
 
@@ -479,6 +480,6 @@ if (process.env.NODE_ENV !== 'test') {
     ],
     port: 3400,
   });
-  
+
   console.log('🎯 GenKit flow server started on port 3400');
 }

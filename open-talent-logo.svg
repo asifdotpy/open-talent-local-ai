@@ -1,0 +1,14 @@
+<svg width="300" height="150" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg" font-family="Inter, sans-serif">
+    <!-- Icon part -->
+    <g transform="translate(20, 25)">
+        <!-- Magnifying glass circle -->
+        <circle cx="45" cy="45" r="28" fill="none" stroke="#4338ca" stroke-width="10"/>
+        <!-- Magnifying glass handle -->
+        <line x1="65" y1="65" x2="85" y2="85" stroke="#4338ca" stroke-width="10" stroke-linecap="round"/>
+        <!-- The 'T' for Talent inside -->
+        <path d="M 35,35 H 55 M 45,35 V 60" stroke="#06b6d4" stroke-width="10" stroke-linecap="round"/>
+    </g>
+    <!-- Text part -->
+    <text x="140" y="75" font-size="40" font-weight="bold" fill="#312e81">Open</text>
+    <text x="240" y="75" font-size="40" font-weight="bold" fill="#06b6d4">Talent</text>
+</svg>

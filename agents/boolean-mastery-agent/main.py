@@ -129,7 +129,7 @@ async def generate_and_publish_query(pipeline_id: str, job_description: str, pla
     try:
         # Use Genkit service to generate query
         query_data = await service_clients.genkit.generate_boolean_query(
-            job_description=job_description, platform=platform
+            search_terms=job_description, platform=platform
         )
 
         # Publish query generated event
