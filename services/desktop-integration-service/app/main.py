@@ -404,8 +404,6 @@ async def select_model(model_id: str) -> dict:
 # =========================================================================
 
 
-
-
 @app.post("/api/v1/voice/synthesize")
 async def synthesize_speech(payload: dict) -> dict:
     """Proxy text-to-speech to voice-service when enabled."""
@@ -450,9 +448,7 @@ async def transcribe_speech(payload: dict) -> dict:
     # Forward the audio file or data to voice service
     # The payload should contain either audio_url or audio_base64
     if not payload.get("audio_url") and not payload.get("audio_base64"):
-        raise HTTPException(
-            status_code=400, detail="Either audio_url or audio_base64 is required"
-        )
+        raise HTTPException(status_code=400, detail="Either audio_url or audio_base64 is required")
 
     try:
         response = await http_client.post(
@@ -531,8 +527,6 @@ async def scout_agents() -> dict:
     except Exception as e:
         logger.warning(f"Scout agents registry fetch failed: {e}")
         raise HTTPException(status_code=502, detail="Scout agents registry unavailable")
-
-
 
 
 # =========================================================================

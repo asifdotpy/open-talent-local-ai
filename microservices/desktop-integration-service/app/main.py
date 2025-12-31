@@ -6,15 +6,14 @@ Lightweight, demo-focused implementation (Phase 0).
 """
 
 import logging
-import asyncio
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Dict, Optional, List, Union
+from typing import Optional, Union
 
+import httpx
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-import httpx
 
 from app.config.settings import settings
 from app.core.service_discovery import ServiceDiscovery
@@ -39,20 +38,22 @@ def format_bytes(size: Union[int, str, None]) -> str:
         return f"{size_int:.1f}PB"
     except (ValueError, TypeError):
         return "unknown"
+
+
 from app.models.schemas import (
-    StartInterviewRequest,
-    InterviewResponseRequest,
-    InterviewSession,
-    InterviewConfig,
-    Message,
-    ModelsResponse,
-    ModelInfo,
-    HealthResponse,
-    SynthesizeSpeechRequest,
-    SynthesizeSpeechResponse,
     AnalyzeSentimentRequest,
     AnalyzeSentimentResponse,
+    HealthResponse,
+    InterviewConfig,
+    InterviewResponseRequest,
+    InterviewSession,
+    Message,
+    ModelInfo,
+    ModelsResponse,
     SentimentScore,
+    StartInterviewRequest,
+    SynthesizeSpeechRequest,
+    SynthesizeSpeechResponse,
 )
 
 # Configure logging
@@ -65,7 +66,6 @@ logger = logging.getLogger(__name__)
 # Global service discovery
 service_discovery: Optional[ServiceDiscovery] = None
 http_client: Optional[httpx.AsyncClient] = None
-
 
 
 @asynccontextmanager
@@ -96,7 +96,7 @@ async def lifespan(app: FastAPI):
     for name, status in health["services"].items():
         icon = "✅" if status["status"] == "online" else "❌"
         visibility = "(hidden)" if name.startswith("_") else ""
-        latency = f"{status.get('latencyMs', 'N/A')}ms" if status.get('latencyMs') else "N/A"
+        latency = f"{status.get('latencyMs', 'N/A')}ms" if status.get("latencyMs") else "N/A"
         logger.info(f"{icon} {name:30s} {status['status']:10s} {latency:>10s} {visibility}")
 
     logger.info("=" * 70)
@@ -157,7 +157,7 @@ async def health_check() -> HealthResponse:
 
 
 @app.get("/api/v1/system/status")
-async def system_status() -> Dict:
+async def system_status() -> dict:
     """Get comprehensive system status."""
     if not service_discovery:
         raise HTTPException(status_code=503, detail="Service discovery not initialized")
@@ -185,7 +185,7 @@ async def system_status() -> Dict:
 
 
 @app.get("/api/v1/services")
-async def list_services() -> Dict:
+async def list_services() -> dict:
     """
     List all 14 registered OpenTalent microservices.
 
@@ -203,40 +203,44 @@ async def list_services() -> Dict:
                 "port": 8000,
                 "url": health["services"].get("scout-service", {}).get("url", ""),
                 "status": health["services"].get("scout-service", {}).get("status", "unknown"),
-                "description": "Talent sourcing and resume parsing"
+                "description": "Talent sourcing and resume parsing",
             },
             "user-service": {
                 "port": 8001,
                 "url": health["services"].get("user-service", {}).get("url", ""),
                 "status": health["services"].get("user-service", {}).get("status", "unknown"),
-                "description": "User management and authentication"
+                "description": "User management and authentication",
             },
             "candidate-service": {
                 "port": 8006,
                 "url": health["services"].get("candidate-service", {}).get("url", ""),
                 "status": health["services"].get("candidate-service", {}).get("status", "unknown"),
-                "description": "Candidate profile management"
+                "description": "Candidate profile management",
             },
         },
         "ai_services": {
             "conversation-service": {
                 "port": 8002,
                 "url": health["services"].get("conversation-service", {}).get("url", ""),
-                "status": health["services"].get("conversation-service", {}).get("status", "unknown"),
-                "description": "AI conversation and chat management"
+                "status": health["services"]
+                .get("conversation-service", {})
+                .get("status", "unknown"),
+                "description": "AI conversation and chat management",
             },
             "interview-service": {
                 "port": 8005,
                 "url": health["services"].get("interview-service", {}).get("url", ""),
                 "status": health["services"].get("interview-service", {}).get("status", "unknown"),
-                "description": "Interview orchestration and flow control"
+                "description": "Interview orchestration and flow control",
             },
             "_granite-interview-service": {
                 "port": 8005,
                 "url": health["services"].get("_granite-interview-service", {}).get("url", ""),
-                "status": health["services"].get("_granite-interview-service", {}).get("status", "unknown"),
+                "status": health["services"]
+                .get("_granite-interview-service", {})
+                .get("status", "unknown"),
                 "description": "Granite interview with custom training (internal)",
-                "hidden": True
+                "hidden": True,
             },
         },
         "media_services": {
@@ -244,13 +248,13 @@ async def list_services() -> Dict:
                 "port": 8003,
                 "url": health["services"].get("voice-service", {}).get("url", ""),
                 "status": health["services"].get("voice-service", {}).get("status", "unknown"),
-                "description": "Text-to-speech synthesis with Piper"
+                "description": "Text-to-speech synthesis with Piper",
             },
             "avatar-service": {
                 "port": 8004,
                 "url": health["services"].get("avatar-service", {}).get("url", ""),
                 "status": health["services"].get("avatar-service", {}).get("status", "unknown"),
-                "description": "3D avatar rendering with phoneme lip-sync"
+                "description": "3D avatar rendering with phoneme lip-sync",
             },
         },
         "analytics_services": {
@@ -258,19 +262,23 @@ async def list_services() -> Dict:
                 "port": 8007,
                 "url": health["services"].get("analytics-service", {}).get("url", ""),
                 "status": health["services"].get("analytics-service", {}).get("status", "unknown"),
-                "description": "Sentiment analysis and interview metrics"
+                "description": "Sentiment analysis and interview metrics",
             },
             "ai-auditing-service": {
                 "port": 8012,
                 "url": health["services"].get("ai-auditing-service", {}).get("url", ""),
-                "status": health["services"].get("ai-auditing-service", {}).get("status", "unknown"),
-                "description": "AI bias detection and fairness auditing"
+                "status": health["services"]
+                .get("ai-auditing-service", {})
+                .get("status", "unknown"),
+                "description": "AI bias detection and fairness auditing",
             },
             "explainability-service": {
                 "port": 8013,
                 "url": health["services"].get("explainability-service", {}).get("url", ""),
-                "status": health["services"].get("explainability-service", {}).get("status", "unknown"),
-                "description": "AI decision explainability and interpretability"
+                "status": health["services"]
+                .get("explainability-service", {})
+                .get("status", "unknown"),
+                "description": "AI decision explainability and interpretability",
             },
         },
         "infrastructure_services": {
@@ -278,13 +286,15 @@ async def list_services() -> Dict:
                 "port": 8010,
                 "url": health["services"].get("security-service", {}).get("url", ""),
                 "status": health["services"].get("security-service", {}).get("status", "unknown"),
-                "description": "Authentication, encryption, and access control"
+                "description": "Authentication, encryption, and access control",
             },
             "notification-service": {
                 "port": 8011,
                 "url": health["services"].get("notification-service", {}).get("url", ""),
-                "status": health["services"].get("notification-service", {}).get("status", "unknown"),
-                "description": "Email, SMS, and push notifications"
+                "status": health["services"]
+                .get("notification-service", {})
+                .get("status", "unknown"),
+                "description": "Email, SMS, and push notifications",
             },
         },
         "ai_engine": {
@@ -292,17 +302,14 @@ async def list_services() -> Dict:
                 "port": 11434,
                 "url": health["services"].get("ollama", {}).get("url", ""),
                 "status": health["services"].get("ollama", {}).get("status", "unknown"),
-                "description": "Local Granite 4 AI model engine"
+                "description": "Local Granite 4 AI model engine",
             }
-        }
+        },
     }
 
     return {
         "total_services": len(service_discovery.services),
-        "gateway": {
-            "version": "0.1.0",
-            "port": 8009
-        },
+        "gateway": {"version": "0.1.0", "port": 8009},
         "service_registry": service_registry,
         "timestamp": datetime.now().isoformat(),
     }
@@ -345,7 +352,7 @@ async def list_models() -> ModelsResponse:
     Merges models from granite-interview-service and ollama.
     Returns fallback if backends unavailable.
     """
-    models: List[ModelInfo] = []
+    models: list[ModelInfo] = []
 
     if not service_discovery or not http_client:
         logger.warning("Service discovery or HTTP client not initialized")
@@ -355,9 +362,7 @@ async def list_models() -> ModelsResponse:
     try:
         url = await service_discovery.get_service_url("granite-interview-service")
         if url:
-            response = await http_client.get(
-                f"{url}/api/v1/models", timeout=5.0
-            )
+            response = await http_client.get(f"{url}/api/v1/models", timeout=5.0)
             if response.status_code == 200:
                 granite_models = response.json().get("models", [])
                 for model in granite_models:
@@ -408,7 +413,7 @@ async def list_models() -> ModelsResponse:
 
 
 @app.post("/api/v1/models/select")
-async def select_model(model_id: str) -> Dict:
+async def select_model(model_id: str) -> dict:
     """
     Select a specific model for interviews.
 
@@ -448,8 +453,8 @@ async def synthesize_speech(request: SynthesizeSpeechRequest) -> SynthesizeSpeec
                 "text": request.text,
                 "voice": request.voice,
                 "speed": request.speed,
-                "pitch": request.pitch
-            }
+                "pitch": request.pitch,
+            },
         )
         data = response.json()
         return SynthesizeSpeechResponse(
@@ -458,7 +463,7 @@ async def synthesize_speech(request: SynthesizeSpeechRequest) -> SynthesizeSpeec
             duration=data.get("duration"),
             format=data.get("format", "mp3"),
             text=request.text,
-            voice=request.voice
+            voice=request.voice,
         )
     except Exception as e:
         logger.warning(f"Voice synthesis failed: {e}")
@@ -488,10 +493,7 @@ async def analyze_sentiment(request: AnalyzeSentimentRequest) -> AnalyzeSentimen
         if request.context:
             request_payload["context"] = request.context
 
-        response = await http_client.post(
-            f"{url}/api/v1/analyze/sentiment",
-            json=request_payload
-        )
+        response = await http_client.post(f"{url}/api/v1/analyze/sentiment", json=request_payload)
         data = response.json()
 
         # Parse sentiment from response
@@ -500,11 +502,11 @@ async def analyze_sentiment(request: AnalyzeSentimentRequest) -> AnalyzeSentimen
             sentiment=SentimentScore(
                 score=sentiment_data.get("score", 0.0),
                 magnitude=sentiment_data.get("magnitude", 0.0),
-                label=sentiment_data.get("label", "neutral")
+                label=sentiment_data.get("label", "neutral"),
             ),
             text=request.text,
             context=request.context,
-            sentences=data.get("sentences")
+            sentences=data.get("sentences"),
         )
     except Exception as e:
         logger.warning(f"Sentiment analysis failed: {e}")
@@ -517,7 +519,7 @@ async def analyze_sentiment(request: AnalyzeSentimentRequest) -> AnalyzeSentimen
 
 
 @app.post("/api/v1/agents/execute")
-async def execute_agent(payload: Dict) -> Dict:
+async def execute_agent(payload: dict) -> dict:
     """Proxy agent execution to agents-service when enabled."""
     if not settings.enable_agents or not settings.agents_url:
         raise HTTPException(status_code=503, detail="Agents service disabled")
@@ -544,7 +546,9 @@ async def execute_agent(payload: Dict) -> Dict:
             interview_id = payload.get("interview_id")
             answer = payload.get("answer")
             if not interview_id or answer is None:
-                raise HTTPException(status_code=400, detail="interview_id and answer are required for answer")
+                raise HTTPException(
+                    status_code=400, detail="interview_id and answer are required for answer"
+                )
             response = await http_client.post(
                 f"{url}/interviews/{interview_id}/answer",
                 params={"answer": answer},
@@ -557,7 +561,9 @@ async def execute_agent(payload: Dict) -> Dict:
         elif action == "next_question":
             interview_id = payload.get("interview_id")
             if not interview_id:
-                raise HTTPException(status_code=400, detail="interview_id is required for next_question")
+                raise HTTPException(
+                    status_code=400, detail="interview_id is required for next_question"
+                )
             response = await http_client.get(f"{url}/interviews/{interview_id}/next-question")
         else:
             raise HTTPException(status_code=400, detail=f"Unsupported action: {action}")
@@ -576,7 +582,7 @@ async def execute_agent(payload: Dict) -> Dict:
 
 
 @app.post("/api/v1/scout/github")
-async def scout_github(payload: Dict) -> Dict:
+async def scout_github(payload: dict) -> dict:
     """Proxy GitHub talent search to scout-service."""
     if not service_discovery or not http_client:
         raise HTTPException(status_code=503, detail="Service discovery not initialized")
@@ -586,10 +592,7 @@ async def scout_github(payload: Dict) -> Dict:
         raise HTTPException(status_code=503, detail="Scout service unavailable")
 
     try:
-        response = await http_client.post(
-            f"{url}/api/v1/scout/github",
-            json=payload
-        )
+        response = await http_client.post(f"{url}/api/v1/scout/github", json=payload)
 
         if response.status_code != 200:
             raise HTTPException(status_code=response.status_code, detail="GitHub search failed")
@@ -601,7 +604,7 @@ async def scout_github(payload: Dict) -> Dict:
 
 
 @app.post("/api/v1/scout/linkedin")
-async def scout_linkedin(payload: Dict) -> Dict:
+async def scout_linkedin(payload: dict) -> dict:
     """Proxy LinkedIn talent search to scout-service."""
     if not service_discovery or not http_client:
         raise HTTPException(status_code=503, detail="Service discovery not initialized")
@@ -611,10 +614,7 @@ async def scout_linkedin(payload: Dict) -> Dict:
         raise HTTPException(status_code=503, detail="Scout service unavailable")
 
     try:
-        response = await http_client.post(
-            f"{url}/api/v1/scout/linkedin",
-            json=payload
-        )
+        response = await http_client.post(f"{url}/api/v1/scout/linkedin", json=payload)
 
         if response.status_code != 200:
             raise HTTPException(status_code=response.status_code, detail="LinkedIn search failed")
@@ -818,7 +818,7 @@ async def respond_to_interview(request: InterviewResponseRequest) -> InterviewSe
                 sentiment_response = await http_client.post(
                     f"{url}/api/v1/analyze/sentiment",
                     json={"text": request.message, "context": "interview_response"},
-                    timeout=3.0
+                    timeout=3.0,
                 )
                 if sentiment_response.status_code == 200:
                     sentiment_data = sentiment_response.json()
@@ -827,7 +827,7 @@ async def respond_to_interview(request: InterviewResponseRequest) -> InterviewSe
                         "magnitude": sentiment_data.get("intensity", 0.0),
                         "label": sentiment_data.get("emotion", "neutral"),
                         "confidence": sentiment_data.get("confidence", 0.8),
-                        "keywords": sentiment_data.get("keywords", [])
+                        "keywords": sentiment_data.get("keywords", []),
                     }
 
                 # Response quality analysis
@@ -835,9 +835,11 @@ async def respond_to_interview(request: InterviewResponseRequest) -> InterviewSe
                     f"{url}/api/v1/analyze/quality",
                     json={
                         "response_text": request.message,
-                        "question_context": session.messages[-2].content if len(session.messages) >= 2 else ""
+                        "question_context": session.messages[-2].content
+                        if len(session.messages) >= 2
+                        else "",
                     },
-                    timeout=3.0
+                    timeout=3.0,
                 )
                 if quality_response.status_code == 200:
                     quality_data = quality_response.json()
@@ -848,7 +850,7 @@ async def respond_to_interview(request: InterviewResponseRequest) -> InterviewSe
                         "clarity": quality_data.get("clarity", 0.5),
                         "technical_accuracy": quality_data.get("technical_accuracy", 0.5),
                         "strengths": quality_data.get("strengths", []),
-                        "improvements": quality_data.get("improvements", [])
+                        "improvements": quality_data.get("improvements", []),
                     }
 
                 # Store analytics in session (extend session schema later)
@@ -862,11 +864,7 @@ async def respond_to_interview(request: InterviewResponseRequest) -> InterviewSe
 
     # Try to get next question from granite-interview-service
     try:
-        if (
-            service_discovery
-            and http_client
-            and session.currentQuestion < total_questions
-        ):
+        if service_discovery and http_client and session.currentQuestion < total_questions:
             url = await service_discovery.get_service_url("granite-interview-service")
             if url:
                 response = await http_client.post(
@@ -885,9 +883,7 @@ async def respond_to_interview(request: InterviewResponseRequest) -> InterviewSe
                         "next_question",
                         f"Question {session.currentQuestion + 1}: Thank you for that response.",
                     )
-                    session.messages.append(
-                        Message(role="assistant", content=next_question)
-                    )
+                    session.messages.append(Message(role="assistant", content=next_question))
                     session.currentQuestion += 1
 
                     if session.currentQuestion > total_questions:
@@ -904,15 +900,11 @@ async def respond_to_interview(request: InterviewResponseRequest) -> InterviewSe
     if session.currentQuestion > total_questions:
         # Interview complete
         session.isComplete = True
-        next_question = f"Thank you for completing the interview. We appreciate your time!"
+        next_question = "Thank you for completing the interview. We appreciate your time!"
     else:
         # Get next templated question
-        question_idx = min(
-            session.currentQuestion - 1, len(prompts["questions"]) - 1
-        )
-        next_question = (
-            f"Question {session.currentQuestion}: {prompts['questions'][question_idx]}"
-        )
+        question_idx = min(session.currentQuestion - 1, len(prompts["questions"]) - 1)
+        next_question = f"Question {session.currentQuestion}: {prompts['questions'][question_idx]}"
 
     session.messages.append(Message(role="assistant", content=next_question))
 
@@ -920,7 +912,7 @@ async def respond_to_interview(request: InterviewResponseRequest) -> InterviewSe
 
 
 @app.post("/api/v1/interviews/summary")
-async def get_interview_summary(session: InterviewSession) -> Dict:
+async def get_interview_summary(session: InterviewSession) -> dict:
     """
     Get interview summary and assessment.
 
@@ -941,7 +933,7 @@ async def get_interview_summary(session: InterviewSession) -> Dict:
                 analytics_start = message.content.find("[ANALYTICS:")
                 analytics_end = message.content.find("]", analytics_start)
                 if analytics_end > analytics_start:
-                    analytics_json = message.content[analytics_start + 11:analytics_end]
+                    analytics_json = message.content[analytics_start + 11 : analytics_end]
                     analytics_data = json.loads(analytics_json)
 
                     if "sentiment" in analytics_data:
@@ -979,8 +971,12 @@ async def get_interview_summary(session: InterviewSession) -> Dict:
         "analyticsAvailable": len(analytics_results) > 0,
         "averageSentiment": round(avg_sentiment, 2),
         "averageQuality": round(avg_quality, 2),
-        "sentimentTrend": "improving" if len(sentiment_scores) > 1 and sentiment_scores[-1] > sentiment_scores[0] else "stable",
-        "recommendations": recommendations if recommendations else ["Continue developing your technical skills and communication abilities"],
+        "sentimentTrend": "improving"
+        if len(sentiment_scores) > 1 and sentiment_scores[-1] > sentiment_scores[0]
+        else "stable",
+        "recommendations": recommendations
+        if recommendations
+        else ["Continue developing your technical skills and communication abilities"],
         "summary": f"""Interview Complete!
 
 Role: {session.config.role}
@@ -1000,7 +996,7 @@ Thank you for participating in this OpenTalent interview.""",
         summary["detailedAnalytics"] = {
             "sentimentScores": sentiment_scores,
             "qualityScores": quality_scores,
-            "responseCount": len(analytics_results)
+            "responseCount": len(analytics_results),
         }
 
     return summary
@@ -1012,7 +1008,7 @@ Thank you for participating in this OpenTalent interview.""",
 
 
 @app.get("/api/v1/dashboard")
-async def get_dashboard() -> Dict:
+async def get_dashboard() -> dict:
     """
     Get complete dashboard data in one request.
 
@@ -1043,7 +1039,7 @@ async def get_dashboard() -> Dict:
 
 
 @app.get("/")
-async def root() -> Dict:
+async def root() -> dict:
     """Root endpoint with API info."""
     return {
         "service": "OpenTalent Desktop Integration Service",
