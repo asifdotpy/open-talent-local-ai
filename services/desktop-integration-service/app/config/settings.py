@@ -11,7 +11,8 @@ class Settings(BaseSettings):
     # AI & Conversation Services
     granite_interview_url: str = "http://localhost:8005"
     conversation_url: str = "http://localhost:8002"
-    interview_url: str = "http://localhost:8005"
+    interview_url: str = "http://localhost:8014"
+    project_url: str = "http://localhost:8015"
 
     # Voice & Avatar Services
     voice_url: str = "http://localhost:8003"

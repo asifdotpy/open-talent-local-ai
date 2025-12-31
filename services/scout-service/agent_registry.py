@@ -105,6 +105,11 @@ class AgentRegistry:
             "purpose": "Interview orchestration and candidate evaluation",
             "capabilities": ["interview", "evaluation", "assessment"],
         },
+        "genkit-service": {
+            "port": 8098,
+            "purpose": "High-performance LLM orchestration and GenKit-powered generation",
+            "capabilities": ["generation", "llm-calls", "genkit"],
+        },
     }
 
     def __init__(self, host: str = "localhost", agents_path: str | None = None):

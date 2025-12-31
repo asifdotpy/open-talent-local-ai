@@ -45,9 +45,20 @@ readonly NC='\033[0m' # No Color
 # Service definitions
 declare -A SERVICES=(
     ["scout-service"]="8000"
+    ["user-service"]="8001"
+    ["conversation-service"]="8002"
     ["voice-service"]="8003"
+    ["avatar-service"]="8004"
+    ["granite-interview-service"]="8005"
+    ["candidate-service"]="8006"
     ["analytics-service"]="8007"
     ["desktop-integration-service"]="8009"
+    ["security-service"]="8010"
+    ["notification-service"]="8011"
+    ["ai-auditing-service"]="8012"
+    ["explainability-service"]="8013"
+    ["interview-service"]="8014"
+    ["project-service"]="8015"
 )
 
 DESKTOP_PORT="3000"
@@ -104,8 +115,6 @@ check_prerequisites() {
             log_warning "Node.js found in common paths but not in current PATH."
         else
             log_warning "Node.js/NPM not detected in PATH. This may fail if you are not using a version manager like NVM."
-            # Don't exit here if we are in a dev environment that might have it via alias/nvm
-            # But for production-level, we'll keep the warning
         fi
     fi
 
@@ -122,15 +131,11 @@ check_prerequisites() {
 start_microservice() {
     local service_name=$1
     local port=$2
-    local service_dir=""
+    local service_dir="services/$service_name"
 
-    # Find service directory
-    if [ -d "services/$service_name" ]; then
-        service_dir="services/$service_name"
-    elif [ -d "microservices/$service_name" ]; then
-        service_dir="microservices/$service_name"
-    else
-        log_error "Service directory not found for $service_name"
+    # Enforce services/ directory structure
+    if [ ! -d "$service_dir" ]; then
+        log_error "Service directory not found for $service_name at $service_dir"
         return 1
     fi
 
@@ -295,7 +300,6 @@ cmd_stop() {
     fi
 
     local stopped=0
-    local failed=0
 
     while IFS=':' read -r service_name pid port; do
         if [ -z "$pid" ]; then

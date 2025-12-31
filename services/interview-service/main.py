@@ -2122,5 +2122,5 @@ if __name__ == "__main__":
     import uvicorn
 
     port = int(os.environ.get("PORT", 8004))
-    host = os.environ.get("HOST", "127.0.0.1")
-    uvicorn.run(app, host=host, port=port)
+    port = int(os.environ.get("PORT", 8014))
+    uvicorn.run(app, host="0.0.0.0", port=port)

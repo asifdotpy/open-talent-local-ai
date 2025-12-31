@@ -46,7 +46,9 @@ cd open-talent
 ```
 
 ### Management Commands
+
 Our unified management script handles the entire lifecycle:
+
 - `./manage.sh start` - Start all microservices and the desktop app
 - `./manage.sh stop` - Gracefully stop all components
 - `./manage.sh status` - Check the health and PIDs of active services
@@ -58,9 +60,9 @@ Our unified management script handles the entire lifecycle:
 
 OpenTalent uses a decoupled microservices architecture coordinated via a **Desktop Integration Gateway**:
 
-1.  **Frontend**: React-based Electron application.
-2.  **Gateway**: Unified proxy for all microservices.
-3.  **Services**:
+1. **Frontend**: React-based Electron application.
+2. **Gateway**: Unified proxy for all microservices.
+3. **Services**:
     - `scout-service`: GitHub/LinkedIn talent sourcing.
     - `voice-service`: Local STT/TTS processing.
     - `analytics-service`: Interview and quality metrics.
@@ -80,6 +82,7 @@ OpenTalent uses a decoupled microservices architecture coordinated via a **Deskt
 ## 🛡️ Security & Privacy
 
 OpenTalent is built on the principle that **hiring data is sensitive**.
+
 - ❌ No cloud API keys required.
 - ❌ No telemetry or tracking.
 - ❌ No external LLM costs.
