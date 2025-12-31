@@ -53,6 +53,15 @@ const Icons = {
             <path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587.26 1.24.43 1.922.43 1.104 0 2.19-.388 3.124-1.086.49.37 1.17.645 1.98.645.867-.001 1.715-.333 2.25-.812.425.253.88.42 1.35.456.416.031.82-.062 1.158-.255.67-.382.767-1.156.73-1.873a.84.84 0 01-.003-.081c.31-.424.531-.945.531-1.516 0-.334-.055-.665-.225-.96a8.7 8.7 0 00-.45-.788c-.1-.164-.2-.31-.27-.466a2.76 2.76 0 01-.117-.35c-.148-.628-.14-1.26.025-1.886.048-.184.103-.368.175-.555.181-.49.374-.99.416-1.55.043-.553-.056-1.12-.309-1.64a8.69 8.69 0 00-.728-1.199c-.437-.57-.958-1.095-1.399-1.67-.324-.42-.646-.976-.711-1.514-.027-.234-.003-.475.068-.69.014-.058.032-.114.053-.169.063-.164.134-.213.146-.223-.114-.033-.243-.067-.333-.112a.586.586 0 01-.126-.072 1.41 1.41 0 00-.228-.085c-.1-.026-.203-.048-.308-.048a2.89 2.89 0 00-.3 0 2.34 2.34 0 00-.25.032 2.97 2.97 0 00-.326.082c-.108.034-.217.077-.324.121a4.31 4.31 0 00-.27.117c-.078.038-.161.072-.24.11-.141.073-.284.147-.422.229" />
         </svg>
     ),
+    Logo: ({ className = "w-8 h-8" }) => (
+        <svg className={className} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Magnifying glass shape */}
+            <circle cx="45" cy="45" r="28" stroke="currentColor" strokeWidth="10" />
+            <line x1="65" y1="65" x2="85" y2="85" stroke="currentColor" strokeWidth="10" strokeLinecap="round" />
+            {/* The 'T' for Talent inside */}
+            <path d="M 35,35 H 55 M 45,35 V 60" stroke="#06b6d4" strokeWidth="10" strokeLinecap="round" />
+        </svg>
+    ),
 }
 
 // GitHub and Download URLs
@@ -73,7 +82,7 @@ function App() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
                         <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg"></div>
+                            <Icons.Logo className="w-10 h-10 text-primary-500" />
                             <span className="text-xl font-bold">OpenTalent</span>
                         </div>
                         <div className="hidden md:flex items-center space-x-8">
@@ -356,7 +365,7 @@ function App() {
             <footer className="py-12 px-4 border-t border-slate-800">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg"></div>
+                        <Icons.Logo className="w-8 h-8 text-primary-500" />
                         <span className="text-xl font-bold">OpenTalent</span>
                     </div>
                     <div className="flex items-center gap-6 text-slate-400">
