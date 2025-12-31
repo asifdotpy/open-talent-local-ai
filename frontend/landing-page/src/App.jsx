@@ -162,7 +162,7 @@ function App() {
                         <div className="text-slate-400 mt-2">Local Privacy</div>
                     </div>
                     <div>
-                        <div className="text-4xl font-bold gradient-text">14</div>
+                        <div className="text-4xl font-bold gradient-text">15</div>
                         <div className="text-slate-400 mt-2">Microservices</div>
                     </div>
                 </div>
