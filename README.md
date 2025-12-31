@@ -1,11 +1,11 @@
 # OpenTalent: Privacy-First AI Recruitment 🚀
 
-[![Release](https://img.shields.io/badge/release-v1.0.0--release-brightgreen.svg)](https://github.com/asifdotpy/open-talent-local-ai/releases/tag/v1.0.0-release)
+[![Release](https://img.shields.io/badge/release-v1.1.0-brightgreen.svg)](https://github.com/asifdotpy/open-talent-local-ai/releases/tag/v1.1.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Local AI](https://img.shields.io/badge/AI-100%25%20Local-orange.svg)](#)
 [![Privacy First](https://img.shields.io/badge/Privacy-First-blueviolet.svg)](#)
 
-OpenTalent is a state-of-the-art, desktop-first recruitment platform that leverages **local AI** to find, evaluate, and track technical talent. No data leaves your machine, no cloud subscriptions required, and complete privacy for your hiring process.
+OpenTalent is a state-of-the-art, desktop-first recruitment platform that leverages **local AI** to find, evaluate, and track technical talent. Featuring the new **TalentScout Pro** interface, it offers a seamless, privacy-first experience where no data leaves your machine.
 
 ---
 

@@ -300,57 +300,40 @@ function RecruiterAppContent() {
         <div className="recruiter-app">
             <header className="header">
                 <div className="logo">
-                    <h1>🎯 OpenTalent Recruiter</h1>
-                    <p className="tagline">AI-Powered Candidate Discovery</p>
+                    <h1>TalentScout Pro</h1>
                 </div>
-                <div className="status">
-                    <button
-                        className="btn-settings-toggle"
-                        onClick={() => setIsSettingsOpen(true)}
-                        title="Platform Settings"
-                    >
-                        ⚙️
-                    </button>
+                <div className="status" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     <span className={`status-indicator ${Object.values(agentHealth).every(h => h === 'healthy') ? 'online' :
                         Object.values(agentHealth).some(h => h === 'healthy') ? 'warning' : 'offline'
                         }`}>
                         {Object.values(agentHealth).filter(h => h === 'healthy').length} / {Object.keys(agentHealth).length} Agents Online
                     </span>
+                    <button
+                        className="btn-settings-toggle"
+                        onClick={() => setIsSettingsOpen(true)}
+                        style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}
+                    >
+                        ⚙️
+                    </button>
                 </div>
             </header>
 
-            <main className="main-content">
-                <SearchPrompt onSearch={handleSearch} isSearching={isSearching} />
-                <ProgressPanel pipeline={pipeline} agentHealth={agentHealth} />
+            <main className="main-content" style={{ display: 'flex', flexDirection: 'column', gap: '24px', padding: '32px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
+                    <SearchPrompt onSearch={handleSearch} isSearching={isSearching} />
+                    <ProgressPanel pipeline={pipeline} agentHealth={agentHealth} />
+                </div>
+
                 {candidates.length > 0 && (
-                    <CandidateResults
-                        candidates={candidates}
-                        onEnrichClick={async (candidate) => {
-                            if (!candidate.linkedin_url) {
-                                addToast('No LinkedIn URL found for enrichment', 'warning');
-                                return;
-                            }
-                            addToast(`Enriching contact info for ${candidate.name}...`, 'info');
-                            try {
-                                const enriched = await enrichmentClient.enrichCandidate(candidate.id, candidate.linkedin_url);
-                                if (enriched.email || enriched.phone) {
-                                    setCandidates(prev => prev.map(c =>
-                                        c.id === candidate.id ? { ...c, bio: `${c.bio}\n\n[Enriched info from ${enriched.source}]\nEmail: ${enriched.email}\nPhone: ${enriched.phone}` } : c
-                                    ));
-                                    addToast(`Enrichment successful for ${candidate.name}!`, 'success');
-                                } else {
-                                    addToast('No new contact info found.', 'info');
-                                }
-                            } catch (error) {
-                                addToast('Enrichment failed. Check your API keys.', 'error');
-                            }
-                        }}
-                        onOutreachClick={(candidate) => setOutreachCandidate(candidate)}
-                        onInterviewClick={(candidate) => {
-                            console.log('Schedule interview for:', candidate);
-                            addToast(`Interview invitation sent to ${candidate.name}`, 'info');
-                        }}
-                    />
+                    <div style={{ background: 'white', borderRadius: '12px', padding: '24px', border: '1px solid #e5e7eb' }}>
+                        <CandidateResults
+                            candidates={candidates}
+                            onInterviewClick={(candidate) => {
+                                console.log('Schedule interview for:', candidate);
+                                addToast(`Interview invitation sent to ${candidate.name}`, 'info');
+                            }}
+                        />
+                    </div>
                 )}
             </main>
 

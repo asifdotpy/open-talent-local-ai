@@ -104,7 +104,12 @@ export function CandidateResults({ candidates, onInterviewClick, onOutreachClick
                                 )}
 
                                 <div className="candidate-info">
-                                    <h3>{candidate.name}</h3>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                                        <h3>{candidate.name}</h3>
+                                        <div className={`score-badge ${getScoreColor(candidate.score)}`}>
+                                            {candidate.score}/100
+                                        </div>
+                                    </div>
                                     {candidate.headline && (
                                         <p className="headline">{candidate.headline}</p>
                                     )}
@@ -112,109 +117,39 @@ export function CandidateResults({ candidates, onInterviewClick, onOutreachClick
                                         <p className="location">📍 {candidate.location}</p>
                                     )}
                                 </div>
-
-                                <div className={`score-badge ${getScoreColor(candidate.score)}`}>
-                                    {candidate.score}
-                                </div>
                             </div>
 
-                            {candidate.bio && (
-                                <p className="bio">{candidate.bio.substring(0, 150)}...</p>
-                            )}
-
-                            {candidate.skills && candidate.skills.length > 0 && (
-                                <div className="skills">
-                                    {candidate.skills.slice(0, 5).map((skill, idx) => (
-                                        <span key={idx} className="skill-tag">
-                                            {skill}
-                                        </span>
-                                    ))}
-                                    {candidate.skills.length > 5 && (
-                                        <span className="skill-tag more">
-                                            +{candidate.skills.length - 5} more
-                                        </span>
-                                    )}
-                                </div>
-                            )}
+                            <div className="skills">
+                                {candidate.skills && candidate.skills.slice(0, 4).map((skill, idx) => (
+                                    <span key={idx} className="skill-tag">
+                                        {skill}
+                                    </span>
+                                ))}
+                                {candidate.skills && candidate.skills.length > 4 && (
+                                    <span className="skill-tag more">+{candidate.skills.length - 4}</span>
+                                )}
+                            </div>
 
                             <div className="social-links">
                                 {candidate.github_url && (
-                                    <a
-                                        href={candidate.github_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="social-link github"
-                                        title="GitHub Profile"
-                                    >
-                                        <span>⭐</span>
-                                        {candidate.github_stars && (
-                                            <span className="stat">{candidate.github_stars}</span>
-                                        )}
+                                    <a href={candidate.github_url} target="_blank" rel="noopener noreferrer" className="social-link github" title="GitHub">
+                                        <span>Git</span>
                                     </a>
                                 )}
                                 {candidate.linkedin_url && (
-                                    <a
-                                        href={candidate.linkedin_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="social-link linkedin"
-                                        title="LinkedIn Profile"
-                                    >
-                                        in
-                                    </a>
-                                )}
-                                {candidate.stackoverflow_url && (
-                                    <a
-                                        href={candidate.stackoverflow_url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="social-link stackoverflow"
-                                        title="Stack Overflow Profile"
-                                    >
-                                        <span>SO</span>
-                                        {candidate.stackoverflow_reputation && (
-                                            <span className="stat">
-                                                {candidate.stackoverflow_reputation.toLocaleString()}
-                                            </span>
-                                        )}
+                                    <a href={candidate.linkedin_url} target="_blank" rel="noopener noreferrer" className="social-link linkedin" title="LinkedIn">
+                                        <span>in</span>
                                     </a>
                                 )}
                             </div>
 
-                            <div className="card-actions">
+                            <div className="card-actions" style={{ marginTop: 'auto' }}>
                                 <button
-                                    onClick={() => setSelectedCandidate(candidate)}
-                                    className="btn-view"
+                                    onClick={() => onInterviewClick?.(candidate)}
+                                    className="btn-interview"
                                 >
-                                    View Details
+                                    Interview
                                 </button>
-                                {onEnrichClick && (
-                                    <button
-                                        onClick={() => onEnrichClick(candidate)}
-                                        className="btn-view"
-                                        style={{ backgroundColor: '#f0f9ff', color: '#0369a1', borderColor: '#bae6fd' }}
-                                        title="Find contact info via ContactOut/SalesQL"
-                                    >
-                                        Enrich
-                                    </button>
-                                )}
-                                {onOutreachClick && (
-                                    <button
-                                        onClick={() => onOutreachClick(candidate)}
-                                        className="btn-view"
-                                        style={{ backgroundColor: '#e0f2fe', color: '#0369a1' }}
-                                    >
-                                        Outreach
-                                    </button>
-                                )}
-                                {onInterviewClick && (
-                                    <button
-                                        onClick={() => onInterviewClick(candidate)}
-                                        className="btn-interview"
-                                    >
-                                        Schedule Interview
-                                    </button>
-                                )}
                             </div>
                         </div>
                     ))}

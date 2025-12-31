@@ -45,107 +45,89 @@ export function SearchPrompt({ onSearch, isSearching }: SearchPromptProps) {
 
     return (
         <div className="search-prompt">
-            <h2>🔍 Find Your Next Hire</h2>
-
-            <textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Describe the candidate you're looking for... (e.g., 'Senior React developer in NYC with 5+ years experience in fintech')"
-                rows={4}
-                disabled={isSearching}
-                className="prompt-textarea"
-            />
-
-            <div className="tool-selection">
-                <h4>Search Tools</h4>
-
-                <div className="tools-grid">
-                    <label className="tool-checkbox">
-                        <input
-                            type="checkbox"
-                            checked={selectedTools.github}
-                            onChange={() => toggleTool('github')}
-                            disabled={isSearching}
-                        />
-                        <span className="tool-name">
-                            GitHub <span className="badge free">Free</span>
-                        </span>
-                        <span className="tool-desc">500M+ developer profiles</span>
-                    </label>
-
-                    <label className="tool-checkbox">
-                        <input
-                            type="checkbox"
-                            checked={selectedTools.stackoverflow}
-                            onChange={() => toggleTool('stackoverflow')}
-                            disabled={isSearching}
-                        />
-                        <span className="tool-name">
-                            Stack Overflow <span className="badge free">Free</span>
-                        </span>
-                        <span className="tool-desc">20M+ technical profiles</span>
-                    </label>
-
-                    <label className="tool-checkbox">
-                        <input
-                            type="checkbox"
-                            checked={selectedTools.googleXray}
-                            onChange={() => toggleTool('googleXray')}
-                            disabled={isSearching}
-                        />
-                        <span className="tool-name">
-                            Google X-Ray <span className="badge free">Free</span>
-                        </span>
-                        <span className="tool-desc">Public LinkedIn search</span>
-                    </label>
-
-                    <label className="tool-checkbox">
-                        <input
-                            type="checkbox"
-                            checked={selectedTools.contactout}
-                            onChange={() => toggleTool('contactout')}
-                            disabled={isSearching}
-                        />
-                        <span className="tool-name">
-                            ContactOut <span className="badge paid">$0.04/profile</span>
-                        </span>
-                        <span className="tool-desc">800M+ verified contacts</span>
-                    </label>
-
-                    <label className="tool-checkbox">
-                        <input
-                            type="checkbox"
-                            checked={selectedTools.salesql}
-                            onChange={() => toggleTool('salesql')}
-                            disabled={isSearching}
-                        />
-                        <span className="tool-name">
-                            SalesQL <span className="badge paid">$0.02/profile</span>
-                        </span>
-                        <span className="tool-desc">500M+ B2B contacts</span>
-                    </label>
-                </div>
+            <div className="prompt-container">
+                <textarea
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    placeholder="Describe the candidate you're looking for..."
+                    disabled={isSearching}
+                    className="prompt-textarea"
+                />
+                <button
+                    onClick={handleSearch}
+                    disabled={isSearching || !prompt.trim()}
+                    className="search-icon-btn"
+                    title="Search"
+                >
+                    {isSearching ? '⏳' : '🔍'}
+                </button>
             </div>
 
-            <button
-                onClick={handleSearch}
-                disabled={isSearching || !prompt.trim()}
-                className={`search-btn ${isSearching ? 'loading' : ''}`}
-            >
-                {isSearching ? (
-                    <>
-                        <span className="spinner">⏳</span> Searching...
-                    </>
-                ) : (
-                    <>
-                        <span className="icon">🚀</span> Search Candidates
-                    </>
-                )}
-            </button>
+            <div className="tools-and-action">
+                <div className="tool-selection">
+                    <h4>Source Tools</h4>
+                    <div className="tools-row">
+                        <label className={`tool-checkbox ${selectedTools.github ? 'active' : ''}`}>
+                            <input
+                                type="checkbox"
+                                checked={selectedTools.github}
+                                onChange={() => toggleTool('github')}
+                                disabled={isSearching}
+                            />
+                            GitHub (Free)
+                        </label>
+                        <label className={`tool-checkbox ${selectedTools.stackoverflow ? 'active' : ''}`}>
+                            <input
+                                type="checkbox"
+                                checked={selectedTools.stackoverflow}
+                                onChange={() => toggleTool('stackoverflow')}
+                                disabled={isSearching}
+                            />
+                            Stack Overflow (Free)
+                        </label>
+                        <label className={`tool-checkbox ${selectedTools.googleXray ? 'active' : ''}`}>
+                            <input
+                                type="checkbox"
+                                checked={selectedTools.googleXray}
+                                onChange={() => toggleTool('googleXray')}
+                                disabled={isSearching}
+                            />
+                            Google X-Ray (Free)
+                        </label>
+                        <label className={`tool-checkbox ${selectedTools.contactout ? 'active' : ''}`}>
+                            <input
+                                type="checkbox"
+                                checked={selectedTools.contactout}
+                                onChange={() => toggleTool('contactout')}
+                                disabled={isSearching}
+                            />
+                            ContactOut (Paid)
+                        </label>
+                        <label className={`tool-checkbox ${selectedTools.salesql ? 'active' : ''}`}>
+                            <input
+                                type="checkbox"
+                                checked={selectedTools.salesql}
+                                onChange={() => toggleTool('salesql')}
+                                disabled={isSearching}
+                            />
+                            SalesQL (Paid)
+                        </label>
+                    </div>
+                </div>
+
+                <button
+                    onClick={handleSearch}
+                    disabled={isSearching || !prompt.trim()}
+                    className="search-btn-large"
+                >
+                    {isSearching ? 'Searching...' : 'Search Candidates'}
+                </button>
+            </div>
 
             {isSearching && (
                 <div className="search-info">
-                    <p>🔎 Your search is running in the background. Results will appear below.</p>
+                    <span>🔍</span>
+                    <span>Scanning for candidates across selected platforms...</span>
                 </div>
             )}
         </div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 
 interface Activity {
     timestamp: string;
@@ -23,119 +23,76 @@ interface ProgressPanelProps {
     agentHealth: AgentHealth;
 }
 
-const statusLabels = {
-    pending: 'Pending',
-    scanning: 'Scanning for Candidates',
-    enriching: 'Enriching Profiles',
-    scoring: 'Scoring Candidates',
-    completed: 'Completed',
+const statusLabels: Record<string, string> = {
+    pending: 'Ready to Start',
+    scanning: 'Scanning',
+    enriching: 'Enriching',
+    scoring: 'Scoring',
+    completed: 'Finished',
     failed: 'Failed'
-};
-
-const statusEmoji = {
-    pending: '⏳',
-    scanning: '🔍',
-    enriching: '📊',
-    scoring: '⭐',
-    completed: '✅',
-    failed: '❌'
 };
 
 export function ProgressPanel({ pipeline, agentHealth }: ProgressPanelProps) {
     if (!pipeline) {
         return (
             <div className="progress-panel">
+                <h3>Pipeline Status</h3>
                 <div className="no-search">
-                    <p>💡 Enter a job description above to start searching for candidates</p>
+                    <p>Start a search to see progress</p>
                 </div>
             </div>
         );
     }
 
     const { status, progress, activities } = pipeline;
+    const progressDeg = (progress / 100) * 360;
 
     return (
         <div className="progress-panel">
-            <h3>Search Progress</h3>
+            <h3>Pipeline Status</h3>
 
-            <div className="status-indicator">
-                <span className="status-emoji">{statusEmoji[status]}</span>
-                <span className={`status-text status-${status}`}>
-                    {statusLabels[status]}
-                </span>
-            </div>
-
-            <div className="progress-bar-container">
-                <div className="progress-bar">
-                    <div
-                        className={`progress-fill progress-${status}`}
-                        style={{ width: `${progress}%` }}
-                    />
-                </div>
-                <span className="progress-percentage">{progress}%</span>
-            </div>
-
-            {/* Outreach Progress Tracker */}
-            {(pipeline.status === 'enriching' || pipeline.status === 'completed') && (
-                <div className="enrichment-stats">
-                    <h3>📢 Engagement Progress</h3>
-                    <div className="stat-grid">
-                        <div className="stat-item">
-                            <span className="stat-label">Outreach Sent</span>
-                            <span className="stat-value">0</span>
-                        </div>
-                        <div className="stat-item">
-                            <span className="stat-label">Response Rate</span>
-                            <span className="stat-value">0%</span>
-                        </div>
+            <div className="circular-progress-container">
+                <div
+                    className="circular-progress"
+                    style={{ '--progress': `${progressDeg}deg` } as any}
+                >
+                    <div className="circular-progress-inner">
+                        <span className="progress-value">{progress}%</span>
+                        <span className="progress-status-label">{statusLabels[status]}</span>
                     </div>
                 </div>
-            )}
+            </div>
 
-            <div className="activity-feed">
+            <div className="linear-progress-mini">
+                <div className="linear-progress-fill" style={{ width: `${progress}%` }} />
+            </div>
+
+            <div className="activity-feed-section">
                 <h4>Recent Activity</h4>
-                {activities.length === 0 ? (
-                    <p className="no-activities">No activities yet</p>
-                ) : (
-                    <div className="activities-list">
-                        {activities.slice(-5).reverse().map((activity, i) => (
+                <div className="activities-list">
+                    {activities.length === 0 ? (
+                        <p className="no-activities">Waiting for activity...</p>
+                    ) : (
+                        activities.slice(-3).reverse().map((activity, i) => (
                             <div key={i} className={`activity-item activity-${activity.type}`}>
-                                <span className="activity-time">{activity.timestamp}</span>
-                                <span className="activity-icon">{activity.icon}</span>
+                                <span className="activity-icon">{activity.icon === '📡' ? '🔵' : activity.icon === '🚀' ? '🟢' : activity.icon}</span>
                                 <span className="activity-message">{activity.message}</span>
                             </div>
-                        ))}
-                    </div>
-                )}
+                        ))
+                    )}
+                </div>
             </div>
 
-            <div className="agent-health">
+            <div className="agent-health" style={{ marginTop: '20px' }}>
                 <h4>Agent Status</h4>
                 <div className="agents-grid">
-                    {Object.entries(agentHealth).map(([name, health]) => (
-                        <div key={name} className={`agent-item agent-${health}`}>
-                            <span className="agent-name">{formatAgentName(name)}</span>
-                            <span className="agent-health-indicator">
-                                {health === 'healthy' ? '✅' :
-                                    health === 'unhealthy' ? '⚠️' :
-                                        health === 'unreachable' ? '🔴' : '⚪'}
-                            </span>
+                    {Object.entries(agentHealth).slice(0, 3).map(([name, health]) => (
+                        <div key={name} className={`agent-item agent-${health}`} style={{ padding: '6px 10px' }}>
+                            <span className="agent-name" style={{ fontSize: '12px' }}>{formatAgentName(name)}</span>
                         </div>
                     ))}
                 </div>
             </div>
-
-            {status === 'failed' && (
-                <div className="error-message">
-                    <p>❌ Search failed. Please try again or adjust your search criteria.</p>
-                </div>
-            )}
-
-            {status === 'completed' && (
-                <div className="success-message">
-                    <p>🎉 Search completed! Check candidates below.</p>
-                </div>
-            )}
         </div>
     );
 }

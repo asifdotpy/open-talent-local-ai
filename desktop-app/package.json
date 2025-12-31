@@ -1,6 +1,6 @@
 {
   "name": "opentalent-desktop",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "description": "OpenTalent - Local AI Interview Platform",
   "author": "OpenTalent Contributors",
   "main": "dist/main/main.js",
