@@ -34,18 +34,17 @@ open http://localhost:3000
 - **Privacy-First**: Everything runs locally - no cloud dependencies
 - **Rich Insights**: Comprehensive candidate assessment with detailed metrics
 
-### Demo Flow
+---
 
-1. **Start**: `./start-demo.sh` (2-3 minutes setup)
-2. **Interview**: Enter "test-001" → Select "Frontend" → Start Interview
-3. **Results**: View enhanced analytics dashboard with charts and recommendations
-4. **Stop**: `./stop-demo.sh`
+## ⚠️ Current Project Status: Week 4 Development
 
-### Documentation
+The project is currently in **Week 4** of the desktop application development, focusing on **Outreach Automation, Enrichment, and Progress Tracking**.
 
-- **[DEMO_ENVIRONMENT_GUIDE.md](DEMO_ENVIRONMENT_GUIDE.md)**: Complete setup and troubleshooting guide
-- **[DEMO_QUICK_REFERENCE.md](DEMO_QUICK_REFERENCE.md)**: Quick commands and demo script
-- **[INTERVIEW_RESULTS_ENHANCEMENT_PLAN.md](INTERVIEW_RESULTS_ENHANCEMENT_PLAN.md)**: Technical implementation details
+| Feature Set | Status | Notes |
+| :--- | :--- | :--- |
+| **Local AI Core** | **Complete** | Ollama, Granite 4, Piper TTS architecture is defined and services are being integrated. |
+| **Desktop App UI** | **In Progress** | Core UI components for Week 4 features (Outreach, Enrichment, Progress Panel) are implemented in the `desktop-app/src/renderer` directory. |
+| **Integration** | **Blocked** | The desktop application is currently blocked by several TypeScript compilation and test failures (see **SETUP_GUIDE.md** for details). |
 
 ---
 
@@ -70,65 +69,20 @@ open http://localhost:3000
 - Model store under `~/OpenTalent/models/` with Granite and Piper artifacts; caches for conversations, audio, and avatars.
 - Security posture: zero cloud dependencies, no key storage, local logs only (see [SECURITY_AND_CODE_QUALITY_CHECKLIST.md](SECURITY_AND_CODE_QUALITY_CHECKLIST.md)).
 
-## Repo layout (high level)
+## 🛠️ Getting Started (Developer Setup)
 
-- [AGENTS.md](AGENTS.md): Architecture overview and current phase plan.
-- [LOCAL_AI_ARCHITECTURE.md](LOCAL_AI_ARCHITECTURE.md): Detailed local AI spec.
-- [CONTRIBUTING.md](CONTRIBUTING.md): Dev standards and workflow.
-- [specs/](specs): Architectural specs, API contracts, requirements.
-- [services/](services): Conversation, voice, avatar, and interview services (offline-focused).
-- [desktop-app/](desktop-app): Electron app scaffolding (planned/under construction).
+For a complete, step-by-step guide on setting up the development environment, installing dependencies, and running tests on a fresh machine, please refer to the dedicated setup guide:
 
-## Avatar Service — Finalized (December 17, 2025)
+➡️ **[SETUP_GUIDE.md](SETUP_GUIDE.md)**
 
-- **Status:** Duplicates resolved, `avatar_v1` exposed under `/api/v1/avatars`, OpenAPI verified.
-- **Core endpoints:** `/`, `/ping`, `/health`, `/api/v1/voices` (GET), `/api/v1/generate-voice` (POST), `/render/lipsync` (POST).
-- **Avatar V1 suite:** Rendering, lipsync, presets, config, performance, state/emotions, assets/models, sessions, voice attach/detach.
-- **Docs:**
-  - [services/avatar-service/ENDPOINT_SPECIFICATION.md](services/avatar-service/ENDPOINT_SPECIFICATION.md)
-  - [services/avatar-service/API_ENDPOINTS_STATUS.md](services/avatar-service/API_ENDPOINTS_STATUS.md)
-  - [services/avatar-service/API_COMPLETE_SUMMARY.md](services/avatar-service/API_COMPLETE_SUMMARY.md)
+### Quick Manual Setup
 
-Quick verify:
+1.  **Clone:** `git clone https://github.com/asifdotpy/open-talent-local-ai.git open-talent`
+2.  **Install Node Deps:** `cd open-talent/desktop-app && npm install --legacy-peer-deps`
+3.  **Install Python Deps:** `cd .. && source .venv/bin/activate && pip install -r requirements.txt`
+4.  **Run:** `./start-demo.sh`
 
-```bash
-curl -s http://127.0.0.1:8001/openapi.json | jq -r '.paths | keys[]'
-curl -s http://127.0.0.1:8001/openapi.json | jq -r '.paths | keys[] | select(startswith("/api/v1/avatars"))'
-```
-
-## Hardware guidance
-
-- Granite-350M: 2-4GB RAM (minimal), ~400MB download, fastest.
-- Granite-2B: 8-12GB RAM (balanced), ~1.2GB download.
-- Granite-8B: 16-32GB RAM (maximum quality), ~4.5GB download.
-
-## Getting started (dev)
-
-### Demo Environment (Recommended)
-
-For the best experience, use the automated demo environment:
-
-```bash
-./start-demo.sh  # Start all services
-# Access: http://localhost:3000
-./stop-demo.sh   # Stop all services
-```
-
-### Manual Development Setup
-
-1) Prereqs: Node 20+, Python 3.12+, Git, `ollama` (optional for local testing), `piper` binary (optional).
-2) Install deps:
-
-```bash
-npm install
-pip install -r requirements.txt
-```
-
-3) Run dev environment (placeholder commands; desktop app wiring in progress):
-
-```bash
-npm run dev
-```
+---
 
 ## Roadmap (abridged)
 
@@ -144,8 +98,3 @@ npm run dev
 - No cloud telemetry or external API calls.
 - Local logs and caches under `~/OpenTalent/` with optional purge/export.
 - Automated security checks documented in [SECURITY_AND_CODE_QUALITY_CHECKLIST.md](SECURITY_AND_CODE_QUALITY_CHECKLIST.md) and [SECURITY_QUICK_START.md](SECURITY_QUICK_START.md).
-
-## Contact / support
-
-- Issues and discussions: use the GitHub repo once created (private for now).
-- Branding note: unrelated to the HR firm "Open Talent" on LinkedIn; this project focuses on an offline AI interview desktop app.
