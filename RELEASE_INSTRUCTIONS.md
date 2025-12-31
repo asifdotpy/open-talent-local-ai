@@ -19,10 +19,10 @@ You are tasked with finalizing the **OpenTalent** local-AI interview platform fo
 
 | Phase | Duration | Objective | Critical Actions |
 | :--- | :--- | :--- | :--- |
-| **Phase 1: Desktop Stabilization** | 12 Hours | Resolve all compilation and test blockers in `desktop-app`. | 1. Create missing `cn` utility in `src/lib/utils.ts`. <br> 2. Fix `PipelineConfig` snake_case mismatch in `scoutCoordinatorClient.test.ts`. <br> 3. Polyfill `AbortSignal.timeout` for Node.js compatibility in `jobDescriptionParser.ts`. |
-| **Phase 2: Backend Hardening** | 18 Hours | Implement missing Pydantic schemas and fix gateway routing. | 1. Implement full `schemas.py` for **Security** and **Notification** services. <br> 2. Register **Scout Service** in `desktop-integration-service/app/core/service_discovery.py`. <br> 3. Correct **Candidate Service** port from 8008 to 8006 in gateway settings. |
+| **Phase 1: Desktop Stabilization** | 12 Hours | **COMPLETED** (Final compilation check pending). | 1. Final compilation check (`tsc --noEmit`). |
+| **Phase 2: Backend Hardening** | 18 Hours | **COMPLETED** (All schemas implemented and gateway config fixed). | 1. No remaining actions. |
 | **Phase 3: Feature Exposure** | 12 Hours | Expose high-value endpoints via the API Gateway. | 1. Add gateway routes for Scout Service search (GitHub/LinkedIn). <br> 2. Add gateway routes for Voice Service TTS/STT streaming. <br> 3. Verify end-to-end flow from Desktop UI to Microservices. |
-| **Phase 4: Release Verification** | 6 Hours | Run automated verification and package for release. | 1. Execute `verify-release.sh` (see below). <br> 2. Update `CHANGELOG.md` to `1.0.0-release`. <br> 3. Tag the repository and prepare the release branch. |
+| **Phase 4: Release Verification** | 6 Hours | Run automated verification and package for release. | 1. Create and execute `verify-release.sh` (see below). <br> 2. Tag the repository and prepare the release branch. |
 
 ---
 
@@ -47,15 +47,13 @@ echo "[2/4] Running Desktop App Tests..."
 if [ $? -eq 0 ]; then echo "✅ Desktop Tests Passed"; else echo "❌ Desktop Tests Failed"; exit 1; fi
 
 # 3. Backend Gateway Health
-echo "[3/4] Verifying API Gateway & Service Discovery..."
-cd ../microservices/desktop-integration-service
-# Mock check for service registration
+echo "[3/4] Verifying API Gateway & Service Discovery.cd ../services/desktop-integration-service# Mock check for service registration
 grep -q "scout-service" app/core/service_discovery.py
 if [ $? -eq 0 ]; then echo "✅ Scout Service Registered"; else echo "❌ Scout Service Missing in Gateway"; exit 1; fi
 
 # 4. Schema Verification
 echo "[4/4] Verifying Critical Service Schemas..."
-cd ../security-service
+cd ../services/security-service
 if [ -f "app/schemas.py" ]; then echo "✅ Security Schemas Found"; else echo "❌ Security Schemas Missing"; exit 1; fi
 
 echo "🚀 ALL SYSTEMS GO: OpenTalent is ready for release!"
