@@ -19,7 +19,15 @@ cd "$SCRIPT_DIR"
 
 LOG_DIR="$SCRIPT_DIR/logs"
 PID_FILE="$SCRIPT_DIR/.opentalent.pids"
-VENV_PATH="$SCRIPT_DIR/.venv"
+
+# Detect correct virtual environment
+if [ -d "$SCRIPT_DIR/.venv-1" ] && [ -f "$SCRIPT_DIR/.venv-1/bin/python" ]; then
+    VENV_PATH="$SCRIPT_DIR/.venv-1"
+elif [ -d "$SCRIPT_DIR/.venv" ] && [ -f "$SCRIPT_DIR/.venv/bin/python" ]; then
+    VENV_PATH="$SCRIPT_DIR/.venv"
+else
+    VENV_PATH="$SCRIPT_DIR/.venv" # Fallback
+fi
 
 # Create necessary directories
 mkdir -p "$LOG_DIR"
@@ -39,7 +47,7 @@ declare -A SERVICES=(
     ["scout-service"]="8000"
     ["voice-service"]="8003"
     ["analytics-service"]="8007"
-    ["gateway"]="8009"
+    ["desktop-integration-service"]="8009"
 )
 
 DESKTOP_PORT="3000"
@@ -89,10 +97,16 @@ check_prerequisites() {
         exit 1
     fi
 
-    # Check Node.js
-    if ! command -v node &> /dev/null; then
-        log_error "Node.js is required but not installed"
-        exit 1
+    # Check Node.js and NPM
+    if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
+        # Try to find node/npm in common paths if not in PATH
+        if [ -f "/usr/bin/node" ] || [ -f "/usr/local/bin/node" ]; then
+            log_warning "Node.js found in common paths but not in current PATH."
+        else
+            log_warning "Node.js/NPM not detected in PATH. This may fail if you are not using a version manager like NVM."
+            # Don't exit here if we are in a dev environment that might have it via alias/nvm
+            # But for production-level, we'll keep the warning
+        fi
     fi
 
     # Check virtual environment
@@ -133,11 +147,10 @@ start_microservice() {
         return 1
     fi
 
-    # Start service
+    # Start service using venv Python directly
     (
         cd "$service_dir"
-        source "$VENV_PATH/bin/activate"
-        python -m uvicorn "$uvicorn_app" \
+        "$VENV_PATH/bin/python" -m uvicorn "$uvicorn_app" \
             --host 0.0.0.0 \
             --port "$port" \
             --log-level warning \

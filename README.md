@@ -1,100 +1,97 @@
-# OpenTalent Local AI Interview Platform
+# OpenTalent: Privacy-First AI Recruitment 🚀
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Security-Bandit](https://img.shields.io/badge/security-bandit-yellow.svg)
-![Security-Semgrep](https://img.shields.io/badge/security-semgrep-green.svg)
-![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
-![Code Quality](https://img.shields.io/badge/code%20quality-ruff-blue.svg)
+[![Release](https://img.shields.io/badge/release-v1.0.0--release-brightgreen.svg)](https://github.com/asifdotpy/open-talent-local-ai/releases/tag/v1.0.0-release)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Local AI](https://img.shields.io/badge/AI-100%25%20Local-orange.svg)](#)
+[![Privacy First](https://img.shields.io/badge/Privacy-First-blueviolet.svg)](#)
 
-Privacy-first, desktop-first interview platform that runs 100% locally. No cloud calls, no API keys, no data leaves the user's device.
+OpenTalent is a state-of-the-art, desktop-first recruitment platform that leverages **local AI** to find, evaluate, and track technical talent. No data leaves your machine, no cloud subscriptions required, and complete privacy for your hiring process.
 
 ---
 
-## 🚀 Demo Environment (Ready Now!)
+## 🌟 Choose Your Journey
 
-**Experience OpenTalent's enhanced interview analytics today!**
+To provide the best experience, we've created specialized guides for different audiences:
 
-### Quick Start
+| I am a... | Goal | Fast Path |
+| :--- | :--- | :--- |
+| **Investor/Executive** | See the value & potential | [**Investor Demo Guide**](README_DEMO.md) 🎬 |
+| **Recruiter/End User** | Install and start using | [**User Guide (Non-Technical)**](README_USER_GUIDE.md) 👥 |
+| **Developer** | Contribute or build | [**Developer Setup Guide**](SETUP_GUIDE.md) 🛠️ |
+| **QA/Tester** | Verify system health | [**Testing Guide**](README_TESTING.md) 🧪 |
+
+---
+
+## 🔥 Key Features
+
+- **Local AI Engines**: Powered by Ollama (Granite 4/Mistral) for search and evaluation.
+- **Privacy Core**: 100% offline interview processing and candidate enrichment.
+- **Unified Gateway**: A high-performance microservices architecture managed through a single entry point.
+- **Voice Intelligence**: Local TTS (Piper) and STT for immersive AI-led interviews.
+- **Cross-Platform**: Built with Electron & React for a premium desktop experience.
+
+---
+
+## 🚀 Quick Start (Production Environment)
+
+If you have the prerequisites (Node.js 20, Python 3.12, NPM), start the entire platform with a single command:
 
 ```bash
-# Start the complete demo environment
-./start-demo.sh
+# Clone the repository
+git clone https://github.com/asifdotpy/open-talent-local-ai.git
+cd open-talent
 
-# Access the application
-open http://localhost:3000
-
-# Stop when done
-./stop-demo.sh
+# Bootstrap dependencies
+./manage.sh start
 ```
 
-### What You'll See
-
-- **Enhanced Interview Results**: Sentiment analysis, quality scoring, and AI recommendations
-- **Real-time Analytics**: Live processing during interviews with visual feedback
-- **Privacy-First**: Everything runs locally - no cloud dependencies
-- **Rich Insights**: Comprehensive candidate assessment with detailed metrics
-
----
-
-## ⚠️ Current Project Status: Week 4 Development
-
-The project is currently in **Week 4** of the desktop application development, focusing on **Outreach Automation, Enrichment, and Progress Tracking**.
-
-| Feature Set | Status | Notes |
-| :--- | :--- | :--- |
-| **Local AI Core** | **Complete** | Ollama, Granite 4, Piper TTS architecture is defined and services are being integrated. |
-| **Desktop App UI** | **In Progress** | Core UI components for Week 4 features (Outreach, Enrichment, Progress Panel) are implemented in the `desktop-app/src/renderer` directory. |
-| **Integration** | **Blocked** | The desktop application is currently blocked by several TypeScript compilation and test failures (see **SETUP_GUIDE.md** for details). |
+### Management Commands
+Our unified management script handles the entire lifecycle:
+- `./manage.sh start` - Start all microservices and the desktop app
+- `./manage.sh stop` - Gracefully stop all components
+- `./manage.sh status` - Check the health and PIDs of active services
+- `./manage.sh restart` - Perform a clean stop-start cycle
 
 ---
 
-## What this repo is
+## 🏛️ Architecture at a Glance
 
-- Source of truth for OpenTalent's offline AI interview stack (Electron desktop app, local AI services, docs).
-- Implements the December 2025 pivot to local AI (Ollama + Granite 4 models, Piper TTS, WebGL avatar) as defined in [AGENTS.md](AGENTS.md) and [LOCAL_AI_ARCHITECTURE.md](LOCAL_AI_ARCHITECTURE.md).
-- Not affiliated with the UK-based "Open Talent" HR services company on LinkedIn; this is an open-source, local-AI interview project.
+OpenTalent uses a decoupled microservices architecture coordinated via a **Desktop Integration Gateway**:
 
-## Core capabilities
-
-- Local LLM conversation via Ollama using Granite 4 models (350M / 2B / 8B; 4-bit/8-bit).
-- Local TTS with Piper (small/medium/large voice models) and audio caching.
-- WebGL/Three.js avatar with phoneme-driven lip-sync.
-- Hardware-aware model selection (RAM-based recommendations with user override).
-- Offline-first packaging: Electron bundles Ollama and Piper binaries for Windows/macOS/Linux.
-
-## Architecture (current plan)
-
-- Desktop app (Electron + React) with setup wizard, settings, and avatar UI.
-- Local services orchestrated by the Electron main process: Ollama server, Piper TTS, hardware detection, model download manager.
-- Model store under `~/OpenTalent/models/` with Granite and Piper artifacts; caches for conversations, audio, and avatars.
-- Security posture: zero cloud dependencies, no key storage, local logs only (see [SECURITY_AND_CODE_QUALITY_CHECKLIST.md](SECURITY_AND_CODE_QUALITY_CHECKLIST.md)).
-
-## 🛠️ Getting Started (Developer Setup)
-
-For a complete, step-by-step guide on setting up the development environment, installing dependencies, and running tests on a fresh machine, please refer to the dedicated setup guide:
-
-➡️ **[SETUP_GUIDE.md](SETUP_GUIDE.md)**
-
-### Quick Manual Setup
-
-1.  **Clone:** `git clone https://github.com/asifdotpy/open-talent-local-ai.git open-talent`
-2.  **Install Node Deps:** `cd open-talent/desktop-app && npm install --legacy-peer-deps`
-3.  **Install Python Deps:** `cd .. && source .venv/bin/activate && pip install -r requirements.txt`
-4.  **Run:** `./start-demo.sh`
+1.  **Frontend**: React-based Electron application.
+2.  **Gateway**: Unified proxy for all microservices.
+3.  **Services**:
+    - `scout-service`: GitHub/LinkedIn talent sourcing.
+    - `voice-service`: Local STT/TTS processing.
+    - `analytics-service`: Interview and quality metrics.
+    - `desktop-integration-service`: Service discovery and orchestration.
 
 ---
 
-## Roadmap (abridged)
+## 📜 Documentation Index
 
-- Phase 5: Electron desktop app setup, bundle Ollama/Piper binaries, setup wizard and hardware detection.
-- Phase 6: Ollama integration with Granite 4 model selection and GPU acceleration paths.
-- Phase 7: Piper TTS integration with quality tiers and caching.
-- Phase 8: Avatar rendering with lip-sync and caching.
-- Phase 9: Benchmarks on low-end/high-end hardware; optimization and testing.
+- [**AGENTS.md**](AGENTS.md): Detailed agent architecture and capabilities.
+- [**CONTRIBUTING.md**](CONTRIBUTING.md): How to help build the future of recruitment.
+- [**SECURITY.md**](SECURITY.md): Our commitment to local data processing.
+- [**v1.0.0 Walkthrough**](.antigravity/walkthrough.md): Technical details of the latest release.
 
-## Security and privacy
+---
 
-- 100% offline operation after initial model download.
-- No cloud telemetry or external API calls.
-- Local logs and caches under `~/OpenTalent/` with optional purge/export.
-- Automated security checks documented in [SECURITY_AND_CODE_QUALITY_CHECKLIST.md](SECURITY_AND_CODE_QUALITY_CHECKLIST.md) and [SECURITY_QUICK_START.md](SECURITY_QUICK_START.md).
+## 🛡️ Security & Privacy
+
+OpenTalent is built on the principle that **hiring data is sensitive**.
+- ❌ No cloud API keys required.
+- ❌ No telemetry or tracking.
+- ❌ No external LLM costs.
+- ✅ 100% data ownership.
+
+---
+
+## 📞 Support
+
+- **Bug Reports**: Open an issue on GitHub.
+- **General Inquiries**: Please refer to the [AGENTS.md](AGENTS.md) for project history and vision.
+
+---
+
+**Built with ❤️ by the OpenTalent community.**

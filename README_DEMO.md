@@ -9,6 +9,7 @@ OpenTalent is an AI-powered recruitment platform that revolutionizes technical h
 ## Prerequisites
 
 Before starting, ensure you have:
+
 - **Python 3.12+** installed
 - **Node.js 20+** installed
 - **10GB free disk space** for AI models
@@ -62,6 +63,7 @@ When you run `./manage.sh start`, the system launches:
    - Linux: SimpleScreenRecorder
 
 2. **Demo Scenario**:
+
    ```
    Role: Senior React Developer
    Location: Remote (US)
@@ -72,14 +74,17 @@ When you run `./manage.sh start`, the system launches:
 ### Recording Steps
 
 1. **Start fresh**:
+
    ```bash
    ./manage.sh restart
    ```
 
 2. **Wait 30 seconds** for all services to be healthy:
+
    ```bash
    ./manage.sh status
    ```
+
    All services should show `✓ Healthy`
 
 3. **Open browser** to `http://localhost:3000`
@@ -148,8 +153,9 @@ This ensures clean shutdown and frees up system resources.
 ## 📞 Support
 
 For demo setup assistance:
+
 - GitHub Issues: [open-talent-local-ai/issues](https://github.com/asifdotpy/open-talent-local-ai/issues)
-- Email: support@opentalent-demo.com
+- Email: <support@opentalent-demo.com>
 
 ---
 

@@ -9,6 +9,7 @@ Welcome to OpenTalent! This guide will help you run the AI recruitment platform 
 OpenTalent is a desktop application that uses artificial intelligence to find and evaluate technical candidates from platforms like GitHub, LinkedIn, and Stack Overflow.
 
 **Key Benefits:**
+
 - 🤖 **AI-Powered**: Automatically finds the best candidates
 - 🔒 **Private**: All data stays on your computer
 - ⚡ **Fast**: Results in seconds, not hours
@@ -21,17 +22,17 @@ OpenTalent is a desktop application that uses artificial intelligence to find an
 ### For Windows Users
 
 1. **Download the project**:
-   - Visit: https://github.com/asifdotpy/open-talent-local-ai
+   - Visit: <https://github.com/asifdotpy/open-talent-local-ai>
    - Click the green "Code" button → "Download ZIP"
    - Extract the ZIP file to your Documents folder
 
 2. **Install Python**:
-   - Download from: https://www.python.org/downloads/
+   - Download from: <https://www.python.org/downloads/>
    - During installation, CHECK ☑️ "Add Python to PATH"
    - Click "Install Now"
 
 3. **Install Node.js**:
-   - Download from: https://nodejs.org/
+   - Download from: <https://nodejs.org/>
    - Choose "LTS" version
    - Click through the installer (use default settings)
 
@@ -40,11 +41,13 @@ OpenTalent is a desktop application that uses artificial intelligence to find an
    - Type `cmd` and press Enter
 
 5. **Navigate to the project**:
+
    ```cmd
    cd Documents\open-talent-local-ai
    ```
 
 6. **Run setup** (copy and paste these commands one by one):
+
    ```cmd
    python -m venv .venv
    .venv\Scripts\activate
@@ -57,23 +60,26 @@ OpenTalent is a desktop application that uses artificial intelligence to find an
 ### For Mac Users
 
 1. **Download the project**:
-   - Visit: https://github.com/asifdotpy/open-talent-local-ai
+   - Visit: <https://github.com/asifdotpy/open-talent-local-ai>
    - Click "Code" → "Download ZIP"
    - Double-click to extract to your Desktop
 
 2. **Install Homebrew** (if not already installed):
    - Open Terminal (find it in Applications → Utilities)
    - Paste this command and press Enter:
+
      ```bash
      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
      ```
 
 3. **Install Python and Node.js**:
+
    ```bash
    brew install python@3.12 node
    ```
 
 4. **Setup the project**:
+
    ```bash
    cd ~/Desktop/open-talent-local-ai
    python3 -m venv .venv
@@ -91,18 +97,21 @@ OpenTalent is a desktop application that uses artificial intelligence to find an
 ### Starting OpenTalent
 
 **Windows**:
+
 ```cmd
 cd Documents\open-talent-local-ai
 manage.bat start
 ```
 
 **Mac/Linux**:
+
 ```bash
 cd ~/Desktop/open-talent-local-ai
 ./manage.sh start
 ```
 
 **What you'll see**:
+
 - Several lines of text showing services starting
 - Green checkmarks ✅ when each service is ready
 - A message: "OpenTalent is Ready for Demo! 🌟"
@@ -123,6 +132,7 @@ You should see the OpenTalent interface!
 ### Searching for Candidates
 
 1. **Enter your search**:
+
    ```
    Example: "Senior Python Developer in San Francisco"
    ````
@@ -154,11 +164,13 @@ You should see the OpenTalent interface!
 When you're done:
 
 **Windows**:
+
 ```cmd
 manage.bat stop
 ```
 
 **Mac/Linux**:
+
 ```bash
 ./manage.sh stop
 ```
@@ -175,6 +187,7 @@ Run this command:
 **Mac/Linux**: `./manage.sh status`
 
 You should see a table showing all services with:
+
 - ✓ Healthy - Service is working perfectly
 - ? Responding - Service is starting up
 - ✗ No response - Service needs to be restarted
@@ -184,19 +197,25 @@ You should see a table showing all services with:
 ## Common Issues and Solutions
 
 ### "Python not found"
+
 **Solution**: Make sure you installed Python and checked "Add to PATH"
 
 ### "Node not found"
+
 **Solution**: Restart your computer after installing Node.js
 
 ### "Port already in use"
+
 **Solution**: Run the stop command first, then start again
 
 ### Browser shows "Cannot connect"
+
 **Solution**: Wait 30 more seconds - services may still be starting
 
-### Nothing works!
+### Nothing works
+
 **Solution**:
+
 1. Close everything
 2. Restart your computer
 3. Run the stop command
@@ -210,7 +229,7 @@ You should see a table showing all services with:
 If you encounter issues:
 
 1. **Take a screenshot** of any error messages
-2. **Email**: support@opentalent-demo.com
+2. **Email**: <support@opentalent-demo.com>
 3. **Include**:
    - Your operating system (Windows 10, Mac OS, etc.)
    - What you were trying to do
@@ -221,12 +240,14 @@ If you encounter issues:
 ## Tips for Best Results
 
 ✅ **DO**:
+
 - Close other programs while running OpenTalent
 - Use specific job titles ("Senior React Developer" not just "Developer")
 - Include location ("in New York", "Remote USA")
 - Wait for the "Ready for Demo" message before opening browser
 
 ❌ **DON'T**:
+
 - Run multiple instances of OpenTalent at once
 - Close Terminal/Command Prompt while OpenTalent is running
 - Use very broad searches ("Any developer")
@@ -237,12 +258,14 @@ If you encounter issues:
 ## System Requirements
 
 **Minimum**:
+
 - 8GB RAM
 - 20GB free disk space
 - Windows 10/Mac OS 10.14 or newer
 - Internet connection (first time only for AI model download)
 
 **Recommended**:
+
 - 16GB RAM
 - 50GB free disk space
 - Recent operating system

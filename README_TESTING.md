@@ -3,6 +3,7 @@
 This guide explains how to test the OpenTalent platform at different levels, from automated verification scripts to manual end-to-end testing.
 
 ## 1. Automated Release Verification (Recommended)
+
 This is the fastest way to verify that the core system components and release requirements are met. It checks compilation, test suites, gateway routes, and schemas.
 
 ```bash
@@ -12,6 +13,7 @@ chmod +x verify-release.sh
 ```
 
 **What it does:**
+
 - Verifies Desktop App TypeScript compilation.
 - Runs the full Jest test suite (150+ tests).
 - Checks Gateway routing for Scout and Voice services.
@@ -20,6 +22,7 @@ chmod +x verify-release.sh
 ---
 
 ## 2. Integrated Demo Mode
+
 To see the full application running with simulated/mocked services (e.g., if you don't have all local LLMs running):
 
 ```bash
@@ -36,9 +39,11 @@ To see the full application running with simulated/mocked services (e.g., if you
 ---
 
 ## 3. Manual Component Testing
+
 If you are developing a specific part of the app, you can run components individually.
 
 ### A. Desktop Application
+
 ```bash
 cd desktop-app
 npm install --legacy-peer-deps  # If not already done
@@ -46,7 +51,9 @@ npm run dev
 ```
 
 ### B. Backend API Gateway
+
 The Gateway acts as the entry point for the desktop app to reach all other microservices.
+
 ```bash
 # Ensure your venv is active
 source .venv/bin/activate
@@ -59,7 +66,9 @@ python app/main.py
 ## 4. Run Automated Test Suites
 
 ### Desktop App (Jest)
+
 Comprehensive tests for React components, hooks, and services.
+
 ```bash
 cd desktop-app
 npm test                # Interactive mode
@@ -67,6 +76,7 @@ npm test -- --watchAll=false  # Run once
 ```
 
 ### Backend Microservices (Pytest)
+
 ```bash
 # Run all backend tests
 pytest
