@@ -5,6 +5,15 @@
  * for candidate sourcing pipeline management.
  */
 
+// Polyfill for AbortSignal.timeout (not available in older Node.js/Electron)
+if (typeof AbortSignal !== 'undefined' && !AbortSignal.timeout) {
+    (AbortSignal as any).timeout = (ms: number): AbortSignal => {
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), ms);
+        return controller.signal;
+    };
+}
+
 const SCOUT_COORDINATOR_URL = process.env.REACT_APP_SCOUT_COORDINATOR_URL || 'http://localhost:8090';
 
 export interface PipelineConfig {

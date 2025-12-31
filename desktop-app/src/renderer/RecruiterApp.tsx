@@ -5,7 +5,7 @@ import { CandidateResults, Candidate } from './components/CandidateResults';
 import { scoutCoordinator } from '../services/scoutCoordinatorClient';
 import { jobDescriptionParser } from '../services/jobDescriptionParser';
 import { qualityScoringClient } from '../services/qualityScoringClient';
-import { useWebSocket } from '../hooks/useWebSocket';
+import { useWebSocket } from './hooks/useWebSocket';
 import { ToastProvider, useToast } from './components/Toast';
 import { OutreachModal } from './components/OutreachModal';
 import { SettingsModal } from './components/SettingsModal';

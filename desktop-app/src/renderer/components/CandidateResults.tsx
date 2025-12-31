@@ -226,7 +226,13 @@ export function CandidateResults({ candidates, onInterviewClick, onOutreachClick
             {
                 selectedCandidate && (
                     <div className="modal-overlay" onClick={() => setSelectedCandidate(null)}>
-                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div
+                            className="modal-content"
+                            onClick={(e) => e.stopPropagation()}
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="candidate-modal-title"
+                        >
                             <button
                                 className="modal-close"
                                 onClick={() => setSelectedCandidate(null)}
@@ -247,7 +253,7 @@ export function CandidateResults({ candidates, onInterviewClick, onOutreachClick
                                     </div>
                                 )}
                                 <div>
-                                    <h2>{selectedCandidate.name}</h2>
+                                    <h2 id="candidate-modal-title">{selectedCandidate.name}</h2>
                                     {selectedCandidate.headline && (
                                         <p className="headline">{selectedCandidate.headline}</p>
                                     )}

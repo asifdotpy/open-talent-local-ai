@@ -26,7 +26,7 @@ def format_bytes(size: Union[int, str, None]) -> str:
         return "unknown"
     if isinstance(size, str):
         return size
-    
+
     # Convert int to human-readable format
     try:
         size_int = int(size)
@@ -91,14 +91,14 @@ async def lifespan(app: FastAPI):
     total_count = health["summary"]["total"]
     logger.info(f"📊 Services Status: {online_count}/{total_count} services online")
     logger.info("=" * 70)
-    
+
     # List all services
     for name, status in health["services"].items():
         icon = "✅" if status["status"] == "online" else "❌"
         visibility = "(hidden)" if name.startswith("_") else ""
         latency = f"{status.get('latencyMs', 'N/A')}ms" if status.get('latencyMs') else "N/A"
         logger.info(f"{icon} {name:30s} {status['status']:10s} {latency:>10s} {visibility}")
-    
+
     logger.info("=" * 70)
     logger.info("✨ Gateway ready to serve requests!")
 
@@ -188,14 +188,14 @@ async def system_status() -> Dict:
 async def list_services() -> Dict:
     """
     List all 14 registered OpenTalent microservices.
-    
+
     Returns registry with URLs and current status for each service.
     """
     if not service_discovery:
         raise HTTPException(status_code=503, detail="Service discovery not initialized")
 
     health = await service_discovery.check_all_services()
-    
+
     # Organize services by category
     service_registry = {
         "core_services": {
@@ -296,7 +296,7 @@ async def list_services() -> Dict:
             }
         }
     }
-    
+
     return {
         "total_services": len(service_discovery.services),
         "gateway": {
@@ -487,13 +487,13 @@ async def analyze_sentiment(request: AnalyzeSentimentRequest) -> AnalyzeSentimen
         request_payload = {"text": request.text}
         if request.context:
             request_payload["context"] = request.context
-        
+
         response = await http_client.post(
             f"{url}/api/v1/analyze/sentiment",
             json=request_payload
         )
         data = response.json()
-        
+
         # Parse sentiment from response
         sentiment_data = data.get("sentiment", {})
         return AnalyzeSentimentResponse(
@@ -568,6 +568,61 @@ async def execute_agent(payload: Dict) -> Dict:
     except Exception as e:
         logger.warning(f"Agent execution failed: {e}")
         raise HTTPException(status_code=502, detail="Agent execution failed")
+
+
+# ============================================================================
+# Scout Search Endpoints (Talent Sourcing)
+# ============================================================================
+
+
+@app.post("/api/v1/scout/github")
+async def scout_github(payload: Dict) -> Dict:
+    """Proxy GitHub talent search to scout-service."""
+    if not service_discovery or not http_client:
+        raise HTTPException(status_code=503, detail="Service discovery not initialized")
+
+    url = await service_discovery.get_service_url("scout-service")
+    if not url:
+        raise HTTPException(status_code=503, detail="Scout service unavailable")
+
+    try:
+        response = await http_client.post(
+            f"{url}/api/v1/scout/github",
+            json=payload
+        )
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail="GitHub search failed")
+
+        return response.json()
+    except Exception as e:
+        logger.warning(f"Scout GitHub search failed: {e}")
+        raise HTTPException(status_code=502, detail="GitHub talent search failed")
+
+
+@app.post("/api/v1/scout/linkedin")
+async def scout_linkedin(payload: Dict) -> Dict:
+    """Proxy LinkedIn talent search to scout-service."""
+    if not service_discovery or not http_client:
+        raise HTTPException(status_code=503, detail="Service discovery not initialized")
+
+    url = await service_discovery.get_service_url("scout-service")
+    if not url:
+        raise HTTPException(status_code=503, detail="Scout service unavailable")
+
+    try:
+        response = await http_client.post(
+            f"{url}/api/v1/scout/linkedin",
+            json=payload
+        )
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=response.status_code, detail="LinkedIn search failed")
+
+        return response.json()
+    except Exception as e:
+        logger.warning(f"Scout LinkedIn search failed: {e}")
+        raise HTTPException(status_code=502, detail="LinkedIn talent search failed")
 
 
 # ============================================================================

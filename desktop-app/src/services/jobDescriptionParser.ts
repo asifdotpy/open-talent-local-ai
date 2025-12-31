@@ -5,6 +5,15 @@
  * using conversation-service's job_description_service.py
  */
 
+// Polyfill for AbortSignal.timeout (not available in older Node.js/Electron)
+if (typeof AbortSignal !== 'undefined' && !AbortSignal.timeout) {
+    (AbortSignal as any).timeout = (ms: number): AbortSignal => {
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), ms);
+        return controller.signal;
+    };
+}
+
 const CONVERSATION_SERVICE_URL = process.env.REACT_APP_CONVERSATION_SERVICE_URL || 'http://localhost:8003';
 
 export interface ParsedJobDescription {
@@ -91,11 +100,16 @@ export class JobDescriptionParser {
         const salaryMatch = prompt.match(/\$?([\d,]+)k?\s*-\s*\$?([\d,]+)k?/i);
         let salary_range = undefined;
         if (salaryMatch) {
-            const min = parseInt(salaryMatch[1].replace(/,/g, ''));
-            const max = parseInt(salaryMatch[2].replace(/,/g, ''));
+            const minStr = salaryMatch[1].replace(/,/g, '');
+            const maxStr = salaryMatch[2].replace(/,/g, '');
+            const min = parseInt(minStr);
+            const max = parseInt(maxStr);
+            // Check for 'k' in the original matched string, not the parsed number
+            const hasMinK = salaryMatch[0].toLowerCase().includes(`${minStr}k`);
+            const hasMaxK = salaryMatch[0].toLowerCase().includes(`${maxStr}k`);
             salary_range = {
-                min: min * (salaryMatch[1].endsWith('k') || salaryMatch[1].includes('k') ? 1000 : 1),
-                max: max * (salaryMatch[2].endsWith('k') || salaryMatch[2].includes('k') ? 1000 : 1),
+                min: min * (hasMinK ? 1000 : 1),
+                max: max * (hasMaxK ? 1000 : 1),
                 currency: 'USD'
             };
         }

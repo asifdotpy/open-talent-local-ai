@@ -74,7 +74,7 @@ HTMLCanvasElement.prototype.getContext = jest.fn((contextType) => {
       drawingBufferHeight: 600,
     };
   }
-  
+
   // Default 2D context mock
   return {
     fillRect: jest.fn(),
@@ -143,6 +143,27 @@ HTMLCanvasElement.prototype.getContext = jest.fn((contextType) => {
   onstop: null,
   onerror: null,
 }));
+
+// Mock navigator.mediaDevices.getUserMedia
+Object.defineProperty(navigator, 'mediaDevices', {
+  writable: true,
+  value: {
+    getUserMedia: jest.fn().mockResolvedValue({
+      getTracks: jest.fn(() => []),
+      getAudioTracks: jest.fn(() => [
+        {
+          stop: jest.fn(),
+          kind: 'audio',
+          enabled: true,
+        },
+      ]),
+      getVideoTracks: jest.fn(() => []),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    }),
+    enumerateDevices: jest.fn().mockResolvedValue([]),
+  },
+});
 
 // Mock localStorage
 const localStorageMock = {

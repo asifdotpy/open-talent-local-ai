@@ -404,6 +404,8 @@ async def select_model(model_id: str) -> dict:
 # =========================================================================
 
 
+
+
 @app.post("/api/v1/voice/synthesize")
 async def synthesize_speech(payload: dict) -> dict:
     """Proxy text-to-speech to voice-service when enabled."""
@@ -430,6 +432,107 @@ async def synthesize_speech(payload: dict) -> dict:
     except Exception as e:
         logger.warning(f"Voice synthesis failed: {e}")
         raise HTTPException(status_code=502, detail="Voice synthesis failed")
+
+
+@app.post("/api/v1/voice/transcribe")
+async def transcribe_speech(payload: dict) -> dict:
+    """Proxy speech-to-text transcription to voice-service when enabled."""
+    if not settings.enable_voice:
+        raise HTTPException(status_code=503, detail="Voice service disabled")
+
+    if not service_discovery or not http_client:
+        raise HTTPException(status_code=503, detail="Service discovery not initialized")
+
+    url = await service_discovery.get_service_url("voice-service")
+    if not url:
+        raise HTTPException(status_code=503, detail="Voice service unavailable")
+
+    # Forward the audio file or data to voice service
+    # The payload should contain either audio_url or audio_base64
+    if not payload.get("audio_url") and not payload.get("audio_base64"):
+        raise HTTPException(
+            status_code=400, detail="Either audio_url or audio_base64 is required"
+        )
+
+    try:
+        response = await http_client.post(
+            f"{url}/voice/stt",
+            json=payload,
+        )
+        return response.json()
+    except Exception as e:
+        logger.warning(f"Speech transcription failed: {e}")
+        raise HTTPException(status_code=502, detail="Speech transcription failed")
+
+
+# =========================================================================
+# Scout Service Endpoints
+# =========================================================================
+
+
+@app.post("/api/v1/scout/search")
+async def scout_search(payload: dict) -> dict:
+    """Proxy candidate search to scout-service.
+
+    Searches GitHub for developer candidates based on natural language query.
+    Returns list of candidates with contact information and LinkedIn enrichment.
+    """
+    if not service_discovery or not http_client:
+        raise HTTPException(status_code=503, detail="Service discovery not initialized")
+
+    url = await service_discovery.get_service_url("scout-service")
+    if not url:
+        raise HTTPException(status_code=503, detail="Scout service unavailable")
+
+    # Validate required fields
+    query = payload.get("query")
+    if not query:
+        raise HTTPException(status_code=400, detail="query is required")
+
+    # Set defaults for optional fields
+    search_payload = {
+        "query": query,
+        "location": payload.get("location", "Ireland"),
+        "max_results": payload.get("max_results", 20),
+        "use_ai_formatting": payload.get("use_ai_formatting", True),
+    }
+
+    try:
+        response = await http_client.post(
+            f"{url}/search",
+            json=search_payload,
+            timeout=30.0,  # Search can take longer
+        )
+        return response.json()
+    except Exception as e:
+        logger.warning(f"Scout search failed: {e}")
+        raise HTTPException(status_code=502, detail="Scout search failed")
+
+
+@app.get("/api/v1/scout/agents")
+async def scout_agents() -> dict:
+    """Get list of available scout agents for specialized searches.
+
+    Returns registry of agent capabilities for talent sourcing.
+    """
+    if not service_discovery or not http_client:
+        raise HTTPException(status_code=503, detail="Service discovery not initialized")
+
+    url = await service_discovery.get_service_url("scout-service")
+    if not url:
+        raise HTTPException(status_code=503, detail="Scout service unavailable")
+
+    try:
+        response = await http_client.get(
+            f"{url}/agents/registry",
+            timeout=5.0,
+        )
+        return response.json()
+    except Exception as e:
+        logger.warning(f"Scout agents registry fetch failed: {e}")
+        raise HTTPException(status_code=502, detail="Scout agents registry unavailable")
+
+
 
 
 # =========================================================================
@@ -833,6 +936,10 @@ async def root() -> dict:
             "health": "/health",
             "models": "/api/v1/models",
             "interviews": "/api/v1/interviews/{action}",
+            "scout_search": "/api/v1/scout/search",
+            "scout_agents": "/api/v1/scout/agents",
+            "voice_synthesize": "/api/v1/voice/synthesize",
+            "voice_transcribe": "/api/v1/voice/transcribe",
             "dashboard": "/api/v1/dashboard",
             "docs": "/docs",
         },

@@ -1,14 +1,11 @@
-import { qualityScoringClient, ScoreResult } from '../services/qualityScoringClient';
+import { qualityScoringClient, ScoreResult } from '../qualityScoringClient';
+
+// Mock fetch globally
+global.fetch = jest.fn();
 
 describe('QualityScoringClient', () => {
-    let fetchMock: jest.SpyInstance;
-
     beforeEach(() => {
-        fetchMock = jest.spyOn(global, 'fetch');
-    });
-
-    afterEach(() => {
-        fetchMock.mockRestore();
+        (fetch as jest.Mock).mockClear();
     });
 
     test('scoreCandidate makes correct API call', async () => {
@@ -23,7 +20,7 @@ describe('QualityScoringClient', () => {
             timestamp: new Date().toISOString()
         };
 
-        fetchMock.mockResolvedValue({
+        (fetch as jest.Mock).mockResolvedValue({
             ok: true,
             json: async () => mockResult
         });
@@ -34,7 +31,7 @@ describe('QualityScoringClient', () => {
             candidate_profile: { name: 'Alice' }
         });
 
-        expect(fetchMock).toHaveBeenCalledWith(
+        expect(fetch).toHaveBeenCalledWith(
             expect.stringContaining('/score'),
             expect.objectContaining({
                 method: 'POST',
@@ -45,13 +42,13 @@ describe('QualityScoringClient', () => {
     });
 
     test('checkHealth returns true on success', async () => {
-        fetchMock.mockResolvedValue({ ok: true });
+        (fetch as jest.Mock).mockResolvedValue({ ok: true });
         const isHealthy = await qualityScoringClient.checkHealth();
         expect(isHealthy).toBe(true);
     });
 
     test('checkHealth returns false on error', async () => {
-        fetchMock.mockRejectedValue(new Error('Network error'));
+        (fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
         const isHealthy = await qualityScoringClient.checkHealth();
         expect(isHealthy).toBe(false);
     });

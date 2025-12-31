@@ -25,16 +25,15 @@ describe('ScoutCoordinatorClient', () => {
             });
 
             const config: PipelineConfig = {
-                jobDescription: 'Senior React Developer in NYC',
-                location: 'New York',
-                skills: ['React', 'TypeScript'],
-                tools: ['github', 'stackoverflow']
+                project_id: 'test-project-123',
+                job_description: 'Senior React Developer in NYC',
+                target_platforms: ['github', 'stackoverflow']
             };
 
             const result = await client.createPipeline(config);
 
             expect(fetch).toHaveBeenCalledWith(
-                expect.stringContaining('/pipelines/create'),
+                expect.stringContaining('/pipelines/start'),
                 expect.objectContaining({
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -53,8 +52,9 @@ describe('ScoutCoordinatorClient', () => {
             });
 
             const config: PipelineConfig = {
-                jobDescription: 'Test',
-                tools: ['github']
+                project_id: 'test-project-456',
+                job_description: 'Test',
+                target_platforms: ['github']
             };
 
             await expect(client.createPipeline(config))
