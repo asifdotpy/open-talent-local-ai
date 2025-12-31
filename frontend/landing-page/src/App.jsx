@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Blog from './Blog'
 
 // Icons as simple SVG components
 const Icons = {
@@ -77,6 +78,7 @@ function App() {
                         </div>
                         <div className="hidden md:flex items-center space-x-8">
                             <a href="#features" className="text-slate-300 hover:text-white transition">Features</a>
+                            <a href="#blog" className="text-slate-300 hover:text-white transition">Blog</a>
                             <a href="#pricing" className="text-slate-300 hover:text-white transition">Pricing</a>
                             <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="text-slate-300 hover:text-white transition flex items-center gap-2">
                                 <Icons.GitHub /> GitHub
@@ -328,6 +330,9 @@ function App() {
                     </p>
                 </div>
             </section>
+
+            {/* Blog Section */}
+            <Blog />
 
             {/* CTA Section */}
             <section className="py-24 px-4 hero-gradient">
