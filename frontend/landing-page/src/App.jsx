@@ -208,8 +208,8 @@ function App() {
                             <Icons.GitHub /> GitHub
                         </a>
                         <a href={`mailto:${CONFIG.project.contactEmail}`} className="hover:text-white transition">Contact</a>
-                        <a href="#" className="hover:text-white transition">Privacy</a>
-                        <a href="#" className="hover:text-white transition">Terms</a>
+                        <a href="/legal?page=privacy" className="hover:text-white transition">Privacy</a>
+                        <a href="/legal?page=terms" className="hover:text-white transition">Terms</a>
                     </div>
                     <div className="text-slate-500 text-sm">
                         © 2025 {CONFIG.project.name}. Open Source under MIT.
