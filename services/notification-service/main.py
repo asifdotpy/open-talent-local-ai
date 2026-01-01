@@ -84,3 +84,11 @@ async def notify_push(payload: PushNotificationRequest = Body(...), p=Depends(pr
 @app.get("/api/v1/notify/templates")
 async def list_templates(p=Depends(provider_dep)):
     return {"data": await p.get_templates()}
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    host = os.environ.get("HOST", "0.0.0.0")
+    port = int(os.environ.get("PORT", 8011))
+    uvicorn.run(app, host=host, port=port)

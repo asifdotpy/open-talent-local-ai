@@ -5,7 +5,8 @@ from pydantic import BaseModel
 
 class Settings(BaseModel):
     app_name: str = "User Service"
-    app_version: str = "0.1.0"
+    PROJECT_NAME: str = "OpenTalent User Service"
+    VERSION: str = "0.1.0"
     database_url: str = os.getenv(
         "USER_SERVICE_DATABASE_URL",
         "postgresql+asyncpg://supabase_user:supabase_pass@localhost:54322/user_service",

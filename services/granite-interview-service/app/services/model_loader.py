@@ -8,13 +8,13 @@ prerequisite validation for different model architectures.
 import asyncio
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
+from app.core.constants import HG_REPO_MAP
 from huggingface_hub import HfApi, snapshot_download
 
 from ..config import settings
 from ..models import model_registry
-from .constants import HG_REPO_MAP
 
 logger = logging.getLogger(__name__)
 
@@ -83,9 +83,12 @@ class ModelLoader:
         try:
             # Map model names to Hugging Face repo IDs
             repo_id = self._get_huggingface_repo_id(model_name)
+            config = settings.get_model_config(model_name)
 
-            if not repo_id:
-                logger.error(f"No Hugging Face repo mapping found for model: {model_name}")
+            if not repo_id or not config:
+                logger.error(
+                    f"No Hugging Face repo mapping or config found for model: {model_name}"
+                )
                 return False
 
             # Download with progress
@@ -105,7 +108,7 @@ class ModelLoader:
 
     def _get_huggingface_repo_id(self, model_name: str) -> str | None:
         """Map model names to Hugging Face repository IDs."""
-        return HG_REPO_MAP.get(model_name)
+        return cast(str | None, HG_REPO_MAP.get(model_name))
 
     async def load_model(self, model_name: str) -> bool:
         """Load a model into memory, downloading it first if necessary.
@@ -121,7 +124,7 @@ class ModelLoader:
             return False
 
         # Load using registry
-        return model_registry.load_model(model_name)
+        return bool(model_registry.load_model(model_name))
 
     def unload_model(self, model_name: str):
         """Unload a model from memory."""
@@ -140,7 +143,7 @@ class ModelLoader:
 
     def get_loaded_models(self) -> list[str]:
         """Get list of currently loaded models."""
-        return model_registry.get_loaded_models()
+        return list(model_registry.get_loaded_models())
 
     def get_cached_models(self) -> list[str]:
         """Get list of cached models on disk."""

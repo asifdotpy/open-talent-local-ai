@@ -45,7 +45,7 @@ class InterviewQuestion:
     phase: InterviewPhase
     difficulty: str  # easy, medium, hard
     skills_assessed: list[str]
-    follow_up_questions: list[str] = None
+    follow_up_questions: list[str] | None = None
 
 
 @dataclass

@@ -7,11 +7,15 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
+    PROJECT_NAME: str = "OpenTalent Desktop Integration Service"
+    VERSION: str = "0.1.0"
+
     # Service URLs (All 14 OpenTalent Microservices)
     # AI & Conversation Services
     granite_interview_url: str = "http://localhost:8005"
     conversation_url: str = "http://localhost:8002"
-    interview_url: str = "http://localhost:8005"
+    interview_url: str = "http://localhost:8014"
+    project_url: str = "http://localhost:8015"
 
     # Voice & Avatar Services
     voice_url: str = "http://localhost:8003"

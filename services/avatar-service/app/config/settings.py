@@ -1,9 +1,7 @@
-"""Configuration settings for the Avatar Service."""
-
-
 from dotenv import load_dotenv
 
 load_dotenv()
+
 
 # CORS Origins
 ALLOWED_ORIGINS = [
@@ -18,6 +16,8 @@ AUDIO_OUTPUT_FORMAT = "mp3_44100_128"
 TEMP_AUDIO_PATH = "/tmp"
 
 # Service Information
-SERVICE_TITLE = "OpenTalent - Avatar Service"
+PROJECT_NAME = "OpenTalent - Avatar Service"
+SERVICE_TITLE = PROJECT_NAME
 SERVICE_DESCRIPTION = "Manages AI avatar interactions and rendering"
-SERVICE_VERSION = "0.1.0"
+VERSION = "0.1.0"
+SERVICE_VERSION = VERSION

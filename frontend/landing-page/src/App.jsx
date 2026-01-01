@@ -85,7 +85,7 @@ function App() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
                         <div className="flex items-center space-x-2">
-                            <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg"></div>
+                            <Icons.Logo className="w-10 h-10 text-primary-500" />
                             <span className="text-xl font-bold">OpenTalent</span>
                         </div>
                         
@@ -206,7 +206,7 @@ function App() {
                         <div className="text-slate-400 mt-2">Local Privacy</div>
                     </div>
                     <div>
-                        <div className="text-4xl font-bold gradient-text">11</div>
+                        <div className="text-4xl font-bold gradient-text">15</div>
                         <div className="text-slate-400 mt-2">Microservices</div>
                     </div>
                 </div>
@@ -409,7 +409,7 @@ function App() {
             <footer className="py-12 px-4 border-t border-slate-800">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg"></div>
+                        <Icons.Logo className="w-8 h-8 text-primary-500" />
                         <span className="text-xl font-bold">OpenTalent</span>
                     </div>
                     <div className="flex items-center gap-6 text-slate-400">

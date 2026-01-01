@@ -14,17 +14,21 @@ NC='\033[0m' # No Color
 
 # Service definitions: service-name:port
 SERVICES=(
-    "avatar-service:8001"
-    "conversation-service:8003"
-    "interview-service:8004"
-    "security-service:8005"
-    "candidate-service:8008"
+    "scout-service:8000"
+    "user-service:8001"
+    "conversation-service:8002"
+    "voice-service:8003"
+    "avatar-service:8004"
+    "granite-interview-service:8005"
+    "candidate-service:8006"
+    "analytics-service:8007"
+    "desktop-integration-service:8009"
+    "security-service:8010"
     "notification-service:8011"
     "ai-auditing-service:8012"
-    "analytics-service:8017"
-    "explainability-service:8014"
-    "voice-service:8015"
-    "scout-service:8010"
+    "explainability-service:8013"
+    "interview-service:8014"
+    "project-service:8015"
 )
 
 # Create output directory with timestamp
@@ -42,7 +46,7 @@ echo ""
 cat > "$OUTPUT_DIR/SUMMARY.md" << EOF
 # OpenTalent Endpoint Extraction Report
 
-**Generated:** $(date)  
+**Generated:** $(date)
 **Location:** $OUTPUT_DIR
 
 ---
@@ -59,40 +63,40 @@ failed_services=0
 for service_port in "${SERVICES[@]}"; do
     IFS=':' read -r service port <<< "$service_port"
     echo -e "${YELLOW}🔍 Checking $service on port $port...${NC}"
-    
-    # Check if service is running (try health endpoint first, then root)
-    http_code=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:$port/health" 2>/dev/null || echo "000")
-    
-    if [ "$http_code" == "000" ]; then
-        # Try root endpoint
-        http_code=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:$port/" 2>/dev/null || echo "000")
+
+    # Check if service is running
+    http_code=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:$port/health" --connect-timeout 2 2>/dev/null)
+
+    if [ "$http_code" != "200" ]; then
+        # Try root endpoint as fallback
+        http_code=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:$port/" --connect-timeout 2 2>/dev/null)
     fi
-    
+
     if [ "$http_code" == "200" ] || [ "$http_code" == "307" ]; then
         echo -e "${GREEN}✅ $service is running (HTTP $http_code)${NC}"
         ((running_services++))
-        
+
         # Extract OpenAPI schema
         schema_response=$(curl -s "http://localhost:$port/openapi.json" 2>/dev/null)
-        
+
         if [ -n "$schema_response" ] && echo "$schema_response" | jq empty 2>/dev/null; then
             # Extract endpoints (paths only)
             echo "$schema_response" | jq -r '.paths | keys[]' > "$OUTPUT_DIR/${service}-endpoints.txt"
-            
+
             # Extract full path details
             echo "$schema_response" | jq '.paths' > "$OUTPUT_DIR/${service}-full.json"
-            
+
             # Extract with methods and summaries
-            echo "$schema_response" | jq -r '.paths | to_entries[] | .key as $path | .value | to_entries[] | "\(.key | ascii_upcase) \($path) - \(.value.summary // \"No description\")"' > "$OUTPUT_DIR/${service}-detailed.txt"
-            
+            echo "$schema_response" | jq -r '.paths | to_entries[] | .key as $path | .value | to_entries[] | "\(.key | ascii_upcase) \($path) - \(.value.summary // "No description")"' > "$OUTPUT_DIR/${service}-detailed.txt"
+
             # Get service info
             echo "$schema_response" | jq '.info' > "$OUTPUT_DIR/${service}-info.json"
-            
+
             # Count endpoints
             count=$(echo "$schema_response" | jq '.paths | keys | length')
             echo -e "${GREEN}  📊 Found $count endpoints${NC}"
             ((total_endpoints+=count))
-            
+
             # Add to summary
             cat >> "$OUTPUT_DIR/SUMMARY.md" << EOF
 ### $service (Port $port)

@@ -45,9 +45,20 @@ readonly NC='\033[0m' # No Color
 # Service definitions
 declare -A SERVICES=(
     ["scout-service"]="8000"
+    ["user-service"]="8001"
+    ["conversation-service"]="8002"
     ["voice-service"]="8003"
+    ["avatar-service"]="8004"
+    ["granite-interview-service"]="8005"
+    ["candidate-service"]="8006"
     ["analytics-service"]="8007"
     ["desktop-integration-service"]="8009"
+    ["security-service"]="8010"
+    ["notification-service"]="8011"
+    ["ai-auditing-service"]="8012"
+    ["explainability-service"]="8013"
+    ["interview-service"]="8014"
+    ["project-service"]="8015"
 )
 
 DESKTOP_PORT="3000"
@@ -104,8 +115,6 @@ check_prerequisites() {
             log_warning "Node.js found in common paths but not in current PATH."
         else
             log_warning "Node.js/NPM not detected in PATH. This may fail if you are not using a version manager like NVM."
-            # Don't exit here if we are in a dev environment that might have it via alias/nvm
-            # But for production-level, we'll keep the warning
         fi
     fi
 
@@ -119,18 +128,34 @@ check_prerequisites() {
     log_success "All prerequisites met"
 }
 
+check_service_health() {
+    local service_name=$1
+    local port=$2
+    local max_attempts=${3:-15}
+    local attempt=1
+
+    while [ $attempt -le $max_attempts ]; do
+        # Try /health, then /docs, then root
+        if curl -s --connect-timeout 2 "http://localhost:$port/health" &> /dev/null || \
+           curl -s --connect-timeout 2 "http://localhost:$port/docs" &> /dev/null || \
+           curl -s --connect-timeout 2 "http://localhost:$port/" &> /dev/null; then
+            return 0
+        fi
+        sleep 2
+        attempt=$((attempt + 1))
+    done
+
+    return 1
+}
+
 start_microservice() {
     local service_name=$1
     local port=$2
-    local service_dir=""
+    local service_dir="services/$service_name"
 
-    # Find service directory
-    if [ -d "services/$service_name" ]; then
-        service_dir="services/$service_name"
-    elif [ -d "microservices/$service_name" ]; then
-        service_dir="microservices/$service_name"
-    else
-        log_error "Service directory not found for $service_name"
+    # Enforce services/ directory structure
+    if [ ! -d "$service_dir" ]; then
+        log_error "Service directory not found for $service_name at $service_dir"
         return 1
     fi
 
@@ -150,6 +175,10 @@ start_microservice() {
     # Start service using venv Python directly
     (
         cd "$service_dir"
+        # Set common environment variables to avoid hardcoded /app paths where possible
+        export PORT="$port"
+        export HOST="0.0.0.0"
+
         "$VENV_PATH/bin/python" -m uvicorn "$uvicorn_app" \
             --host 0.0.0.0 \
             --port "$port" \
@@ -160,14 +189,19 @@ start_microservice() {
     local pid=$!
     echo "$service_name:$pid:$port" >> "$PID_FILE"
 
-    # Wait and verify
-    sleep 2
-    if kill -0 $pid 2>/dev/null; then
-        log_success "$service_name started (PID: $pid, Port: $port)"
+    # Wait for application-layer healthiness instead of just process presence
+    if check_service_health "$service_name" "$port" 10; then
+        log_success "$service_name started and healthy (PID: $pid, Port: $port)"
         return 0
     else
-        log_error "$service_name failed to start"
-        return 1
+        # Final check if process is at least still alive
+        if kill -0 $pid 2>/dev/null; then
+            log_warning "$service_name started but health check timed out (PID: $pid)"
+            return 0 # Treat slow starters as success for now to avoid blocking others
+        else
+            log_error "$service_name failed to start (Process died)"
+            return 1
+        fi
     fi
 }
 
@@ -190,25 +224,6 @@ start_desktop() {
         log_error "Desktop App failed to start"
         return 1
     fi
-}
-
-check_service_health() {
-    local service_name=$1
-    local port=$2
-    local max_attempts=15
-    local attempt=1
-
-    while [ $attempt -le $max_attempts ]; do
-        if curl -s "http://localhost:$port/health" &> /dev/null || \
-           curl -s "http://localhost:$port/docs" &> /dev/null || \
-           curl -s "http://localhost:$port/" &> /dev/null; then
-            return 0
-        fi
-        sleep 1
-        attempt=$((attempt + 1))
-    done
-
-    return 1
 }
 
 ################################################################################
@@ -295,7 +310,6 @@ cmd_stop() {
     fi
 
     local stopped=0
-    local failed=0
 
     while IFS=':' read -r service_name pid port; do
         if [ -z "$pid" ]; then

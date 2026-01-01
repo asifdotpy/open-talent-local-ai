@@ -32,6 +32,7 @@ try:
     import pyarrow as pa
     from fastembed import TextEmbedding
     from lancedb import connect
+
     VECTOR_SEARCH_AVAILABLE = True
 except ImportError:
     VECTOR_SEARCH_AVAILABLE = False
@@ -41,22 +42,26 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # TypeVar for generic pagination
-T = TypeVar('T')
+T = TypeVar("T")
 
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
 
+
 class Settings(BaseSettings):
     """Database and vector search settings."""
+
     database_url: str = os.getenv("DATABASE_URL", "postgresql://user:@localhost/db")
     vector_db_path: str = os.getenv("VECTOR_DB_PATH", "./candidate_vectors.db")
+
 
 settings = Settings()
 
 # Initialize vector search components
 embedding_model = None
 vector_db = None
+
 
 def initialize_vector_search():
     """Initialize the FastEmbed embedding model and LanceDB connection for vector search capabilities.
@@ -83,13 +88,15 @@ def initialize_vector_search():
         # Create candidates table if it doesn't exist
         if "candidates" not in vector_db.table_names():
             # Define schema for vector storage using pyarrow
-            schema = pa.schema([
-                ("id", pa.string()),
-                ("full_name", pa.string()),
-                ("profile_text", pa.string()),
-                ("vector", pa.list_(pa.float32(), 384)),  # 384 dimensions for MiniLM-L6-v2
-                ("metadata", pa.string())  # JSON string with full profile data
-            ])
+            schema = pa.schema(
+                [
+                    ("id", pa.string()),
+                    ("full_name", pa.string()),
+                    ("profile_text", pa.string()),
+                    ("vector", pa.list_(pa.float32(), 384)),  # 384 dimensions for MiniLM-L6-v2
+                    ("metadata", pa.string()),  # JSON string with full profile data
+                ]
+            )
             vector_db.create_table("candidates", schema=schema)
 
         logger.info("Vector search initialized successfully with FastEmbed + LanceDB")
@@ -104,13 +111,16 @@ def initialize_vector_search():
         embedding_model = None
         vector_db = None
 
+
 # Database setup
 engine = create_engine(settings.database_url, connect_args={"check_same_thread": False}, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+
 class CandidateDB(Base):
     """SQLAlchemy Candidate Model."""
+
     __tablename__ = "candidates"
 
     id = Column(String, primary_key=True, index=True)
@@ -122,31 +132,39 @@ class CandidateDB(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
+
 # ============================================================================
 # ENUMS - STRONGLY TYPED STATUS/PROFICIENCY VALUES
 # ============================================================================
 
+
 class ApplicationStatus(str, Enum):
     """Application status enumeration."""
+
     APPLIED = "applied"
     REVIEWING = "reviewing"
     INTERVIEW_SCHEDULED = "interview_scheduled"
     ACCEPTED = "accepted"
     REJECTED = "rejected"
 
+
 class SkillProficiency(str, Enum):
     """Skill proficiency enumeration."""
+
     BEGINNER = "beginner"
     INTERMEDIATE = "intermediate"
     ADVANCED = "advanced"
     EXPERT = "expert"
 
+
 # ----------------------------------------------------------------------------
 # CANDIDATE STATUS WORKFLOW
 # ----------------------------------------------------------------------------
 
+
 class CandidateStatus(str, Enum):
     """Candidate lifecycle status."""
+
     NEW = "new"
     REVIEWING = "reviewing"
     INTERVIEW_SCHEDULED = "interview_scheduled"
@@ -154,16 +172,19 @@ class CandidateStatus(str, Enum):
     HIRED = "hired"
     REJECTED = "rejected"
 
+
 # ============================================================================
 # PYDANTIC MODELS - BASIC CANDIDATE MANAGEMENT
 # ============================================================================
 
+
 class CandidateCreate(BaseModel):
     """Schema for creating a candidate."""
+
     email: EmailStr
     first_name: str = Field(..., min_length=1, max_length=100)
     last_name: str = Field(..., min_length=1, max_length=100)
-    phone: str | None = Field(None, pattern=r'^\+?1?\d{9,15}$')
+    phone: str | None = Field(None, pattern=r"^\+?1?\d{9,15}$")
     resume_url: str | None = None
 
     class Config:
@@ -173,20 +194,24 @@ class CandidateCreate(BaseModel):
                 "first_name": "John",
                 "last_name": "Doe",
                 "phone": "+1234567890",
-                "resume_url": "https://example.com/resume.pdf"
+                "resume_url": "https://example.com/resume.pdf",
             }
         }
 
+
 class CandidateUpdate(BaseModel):
     """Schema for updating a candidate."""
+
     email: EmailStr | None = None
     first_name: str | None = Field(None, min_length=1, max_length=100)
     last_name: str | None = Field(None, min_length=1, max_length=100)
-    phone: str | None = Field(None, pattern=r'^\+?1?\d{9,15}$')
+    phone: str | None = Field(None, pattern=r"^\+?1?\d{9,15}$")
     resume_url: str | None = None
+
 
 class CandidateResponse(BaseModel):
     """Schema for candidate response."""
+
     id: str
     email: str
     first_name: str
@@ -197,8 +222,10 @@ class CandidateResponse(BaseModel):
     created_at: str
     updated_at: str
 
+
 class ApplicationCreate(BaseModel):
     """Schema for creating an application."""
+
     candidate_id: str
     job_id: str
     cover_letter: str | None = None
@@ -210,17 +237,24 @@ class ApplicationCreate(BaseModel):
                 "candidate_id": "uuid-here",
                 "job_id": "job-123",
                 "cover_letter": "I am interested in this position...",
-                "status": "applied"
+                "status": "applied",
             }
         }
 
+
 class ApplicationUpdate(BaseModel):
     """Schema for updating an application."""
-    status: ApplicationStatus = Field(..., description="Application status must be one of: applied, reviewing, interview_scheduled, accepted, rejected")
+
+    status: ApplicationStatus = Field(
+        ...,
+        description="Application status must be one of: applied, reviewing, interview_scheduled, accepted, rejected",
+    )
     cover_letter: str | None = None
+
 
 class ApplicationResponse(BaseModel):
     """Schema for application response."""
+
     id: str
     job_id: str
     candidate_id: str
@@ -229,38 +263,43 @@ class ApplicationResponse(BaseModel):
     created_at: str
     updated_at: str
 
+
 class SkillCreate(BaseModel):
     """Schema for adding a skill."""
+
     skill: str = Field(..., min_length=1, max_length=100)
     proficiency: SkillProficiency = Field(default=SkillProficiency.INTERMEDIATE)
 
     class Config:
-        json_schema_extra = {
-            "example": {
-                "skill": "Python",
-                "proficiency": "advanced"
-            }
-        }
+        json_schema_extra = {"example": {"skill": "Python", "proficiency": "advanced"}}
+
 
 class SkillResponse(BaseModel):
     """Schema for skill response."""
+
     skill: str
     proficiency: SkillProficiency
     added_at: str
 
+
 class SkillListResponse(BaseModel):
     """Schema for skill list response."""
+
     candidate_id: str
     skills: list[SkillResponse]
 
+
 class ResumeResponse(BaseModel):
     """Schema for resume response."""
+
     candidate_id: str
     resume_url: str
+
 
 # ============================================================================
 # SEARCH & FILTER MODELS
 # ============================================================================
+
 
 class SearchResponse(BaseModel):
     total: int
@@ -269,17 +308,22 @@ class SearchResponse(BaseModel):
     results: list[dict[str, Any]] = []
     search_method: str
 
+
 # ============================================================================
 # PAGINATION MODELS
 # ============================================================================
 
+
 class PaginationParams(BaseModel):
     """Pagination parameters for list endpoints."""
+
     offset: int = Field(default=0, ge=0, description="Number of items to skip")
     limit: int = Field(default=20, ge=1, le=100, description="Number of items to return (1-100)")
 
+
 class PaginatedResponse(BaseModel, Generic[T]):
     """Generic paginated response wrapper."""
+
     total: int = Field(..., description="Total number of items")
     offset: int = Field(..., description="Number of items skipped")
     limit: int = Field(..., description="Number of items returned")
@@ -305,9 +349,11 @@ class PaginatedResponse(BaseModel, Generic[T]):
         """Calculate total number of pages."""
         return (self.total + self.limit - 1) // self.limit
 
+
 # ============================================================================
 # PYDANTIC MODELS - VECTOR SEARCH & PROFILING
 # ============================================================================
+
 
 class WorkExperience(BaseModel):
     title: str
@@ -315,28 +361,37 @@ class WorkExperience(BaseModel):
     duration: str
     responsibilities: list[str]
 
+
 class Education(BaseModel):
     institution: str
     degree: str
     year: str
 
+
 class Skills(BaseModel):
     matched: list[str]
     unmatched: list[str]
+
 
 class InitialQuestion(BaseModel):
     question: str = Field(..., description="Targeted question based on profile.")
     reasoning: str = Field(..., description="Why this question is being asked.")
 
+
 class CandidateProfile(BaseModel):
     full_name: str = Field(..., description="The candidate's full name.")
-    source_url: str = Field(..., description="The primary URL where the candidate's profile was found.")
+    source_url: str = Field(
+        ..., description="The primary URL where the candidate's profile was found."
+    )
     summary: str = Field(..., description="AI-generated summary of the candidate's profile.")
     work_experience: list[WorkExperience]
     education: list[Education]
     skills: Skills
-    alignment_score: float = Field(ge=0.0, le=1.0, description="Score indicating alignment with the search criteria.")
+    alignment_score: float = Field(
+        ge=0.0, le=1.0, description="Score indicating alignment with the search criteria."
+    )
     initial_questions: list[InitialQuestion]
+
 
 # ============================================================================
 # IN-MEMORY STORAGE
@@ -359,6 +414,7 @@ availability_db: dict[str, list[dict[str, Any]]] = {}
 
 TEST_TOKEN = "test-token-12345"
 DEFAULT_USER_ID = "test-user-001"
+
 
 def get_current_user(authorization: str | None = Header(None)) -> str | None:
     """Simple auth stub that accepts Bearer tokens.
@@ -389,9 +445,11 @@ def get_current_user(authorization: str | None = Header(None)) -> str | None:
     # Fallback: return default user ID for all auth attempts
     return DEFAULT_USER_ID
 
+
 def generate_id() -> str:
     """Generate unique ID."""
     return str(uuid.uuid4())
+
 
 def get_db():
     """Dependency to get a database session."""
@@ -400,6 +458,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 def create_candidate_embedding(profile: CandidateProfile) -> np.ndarray:
     """Generate embedding vector for a candidate profile."""
@@ -419,6 +478,7 @@ def create_candidate_embedding(profile: CandidateProfile) -> np.ndarray:
     embeddings = list(embedding_model.embed([profile_text]))
     return np.array(embeddings[0])
 
+
 def store_candidate_profile(profile: CandidateProfile) -> str:
     """Store a candidate profile in the vector database."""
     if vector_db is None:
@@ -437,7 +497,7 @@ def store_candidate_profile(profile: CandidateProfile) -> str:
             "full_name": profile.full_name,
             "profile_text": f"{profile.full_name} {profile.summary} {' '.join(profile.skills.matched)}",
             "vector": embedding.tolist(),
-            "metadata": profile.model_dump_json()
+            "metadata": profile.model_dump_json(),
         }
 
         # Store in LanceDB
@@ -450,6 +510,7 @@ def store_candidate_profile(profile: CandidateProfile) -> str:
     except Exception as e:
         logger.error(f"Failed to store candidate profile: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to store candidate profile: {str(e)}")
+
 
 def search_similar_candidates(query: str, limit: int = 5) -> list[dict]:
     """Search for candidates similar to the query using vector similarity."""
@@ -470,18 +531,23 @@ def search_similar_candidates(query: str, limit: int = 5) -> list[dict]:
         candidates = []
         for result in results:
             metadata = json.loads(result["metadata"])
-            candidates.append({
-                "id": result["id"],
-                "full_name": result["full_name"],
-                "score": float(result["_distance"]),  # LanceDB returns distance, convert to score
-                "profile": metadata
-            })
+            candidates.append(
+                {
+                    "id": result["id"],
+                    "full_name": result["full_name"],
+                    "score": float(
+                        result["_distance"]
+                    ),  # LanceDB returns distance, convert to score
+                    "profile": metadata,
+                }
+            )
 
         return candidates
 
     except Exception as e:
         logger.error(f"Vector search failed: {e}")
         return []
+
 
 # ============================================================================
 # FASTAPI APPLICATION
@@ -507,12 +573,13 @@ app = FastAPI(
     """,
     docs_url="/docs",
     redoc_url="/redoc",
-    openapi_url="/openapi.json"
+    openapi_url="/openapi.json",
 )
 
 # ============================================================================
 # STARTUP/SHUTDOWN EVENTS
 # ============================================================================
+
 
 @app.on_event("startup")
 def on_startup():
@@ -527,9 +594,11 @@ def on_startup():
     # Initialize vector search
     initialize_vector_search()
 
+
 # ============================================================================
 # ROOT & HEALTH ENDPOINTS
 # ============================================================================
+
 
 @app.get("/")
 async def root():
@@ -542,9 +611,10 @@ async def root():
             "candidate_management": True,
             "application_tracking": True,
             "skill_management": True,
-            "vector_search": vector_db is not None
-        }
+            "vector_search": vector_db is not None,
+        },
     }
+
 
 @app.get("/health")
 async def health():
@@ -552,25 +622,27 @@ async def health():
     return {
         "service": "candidate",
         "status": "healthy",
-        "vector_search": "available" if vector_db is not None else "unavailable"
+        "vector_search": "available" if vector_db is not None else "unavailable",
     }
+
 
 @app.get("/doc", include_in_schema=False)
 async def doc_redirect():
     """Alternative redirect to API documentation."""
     return RedirectResponse(url="/docs")
 
+
 @app.get("/api-docs", include_in_schema=False)
 async def api_docs_info():
     """Get API documentation information and available endpoints."""
     routes_info = []
     for route in app.routes:
-        if hasattr(route, 'methods') and hasattr(route, 'path'):
+        if hasattr(route, "methods") and hasattr(route, "path"):
             route_info = {
                 "path": route.path,
                 "methods": list(route.methods),
-                "name": getattr(route, 'name', 'unknown'),
-                "summary": getattr(route, 'summary', None) or getattr(route, 'description', None)
+                "name": getattr(route, "name", "unknown"),
+                "summary": getattr(route, "summary", None) or getattr(route, "description", None),
             }
             routes_info.append(route_info)
 
@@ -581,14 +653,16 @@ async def api_docs_info():
         "documentation_urls": {
             "swagger_ui": "/docs",
             "redoc": "/redoc",
-            "openapi_json": "/openapi.json"
+            "openapi_json": "/openapi.json",
         },
-        "routes": routes_info
+        "routes": routes_info,
     }
+
 
 # ============================================================================
 # CANDIDATE MANAGEMENT ENDPOINTS
 # ============================================================================
+
 
 @app.post(
     "/api/v1/candidates",
@@ -600,19 +674,15 @@ async def api_docs_info():
     responses={
         201: {"description": "Candidate created successfully"},
         400: {"description": "Invalid input - missing or invalid fields"},
-        401: {"description": "Unauthorized - missing authorization header"}
-    }
+        401: {"description": "Unauthorized - missing authorization header"},
+    },
 )
 async def create_candidate(
-    payload: CandidateCreate,
-    current_user: str | None = Depends(get_current_user)
+    payload: CandidateCreate, current_user: str | None = Depends(get_current_user)
 ):
     """Create a new candidate."""
     if not current_user:
-        return JSONResponse(
-            status_code=401,
-            content={"error": "Unauthorized"}
-        )
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
     candidate_id = generate_id()
     candidate = {
@@ -625,7 +695,7 @@ async def create_candidate(
         "resume_url": payload.resume_url,
         "status": CandidateStatus.NEW,
         "created_at": datetime.utcnow().isoformat(),
-        "updated_at": datetime.utcnow().isoformat()
+        "updated_at": datetime.utcnow().isoformat(),
     }
 
     candidates_db[candidate_id] = candidate
@@ -636,15 +706,13 @@ async def create_candidate(
 
     return candidate
 
+
 @app.get(
     "/api/v1/candidates/search",
     tags=["search"],
     summary="Search candidates with optional filters",
     response_model=SearchResponse,
-    responses={
-        200: {"description": "Search results"},
-        400: {"description": "Invalid query"}
-    }
+    responses={200: {"description": "Search results"}, 400: {"description": "Invalid query"}},
 )
 async def search_candidates(
     query: str,
@@ -652,7 +720,7 @@ async def search_candidates(
     min_experience: int | None = None,
     location: str | None = None,
     tags: str | None = None,
-    limit: int = Query(default=5, ge=1, le=100)
+    limit: int = Query(default=5, ge=1, le=100),
 ):
     """Search for candidates with optional filters.
 
@@ -675,7 +743,7 @@ async def search_candidates(
         "skills": filter_skills if filter_skills else None,
         "min_experience": min_experience,
         "location": filter_location,
-        "tags": filter_tags if filter_tags else None
+        "tags": filter_tags if filter_tags else None,
     }
 
     # Get vector search results if available, otherwise use all candidates
@@ -693,13 +761,15 @@ async def search_candidates(
         results = []
         for cand_id, cand in list(candidates_db.items())[:limit]:
             full_name = f"{cand.get('first_name', '')} {cand.get('last_name', '')}".lower()
-            if query.lower() in full_name or query.lower() in cand.get('email', '').lower():
-                results.append({
-                    "id": cand_id,
-                    "full_name": full_name.strip(),
-                    "email": cand.get("email"),
-                    "score": 1.0
-                })
+            if query.lower() in full_name or query.lower() in cand.get("email", "").lower():
+                results.append(
+                    {
+                        "id": cand_id,
+                        "full_name": full_name.strip(),
+                        "email": cand.get("email"),
+                        "score": 1.0,
+                    }
+                )
         search_method = "basic_text_match"
 
     # Apply filters to results
@@ -738,8 +808,9 @@ async def search_candidates(
         query=query,
         filters_applied=filters_applied,
         results=filtered_results[:limit],
-        search_method=search_method
+        search_method=search_method,
     )
+
 
 @app.get(
     "/api/v1/candidates/{candidate_id}",
@@ -749,28 +820,20 @@ async def search_candidates(
     responses={
         200: {"description": "Candidate found"},
         401: {"description": "Unauthorized"},
-        404: {"description": "Candidate not found"}
-    }
+        404: {"description": "Candidate not found"},
+    },
 )
-async def get_candidate(
-    candidate_id: str,
-    current_user: str | None = Depends(get_current_user)
-):
+async def get_candidate(candidate_id: str, current_user: str | None = Depends(get_current_user)):
     """Get candidate by ID."""
     if not current_user:
-        return JSONResponse(
-            status_code=401,
-            content={"error": "Unauthorized"}
-        )
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
     if candidate_id not in candidates_db:
-        return JSONResponse(
-            status_code=404,
-            content={"error": "Candidate not found"}
-        )
+        return JSONResponse(status_code=404, content={"error": "Candidate not found"})
 
     candidate = candidates_db[candidate_id]
     return candidate
+
 
 @app.get(
     "/api/v1/candidates",
@@ -778,25 +841,22 @@ async def get_candidate(
     summary="List all candidates with pagination",
     responses={
         200: {"description": "Paginated list of candidates"},
-        403: {"description": "Forbidden"}
-    }
+        403: {"description": "Forbidden"},
+    },
 )
 async def list_candidates(
     offset: int = Query(default=0, ge=0, description="Number of items to skip"),
     limit: int = Query(default=20, ge=1, le=100, description="Number of items to return"),
-    current_user: str | None = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user),
 ):
     """List all candidates with pagination (offset, limit)."""
     if not current_user:
-        return JSONResponse(
-            status_code=403,
-            content={"error": "Forbidden"}
-        )
+        return JSONResponse(status_code=403, content={"error": "Forbidden"})
 
     # Get all candidates and apply pagination
     all_candidates = list(candidates_db.values())
     total = len(all_candidates)
-    items = all_candidates[offset:offset + limit]
+    items = all_candidates[offset : offset + limit]
 
     return {
         "total": total,
@@ -806,15 +866,18 @@ async def list_candidates(
         "has_next": (offset + limit) < total,
         "has_previous": offset > 0,
         "page": (offset // limit) + 1,
-        "total_pages": (total + limit - 1) // limit
+        "total_pages": (total + limit - 1) // limit,
     }
+
 
 # ============================================================================
 # BULK OPERATIONS
 # ============================================================================
 
+
 class BulkCandidateImport(BaseModel):
     candidates: list[CandidateCreate] = Field(..., min_items=1, max_items=1000)
+
 
 class BulkImportResponse(BaseModel):
     total: int
@@ -822,6 +885,7 @@ class BulkImportResponse(BaseModel):
     failed: int
     errors: list[dict[str, Any]] = []
     candidate_ids: list[str] = []
+
 
 @app.post(
     "/api/v1/candidates/bulk",
@@ -832,12 +896,11 @@ class BulkImportResponse(BaseModel):
     responses={
         201: {"description": "Bulk import processed"},
         400: {"description": "Invalid payload"},
-        401: {"description": "Unauthorized"}
-    }
+        401: {"description": "Unauthorized"},
+    },
 )
 async def bulk_import_candidates(
-    payload: BulkCandidateImport,
-    current_user: str | None = Depends(get_current_user)
+    payload: BulkCandidateImport, current_user: str | None = Depends(get_current_user)
 ):
     """Bulk import candidates from a list."""
     if not current_user:
@@ -859,7 +922,7 @@ async def bulk_import_candidates(
                 "resume_url": cand_data.resume_url,
                 "status": CandidateStatus.NEW,
                 "created_at": datetime.utcnow().isoformat(),
-                "updated_at": datetime.utcnow().isoformat()
+                "updated_at": datetime.utcnow().isoformat(),
             }
             candidates_db[candidate_id] = candidate
             candidate_skills_db[candidate_id] = []
@@ -868,44 +931,34 @@ async def bulk_import_candidates(
             availability_db[candidate_id] = []
             created_ids.append(candidate_id)
         except Exception as e:
-            errors.append({
-                "index": idx,
-                "email": cand_data.email,
-                "error": str(e)
-            })
+            errors.append({"index": idx, "email": cand_data.email, "error": str(e)})
 
     return BulkImportResponse(
         total=len(payload.candidates),
         created=len(created_ids),
         failed=len(errors),
         errors=errors,
-        candidate_ids=created_ids
+        candidate_ids=created_ids,
     )
+
 
 @app.get(
     "/api/v1/candidates/bulk/export",
     tags=["bulk"],
     summary="Bulk export all candidates",
-    responses={
-        200: {"description": "Exported candidates"},
-        403: {"description": "Forbidden"}
-    }
+    responses={200: {"description": "Exported candidates"}, 403: {"description": "Forbidden"}},
 )
-async def bulk_export_candidates(
-    current_user: str | None = Depends(get_current_user)
-):
+async def bulk_export_candidates(current_user: str | None = Depends(get_current_user)):
     """Export all candidates as JSON."""
     if not current_user:
-        return JSONResponse(
-            status_code=403,
-            content={"error": "Forbidden"}
-        )
+        return JSONResponse(status_code=403, content={"error": "Forbidden"})
 
     return {
         "total": len(candidates_db),
         "exported_at": datetime.utcnow().isoformat(),
-        "candidates": list(candidates_db.values())
+        "candidates": list(candidates_db.values()),
     }
+
 
 @app.put(
     "/api/v1/candidates/{candidate_id}",
@@ -916,26 +969,20 @@ async def bulk_export_candidates(
         200: {"description": "Candidate updated successfully"},
         400: {"description": "Invalid input"},
         401: {"description": "Unauthorized"},
-        404: {"description": "Candidate not found"}
-    }
+        404: {"description": "Candidate not found"},
+    },
 )
 async def update_candidate(
     candidate_id: str,
     payload: CandidateUpdate,
-    current_user: str | None = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user),
 ):
     """Update candidate information."""
     if not current_user:
-        return JSONResponse(
-            status_code=401,
-            content={"error": "Unauthorized"}
-        )
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
     if candidate_id not in candidates_db:
-        return JSONResponse(
-            status_code=404,
-            content={"error": "Candidate not found"}
-        )
+        return JSONResponse(status_code=404, content={"error": "Candidate not found"})
 
     candidate = candidates_db[candidate_id]
 
@@ -946,12 +993,18 @@ async def update_candidate(
 
     return candidate
 
+
 # ----------------------------------------------------------------------------
 # CANDIDATE STATUS ENDPOINT
 # ----------------------------------------------------------------------------
 
+
 class CandidateStatusUpdate(BaseModel):
-    status: CandidateStatus = Field(..., description="Candidate status: new, reviewing, interview_scheduled, offered, hired, rejected")
+    status: CandidateStatus = Field(
+        ...,
+        description="Candidate status: new, reviewing, interview_scheduled, offered, hired, rejected",
+    )
+
 
 @app.patch(
     "/api/v1/candidates/{candidate_id}/status",
@@ -962,13 +1015,13 @@ class CandidateStatusUpdate(BaseModel):
         200: {"description": "Candidate status updated"},
         400: {"description": "Invalid status"},
         401: {"description": "Unauthorized"},
-        404: {"description": "Candidate not found"}
-    }
+        404: {"description": "Candidate not found"},
+    },
 )
 async def update_candidate_status(
     candidate_id: str,
     payload: CandidateStatusUpdate,
-    current_user: str | None = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user),
 ):
     """Update the lifecycle status of a candidate."""
     if not current_user:
@@ -982,6 +1035,7 @@ async def update_candidate_status(
     candidate["updated_at"] = datetime.utcnow().isoformat()
     return candidate
 
+
 @app.delete(
     "/api/v1/candidates/{candidate_id}",
     tags=["candidates"],
@@ -990,25 +1044,16 @@ async def update_candidate_status(
     responses={
         204: {"description": "Candidate deleted successfully"},
         401: {"description": "Unauthorized"},
-        404: {"description": "Candidate not found"}
-    }
+        404: {"description": "Candidate not found"},
+    },
 )
-async def delete_candidate(
-    candidate_id: str,
-    current_user: str | None = Depends(get_current_user)
-):
+async def delete_candidate(candidate_id: str, current_user: str | None = Depends(get_current_user)):
     """Delete a candidate."""
     if not current_user:
-        return JSONResponse(
-            status_code=401,
-            content={"error": "Unauthorized"}
-        )
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
     if candidate_id not in candidates_db:
-        return JSONResponse(
-            status_code=404,
-            content={"error": "Candidate not found"}
-        )
+        return JSONResponse(status_code=404, content={"error": "Candidate not found"})
 
     del candidates_db[candidate_id]
     if candidate_id in candidate_skills_db:
@@ -1022,9 +1067,11 @@ async def delete_candidate(
 
     return None
 
+
 # ============================================================================
 # APPLICATION TRACKING ENDPOINTS
 # ============================================================================
+
 
 @app.post(
     "/api/v1/applications",
@@ -1035,19 +1082,15 @@ async def delete_candidate(
     responses={
         201: {"description": "Application created successfully"},
         400: {"description": "Invalid input"},
-        401: {"description": "Unauthorized"}
-    }
+        401: {"description": "Unauthorized"},
+    },
 )
 async def create_application(
-    payload: ApplicationCreate,
-    current_user: str | None = Depends(get_current_user)
+    payload: ApplicationCreate, current_user: str | None = Depends(get_current_user)
 ):
     """Create a new application."""
     if not current_user:
-        return JSONResponse(
-            status_code=401,
-            content={"error": "Unauthorized"}
-        )
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
     app_id = generate_id()
     application = {
@@ -1058,12 +1101,13 @@ async def create_application(
         "status": payload.status,
         "cover_letter": payload.cover_letter,
         "created_at": datetime.utcnow().isoformat(),
-        "updated_at": datetime.utcnow().isoformat()
+        "updated_at": datetime.utcnow().isoformat(),
     }
 
     applications_db[app_id] = application
 
     return application
+
 
 @app.get(
     "/api/v1/applications",
@@ -1071,25 +1115,22 @@ async def create_application(
     summary="Get all applications with pagination",
     responses={
         200: {"description": "Paginated list of applications"},
-        403: {"description": "Forbidden"}
-    }
+        403: {"description": "Forbidden"},
+    },
 )
 async def get_applications(
     offset: int = Query(default=0, ge=0, description="Number of items to skip"),
     limit: int = Query(default=20, ge=1, le=100, description="Number of items to return"),
-    current_user: str | None = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user),
 ):
     """Get all applications with pagination (offset, limit)."""
     if not current_user:
-        return JSONResponse(
-            status_code=403,
-            content={"error": "Forbidden"}
-        )
+        return JSONResponse(status_code=403, content={"error": "Forbidden"})
 
     # Get all applications and apply pagination
     all_applications = list(applications_db.values())
     total = len(all_applications)
-    items = all_applications[offset:offset + limit]
+    items = all_applications[offset : offset + limit]
 
     return {
         "total": total,
@@ -1099,8 +1140,9 @@ async def get_applications(
         "has_next": (offset + limit) < total,
         "has_previous": offset > 0,
         "page": (offset // limit) + 1,
-        "total_pages": (total + limit - 1) // limit
+        "total_pages": (total + limit - 1) // limit,
     }
+
 
 @app.get(
     "/api/v1/candidates/{candidate_id}/applications",
@@ -1110,32 +1152,25 @@ async def get_applications(
     responses={
         200: {"description": "List of candidate applications"},
         401: {"description": "Unauthorized"},
-        404: {"description": "Candidate not found"}
-    }
+        404: {"description": "Candidate not found"},
+    },
 )
 async def get_candidate_applications(
-    candidate_id: str,
-    current_user: str | None = Depends(get_current_user)
+    candidate_id: str, current_user: str | None = Depends(get_current_user)
 ):
     """Get applications for a candidate."""
     if not current_user:
-        return JSONResponse(
-            status_code=401,
-            content={"error": "Unauthorized"}
-        )
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
     if candidate_id not in candidates_db:
-        return JSONResponse(
-            status_code=404,
-            content={"error": "Candidate not found"}
-        )
+        return JSONResponse(status_code=404, content={"error": "Candidate not found"})
 
     candidate_apps = [
-        app for app in applications_db.values()
-        if app["candidate_id"] == candidate_id
+        app for app in applications_db.values() if app["candidate_id"] == candidate_id
     ]
 
     return candidate_apps
+
 
 @app.patch(
     "/api/v1/applications/{app_id}",
@@ -1146,26 +1181,18 @@ async def get_candidate_applications(
         200: {"description": "Application updated successfully"},
         400: {"description": "Invalid status"},
         401: {"description": "Unauthorized"},
-        404: {"description": "Application not found"}
-    }
+        404: {"description": "Application not found"},
+    },
 )
 async def update_application_status(
-    app_id: str,
-    payload: ApplicationUpdate,
-    current_user: str | None = Depends(get_current_user)
+    app_id: str, payload: ApplicationUpdate, current_user: str | None = Depends(get_current_user)
 ):
     """Update application status."""
     if not current_user:
-        return JSONResponse(
-            status_code=401,
-            content={"error": "Unauthorized"}
-        )
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
     if app_id not in applications_db:
-        return JSONResponse(
-            status_code=404,
-            content={"error": "Application not found"}
-        )
+        return JSONResponse(status_code=404, content={"error": "Application not found"})
 
     application = applications_db[app_id]
     application["status"] = payload.status
@@ -1175,9 +1202,11 @@ async def update_application_status(
 
     return application
 
+
 # ============================================================================
 # CANDIDATE PROFILE ENDPOINTS
 # ============================================================================
+
 
 @app.get(
     "/api/v1/candidates/{candidate_id}/resume",
@@ -1187,31 +1216,22 @@ async def update_application_status(
     responses={
         200: {"description": "Resume found"},
         401: {"description": "Unauthorized"},
-        404: {"description": "Candidate not found"}
-    }
+        404: {"description": "Candidate not found"},
+    },
 )
 async def get_candidate_resume(
-    candidate_id: str,
-    current_user: str | None = Depends(get_current_user)
+    candidate_id: str, current_user: str | None = Depends(get_current_user)
 ):
     """Get candidate resume."""
     if not current_user:
-        return JSONResponse(
-            status_code=401,
-            content={"error": "Unauthorized"}
-        )
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
     if candidate_id not in candidates_db:
-        return JSONResponse(
-            status_code=404,
-            content={"error": "Candidate not found"}
-        )
+        return JSONResponse(status_code=404, content={"error": "Candidate not found"})
 
     candidate = candidates_db[candidate_id]
-    return {
-        "candidate_id": candidate_id,
-        "resume_url": candidate.get("resume_url", "")
-    }
+    return {"candidate_id": candidate_id, "resume_url": candidate.get("resume_url", "")}
+
 
 @app.post(
     "/api/v1/candidates/{candidate_id}/resume",
@@ -1221,26 +1241,20 @@ async def get_candidate_resume(
     responses={
         200: {"description": "Resume uploaded successfully"},
         401: {"description": "Unauthorized"},
-        404: {"description": "Candidate not found"}
-    }
+        404: {"description": "Candidate not found"},
+    },
 )
 async def upload_resume(
     candidate_id: str,
     payload: dict = Body(...),
-    current_user: str | None = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user),
 ):
     """Upload candidate resume."""
     if not current_user:
-        return JSONResponse(
-            status_code=401,
-            content={"error": "Unauthorized"}
-        )
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
     if candidate_id not in candidates_db:
-        return JSONResponse(
-            status_code=404,
-            content={"error": "Candidate not found"}
-        )
+        return JSONResponse(status_code=404, content={"error": "Candidate not found"})
 
     resume_url = payload.get("resume_url", "").strip()
 
@@ -1248,10 +1262,8 @@ async def upload_resume(
     candidate["resume_url"] = resume_url
     candidate["updated_at"] = datetime.utcnow().isoformat()
 
-    return {
-        "candidate_id": candidate_id,
-        "resume_url": resume_url
-    }
+    return {"candidate_id": candidate_id, "resume_url": resume_url}
+
 
 @app.get(
     "/api/v1/candidates/{candidate_id}/skills",
@@ -1260,32 +1272,26 @@ async def upload_resume(
     responses={
         200: {"description": "Skills found"},
         401: {"description": "Unauthorized"},
-        404: {"description": "Candidate not found"}
-    }
+        404: {"description": "Candidate not found"},
+    },
 )
 async def get_candidate_skills(
     candidate_id: str,
     offset: int = Query(default=0, ge=0, description="Number of items to skip"),
     limit: int = Query(default=20, ge=1, le=100, description="Number of items to return"),
-    current_user: str | None = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user),
 ):
     """Get candidate skills with pagination."""
     if not current_user:
-        return JSONResponse(
-            status_code=401,
-            content={"error": "Unauthorized"}
-        )
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
     if candidate_id not in candidate_skills_db:
-        return JSONResponse(
-            status_code=404,
-            content={"error": "Candidate not found"}
-        )
+        return JSONResponse(status_code=404, content={"error": "Candidate not found"})
 
     # Get all skills and apply pagination
     all_skills = candidate_skills_db[candidate_id]
     total = len(all_skills)
-    items = all_skills[offset:offset + limit]
+    items = all_skills[offset : offset + limit]
 
     return {
         "candidate_id": candidate_id,
@@ -1296,8 +1302,9 @@ async def get_candidate_skills(
         "has_next": (offset + limit) < total,
         "has_previous": offset > 0,
         "page": (offset // limit) + 1,
-        "total_pages": (total + limit - 1) // limit
+        "total_pages": (total + limit - 1) // limit,
     }
+
 
 @app.post(
     "/api/v1/candidates/{candidate_id}/skills",
@@ -1307,45 +1314,40 @@ async def get_candidate_skills(
     responses={
         200: {"description": "Skill added successfully"},
         401: {"description": "Unauthorized"},
-        404: {"description": "Candidate not found"}
-    }
+        404: {"description": "Candidate not found"},
+    },
 )
 async def add_skill(
-    candidate_id: str,
-    payload: SkillCreate,
-    current_user: str | None = Depends(get_current_user)
+    candidate_id: str, payload: SkillCreate, current_user: str | None = Depends(get_current_user)
 ):
     """Add skill to candidate."""
     if not current_user:
-        return JSONResponse(
-            status_code=401,
-            content={"error": "Unauthorized"}
-        )
+        return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
     if candidate_id not in candidate_skills_db:
-        return JSONResponse(
-            status_code=404,
-            content={"error": "Candidate not found"}
-        )
+        return JSONResponse(status_code=404, content={"error": "Candidate not found"})
 
     skill_entry = {
         "skill": payload.skill,
         "proficiency": payload.proficiency,
-        "added_at": datetime.utcnow().isoformat()
+        "added_at": datetime.utcnow().isoformat(),
     }
 
     candidate_skills_db[candidate_id].append(skill_entry)
 
     return skill_entry
 
+
 # =========================================================================
 # INTERVIEW HISTORY ENDPOINTS
 # =========================================================================
+
 
 class InterviewStatus(str, Enum):
     SCHEDULED = "scheduled"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
+
 
 class InterviewCreate(BaseModel):
     title: str = Field(min_length=1, max_length=200)
@@ -1355,6 +1357,7 @@ class InterviewCreate(BaseModel):
     notes: str | None = None
     status: InterviewStatus = InterviewStatus.SCHEDULED
 
+
 class InterviewUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=200)
     scheduled_at: datetime | None = None
@@ -1362,6 +1365,7 @@ class InterviewUpdate(BaseModel):
     location: str | None = None
     notes: str | None = None
     status: InterviewStatus | None = None
+
 
 class InterviewResponse(BaseModel):
     id: str
@@ -1375,17 +1379,21 @@ class InterviewResponse(BaseModel):
     created_at: str
     updated_at: str
 
+
 @app.get(
     "/api/v1/candidates/{candidate_id}/interviews",
     tags=["interviews"],
     summary="List interviews for candidate with pagination",
-    responses={200: {"description": "Paginated list of interviews"}, 404: {"description": "Candidate not found"}}
+    responses={
+        200: {"description": "Paginated list of interviews"},
+        404: {"description": "Candidate not found"},
+    },
 )
 async def list_interviews(
     candidate_id: str,
     offset: int = Query(default=0, ge=0, description="Number of items to skip"),
     limit: int = Query(default=20, ge=1, le=100, description="Number of items to return"),
-    current_user: str | None = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user),
 ):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
@@ -1393,7 +1401,7 @@ async def list_interviews(
     # Get all interviews for candidate and apply pagination
     all_interviews = interviews_db.get(candidate_id, [])
     total = len(all_interviews)
-    items = all_interviews[offset:offset + limit]
+    items = all_interviews[offset : offset + limit]
 
     return {
         "total": total,
@@ -1403,8 +1411,9 @@ async def list_interviews(
         "has_next": (offset + limit) < total,
         "has_previous": offset > 0,
         "page": (offset // limit) + 1,
-        "total_pages": (total + limit - 1) // limit
+        "total_pages": (total + limit - 1) // limit,
     }
+
 
 @app.post(
     "/api/v1/candidates/{candidate_id}/interviews",
@@ -1412,9 +1421,17 @@ async def list_interviews(
     summary="Create interview for candidate",
     response_model=InterviewResponse,
     status_code=201,
-    responses={201: {"description": "Interview created"}, 401: {"description": "Unauthorized"}, 404: {"description": "Candidate not found"}}
+    responses={
+        201: {"description": "Interview created"},
+        401: {"description": "Unauthorized"},
+        404: {"description": "Candidate not found"},
+    },
 )
-async def create_interview(candidate_id: str, payload: InterviewCreate, current_user: str | None = Depends(get_current_user)):
+async def create_interview(
+    candidate_id: str,
+    payload: InterviewCreate,
+    current_user: str | None = Depends(get_current_user),
+):
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
     if candidate_id not in candidates_db:
@@ -1435,14 +1452,17 @@ async def create_interview(candidate_id: str, payload: InterviewCreate, current_
     interviews_db.setdefault(candidate_id, []).append(interview)
     return interview
 
+
 @app.get(
     "/api/v1/candidates/{candidate_id}/interviews/{interview_id}",
     tags=["interviews"],
     summary="Get interview",
     response_model=InterviewResponse,
-    responses={404: {"description": "Interview or candidate not found"}}
+    responses={404: {"description": "Interview or candidate not found"}},
 )
-async def get_interview(candidate_id: str, interview_id: str, current_user: str | None = Depends(get_current_user)):
+async def get_interview(
+    candidate_id: str, interview_id: str, current_user: str | None = Depends(get_current_user)
+):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     interviews = interviews_db.get(candidate_id, [])
@@ -1451,14 +1471,20 @@ async def get_interview(candidate_id: str, interview_id: str, current_user: str 
             return it
     return JSONResponse(status_code=404, content={"error": "Interview not found"})
 
+
 @app.put(
     "/api/v1/candidates/{candidate_id}/interviews/{interview_id}",
     tags=["interviews"],
     summary="Update interview",
     response_model=InterviewResponse,
-    responses={404: {"description": "Interview or candidate not found"}}
+    responses={404: {"description": "Interview or candidate not found"}},
 )
-async def update_interview(candidate_id: str, interview_id: str, payload: InterviewUpdate, current_user: str | None = Depends(get_current_user)):
+async def update_interview(
+    candidate_id: str,
+    interview_id: str,
+    payload: InterviewUpdate,
+    current_user: str | None = Depends(get_current_user),
+):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     interviews = interviews_db.get(candidate_id, [])
@@ -1472,13 +1498,19 @@ async def update_interview(candidate_id: str, interview_id: str, payload: Interv
             return it
     return JSONResponse(status_code=404, content={"error": "Interview not found"})
 
+
 @app.delete(
     "/api/v1/candidates/{candidate_id}/interviews/{interview_id}",
     tags=["interviews"],
     summary="Delete interview",
-    responses={204: {"description": "Interview deleted"}, 404: {"description": "Interview or candidate not found"}}
+    responses={
+        204: {"description": "Interview deleted"},
+        404: {"description": "Interview or candidate not found"},
+    },
 )
-async def delete_interview(candidate_id: str, interview_id: str, current_user: str | None = Depends(get_current_user)):
+async def delete_interview(
+    candidate_id: str, interview_id: str, current_user: str | None = Depends(get_current_user)
+):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     interviews = interviews_db.get(candidate_id, [])
@@ -1486,12 +1518,15 @@ async def delete_interview(candidate_id: str, interview_id: str, current_user: s
         if it["id"] == interview_id:
             del interviews[idx]
             from fastapi import Response
+
             return Response(status_code=204)
     return JSONResponse(status_code=404, content={"error": "Interview not found"})
+
 
 # =========================================================================
 # ASSESSMENTS ENDPOINTS
 # =========================================================================
+
 
 class AssessmentStatus(str, Enum):
     PENDING = "pending"
@@ -1499,13 +1534,17 @@ class AssessmentStatus(str, Enum):
     COMPLETED = "completed"
     FAILED = "failed"
 
+
 class AssessmentCreate(BaseModel):
     title: str = Field(min_length=1, max_length=200)
     description: str | None = None
-    assessment_type: str = Field(min_length=1, max_length=100)  # e.g., "coding", "technical", "soft_skills"
+    assessment_type: str = Field(
+        min_length=1, max_length=100
+    )  # e.g., "coding", "technical", "soft_skills"
     status: AssessmentStatus = AssessmentStatus.PENDING
     score: float | None = Field(default=None, ge=0.0, le=100.0)
     result_url: str | None = None
+
 
 class AssessmentUpdate(BaseModel):
     title: str | None = Field(default=None, min_length=1, max_length=200)
@@ -1514,6 +1553,7 @@ class AssessmentUpdate(BaseModel):
     status: AssessmentStatus | None = None
     score: float | None = Field(default=None, ge=0.0, le=100.0)
     result_url: str | None = None
+
 
 class AssessmentResponse(BaseModel):
     id: str
@@ -1527,17 +1567,21 @@ class AssessmentResponse(BaseModel):
     created_at: str
     updated_at: str
 
+
 @app.get(
     "/api/v1/candidates/{candidate_id}/assessments",
     tags=["assessments"],
     summary="List assessments for candidate with pagination",
-    responses={200: {"description": "Paginated list of assessments"}, 404: {"description": "Candidate not found"}}
+    responses={
+        200: {"description": "Paginated list of assessments"},
+        404: {"description": "Candidate not found"},
+    },
 )
 async def list_assessments(
     candidate_id: str,
     offset: int = Query(default=0, ge=0, description="Number of items to skip"),
     limit: int = Query(default=20, ge=1, le=100, description="Number of items to return"),
-    current_user: str | None = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user),
 ):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
@@ -1545,7 +1589,7 @@ async def list_assessments(
     # Get all assessments for candidate and apply pagination
     all_assessments = assessments_db.get(candidate_id, [])
     total = len(all_assessments)
-    items = all_assessments[offset:offset + limit]
+    items = all_assessments[offset : offset + limit]
 
     return {
         "total": total,
@@ -1555,8 +1599,9 @@ async def list_assessments(
         "has_next": (offset + limit) < total,
         "has_previous": offset > 0,
         "page": (offset // limit) + 1,
-        "total_pages": (total + limit - 1) // limit
+        "total_pages": (total + limit - 1) // limit,
     }
+
 
 @app.post(
     "/api/v1/candidates/{candidate_id}/assessments",
@@ -1564,9 +1609,17 @@ async def list_assessments(
     summary="Create assessment for candidate",
     response_model=AssessmentResponse,
     status_code=201,
-    responses={201: {"description": "Assessment created"}, 401: {"description": "Unauthorized"}, 404: {"description": "Candidate not found"}}
+    responses={
+        201: {"description": "Assessment created"},
+        401: {"description": "Unauthorized"},
+        404: {"description": "Candidate not found"},
+    },
 )
-async def create_assessment(candidate_id: str, payload: AssessmentCreate, current_user: str | None = Depends(get_current_user)):
+async def create_assessment(
+    candidate_id: str,
+    payload: AssessmentCreate,
+    current_user: str | None = Depends(get_current_user),
+):
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
     if candidate_id not in candidates_db:
@@ -1587,14 +1640,17 @@ async def create_assessment(candidate_id: str, payload: AssessmentCreate, curren
     assessments_db.setdefault(candidate_id, []).append(assessment)
     return assessment
 
+
 @app.get(
     "/api/v1/candidates/{candidate_id}/assessments/{assessment_id}",
     tags=["assessments"],
     summary="Get assessment",
     response_model=AssessmentResponse,
-    responses={404: {"description": "Assessment or candidate not found"}}
+    responses={404: {"description": "Assessment or candidate not found"}},
 )
-async def get_assessment(candidate_id: str, assessment_id: str, current_user: str | None = Depends(get_current_user)):
+async def get_assessment(
+    candidate_id: str, assessment_id: str, current_user: str | None = Depends(get_current_user)
+):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     assessments = assessments_db.get(candidate_id, [])
@@ -1603,14 +1659,20 @@ async def get_assessment(candidate_id: str, assessment_id: str, current_user: st
             return a
     return JSONResponse(status_code=404, content={"error": "Assessment not found"})
 
+
 @app.put(
     "/api/v1/candidates/{candidate_id}/assessments/{assessment_id}",
     tags=["assessments"],
     summary="Update assessment",
     response_model=AssessmentResponse,
-    responses={404: {"description": "Assessment or candidate not found"}}
+    responses={404: {"description": "Assessment or candidate not found"}},
 )
-async def update_assessment(candidate_id: str, assessment_id: str, payload: AssessmentUpdate, current_user: str | None = Depends(get_current_user)):
+async def update_assessment(
+    candidate_id: str,
+    assessment_id: str,
+    payload: AssessmentUpdate,
+    current_user: str | None = Depends(get_current_user),
+):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     assessments = assessments_db.get(candidate_id, [])
@@ -1622,13 +1684,19 @@ async def update_assessment(candidate_id: str, assessment_id: str, payload: Asse
             return a
     return JSONResponse(status_code=404, content={"error": "Assessment not found"})
 
+
 @app.delete(
     "/api/v1/candidates/{candidate_id}/assessments/{assessment_id}",
     tags=["assessments"],
     summary="Delete assessment",
-    responses={204: {"description": "Assessment deleted"}, 404: {"description": "Assessment or candidate not found"}}
+    responses={
+        204: {"description": "Assessment deleted"},
+        404: {"description": "Assessment or candidate not found"},
+    },
 )
-async def delete_assessment(candidate_id: str, assessment_id: str, current_user: str | None = Depends(get_current_user)):
+async def delete_assessment(
+    candidate_id: str, assessment_id: str, current_user: str | None = Depends(get_current_user)
+):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     assessments = assessments_db.get(candidate_id, [])
@@ -1636,12 +1704,15 @@ async def delete_assessment(candidate_id: str, assessment_id: str, current_user:
         if a["id"] == assessment_id:
             del assessments[idx]
             from fastapi import Response
+
             return Response(status_code=204)
     return JSONResponse(status_code=404, content={"error": "Assessment not found"})
+
 
 # =========================================================================
 # AVAILABILITY ENDPOINTS
 # =========================================================================
+
 
 class AvailabilityCreate(BaseModel):
     start_time: datetime
@@ -1650,12 +1721,14 @@ class AvailabilityCreate(BaseModel):
     is_available: bool = True
     notes: str | None = None
 
+
 class AvailabilityUpdate(BaseModel):
     start_time: datetime | None = None
     end_time: datetime | None = None
     timezone: str | None = None
     is_available: bool | None = None
     notes: str | None = None
+
 
 class AvailabilityResponse(BaseModel):
     id: str
@@ -1668,17 +1741,21 @@ class AvailabilityResponse(BaseModel):
     created_at: str
     updated_at: str
 
+
 @app.get(
     "/api/v1/candidates/{candidate_id}/availability",
     tags=["availability"],
     summary="List availability slots for candidate with pagination",
-    responses={200: {"description": "Paginated list of availability slots"}, 404: {"description": "Candidate not found"}}
+    responses={
+        200: {"description": "Paginated list of availability slots"},
+        404: {"description": "Candidate not found"},
+    },
 )
 async def list_availability(
     candidate_id: str,
     offset: int = Query(default=0, ge=0, description="Number of items to skip"),
     limit: int = Query(default=20, ge=1, le=100, description="Number of items to return"),
-    current_user: str | None = Depends(get_current_user)
+    current_user: str | None = Depends(get_current_user),
 ):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
@@ -1686,7 +1763,7 @@ async def list_availability(
     # Get all availability slots for candidate and apply pagination
     all_availability = availability_db.get(candidate_id, [])
     total = len(all_availability)
-    items = all_availability[offset:offset + limit]
+    items = all_availability[offset : offset + limit]
 
     return {
         "total": total,
@@ -1696,8 +1773,9 @@ async def list_availability(
         "has_next": (offset + limit) < total,
         "has_previous": offset > 0,
         "page": (offset // limit) + 1,
-        "total_pages": (total + limit - 1) // limit
+        "total_pages": (total + limit - 1) // limit,
     }
+
 
 @app.post(
     "/api/v1/candidates/{candidate_id}/availability",
@@ -1705,9 +1783,17 @@ async def list_availability(
     summary="Create availability slot for candidate",
     response_model=AvailabilityResponse,
     status_code=201,
-    responses={201: {"description": "Availability created"}, 401: {"description": "Unauthorized"}, 404: {"description": "Candidate not found"}}
+    responses={
+        201: {"description": "Availability created"},
+        401: {"description": "Unauthorized"},
+        404: {"description": "Candidate not found"},
+    },
 )
-async def create_availability(candidate_id: str, payload: AvailabilityCreate, current_user: str | None = Depends(get_current_user)):
+async def create_availability(
+    candidate_id: str,
+    payload: AvailabilityCreate,
+    current_user: str | None = Depends(get_current_user),
+):
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
     if candidate_id not in candidates_db:
@@ -1727,14 +1813,17 @@ async def create_availability(candidate_id: str, payload: AvailabilityCreate, cu
     availability_db.setdefault(candidate_id, []).append(availability)
     return availability
 
+
 @app.get(
     "/api/v1/candidates/{candidate_id}/availability/{availability_id}",
     tags=["availability"],
     summary="Get availability slot",
     response_model=AvailabilityResponse,
-    responses={404: {"description": "Availability or candidate not found"}}
+    responses={404: {"description": "Availability or candidate not found"}},
 )
-async def get_availability(candidate_id: str, availability_id: str, current_user: str | None = Depends(get_current_user)):
+async def get_availability(
+    candidate_id: str, availability_id: str, current_user: str | None = Depends(get_current_user)
+):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     availabilities = availability_db.get(candidate_id, [])
@@ -1743,14 +1832,20 @@ async def get_availability(candidate_id: str, availability_id: str, current_user
             return av
     return JSONResponse(status_code=404, content={"error": "Availability not found"})
 
+
 @app.put(
     "/api/v1/candidates/{candidate_id}/availability/{availability_id}",
     tags=["availability"],
     summary="Update availability slot",
     response_model=AvailabilityResponse,
-    responses={404: {"description": "Availability or candidate not found"}}
+    responses={404: {"description": "Availability or candidate not found"}},
 )
-async def update_availability(candidate_id: str, availability_id: str, payload: AvailabilityUpdate, current_user: str | None = Depends(get_current_user)):
+async def update_availability(
+    candidate_id: str,
+    availability_id: str,
+    payload: AvailabilityUpdate,
+    current_user: str | None = Depends(get_current_user),
+):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     availabilities = availability_db.get(candidate_id, [])
@@ -1766,13 +1861,19 @@ async def update_availability(candidate_id: str, availability_id: str, payload: 
             return av
     return JSONResponse(status_code=404, content={"error": "Availability not found"})
 
+
 @app.delete(
     "/api/v1/candidates/{candidate_id}/availability/{availability_id}",
     tags=["availability"],
     summary="Delete availability slot",
-    responses={204: {"description": "Availability deleted"}, 404: {"description": "Availability or candidate not found"}}
+    responses={
+        204: {"description": "Availability deleted"},
+        404: {"description": "Availability or candidate not found"},
+    },
 )
-async def delete_availability(candidate_id: str, availability_id: str, current_user: str | None = Depends(get_current_user)):
+async def delete_availability(
+    candidate_id: str, availability_id: str, current_user: str | None = Depends(get_current_user)
+):
     if candidate_id not in candidates_db:
         return JSONResponse(status_code=404, content={"error": "Candidate not found"})
     availabilities = availability_db.get(candidate_id, [])
@@ -1780,8 +1881,10 @@ async def delete_availability(candidate_id: str, availability_id: str, current_u
         if av["id"] == availability_id:
             del availabilities[idx]
             from fastapi import Response
+
             return Response(status_code=204)
     return JSONResponse(status_code=404, content={"error": "Availability not found"})
+
 
 # ============================================================================
 # VECTOR SEARCH ENDPOINTS (Optional)
@@ -1796,43 +1899,7 @@ async def get_candidate_profile(candidate_id: str):
     logger.info(f"Fetching profile for candidate_id: {candidate_id}")
 
     if vector_db is None:
-        # Fallback to mock data only for specific mock candidate IDs
-        mock_candidate_ids = ["mock-id", "test-candidate", "demo-profile"]
-        if candidate_id in mock_candidate_ids:
-            mock_candidate_profile = CandidateProfile(
-                full_name="John Doe",
-                source_url="https://www.linkedin.com/in/johndoe",
-                summary="A highly skilled software engineer with over 10 years of experience.",
-                work_experience=[
-                    WorkExperience(
-                        title="Senior Software Engineer",
-                        company="Tech Corp",
-                        duration="2018 - Present",
-                        responsibilities=["Developed and maintained web applications.", "Mentored junior engineers."]
-                    )
-                ],
-                education=[
-                    Education(
-                        institution="University of Technology",
-                        degree="Bachelor of Science in Computer Science",
-                        year="2014"
-                    )
-                ],
-                skills=Skills(
-                    matched=["Python", "FastAPI", "SQLAlchemy"],
-                    unmatched=["React", "TypeScript"]
-                ),
-                alignment_score=0.85,
-                initial_questions=[
-                    InitialQuestion(
-                        question="What was your most challenging project at Tech Corp?",
-                        reasoning="To understand problem-solving skills."
-                    )
-                ]
-            )
-            return mock_candidate_profile
-        else:
-            raise HTTPException(status_code=404, detail="Candidate not found")
+        raise HTTPException(status_code=503, detail="Vector search engine is not available")
 
     try:
         # Search for candidate in vector database
@@ -1849,7 +1916,9 @@ async def get_candidate_profile(candidate_id: str):
         raise
     except Exception as e:
         logger.error(f"Failed to retrieve candidate profile: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve candidate profile: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to retrieve candidate profile: {str(e)}"
+        )
 
 
 @app.post("/api/v1/candidate-profiles", response_model=dict)
@@ -1864,7 +1933,7 @@ async def create_candidate_profile(profile: CandidateProfile):
         return {
             "candidate_id": candidate_id,
             "message": "Candidate profile stored successfully",
-            "vector_search_enabled": vector_db is not None
+            "vector_search_enabled": vector_db is not None,
         }
     except HTTPException:
         raise
@@ -1872,11 +1941,12 @@ async def create_candidate_profile(profile: CandidateProfile):
         logger.error(f"Failed to create candidate profile: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to create candidate profile: {str(e)}")
 
+
 if __name__ == "__main__":
     import os
 
     import uvicorn
-    port = int(os.environ.get("PORT", 8001))
-    host = os.environ.get("HOST", "127.0.0.1")
+
+    port = int(os.environ.get("PORT", 8006))
+    host = os.environ.get("HOST", "0.0.0.0")
     uvicorn.run(app, host=host, port=port)
-```

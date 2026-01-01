@@ -648,3 +648,17 @@ frontend/**/.next/
 
 # Internal Development Artifacts
 internal/
+
+# Platform runtime files
+.opentalent.pids
+infra_status.json
+microservices_status.json
+
+# Service-local assets
+services/**/models/
+!services/**/models/*.py
+!services/**/models/*.yaml
+!services/**/models/*.json
+services/**/data/
+services/**/logs/
+!services/**/.gitkeep

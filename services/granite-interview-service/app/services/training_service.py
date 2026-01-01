@@ -23,7 +23,7 @@ from transformers import (
 )
 
 from ..config import settings
-from .constants import (
+from ..core.constants import (
     DEFAULT_TRAINING_CONFIG,
     DISK_SPACE_MULTIPLIER,
     GB_TO_BYTES,
@@ -227,7 +227,7 @@ class TrainingService:
         # Apply user overrides
         defaults.update(user_config)
 
-        return defaults
+        return dict(defaults)
 
     async def _run_training(
         self, training_id: str, model_name: str, dataset_file: str, train_config: dict[str, Any]
@@ -345,7 +345,11 @@ class TrainingService:
 
     def list_active_trainings(self) -> list[dict[str, Any]]:
         """List all active training jobs."""
-        return [self.get_training_status(training_id) for training_id in self.active_trainings]
+        return [
+            s
+            for s in [self.get_training_status(tid) for tid in self.active_trainings]
+            if s is not None
+        ]
 
     def cancel_training(self, training_id: str) -> bool:
         """Cancel a training job."""
