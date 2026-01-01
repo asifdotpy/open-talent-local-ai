@@ -9,14 +9,10 @@ import logging
 import os
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Any
+from typing import Any, cast
 
 import uvicorn
 from app.config.settings import Settings
-from app.services.inference_engine import InferenceEngine
-from app.services.model_loader import ModelLoader
-from app.services.model_registry import ModelRegistry
-from app.services.training_service import TrainingService
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -43,10 +39,15 @@ async def lifespan(app: FastAPI):
 
     # Initialize services
     settings = Settings()
-    model_registry = ModelRegistry(settings)
-    model_loader = ModelLoader(settings, model_registry)
-    inference_engine = InferenceEngine(settings, model_loader)
-    training_service = TrainingService(settings, model_registry)
+    from app.models import model_registry as reg
+    from app.services.inference_engine import InferenceEngine
+    from app.services.model_loader import ModelLoader
+    from app.services.training_service import TrainingService
+
+    model_registry = reg
+    model_loader = ModelLoader()
+    inference_engine = InferenceEngine()
+    training_service = TrainingService()
 
     # Load default model if specified
     if settings.default_model:
@@ -89,6 +90,8 @@ app.add_middleware(
 class ModelInfo(BaseModel):
     """Model information response."""
 
+    model_config = {"protected_namespaces": ()}
+
     name: str
     architecture: str
     size: str
@@ -100,6 +103,8 @@ class ModelInfo(BaseModel):
 
 class LoadModelRequest(BaseModel):
     """Request to load a model."""
+
+    model_config = {"protected_namespaces": ()}
 
     model_name: str = Field(..., description="Name of the model to load")
     quantization: str = Field("4bit", description="Quantization level (4bit, 8bit, 16bit)")
@@ -129,6 +134,8 @@ class CandidateProfile(BaseModel):
 class GenerateQuestionRequest(BaseModel):
     """Request to generate an interview question."""
 
+    model_config = {"protected_namespaces": ()}
+
     model_name: str
     context: InterviewContext
     candidate_profile: CandidateProfile
@@ -138,6 +145,8 @@ class GenerateQuestionRequest(BaseModel):
 
 class AnalyzeResponseRequest(BaseModel):
     """Request to analyze a candidate response."""
+
+    model_config = {"protected_namespaces": ()}
 
     model_name: str
     question: str
@@ -174,7 +183,7 @@ async def root():
         "service": "OpenTalent Granite Interview Service",
         "version": "1.0.0",
         "description": "Modular AI service for interview intelligence",
-        "models_loaded": len(model_loader.loaded_models) if model_loader else 0,
+        "models_loaded": len(cast(Any, model_loader).loaded_models) if model_loader else 0,
         "supported_architectures": ["granite", "llama", "mistral"],
         "endpoints": {
             "models": "/api/v1/models",
@@ -192,7 +201,7 @@ async def health_check():
         models_status = "healthy" if model_registry else "unhealthy"
 
         # Check loaded models
-        loaded_count = len(model_loader.loaded_models) if model_loader else 0
+        loaded_count = len(cast(Any, model_loader).loaded_models) if model_loader else 0
 
         # GPU status (if available)
         gpu_info = {}
@@ -222,13 +231,13 @@ async def health_check():
             },
             "models": {
                 "loaded_count": loaded_count,
-                "available_count": len(model_registry.models) if model_registry else 0,
+                "available_count": len(cast(Any, model_registry).models) if model_registry else 0,
             },
             "hardware": gpu_info,
         }
     except Exception as e:
         logger.error(f"Health check failed: {e}")
-        raise HTTPException(status_code=503, detail=f"Service unhealthy: {str(e)}")
+        raise HTTPException(status_code=503, detail=f"Service unhealthy: {str(e)}") from e
 
 
 # --- Model Management Endpoints ---
@@ -242,12 +251,12 @@ async def list_models():
 
     models = []
     for name, config in model_registry.models.items():
-        status = "loaded" if name in model_loader.loaded_models else "available"
+        status = "loaded" if name in cast(Any, model_loader).loaded_models else "available"
         loaded_at = None
         memory_usage = None
 
         if status == "loaded":
-            model_instance = model_loader.loaded_models.get(name)
+            model_instance = cast(Any, model_loader).loaded_models.get(name)
             if model_instance:
                 loaded_at = getattr(model_instance, "loaded_at", None)
                 memory_usage = getattr(model_instance, "memory_usage", None)
@@ -271,33 +280,33 @@ async def list_models():
 async def load_model(request: LoadModelRequest):
     """Load a model into memory."""
     try:
-        await model_loader.load_model(
+        await cast(Any, model_loader).load_model(
             request.model_name, quantization=request.quantization, device=request.device
         )
         return {"message": f"Model {request.model_name} loaded successfully"}
     except Exception as e:
         logger.error(f"Failed to load model {request.model_name}: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to load model: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to load model: {str(e)}") from e
 
 
 @app.delete("/api/v1/models/{model_name}")
 async def unload_model(model_name: str):
     """Unload a model from memory."""
     try:
-        await model_loader.unload_model(model_name)
+        await cast(Any, model_loader).unload_model(model_name)
         return {"message": f"Model {model_name} unloaded successfully"}
     except Exception as e:
         logger.error(f"Failed to unload model {model_name}: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to unload model: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to unload model: {str(e)}") from e
 
 
 @app.get("/api/v1/models/{model_name}/status")
 async def get_model_status(model_name: str):
     """Get detailed status of a specific model."""
-    if model_name not in model_loader.loaded_models:
+    if model_name not in cast(Any, model_loader).loaded_models:
         return {"status": "not_loaded"}
 
-    model_instance = model_loader.loaded_models[model_name]
+    model_instance = cast(Any, model_loader).loaded_models[model_name]
     return {
         "status": "loaded",
         "loaded_at": getattr(model_instance, "loaded_at", None),
@@ -315,11 +324,11 @@ async def generate_interview_question(request: GenerateQuestionRequest):
     """Generate an interview question using the specified model."""
     try:
         # Check if model is loaded
-        if request.model_name not in model_loader.loaded_models:
+        if request.model_name not in cast(Any, model_loader).loaded_models:
             raise HTTPException(status_code=400, detail=f"Model {request.model_name} not loaded")
 
         # Generate question
-        result = await inference_engine.generate_question(
+        result = await cast(Any, inference_engine).generate_question(
             model_name=request.model_name,
             context=request.context,
             candidate_profile=request.candidate_profile,
@@ -331,7 +340,7 @@ async def generate_interview_question(request: GenerateQuestionRequest):
 
     except Exception as e:
         logger.error(f"Failed to generate question: {e}")
-        raise HTTPException(status_code=500, detail=f"Question generation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Question generation failed: {str(e)}") from e
 
 
 @app.post("/api/v1/interview/analyze-response")
@@ -339,11 +348,11 @@ async def analyze_candidate_response(request: AnalyzeResponseRequest):
     """Analyze a candidate's response to an interview question."""
     try:
         # Check if model is loaded
-        if request.model_name not in model_loader.loaded_models:
+        if request.model_name not in cast(Any, model_loader).loaded_models:
             raise HTTPException(status_code=400, detail=f"Model {request.model_name} not loaded")
 
         # Analyze response
-        result = await inference_engine.analyze_response(
+        result = await cast(Any, inference_engine).analyze_response(
             model_name=request.model_name,
             question=request.question,
             response=request.response,
@@ -354,7 +363,7 @@ async def analyze_candidate_response(request: AnalyzeResponseRequest):
 
     except Exception as e:
         logger.error(f"Failed to analyze response: {e}")
-        raise HTTPException(status_code=500, detail=f"Response analysis failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Response analysis failed: {str(e)}") from e
 
 
 # --- Training Endpoints ---
@@ -364,7 +373,7 @@ async def analyze_candidate_response(request: AnalyzeResponseRequest):
 async def start_fine_tuning(request: FineTuneRequest, background_tasks: BackgroundTasks):
     """Start fine-tuning a model."""
     try:
-        job_id = await training_service.start_fine_tuning(
+        job_id = await cast(Any, training_service).start_fine_tuning(
             base_model=request.base_model,
             training_data=request.training_data,
             config=request.config,
@@ -381,29 +390,31 @@ async def start_fine_tuning(request: FineTuneRequest, background_tasks: Backgrou
 
     except Exception as e:
         logger.error(f"Failed to start fine-tuning: {e}")
-        raise HTTPException(status_code=500, detail=f"Fine-tuning failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Fine-tuning failed: {str(e)}") from e
 
 
 @app.get("/api/v1/training/jobs/{job_id}", response_model=TrainingStatus)
 async def get_training_status(job_id: str):
     """Get the status of a training job."""
     try:
-        status = await training_service.get_training_status(job_id)
+        status = await cast(Any, training_service).get_training_status(job_id)
         return status
     except Exception as e:
         logger.error(f"Failed to get training status for {job_id}: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to get training status: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to get training status: {str(e)}"
+        ) from e
 
 
 @app.delete("/api/v1/training/jobs/{job_id}")
 async def cancel_training(job_id: str):
     """Cancel a training job."""
     try:
-        await training_service.cancel_training(job_id)
+        await cast(Any, training_service).cancel_training(job_id)
         return {"message": f"Training job {job_id} cancelled"}
     except Exception as e:
         logger.error(f"Failed to cancel training {job_id}: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to cancel training: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to cancel training: {str(e)}") from e
 
 
 # --- System Endpoints ---
@@ -441,7 +452,7 @@ async def get_gpu_status():
         return {"cuda_available": False, "error": "PyTorch not available"}
     except Exception as e:
         logger.error(f"Failed to get GPU status: {e}")
-        raise HTTPException(status_code=500, detail=f"GPU status check failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"GPU status check failed: {str(e)}") from e
 
 
 if __name__ == "__main__":
