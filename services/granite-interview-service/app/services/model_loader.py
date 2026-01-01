@@ -10,11 +10,11 @@ import logging
 from pathlib import Path
 from typing import Any
 
+from app.core.constants import HG_REPO_MAP
 from huggingface_hub import HfApi, snapshot_download
 
 from ..config import settings
 from ..models import model_registry
-from .constants import HG_REPO_MAP
 
 logger = logging.getLogger(__name__)
 

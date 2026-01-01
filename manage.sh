@@ -166,7 +166,7 @@ start_microservice() {
     echo "$service_name:$pid:$port" >> "$PID_FILE"
 
     # Wait and verify
-    sleep 2
+    sleep 5
     if kill -0 $pid 2>/dev/null; then
         log_success "$service_name started (PID: $pid, Port: $port)"
         return 0
