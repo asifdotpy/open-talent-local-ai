@@ -1899,45 +1899,7 @@ async def get_candidate_profile(candidate_id: str):
     logger.info(f"Fetching profile for candidate_id: {candidate_id}")
 
     if vector_db is None:
-        # Fallback to mock data only for specific mock candidate IDs
-        mock_candidate_ids = ["mock-id", "test-candidate", "demo-profile"]
-        if candidate_id in mock_candidate_ids:
-            mock_candidate_profile = CandidateProfile(
-                full_name="John Doe",
-                source_url="https://www.linkedin.com/in/johndoe",
-                summary="A highly skilled software engineer with over 10 years of experience.",
-                work_experience=[
-                    WorkExperience(
-                        title="Senior Software Engineer",
-                        company="Tech Corp",
-                        duration="2018 - Present",
-                        responsibilities=[
-                            "Developed and maintained web applications.",
-                            "Mentored junior engineers.",
-                        ],
-                    )
-                ],
-                education=[
-                    Education(
-                        institution="University of Technology",
-                        degree="Bachelor of Science in Computer Science",
-                        year="2014",
-                    )
-                ],
-                skills=Skills(
-                    matched=["Python", "FastAPI", "SQLAlchemy"], unmatched=["React", "TypeScript"]
-                ),
-                alignment_score=0.85,
-                initial_questions=[
-                    InitialQuestion(
-                        question="What was your most challenging project at Tech Corp?",
-                        reasoning="To understand problem-solving skills.",
-                    )
-                ],
-            )
-            return mock_candidate_profile
-        else:
-            raise HTTPException(status_code=404, detail="Candidate not found")
+        raise HTTPException(status_code=503, detail="Vector search engine is not available")
 
     try:
         # Search for candidate in vector database

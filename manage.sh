@@ -128,6 +128,26 @@ check_prerequisites() {
     log_success "All prerequisites met"
 }
 
+check_service_health() {
+    local service_name=$1
+    local port=$2
+    local max_attempts=${3:-15}
+    local attempt=1
+
+    while [ $attempt -le $max_attempts ]; do
+        # Try /health, then /docs, then root
+        if curl -s --connect-timeout 2 "http://localhost:$port/health" &> /dev/null || \
+           curl -s --connect-timeout 2 "http://localhost:$port/docs" &> /dev/null || \
+           curl -s --connect-timeout 2 "http://localhost:$port/" &> /dev/null; then
+            return 0
+        fi
+        sleep 2
+        attempt=$((attempt + 1))
+    done
+
+    return 1
+}
+
 start_microservice() {
     local service_name=$1
     local port=$2
@@ -155,6 +175,10 @@ start_microservice() {
     # Start service using venv Python directly
     (
         cd "$service_dir"
+        # Set common environment variables to avoid hardcoded /app paths where possible
+        export PORT="$port"
+        export HOST="0.0.0.0"
+
         "$VENV_PATH/bin/python" -m uvicorn "$uvicorn_app" \
             --host 0.0.0.0 \
             --port "$port" \
@@ -165,14 +189,19 @@ start_microservice() {
     local pid=$!
     echo "$service_name:$pid:$port" >> "$PID_FILE"
 
-    # Wait and verify
-    sleep 5
-    if kill -0 $pid 2>/dev/null; then
-        log_success "$service_name started (PID: $pid, Port: $port)"
+    # Wait for application-layer healthiness instead of just process presence
+    if check_service_health "$service_name" "$port" 10; then
+        log_success "$service_name started and healthy (PID: $pid, Port: $port)"
         return 0
     else
-        log_error "$service_name failed to start"
-        return 1
+        # Final check if process is at least still alive
+        if kill -0 $pid 2>/dev/null; then
+            log_warning "$service_name started but health check timed out (PID: $pid)"
+            return 0 # Treat slow starters as success for now to avoid blocking others
+        else
+            log_error "$service_name failed to start (Process died)"
+            return 1
+        fi
     fi
 }
 
@@ -195,25 +224,6 @@ start_desktop() {
         log_error "Desktop App failed to start"
         return 1
     fi
-}
-
-check_service_health() {
-    local service_name=$1
-    local port=$2
-    local max_attempts=15
-    local attempt=1
-
-    while [ $attempt -le $max_attempts ]; do
-        if curl -s "http://localhost:$port/health" &> /dev/null || \
-           curl -s "http://localhost:$port/docs" &> /dev/null || \
-           curl -s "http://localhost:$port/" &> /dev/null; then
-            return 0
-        fi
-        sleep 1
-        attempt=$((attempt + 1))
-    done
-
-    return 1
 }
 
 ################################################################################
