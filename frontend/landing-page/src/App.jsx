@@ -53,18 +53,30 @@ const Icons = {
             <path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587.26 1.24.43 1.922.43 1.104 0 2.19-.388 3.124-1.086.49.37 1.17.645 1.98.645.867-.001 1.715-.333 2.25-.812.425.253.88.42 1.35.456.416.031.82-.062 1.158-.255.67-.382.767-1.156.73-1.873a.84.84 0 01-.003-.081c.31-.424.531-.945.531-1.516 0-.334-.055-.665-.225-.96a8.7 8.7 0 00-.45-.788c-.1-.164-.2-.31-.27-.466a2.76 2.76 0 01-.117-.35c-.148-.628-.14-1.26.025-1.886.048-.184.103-.368.175-.555.181-.49.374-.99.416-1.55.043-.553-.056-1.12-.309-1.64a8.69 8.69 0 00-.728-1.199c-.437-.57-.958-1.095-1.399-1.67-.324-.42-.646-.976-.711-1.514-.027-.234-.003-.475.068-.69.014-.058.032-.114.053-.169.063-.164.134-.213.146-.223-.114-.033-.243-.067-.333-.112a.586.586 0 01-.126-.072 1.41 1.41 0 00-.228-.085c-.1-.026-.203-.048-.308-.048a2.89 2.89 0 00-.3 0 2.34 2.34 0 00-.25.032 2.97 2.97 0 00-.326.082c-.108.034-.217.077-.324.121a4.31 4.31 0 00-.27.117c-.078.038-.161.072-.24.11-.141.073-.284.147-.422.229" />
         </svg>
     ),
+    Menu: () => (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+        </svg>
+    ),
+    Close: () => (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    )
 }
 
-// GitHub and Download URLs
+// GitHub URL
 const GITHUB_URL = "https://github.com/asifdotpy/open-talent-local-ai"
-const DOWNLOAD_URLS = {
-    windows: "#download-windows",
-    mac: "#download-mac",
-    linux: "#download-linux"
-}
 
 function App() {
     const [activeTab, setActiveTab] = useState('monthly')
+    const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+    const navLinks = [
+        { name: 'Features', href: '#features' },
+        { name: 'Blog', href: '#blog' },
+        { name: 'Pricing', href: '#pricing' },
+    ]
 
     return (
         <div className="min-h-screen bg-slate-950 text-white">
@@ -76,19 +88,60 @@ function App() {
                             <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg"></div>
                             <span className="text-xl font-bold">OpenTalent</span>
                         </div>
+                        
+                        {/* Desktop Menu */}
                         <div className="hidden md:flex items-center space-x-8">
-                            <a href="#features" className="text-slate-300 hover:text-white transition">Features</a>
-                            <a href="#blog" className="text-slate-300 hover:text-white transition">Blog</a>
-                            <a href="#pricing" className="text-slate-300 hover:text-white transition">Pricing</a>
+                            {navLinks.map((link) => (
+                                <a key={link.name} href={link.href} className="text-slate-300 hover:text-white transition">
+                                    {link.name}
+                                </a>
+                            ))}
                             <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="text-slate-300 hover:text-white transition flex items-center gap-2">
                                 <Icons.GitHub /> GitHub
                             </a>
-                            <a href="#download" className="bg-primary-600 hover:bg-primary-500 px-4 py-2 rounded-lg font-medium transition flex items-center gap-2">
-                                <Icons.Download /> Download
-                            </a>
+                            <button className="bg-slate-800 text-slate-400 cursor-not-allowed px-4 py-2 rounded-lg font-medium transition flex items-center gap-2">
+                                Coming Soon
+                            </button>
+                        </div>
+
+                        {/* Mobile Menu Button */}
+                        <div className="md:hidden flex items-center">
+                            <button 
+                                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                className="text-slate-300 hover:text-white p-2"
+                            >
+                                {isMenuOpen ? <Icons.Close /> : <Icons.Menu />}
+                            </button>
                         </div>
                     </div>
                 </div>
+
+                {/* Mobile Menu Overlay */}
+                {isMenuOpen && (
+                    <div className="md:hidden bg-slate-900 border-b border-slate-800 py-4 px-4 space-y-4">
+                        {navLinks.map((link) => (
+                            <a 
+                                key={link.name} 
+                                href={link.href} 
+                                onClick={() => setIsMenuOpen(false)}
+                                className="block text-slate-300 hover:text-white transition text-lg"
+                            >
+                                {link.name}
+                            </a>
+                        ))}
+                        <a 
+                            href={GITHUB_URL} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="flex items-center gap-2 text-slate-300 hover:text-white transition text-lg"
+                        >
+                            <Icons.GitHub /> GitHub
+                        </a>
+                        <button className="w-full bg-slate-800 text-slate-400 cursor-not-allowed py-3 rounded-lg font-medium text-center">
+                            Coming Soon
+                        </button>
+                    </div>
+                )}
             </nav>
 
             {/* Hero Section */}
@@ -112,9 +165,9 @@ function App() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                        <a href="#download" className="bg-primary-600 hover:bg-primary-500 px-8 py-4 rounded-xl font-semibold text-lg transition glow flex items-center justify-center gap-3">
-                            <Icons.Download /> Download Free
-                        </a>
+                        <button className="bg-slate-800 text-slate-400 cursor-not-allowed px-8 py-4 rounded-xl font-semibold text-lg transition flex items-center justify-center gap-3">
+                            Coming Soon
+                        </button>
                         <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-8 py-4 rounded-xl font-semibold text-lg transition flex items-center justify-center gap-3">
                             <Icons.GitHub /> View on GitHub
                         </a>
@@ -241,9 +294,9 @@ function App() {
                                     </li>
                                 ))}
                             </ul>
-                            <a href="#download" className="block text-center bg-slate-800 hover:bg-slate-700 py-3 rounded-lg font-medium transition">
-                                Get Started Free
-                            </a>
+                            <button className="w-full bg-slate-800 text-slate-400 cursor-not-allowed py-3 rounded-lg font-medium transition">
+                                Coming Soon
+                            </button>
                         </div>
 
                         {/* Pro Tier */}
@@ -263,9 +316,9 @@ function App() {
                                     </li>
                                 ))}
                             </ul>
-                            <a href="#download" className="block text-center bg-primary-600 hover:bg-primary-500 py-3 rounded-lg font-medium transition">
-                                Start Pro Trial
-                            </a>
+                            <button className="w-full bg-slate-800 text-slate-400 cursor-not-allowed py-3 rounded-lg font-medium transition">
+                                Coming Soon
+                            </button>
                         </div>
 
                         {/* Enterprise Tier */}
@@ -288,6 +341,9 @@ function App() {
                 </div>
             </section>
 
+            {/* Blog Section */}
+            <Blog />
+
             {/* Download Section */}
             <section id="download" className="py-24 px-4">
                 <div className="max-w-4xl mx-auto text-center">
@@ -297,32 +353,32 @@ function App() {
                     </p>
 
                     <div className="grid md:grid-cols-3 gap-6">
-                        <a href={DOWNLOAD_URLS.windows} className="flex flex-col items-center gap-4 border border-slate-800 rounded-2xl p-8 hover:border-primary-500/50 transition bg-slate-900/50">
+                        <div className="flex flex-col items-center gap-4 border border-slate-800 rounded-2xl p-8 bg-slate-900/50 opacity-75">
                             <Icons.Windows />
                             <div>
                                 <div className="font-semibold text-lg">Windows</div>
                                 <div className="text-slate-400 text-sm">Windows 10+</div>
                             </div>
-                            <span className="text-primary-400 text-sm">Download .exe</span>
-                        </a>
+                            <span className="text-slate-500 text-sm font-medium">Coming Soon</span>
+                        </div>
 
-                        <a href={DOWNLOAD_URLS.mac} className="flex flex-col items-center gap-4 border border-slate-800 rounded-2xl p-8 hover:border-primary-500/50 transition bg-slate-900/50">
+                        <div className="flex flex-col items-center gap-4 border border-slate-800 rounded-2xl p-8 bg-slate-900/50 opacity-75">
                             <Icons.Apple />
                             <div>
                                 <div className="font-semibold text-lg">macOS</div>
                                 <div className="text-slate-400 text-sm">macOS 11+</div>
                             </div>
-                            <span className="text-primary-400 text-sm">Download .dmg</span>
-                        </a>
+                            <span className="text-slate-500 text-sm font-medium">Coming Soon</span>
+                        </div>
 
-                        <a href={DOWNLOAD_URLS.linux} className="flex flex-col items-center gap-4 border border-slate-800 rounded-2xl p-8 hover:border-primary-500/50 transition bg-slate-900/50">
+                        <div className="flex flex-col items-center gap-4 border border-slate-800 rounded-2xl p-8 bg-slate-900/50 opacity-75">
                             <Icons.Linux />
                             <div>
                                 <div className="font-semibold text-lg">Linux</div>
                                 <div className="text-slate-400 text-sm">Ubuntu/Debian</div>
                             </div>
-                            <span className="text-primary-400 text-sm">Download .AppImage</span>
-                        </a>
+                            <span className="text-slate-500 text-sm font-medium">Coming Soon</span>
+                        </div>
                     </div>
 
                     <p className="mt-8 text-slate-500">
@@ -330,9 +386,6 @@ function App() {
                     </p>
                 </div>
             </section>
-
-            {/* Blog Section */}
-            <Blog />
 
             {/* CTA Section */}
             <section className="py-24 px-4 hero-gradient">
@@ -342,9 +395,9 @@ function App() {
                         Join recruiters saving $1,500+/month with privacy-first hiring.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <a href="#download" className="bg-white text-slate-900 hover:bg-slate-100 px-8 py-4 rounded-xl font-semibold text-lg transition flex items-center justify-center gap-3">
-                            <Icons.Download /> Download Now
-                        </a>
+                        <button className="bg-white text-slate-900 cursor-not-allowed px-8 py-4 rounded-xl font-semibold text-lg transition flex items-center justify-center gap-3">
+                            Coming Soon
+                        </button>
                         <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="border border-white/30 hover:bg-white/10 px-8 py-4 rounded-xl font-semibold text-lg transition flex items-center justify-center gap-3">
                             <Icons.GitHub /> Star on GitHub
                         </a>
