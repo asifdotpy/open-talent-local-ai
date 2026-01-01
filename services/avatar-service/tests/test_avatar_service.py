@@ -16,7 +16,7 @@ import httpx
 
 @pytest.fixture
 def avatar_service_url():
-    return "http://localhost:8016"
+    return "http://localhost:8004"
 
 
 @pytest.fixture

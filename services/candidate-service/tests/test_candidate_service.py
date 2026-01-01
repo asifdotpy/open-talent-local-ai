@@ -13,7 +13,7 @@ import pytest
 
 @pytest.fixture
 def candidate_service_url():
-    return "http://localhost:8008"
+    return "http://localhost:8006"
 
 
 @pytest.fixture

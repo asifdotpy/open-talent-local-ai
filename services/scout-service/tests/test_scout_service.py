@@ -11,7 +11,7 @@ import pytest
 
 @pytest.fixture
 def scout_service_url():
-    return "http://localhost:8010"
+    return "http://localhost:8000"
 
 
 @pytest.fixture

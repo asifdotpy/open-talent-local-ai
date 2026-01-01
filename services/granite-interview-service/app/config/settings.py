@@ -141,7 +141,8 @@ class Settings:
         self.max_model_memory = float(os.environ.get("MAX_MODEL_MEMORY", 0.8))
 
         # Training settings
-        self.training_data_dir = Path(os.environ.get("TRAINING_DATA_DIR", "./data"))
+        default_data_dir = Path(__file__).parent.parent.parent / "data"
+        self.training_data_dir = Path(os.environ.get("TRAINING_DATA_DIR", default_data_dir))
         self.output_dir = Path(os.environ.get("OUTPUT_DIR", "./models/fine-tuned"))
         self.wandb_project = os.environ.get("WANDB_PROJECT", "open-talent-granite")
 

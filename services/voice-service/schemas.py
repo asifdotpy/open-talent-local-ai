@@ -134,6 +134,7 @@ class TTSRequest(BaseModel):
     volume_gain_db: float = Field(0.0, ge=-96.0, le=16.0)
     audio_format: AudioFormat = AudioFormat.MP3
     sample_rate: int = Field(24000, ge=8000, le=48000)
+    extract_phonemes: bool = False
 
     class Config:
         json_schema_extra = {

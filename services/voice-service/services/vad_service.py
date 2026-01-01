@@ -47,13 +47,18 @@ class VoiceActivityDetector:
                 f"frame_duration={self.frame_duration_ms}ms, "
                 f"sample_rate={self.sample_rate}Hz"
             )
+            return True
         except ImportError:
             logger.warning("webrtcvad not installed. Install with: pip install webrtcvad")
             logger.warning("Falling back to processing all audio (no VAD filtering)")
             self.use_vad = False
+            self.vad = None
+            return False
         except Exception as e:
             logger.error(f"Failed to initialize VAD: {e}")
             self.use_vad = False
+            self.vad = None
+            return False
 
     def is_speech(self, audio_chunk: bytes) -> bool:
         """Detect if audio chunk contains speech.

@@ -151,7 +151,7 @@ class TestVoiceActivityDetector:
         """Test different aggressiveness levels."""
         for level in [0, 1, 2, 3]:
             service = VoiceActivityDetector()
-            service._initialize_vad()
+            service.set_aggressiveness(level)
             mock_vad_class.assert_called_with(level)
 
     def test_aggressiveness_validation(self):

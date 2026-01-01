@@ -181,6 +181,144 @@ class RoomSecurity(BaseModel):
     recording_allowed: bool = True
 
 
+# --- AI Interview Intelligence Models ---
+
+
+class SentimentAnalysis(BaseModel):
+    """Sentiment analysis results for candidate responses."""
+
+    polarity: float = Field(..., description="Sentiment polarity (-1 to 1, negative to positive)")
+    subjectivity: float = Field(
+        ..., description="Subjectivity score (0 to 1, objective to subjective)"
+    )
+    confidence: float = Field(..., description="Analysis confidence score")
+    emotion: str = Field(..., description="Primary emotion detected")
+    intensity: float = Field(..., description="Emotional intensity score")
+    keywords: list[str] = Field(default_factory=list, description="Key emotional indicators")
+
+
+class ResponseQuality(BaseModel):
+    """Quality assessment of candidate responses."""
+
+    overall_score: float = Field(..., description="Overall quality score (0-10)")
+    completeness: float = Field(..., description="Response completeness score")
+    relevance: float = Field(..., description="Relevance to question score")
+    clarity: float = Field(..., description="Clarity and coherence score")
+    technical_accuracy: float = Field(..., description="Technical accuracy score")
+    strengths: list[str] = Field(default_factory=list, description="Response strengths")
+    improvements: list[str] = Field(default_factory=list, description="Areas for improvement")
+
+
+class BiasDetection(BaseModel):
+    """Bias detection results in responses and interview process."""
+
+    bias_score: float = Field(..., description="Overall bias score (0-1, higher = more biased)")
+    flags: list[str] = Field(default_factory=list, description="Specific bias indicators detected")
+    severity: str = Field(..., description="Bias severity level")
+    categories: list[str] = Field(default_factory=list, description="Bias categories identified")
+    recommendations: list[str] = Field(
+        default_factory=list, description="Bias mitigation recommendations"
+    )
+
+
+class ExpertiseAssessment(BaseModel):
+    """Assessment of candidate's expertise level."""
+
+    level: str = Field(
+        ..., description="Expertise level (beginner, intermediate, advanced, expert)"
+    )
+    confidence: float = Field(..., description="Assessment confidence score")
+    technical_skills: list[str] = Field(
+        default_factory=list, description="Identified technical skills"
+    )
+    knowledge_gaps: list[str] = Field(default_factory=list, description="Knowledge gaps identified")
+    experience_years: int | None = Field(None, description="Estimated years of experience")
+
+
+class FollowupQuestion(BaseModel):
+    """Suggested follow-up question."""
+
+    question: str = Field(..., description="Follow-up question text")
+    priority: int = Field(..., description="Question priority (1-5, higher = more important)")
+    reasoning: str = Field(..., description="Reason for suggesting this question")
+    expected_outcome: str = Field(..., description="Expected learning outcome")
+
+
+class ResponseAnalysis(BaseModel):
+    """Comprehensive analysis of a candidate response."""
+
+    response_id: str = Field(..., description="Unique identifier for this analysis")
+    question_id: str = Field(..., description="ID of the question being analyzed")
+    sentiment: SentimentAnalysis = Field(..., description="Sentiment analysis results")
+    quality: ResponseQuality = Field(..., description="Content quality assessment")
+    bias_detection: BiasDetection = Field(..., description="Bias detection results")
+    expertise_assessment: ExpertiseAssessment = Field(..., description="Expertise level assessment")
+    followup_suggestions: list[FollowupQuestion] = Field(
+        default_factory=list, description="Suggested follow-up questions"
+    )
+    analyzed_at: datetime = Field(
+        default_factory=datetime.now, description="When the analysis was performed"
+    )
+
+
+class NextQuestionRequest(BaseModel):
+    """Request for next AI-generated question."""
+
+    current_responses: list["InterviewAnswer"] = Field(default_factory=list)
+    job_requirements: str | None = None
+    interview_phase: str | None = None
+
+
+class ResponseAnalysisRequest(BaseModel):
+    """Request for response analysis."""
+
+    question_id: str
+    response_text: str
+    question_context: str
+    participant_id: str
+
+
+class InterviewAdaptationRequest(BaseModel):
+    """Request for interview strategy adaptation."""
+
+    current_phase: str
+    time_remaining_minutes: int
+    performance_indicators: dict[str, Any] = Field(default_factory=dict)
+
+
+class InterviewPerformance(BaseModel):
+    """Overall interview performance analysis."""
+
+    overall_score: float
+    sentiment_trend: str
+    expertise_level: str
+    bias_incidents: int
+    quality_trend: str
+    recommendations: list[str]
+
+
+class InterviewAdaptation(BaseModel):
+    """Interview adaptation recommendations."""
+
+    question_difficulty: str
+    focus_areas: list[str]
+    time_adjustments: dict[str, Any]
+    immediate_actions: list[str]
+    strategy_changes: list[str]
+
+
+class IntelligenceReport(BaseModel):
+    """Comprehensive AI intelligence report."""
+
+    summary: dict[str, Any]
+    sentiment_analysis: dict[str, Any]
+    bias_report: dict[str, Any]
+    expertise_evaluation: dict[str, Any]
+    quality_metrics: dict[str, Any]
+    recommendations: list[str]
+    interview_effectiveness: float
+
+
 class InterviewQuestion(BaseModel):
     """Interview question with AI metadata."""
 
@@ -198,15 +336,6 @@ class InterviewAnswer(BaseModel):
     answer: str
     timestamp: datetime
     analysis: Optional["ResponseAnalysis"] = None
-
-
-class FollowupQuestion(BaseModel):
-    """Suggested follow-up question."""
-
-    question: str = Field(..., description="Follow-up question text")
-    priority: int = Field(..., description="Question priority (1-5, higher = more important)")
-    reasoning: str = Field(..., description="Reason for suggesting this question")
-    expected_outcome: str = Field(..., description="Expected learning outcome")
 
 
 class InterviewRoom(BaseModel):
@@ -318,142 +447,11 @@ class WebSocketConnection(BaseModel):
     last_activity: datetime = Field(default_factory=datetime.now)
 
 
-# --- AI Interview Intelligence Models ---
-
-
-class SentimentAnalysis(BaseModel):
-    """Sentiment analysis results for candidate responses."""
-
-    polarity: float = Field(..., description="Sentiment polarity (-1 to 1, negative to positive)")
-    subjectivity: float = Field(
-        ..., description="Subjectivity score (0 to 1, objective to subjective)"
-    )
-    confidence: float = Field(..., description="Analysis confidence score")
-    emotion: str = Field(..., description="Primary emotion detected")
-    intensity: float = Field(..., description="Emotional intensity score")
-    keywords: list[str] = Field(default_factory=list, description="Key emotional indicators")
-
-
-class ResponseQuality(BaseModel):
-    """Quality assessment of candidate responses."""
-
-    overall_score: float = Field(..., description="Overall quality score (0-10)")
-    completeness: float = Field(..., description="Response completeness score")
-    relevance: float = Field(..., description="Relevance to question score")
-    clarity: float = Field(..., description="Clarity and coherence score")
-    technical_accuracy: float = Field(..., description="Technical accuracy score")
-    strengths: list[str] = Field(default_factory=list, description="Response strengths")
-    improvements: list[str] = Field(default_factory=list, description="Areas for improvement")
-
-
-class BiasDetection(BaseModel):
-    """Bias detection results in responses and interview process."""
-
-    bias_score: float = Field(..., description="Overall bias score (0-1, higher = more biased)")
-    flags: list[str] = Field(default_factory=list, description="Specific bias indicators detected")
-    severity: str = Field(..., description="Bias severity level")
-    categories: list[str] = Field(default_factory=list, description="Bias categories identified")
-    recommendations: list[str] = Field(
-        default_factory=list, description="Bias mitigation recommendations"
-    )
-
-
-class ExpertiseAssessment(BaseModel):
-    """Assessment of candidate's expertise level."""
-
-    level: str = Field(
-        ..., description="Expertise level (beginner, intermediate, advanced, expert)"
-    )
-    confidence: float = Field(..., description="Assessment confidence score")
-    technical_skills: list[str] = Field(
-        default_factory=list, description="Identified technical skills"
-    )
-    knowledge_gaps: list[str] = Field(default_factory=list, description="Knowledge gaps identified")
-    experience_years: int | None = Field(None, description="Estimated years of experience")
-
-
-class FollowupQuestion(BaseModel):
-    """Suggested follow-up question."""
-
-    question: str = Field(..., description="Follow-up question text")
-    priority: int = Field(..., description="Question priority (1-5, higher = more important)")
-    reasoning: str = Field(..., description="Reason for suggesting this question")
-    expected_outcome: str = Field(..., description="Expected learning outcome")
-
-
-class ResponseAnalysis(BaseModel):
-    """Comprehensive analysis of a candidate response."""
-
-    response_id: str = Field(..., description="Unique identifier for this analysis")
-    question_id: str = Field(..., description="ID of the question being analyzed")
-    sentiment: SentimentAnalysis = Field(..., description="Sentiment analysis results")
-    quality: ResponseQuality = Field(..., description="Content quality assessment")
-    bias_detection: BiasDetection = Field(..., description="Bias detection results")
-    expertise_assessment: ExpertiseAssessment = Field(..., description="Expertise level assessment")
-    followup_suggestions: list[FollowupQuestion] = Field(
-        default_factory=list, description="Suggested follow-up questions"
-    )
-    analyzed_at: datetime = Field(
-        default_factory=datetime.now, description="When the analysis was performed"
-    )
-
-
-class NextQuestionRequest(BaseModel):
-    """Request for next AI-generated question."""
-
-    current_responses: list[InterviewAnswer] = Field(default_factory=list)
-    job_requirements: str | None = None
-    interview_phase: str | None = None
-
-
-class ResponseAnalysisRequest(BaseModel):
-    """Request for response analysis."""
-
-    question_id: str
-    response_text: str
-    question_context: str
-    participant_id: str
-
-
-class InterviewAdaptationRequest(BaseModel):
-    """Request for interview strategy adaptation."""
-
-    current_phase: str
-    time_remaining_minutes: int
-    performance_indicators: dict[str, Any] = Field(default_factory=dict)
-
-
-class InterviewPerformance(BaseModel):
-    """Overall interview performance analysis."""
-
-    overall_score: float
-    sentiment_trend: str
-    expertise_level: str
-    bias_incidents: int
-    quality_trend: str
-    recommendations: list[str]
-
-
-class InterviewAdaptation(BaseModel):
-    """Interview adaptation recommendations."""
-
-    question_difficulty: str
-    focus_areas: list[str]
-    time_adjustments: dict[str, Any]
-    immediate_actions: list[str]
-    strategy_changes: list[str]
-
-
-class IntelligenceReport(BaseModel):
-    """Comprehensive AI intelligence report."""
-
-    summary: dict[str, Any]
-    sentiment_analysis: dict[str, Any]
-    bias_report: dict[str, Any]
-    expertise_evaluation: dict[str, Any]
-    quality_metrics: dict[str, Any]
-    recommendations: list[str]
-    interview_effectiveness: float
+# Rebuild models to resolve forward references
+NextQuestionRequest.model_rebuild()
+InterviewAnswer.model_rebuild()
+InterviewRoom.model_rebuild()
+ResponseAnalysis.model_rebuild()
 
 
 # --- In-Memory Storage (Replace with DB in production) ---

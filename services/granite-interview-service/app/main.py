@@ -139,6 +139,8 @@ class GenerateQuestionRequest(BaseModel):
     model_name: str
     context: InterviewContext
     candidate_profile: CandidateProfile
+    num_questions: int = Field(3, description="Number of questions to generate")
+    phase: str = Field("technical", description="Interview phase")
     temperature: float = Field(0.7, description="Sampling temperature")
     max_tokens: int = Field(256, description="Maximum tokens to generate")
 
@@ -264,9 +266,9 @@ async def list_models():
         models.append(
             ModelInfo(
                 name=name,
-                architecture=config.get("architecture", "unknown"),
-                size=config.get("size", "unknown"),
-                quantization=config.get("quantization", "unknown"),
+                architecture=config.architecture,
+                size=config.size,
+                quantization=config.quantization,
                 status=status,
                 loaded_at=loaded_at,
                 memory_usage=memory_usage,
@@ -338,6 +340,8 @@ async def generate_interview_question(request: GenerateQuestionRequest):
 
         return result
 
+    except HTTPException as e:
+        raise e
     except Exception as e:
         logger.error(f"Failed to generate question: {e}")
         raise HTTPException(status_code=500, detail=f"Question generation failed: {str(e)}") from e
@@ -361,6 +365,8 @@ async def analyze_candidate_response(request: AnalyzeResponseRequest):
 
         return result
 
+    except HTTPException as e:
+        raise e
     except Exception as e:
         logger.error(f"Failed to analyze response: {e}")
         raise HTTPException(status_code=500, detail=f"Response analysis failed: {str(e)}") from e
@@ -370,34 +376,44 @@ async def analyze_candidate_response(request: AnalyzeResponseRequest):
 
 
 @app.post("/api/v1/training/fine-tune")
-async def start_fine_tuning(request: FineTuneRequest, background_tasks: BackgroundTasks):
+async def start_fine_tuning_endpoint(request: FineTuneRequest, background_tasks: BackgroundTasks):
     """Start fine-tuning a model."""
     try:
-        job_id = await cast(Any, training_service).start_fine_tuning(
-            base_model=request.base_model,
-            training_data=request.training_data,
-            config=request.config,
+        logger.info(f"DEBUG: training_service instance: {training_service}")
+        logger.info(
+            f"DEBUG: training_service methods: {[m for m in dir(training_service) if not m.startswith('_')]}"
+        )
+        result = await cast(Any, training_service).start_training(
+            model_name=request.base_model,
+            dataset_path=request.training_data,
+            training_config=request.config,
         )
 
-        # Add to background tasks if async training
-        # background_tasks.add_task(training_service.monitor_training, job_id)
+        if not result.get("success"):
+            raise HTTPException(status_code=400, detail=result.get("error"))
 
         return {
-            "job_id": job_id,
+            "job_id": result["training_id"],
             "status": "started",
             "message": f"Fine-tuning started for {request.base_model}",
         }
 
+    except HTTPException as e:
+        raise e
     except Exception as e:
-        logger.error(f"Failed to start fine-tuning: {e}")
-        raise HTTPException(status_code=500, detail=f"Fine-tuning failed: {str(e)}") from e
+        import traceback
+
+        logger.error(f"Failed to start fine-tuning: {e}\n{traceback.format_exc()}")
+        raise HTTPException(
+            status_code=500, detail=f"Fine-tuning failed: {str(e)}\n{traceback.format_exc()}"
+        ) from e
 
 
 @app.get("/api/v1/training/jobs/{job_id}", response_model=TrainingStatus)
 async def get_training_status(job_id: str):
     """Get the status of a training job."""
     try:
-        status = await cast(Any, training_service).get_training_status(job_id)
+        status = cast(Any, training_service).get_training_status(job_id)
         return status
     except Exception as e:
         logger.error(f"Failed to get training status for {job_id}: {e}")
@@ -410,7 +426,7 @@ async def get_training_status(job_id: str):
 async def cancel_training(job_id: str):
     """Cancel a training job."""
     try:
-        await cast(Any, training_service).cancel_training(job_id)
+        cast(Any, training_service).cancel_training(job_id)
         return {"message": f"Training job {job_id} cancelled"}
     except Exception as e:
         logger.error(f"Failed to cancel training {job_id}: {e}")

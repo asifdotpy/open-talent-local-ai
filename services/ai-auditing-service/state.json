@@ -414,6 +414,150 @@
       "progress": 100.0,
       "_elapsed": 0.5,
       "finished_at": "2025-12-16T06:27:55Z"
+    },
+    "job_1767283132747": {
+      "status": "completed",
+      "target": "services/security-service",
+      "started_at": "2026-01-01T15:58:52Z",
+      "ruleset": [
+        "enum_validation",
+        "secret_detection"
+      ],
+      "progress": 100.0,
+      "_elapsed": 0.5,
+      "finished_at": "2026-01-01T15:58:52Z"
+    },
+    "job_1767283133071": {
+      "status": "completed",
+      "target": "services/security-service",
+      "started_at": "2026-01-01T15:58:53Z",
+      "ruleset": [
+        "enum_validation",
+        "secret_detection"
+      ],
+      "progress": 100.0,
+      "_elapsed": 0.5,
+      "finished_at": "2026-01-01T15:58:53Z"
+    },
+    "job_1767283133197": {
+      "status": "completed",
+      "target": "services/security-service",
+      "started_at": "2026-01-01T15:58:53Z",
+      "ruleset": [
+        "enum_validation",
+        "secret_detection"
+      ],
+      "progress": 100.0,
+      "_elapsed": 0.5,
+      "finished_at": "2026-01-01T15:58:53Z"
+    },
+    "job_1767283134439": {
+      "status": "completed",
+      "target": "services/security-service",
+      "started_at": "2026-01-01T15:58:54Z",
+      "ruleset": [
+        "enum_validation",
+        "secret_detection"
+      ],
+      "progress": 100.0,
+      "_elapsed": 0.5,
+      "finished_at": "2026-01-01T15:58:54Z"
+    },
+    "job_1767283396174": {
+      "status": "completed",
+      "target": "services/security-service",
+      "started_at": "2026-01-01T16:03:16Z",
+      "ruleset": [
+        "enum_validation",
+        "secret_detection"
+      ],
+      "progress": 100.0,
+      "_elapsed": 0.5,
+      "finished_at": "2026-01-01T16:03:16Z"
+    },
+    "job_1767283396906": {
+      "status": "completed",
+      "target": "services/security-service",
+      "started_at": "2026-01-01T16:03:16Z",
+      "ruleset": [
+        "enum_validation",
+        "secret_detection"
+      ],
+      "progress": 100.0,
+      "_elapsed": 0.5,
+      "finished_at": "2026-01-01T16:03:16Z"
+    },
+    "job_1767283397267": {
+      "status": "completed",
+      "target": "services/security-service",
+      "started_at": "2026-01-01T16:03:17Z",
+      "ruleset": [
+        "enum_validation",
+        "secret_detection"
+      ],
+      "progress": 100.0,
+      "_elapsed": 0.5,
+      "finished_at": "2026-01-01T16:03:17Z"
+    },
+    "job_1767283398612": {
+      "status": "completed",
+      "target": "services/security-service",
+      "started_at": "2026-01-01T16:03:18Z",
+      "ruleset": [
+        "enum_validation",
+        "secret_detection"
+      ],
+      "progress": 100.0,
+      "_elapsed": 0.5,
+      "finished_at": "2026-01-01T16:03:18Z"
+    },
+    "job_1767283535930": {
+      "status": "completed",
+      "target": "services/security-service",
+      "started_at": "2026-01-01T16:05:35Z",
+      "ruleset": [
+        "enum_validation",
+        "secret_detection"
+      ],
+      "progress": 100.0,
+      "_elapsed": 0.5,
+      "finished_at": "2026-01-01T16:05:35Z"
+    },
+    "job_1767283536236": {
+      "status": "completed",
+      "target": "services/security-service",
+      "started_at": "2026-01-01T16:05:36Z",
+      "ruleset": [
+        "enum_validation",
+        "secret_detection"
+      ],
+      "progress": 100.0,
+      "_elapsed": 0.5,
+      "finished_at": "2026-01-01T16:05:36Z"
+    },
+    "job_1767283536361": {
+      "status": "completed",
+      "target": "services/security-service",
+      "started_at": "2026-01-01T16:05:36Z",
+      "ruleset": [
+        "enum_validation",
+        "secret_detection"
+      ],
+      "progress": 100.0,
+      "_elapsed": 0.5,
+      "finished_at": "2026-01-01T16:05:36Z"
+    },
+    "job_1767283537627": {
+      "status": "completed",
+      "target": "services/security-service",
+      "started_at": "2026-01-01T16:05:37Z",
+      "ruleset": [
+        "enum_validation",
+        "secret_detection"
+      ],
+      "progress": 100.0,
+      "_elapsed": 0.5,
+      "finished_at": "2026-01-01T16:05:37Z"
     }
   },
   "history": {
@@ -695,6 +839,102 @@
       "status": "completed",
       "created_at": "2025-12-16T06:27:55Z",
       "finished_at": "2025-12-16T06:27:55Z",
+      "summary": null
+    },
+    "job_1767283132747": {
+      "job_id": "job_1767283132747",
+      "target": "services/security-service",
+      "status": "completed",
+      "created_at": "2026-01-01T15:58:52Z",
+      "finished_at": "2026-01-01T15:58:52Z",
+      "summary": null
+    },
+    "job_1767283133071": {
+      "job_id": "job_1767283133071",
+      "target": "services/security-service",
+      "status": "completed",
+      "created_at": "2026-01-01T15:58:53Z",
+      "finished_at": "2026-01-01T15:58:53Z",
+      "summary": null
+    },
+    "job_1767283133197": {
+      "job_id": "job_1767283133197",
+      "target": "services/security-service",
+      "status": "completed",
+      "created_at": "2026-01-01T15:58:53Z",
+      "finished_at": "2026-01-01T15:58:53Z",
+      "summary": null
+    },
+    "job_1767283134439": {
+      "job_id": "job_1767283134439",
+      "target": "services/security-service",
+      "status": "completed",
+      "created_at": "2026-01-01T15:58:54Z",
+      "finished_at": "2026-01-01T15:58:54Z",
+      "summary": null
+    },
+    "job_1767283396174": {
+      "job_id": "job_1767283396174",
+      "target": "services/security-service",
+      "status": "completed",
+      "created_at": "2026-01-01T16:03:16Z",
+      "finished_at": "2026-01-01T16:03:16Z",
+      "summary": null
+    },
+    "job_1767283396906": {
+      "job_id": "job_1767283396906",
+      "target": "services/security-service",
+      "status": "completed",
+      "created_at": "2026-01-01T16:03:16Z",
+      "finished_at": "2026-01-01T16:03:16Z",
+      "summary": null
+    },
+    "job_1767283397267": {
+      "job_id": "job_1767283397267",
+      "target": "services/security-service",
+      "status": "completed",
+      "created_at": "2026-01-01T16:03:17Z",
+      "finished_at": "2026-01-01T16:03:17Z",
+      "summary": null
+    },
+    "job_1767283398612": {
+      "job_id": "job_1767283398612",
+      "target": "services/security-service",
+      "status": "completed",
+      "created_at": "2026-01-01T16:03:18Z",
+      "finished_at": "2026-01-01T16:03:18Z",
+      "summary": null
+    },
+    "job_1767283535930": {
+      "job_id": "job_1767283535930",
+      "target": "services/security-service",
+      "status": "completed",
+      "created_at": "2026-01-01T16:05:35Z",
+      "finished_at": "2026-01-01T16:05:35Z",
+      "summary": null
+    },
+    "job_1767283536236": {
+      "job_id": "job_1767283536236",
+      "target": "services/security-service",
+      "status": "completed",
+      "created_at": "2026-01-01T16:05:36Z",
+      "finished_at": "2026-01-01T16:05:36Z",
+      "summary": null
+    },
+    "job_1767283536361": {
+      "job_id": "job_1767283536361",
+      "target": "services/security-service",
+      "status": "completed",
+      "created_at": "2026-01-01T16:05:36Z",
+      "finished_at": "2026-01-01T16:05:36Z",
+      "summary": null
+    },
+    "job_1767283537627": {
+      "job_id": "job_1767283537627",
+      "target": "services/security-service",
+      "status": "completed",
+      "created_at": "2026-01-01T16:05:37Z",
+      "finished_at": "2026-01-01T16:05:37Z",
       "summary": null
     }
   }

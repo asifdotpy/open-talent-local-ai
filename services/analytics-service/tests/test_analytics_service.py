@@ -11,7 +11,7 @@ import pytest
 
 @pytest.fixture
 def analytics_service_url():
-    return "http://localhost:8017"
+    return "http://localhost:8007"
 
 
 @pytest.fixture

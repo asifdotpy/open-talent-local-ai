@@ -9,6 +9,7 @@ import os
 import tempfile
 from datetime import datetime
 
+import uvicorn
 from fastapi import Body, FastAPI, File, HTTPException, UploadFile, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -65,7 +66,7 @@ app = FastAPI(
     openapi_url="/openapi.json",
     contact={
         "name": "OpenTalent Platform Team",
-        "url": "https://github.com/asifdotpy/open-talent-platform",
+        "url": "https://github.com/asifdotpy/open-talent",
         "email": "support@OpenTalent.platform",
     },
     license_info={"name": "MIT License", "url": "https://opensource.org/licenses/MIT"},
@@ -180,7 +181,7 @@ else:
             ),
             piper_binary=os.getenv(
                 "PIPER_BINARY",
-                "/home/asif1/open-talent-platform/microservices/voice-service/piper/piper",
+                os.path.join(os.path.dirname(os.path.abspath(__file__)), "piper", "piper"),
             ),
         )
 
@@ -552,7 +553,7 @@ async def text_to_speech(request: TTSRequest):
     Returns:
         Audio file (WAV) with word timing and phoneme data, or JSON with phonemes if return_json=True
     """
-    logger.info(f"TTS request: '{request.text[:50]}...' (voice: {request.voice})")
+    logger.info(f"TTS request: '{request.text[:50]}...' (voice: {request.voice_id})")
 
     if not request.text or len(request.text.strip()) == 0:
         raise HTTPException(status_code=400, detail="Text cannot be empty")
@@ -566,8 +567,8 @@ async def text_to_speech(request: TTSRequest):
         synthesis_result = tts_service.synthesize_speech(
             text=request.text,
             output_path=output_path,
-            voice=request.voice,
-            speed=request.speed,
+            voice=request.voice_id,
+            speed=request.speaking_rate,
             extract_phonemes=request.extract_phonemes,
         )
 
@@ -798,8 +799,8 @@ async def batch_tts(requests: list[TTSRequest]):
             synthesis_result = tts_service.synthesize_speech(
                 text=req.text,
                 output_path=output_path,
-                voice=req.voice,
-                speed=req.speed,
+                voice=req.voice_id,
+                speed=req.speaking_rate,
                 extract_phonemes=req.extract_phonemes,
             )
             with open(output_path, "rb") as f:
@@ -918,4 +919,5 @@ if WEBRTC_AVAILABLE:
 
 if __name__ == "__main__":
     host = os.getenv("HOST", "127.0.0.1")
-    uvicorn.run(app, host=host, port=8003)
+    port = int(os.getenv("PORT", 8008))
+    uvicorn.run(app, host=host, port=port)

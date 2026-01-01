@@ -7,8 +7,10 @@ candidate assessment, and interview flow management.
 
 import json
 import logging
+import re
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any
 
 from ..config import settings
 from ..models import model_registry
@@ -81,72 +83,135 @@ class InferenceEngine:
     def __init__(self):
         self.default_model = settings.default_model
 
-    def generate_interview_questions(
+    async def generate_question(
         self,
-        job_description: str,
-        candidate_experience: str,
-        num_questions: int = 5,
-        phase: InterviewPhase = InterviewPhase.TECHNICAL,
+        context: Any,
+        candidate_profile: Any,
+        num_questions: int = 1,
+        phase: Any = InterviewPhase.TECHNICAL,
         model_name: str | None = None,
-    ) -> list[InterviewQuestion]:
-        """Generate tailored interview questions based on a job description and candidate experience.
-
-        Args:
-            job_description: The text of the job description.
-            candidate_experience: Description of the candidate's background.
-            num_questions: Number of questions to generate.
-            phase: The part of the interview to focus on.
-            model_name: Optional specific model to use for generation.
-
-        Returns:
-            A list of InterviewQuestion objects.
-        """
-
-        model = model_name or self.default_model
-        if model not in model_registry.get_loaded_models():
-            raise ValueError(f"Model {model} not loaded")
-
-        prompt = self._build_question_generation_prompt(
-            job_description, candidate_experience, num_questions, phase
-        )
-
+        temperature: float = 0.7,
+        max_tokens: int = 512,
+    ) -> dict[str, Any]:
+        """Generate tailored interview questions."""
         try:
-            response = model_registry.generate_response(model, prompt)
-            return self._parse_question_response(response, phase)
-        except Exception as e:
-            logger.error(f"Error generating questions: {e}")
-            return []
+            # Convert phase to Enum if it's a string
+            if isinstance(phase, str):
+                try:
+                    phase = InterviewPhase(phase.lower())
+                except ValueError:
+                    phase = InterviewPhase.TECHNICAL
 
-    def analyze_candidate_response(
+            # Format context and profile for prompt
+            context_str = str(context)
+            profile_str = str(candidate_profile)
+
+            model = model_name or self.default_model
+            if model not in model_registry.get_loaded_models():
+                raise ValueError(f"Model {model} not loaded")
+
+            prompt = self._build_question_generation_prompt(
+                context_str, profile_str, num_questions, phase
+            )
+
+            # Run inference in a thread pool to avoid blocking
+            import asyncio
+
+            response = await asyncio.to_thread(
+                model_registry.generate_response,
+                model,
+                prompt,
+                temperature=temperature,
+                max_new_tokens=max_tokens,
+            )
+
+            questions = self._parse_question_response(response, phase)
+            if not questions:
+                return {"question": "Failed to generate question", "status": "error"}
+
+            # If only one question requested, return it directly
+            if num_questions == 1 and questions:
+                q = questions[0]
+                return {
+                    "question": q.question,
+                    "type": q.type.value,
+                    "phase": q.phase.value,
+                    "difficulty": q.difficulty,
+                    "skills_assessed": q.skills_assessed,
+                    "follow_up_questions": q.follow_up_questions,
+                }
+
+            return {
+                "questions": [
+                    {
+                        "question": q.question,
+                        "type": q.type.value,
+                        "phase": q.phase.value,
+                        "difficulty": q.difficulty,
+                        "skills_assessed": q.skills_assessed,
+                        "follow_up_questions": q.follow_up_questions,
+                    }
+                    for q in questions
+                ]
+            }
+        except Exception:
+            import traceback
+
+            error_trace = traceback.format_exc()
+            logger.error(f"Error generating questions: {error_trace}")
+            return {"questions": [], "error": error_trace, "status": "error"}
+
+    async def analyze_response(
         self,
         question: str,
         response: str,
-        expected_skills: list[str],
+        context: dict[str, Any] | None = None,
         model_name: str | None = None,
-    ) -> CandidateResponse:
+    ) -> dict[str, Any]:
         """Analyze a candidate's response to a question."""
-
-        model = model_name or self.default_model
-        if model not in model_registry.get_loaded_models():
-            raise ValueError(f"Model {model} not loaded")
-
-        prompt = self._build_response_analysis_prompt(question, response, expected_skills)
-
         try:
-            analysis_response = model_registry.generate_response(model, prompt)
-            return self._parse_response_analysis(analysis_response, response)
-        except Exception as e:
-            logger.error(f"Error analyzing response: {e}")
-            return CandidateResponse(
-                response_text=response,
-                sentiment_score=0.0,
-                confidence_score=0.0,
-                key_points=[],
-                strengths=[],
-                weaknesses=[],
-                technical_accuracy=0.0,
-                communication_score=0.0,
+            model = model_name or self.default_model
+            if model not in model_registry.get_loaded_models():
+                raise ValueError(f"Model {model} not loaded")
+
+            # Extract skills from context if provided
+            expected_skills = []
+            if context and isinstance(context, dict):
+                expected_skills = context.get("skills", [])
+
+            prompt = self._build_response_analysis_prompt(question, response, expected_skills)
+
+            import asyncio
+
+            analysis_response = await asyncio.to_thread(
+                model_registry.generate_response, model, prompt
             )
+            analysis = self._parse_response_analysis(analysis_response, response)
+
+            return {
+                "sentiment_score": analysis.sentiment_score,
+                "confidence_score": analysis.confidence_score,
+                "key_points": analysis.key_points,
+                "strengths": analysis.strengths,
+                "weaknesses": analysis.weaknesses,
+                "technical_accuracy": analysis.technical_accuracy,
+                "communication_score": analysis.communication_score,
+            }
+        except Exception:
+            import traceback
+
+            error_trace = traceback.format_exc()
+            logger.error(f"Error analyzing response: {error_trace}")
+            return {
+                "sentiment_score": 0.0,
+                "confidence_score": 0.0,
+                "key_points": [],
+                "strengths": [],
+                "weaknesses": [],
+                "technical_accuracy": 0.0,
+                "communication_score": 0.0,
+                "error": error_trace,
+            }
 
     def generate_follow_up_questions(
         self,
@@ -340,55 +405,117 @@ Provide assessment in this JSON format:
 
 Be thorough and objective in your assessment."""
 
+    def _extract_json(self, text: str) -> Any:
+        """Extract JSON from a string, handling markdown blocks or raw text."""
+        if not text:
+            return None
+
+        # Try direct parsing
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            pass
+
+        # Try to find JSON block in markdown
+        match = re.search(r"```(?:json)?\s*([\s\S]*?)```", text)
+        if match:
+            try:
+                return json.loads(match.group(1).strip())
+            except json.JSONDecodeError:
+                pass
+
+        # Try to find anything that looks like a JSON array or object
+        match = re.search(r"(\[[\s\S]*\]|\{[\s\S]*\})", text)
+        if match:
+            try:
+                return json.loads(match.group(1).strip())
+            except json.JSONDecodeError:
+                pass
+
+        return None
+
     def _parse_question_response(
         self, response: str, phase: InterviewPhase
     ) -> list[InterviewQuestion]:
         """Parse question generation response."""
+        questions_data = self._extract_json(response)
+
+        if not questions_data:
+            # Fallback for raw text response
+            if response and len(response.strip()) > 10:
+                logger.info("Falling back to raw text for question")
+                return [
+                    InterviewQuestion(
+                        question=response.strip(),
+                        type=QuestionType.TECHNICAL,
+                        phase=phase,
+                        difficulty="intermediate",
+                        skills_assessed=[],
+                        follow_up_questions=[],
+                    )
+                ]
+            return []
+
+        questions = []
         try:
-            questions_data = json.loads(response)
-            questions = []
+            # Handle both single object and list
+            if isinstance(questions_data, dict):
+                questions_data = [questions_data]
 
             for q_data in questions_data:
                 question = InterviewQuestion(
-                    question=q_data["question"],
-                    type=QuestionType(q_data["type"]),
+                    question=q_data.get("question", str(q_data)),
+                    type=QuestionType(q_data.get("type", "technical")),
                     phase=phase,
-                    difficulty=q_data["difficulty"],
-                    skills_assessed=q_data["skills_assessed"],
+                    difficulty=q_data.get("difficulty", "intermediate"),
+                    skills_assessed=q_data.get("skills_assessed", []),
                     follow_up_questions=q_data.get("follow_up_questions", []),
                 )
                 questions.append(question)
-
             return questions
-        except (json.JSONDecodeError, KeyError) as e:
-            logger.error(f"Error parsing question response: {e}")
+        except Exception as e:
+            logger.error(f"Error parsing question data: {e}")
             return []
 
     def _parse_response_analysis(self, response: str, original_response: str) -> CandidateResponse:
         """Parse response analysis."""
-        try:
-            analysis = json.loads(response)
+        analysis = self._extract_json(response)
+
+        if not analysis or not isinstance(analysis, dict):
+            logger.warning("Failing back to default analysis for malformed response")
             return CandidateResponse(
                 response_text=original_response,
-                sentiment_score=float(analysis["sentiment_score"]),
-                confidence_score=float(analysis["confidence_score"]),
-                key_points=analysis["key_points"],
-                strengths=analysis["strengths"],
-                weaknesses=analysis["weaknesses"],
-                technical_accuracy=float(analysis["technical_accuracy"]),
-                communication_score=float(analysis["communication_score"]),
-            )
-        except (json.JSONDecodeError, KeyError) as e:
-            logger.error(f"Error parsing response analysis: {e}")
-            return CandidateResponse(
-                response_text=original_response,
-                sentiment_score=0.0,
-                confidence_score=0.0,
+                sentiment_score=0.5,
+                confidence_score=0.5,
                 key_points=[],
                 strengths=[],
                 weaknesses=[],
-                technical_accuracy=0.0,
-                communication_score=0.0,
+                technical_accuracy=0.5,
+                communication_score=0.5,
+            )
+
+        try:
+            return CandidateResponse(
+                response_text=original_response,
+                sentiment_score=float(analysis.get("sentiment_score", 0.5)),
+                confidence_score=float(analysis.get("confidence_score", 0.5)),
+                key_points=analysis.get("key_points", []),
+                strengths=analysis.get("strengths", []),
+                weaknesses=analysis.get("weaknesses", []),
+                technical_accuracy=float(analysis.get("technical_accuracy", 0.5)),
+                communication_score=float(analysis.get("communication_score", 0.5)),
+            )
+        except (ValueError, TypeError) as e:
+            logger.error(f"Error parsing analysis values: {e}")
+            return CandidateResponse(
+                response_text=original_response,
+                sentiment_score=0.5,
+                confidence_score=0.5,
+                key_points=[],
+                strengths=[],
+                weaknesses=[],
+                technical_accuracy=0.5,
+                communication_score=0.5,
             )
 
     def _parse_follow_up_response(self, response: str) -> list[str]:

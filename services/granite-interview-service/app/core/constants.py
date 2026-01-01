@@ -27,8 +27,8 @@ DEFAULT_TRAINING_CONFIG = {
 
 # Model mapping (HuggingFace)
 HG_REPO_MAP = {
-    "granite4:350m-h": "ibm-granite/granite-3.1-2b-instruct",
-    "granite-interview-ft": "ibm-granite/granite-3.1-2b-instruct",
+    "granite4:350m-h": "ibm-granite/granite-4.0-h-350m",
+    "granite-interview-ft": "ibm-granite/granite-4.0-h-350m",
     "llama-2-7b-chat": "meta-llama/Llama-2-7b-chat-hf",
     "llama-2-13b-chat": "meta-llama/Llama-2-13b-chat-hf",
     "llama-2-70b-chat": "meta-llama/Llama-2-70b-chat-hf",

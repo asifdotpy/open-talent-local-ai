@@ -4,6 +4,7 @@ import sys as _sys
 import time
 from typing import Any
 
+import uvicorn
 from fastapi import Body, FastAPI
 from fastapi.responses import JSONResponse
 

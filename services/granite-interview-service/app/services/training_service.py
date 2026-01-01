@@ -263,7 +263,9 @@ class TrainingService:
             # Apply LoRA/QLoRA
             self.active_trainings[training_id]["status"] = "configuring_lora"
 
-            lora_config = LoraConfig(**config.get_training_config())
+            lora_params = config.get_training_config()
+            lora_params.pop("technique", None)
+            lora_config = LoraConfig(**lora_params)
             model = prepare_model_for_kbit_training(model)
             model = get_peft_model(model, lora_config)
 

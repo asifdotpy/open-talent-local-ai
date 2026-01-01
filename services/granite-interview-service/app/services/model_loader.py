@@ -25,6 +25,8 @@ class ModelLoader:
     def __init__(self):
         self.hf_api = HfApi()
         self.download_tasks: dict[str, asyncio.Task] = {}
+        # Reference current model registry's loaded models for backward compatibility with main.py
+        self.loaded_models = model_registry.loaded_models
 
     async def download_model(self, model_name: str, force: bool = False) -> bool:
         """Download model from Hugging Face if not cached.
@@ -97,7 +99,7 @@ class ModelLoader:
                 revision=config.revision,
                 local_dir=str(model_path),
                 local_dir_use_symlinks=False,
-                ignore_patterns=["*.md", "*.txt", "*.json"],  # Skip documentation
+                ignore_patterns=["*.md", "*.txt"],  # Skip redundant documentation
             )
 
             return True
@@ -129,6 +131,11 @@ class ModelLoader:
     def unload_model(self, model_name: str):
         """Unload a model from memory."""
         model_registry.unload_model(model_name)
+
+    async def unload_all_models(self):
+        """Unload all models from memory."""
+        for model_name in list(self.loaded_models.keys()):
+            self.unload_model(model_name)
 
     def get_download_progress(self, model_name: str) -> dict[str, Any] | None:
         """Get download progress for a model."""

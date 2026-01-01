@@ -12,7 +12,7 @@ import pytest
 
 @pytest.fixture
 def interview_service_url():
-    return "http://localhost:8006"
+    return "http://localhost:8014"
 
 
 @pytest.fixture

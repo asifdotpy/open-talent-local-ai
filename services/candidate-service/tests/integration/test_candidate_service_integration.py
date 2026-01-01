@@ -21,7 +21,7 @@ from fastapi.testclient import TestClient
 from main import app
 
 # Test configuration
-SERVICE_URL = "http://localhost:8000"
+SERVICE_URL = "http://localhost:8006"
 TEST_TIMEOUT = 30  # seconds
 
 
@@ -30,13 +30,14 @@ class TestCandidateServiceIntegration:
 
     def setup_method(self):
         """Setup for each test method."""
-        self.client = TestClient(app)
+        self.client_context = TestClient(app)
+        self.client = self.client_context.__enter__()
         # Alternative httpx client for when we need real HTTP
         # self.http_client = httpx.AsyncClient(base_url=SERVICE_URL, timeout=TEST_TIMEOUT)
 
     def teardown_method(self):
         """Cleanup after each test method."""
-        pass
+        self.client_context.__exit__(None, None, None)
         # asyncio.run(self.http_client.aclose())
 
     def test_health_endpoint(self):
@@ -283,9 +284,9 @@ class TestCandidateServiceIntegration:
             assert data["search_method"] == "vector_similarity"
             assert isinstance(data["results"], list)
         else:
-            # Vector search not available
-            assert "message" in data
-            assert data["message"] == "Vector search not available"
+            # Vector search not available - returns basic text match
+            assert "results" in data
+            assert data.get("search_method") == "basic_text_match"
 
     def test_search_candidates_empty_query(self):
         """Test searching candidates with empty query."""

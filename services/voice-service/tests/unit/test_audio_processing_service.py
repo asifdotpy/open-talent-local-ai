@@ -1,3 +1,4 @@
+from fractions import Fraction
 from unittest.mock import AsyncMock, Mock, patch
 
 import numpy as np
@@ -38,7 +39,7 @@ class TestRNNoiseTrack:
         # Create a mock frame with mono audio
         mock_frame = Mock()
         mock_frame.to_ndarray.return_value = np.random.rand(480).astype(np.float32)
-        mock_frame.time_base = "1/48000"
+        mock_frame.time_base = Fraction(1, 48000)
         rnnoise_track.track.recv.return_value = mock_frame
 
         # Mock RNNoise processing
@@ -51,7 +52,7 @@ class TestRNNoiseTrack:
             mock_denoise.assert_called_once()
             assert result_frame.sample_rate == 48000
             assert result_frame.pts == 0
-            assert result_frame.time_base == "1/48000"
+            assert result_frame.time_base == Fraction(1, 48000)
 
     @pytest.mark.asyncio
     async def test_recv_stereo_to_mono_conversion(self, rnnoise_track):
@@ -60,7 +61,7 @@ class TestRNNoiseTrack:
         mock_frame = Mock()
         stereo_audio = np.random.rand(2, 480).astype(np.float32)  # 2 channels
         mock_frame.to_ndarray.return_value = stereo_audio
-        mock_frame.time_base = "1/48000"
+        mock_frame.time_base = Fraction(1, 48000)
         rnnoise_track.track.recv.return_value = mock_frame
 
         with patch.object(rnnoise_track.rnnoise, "denoise_frame") as mock_denoise:
@@ -77,7 +78,7 @@ class TestRNNoiseTrack:
         """Test fallback when RNNoise processing fails."""
         mock_frame = Mock()
         mock_frame.to_ndarray.return_value = np.random.rand(480).astype(np.float32)
-        mock_frame.time_base = "1/48000"
+        mock_frame.time_base = Fraction(1, 48000)
         rnnoise_track.track.recv.return_value = mock_frame
 
         # Mock RNNoise to raise an exception
@@ -96,7 +97,7 @@ class TestRNNoiseTrack:
         # Create a frame with less than frame_size samples
         mock_frame = Mock()
         mock_frame.to_ndarray.return_value = np.random.rand(240).astype(np.float32)  # Less than 480
-        mock_frame.time_base = "1/48000"
+        mock_frame.time_base = Fraction(1, 48000)
         rnnoise_track.track.recv.return_value = mock_frame
 
         result_frame = await rnnoise_track.recv()
@@ -104,8 +105,9 @@ class TestRNNoiseTrack:
         # Should return silence frame
         assert result_frame is not None
         assert result_frame.sample_rate == 48000
-        # PTS should be incremented
-        assert result_frame.pts == 480
+        # PTS should be incremented for next call
+        assert result_frame.pts == 0
+        assert rnnoise_track.pts_counter == 480
 
     @pytest.mark.asyncio
     async def test_recv_buffer_accumulation(self, rnnoise_track):
@@ -113,12 +115,12 @@ class TestRNNoiseTrack:
         # First small frame
         mock_frame1 = Mock()
         mock_frame1.to_ndarray.return_value = np.random.rand(240).astype(np.float32)
-        mock_frame1.time_base = "1/48000"
+        mock_frame1.time_base = Fraction(1, 48000)
 
         # Second small frame that completes the buffer
         mock_frame2 = Mock()
         mock_frame2.to_ndarray.return_value = np.random.rand(240).astype(np.float32)
-        mock_frame2.time_base = "1/48000"
+        mock_frame2.time_base = Fraction(1, 48000)
 
         rnnoise_track.track.recv.side_effect = [mock_frame1, mock_frame2]
 
@@ -139,7 +141,7 @@ class TestRNNoiseTrack:
         """Test PTS counter increment."""
         mock_frame = Mock()
         mock_frame.to_ndarray.return_value = np.random.rand(480).astype(np.float32)
-        mock_frame.time_base = "1/48000"
+        mock_frame.time_base = Fraction(1, 48000)
         rnnoise_track.track.recv.return_value = mock_frame
 
         with patch.object(rnnoise_track.rnnoise, "denoise_frame") as mock_denoise:
