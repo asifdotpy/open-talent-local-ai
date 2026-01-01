@@ -62,6 +62,10 @@ export const Icons = {
         </svg>
     ),
     Logo: ({ className }) => (
-        <div className={`bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg ${className}`}></div>
+        <svg className={className} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="45" cy="45" r="28" stroke="#4338ca" strokeWidth="10"/>
+            <line x1="65" y1="65" x2="85" y2="85" stroke="#4338ca" strokeWidth="10" strokeLinecap="round"/>
+            <path d="M 35,35 H 55 M 45,35 V 60" stroke="#06b6d4" strokeWidth="10" strokeLinecap="round"/>
+        </svg>
     )
 };
