@@ -10,10 +10,10 @@ rules:
           $VAR: str = Field(..., min_length=$N, max_length=$M)
     message: |
       Use Python Enum instead of loose string validation for status/enum fields.
-      
+
       Bad:  status: str = Field(min_length=1, max_length=100)
       Good: status: ApplicationStatus = Field(...)
-      
+
       See CODE_QUALITY_AUDIT_ENUM_VALIDATION.md for details.
     severity: WARNING
     languages: [python]
@@ -22,7 +22,7 @@ rules:
         - "*.py"
       exclude:
         - "tests/"
-        
+
   # ==========================================================================
   # HARDCODED SECRETS
   # ==========================================================================
@@ -33,12 +33,12 @@ rules:
       - pattern: API_KEY = "$VALUE"
     message: |
       Secret keys should be loaded from environment variables, not hardcoded.
-      
+
       Bad:  SECRET_KEY = "my-secret-key"
       Good: SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
     severity: ERROR
     languages: [python]
-    
+
   # ==========================================================================
   # GENERIC DICT PAYLOADS
   # ==========================================================================
@@ -53,7 +53,7 @@ rules:
     message: |
       Use Pydantic models instead of dict for payload validation.
       This ensures type safety, validation, and OpenAPI schema generation.
-      
+
       Bad:  async def create_user(payload: dict = Body(...)):
       Good: async def create_user(payload: UserCreate):
     severity: WARNING
@@ -61,7 +61,7 @@ rules:
     paths:
       include:
         - "services/*/main.py"
-        
+
   # ==========================================================================
   # INSECURE PASSWORD HASHING
   # ==========================================================================
@@ -73,14 +73,14 @@ rules:
       - pattern: hashlib.md5($PASSWORD.encode())
     message: |
       SHA256/MD5 are not suitable for password hashing. Use bcrypt or argon2.
-      
+
       Bad:  password_hash = sha256(password.encode()).hexdigest()
       Good: from passlib.context import CryptContext
             pwd_context = CryptContext(schemes=["bcrypt"])
             password_hash = pwd_context.hash(password)
     severity: ERROR
     languages: [python]
-    
+
   # ==========================================================================
   # SQL INJECTION
   # ==========================================================================
@@ -96,13 +96,13 @@ rules:
           $DB.execute($QUERY)
     message: |
       Potential SQL injection. Use parameterized queries.
-      
+
       Bad:  query = f"SELECT * FROM users WHERE email = '{email}'"
       Good: query = "SELECT * FROM users WHERE email = :email"
             result = await db.fetch_one(query, values={"email": email})
     severity: ERROR
     languages: [python]
-    
+
   # ==========================================================================
   # COMMAND INJECTION
   # ==========================================================================
@@ -114,12 +114,12 @@ rules:
       - pattern: subprocess.Popen($CMD, shell=True)
     message: |
       Command injection risk. Avoid shell=True and use list arguments.
-      
+
       Bad:  os.system(f"convert {user_file} output.png")
       Good: subprocess.run(["convert", user_file, "output.png"], check=True)
     severity: ERROR
     languages: [python]
-    
+
   # ==========================================================================
   # INSECURE RANDOM
   # ==========================================================================
@@ -130,7 +130,7 @@ rules:
       - pattern: random.choice(...)
     message: |
       Use secrets module for cryptographic randomness, not random module.
-      
+
       Bad:  token = random.randint(100000, 999999)
       Good: import secrets
             token = secrets.randbelow(900000) + 100000
@@ -141,7 +141,7 @@ rules:
         - "services/*/main.py"
       exclude:
         - "tests/"
-        
+
   # ==========================================================================
   # MISSING AUTHORIZATION CHECK
   # ==========================================================================
@@ -155,7 +155,7 @@ rules:
       Ensure Depends(get_current_user) or equivalent is present.
     severity: INFO
     languages: [python]
-    
+
   # ==========================================================================
   # CORS WILDCARD IN PRODUCTION
   # ==========================================================================
@@ -169,12 +169,12 @@ rules:
     message: |
       CORS wildcard (*) should not be used in production.
       Use environment-specific origin whitelist.
-      
+
       Good: ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS").split(",")
             app.add_middleware(CORSMiddleware, allow_origins=ALLOWED_ORIGINS)
     severity: WARNING
     languages: [python]
-    
+
   # ==========================================================================
   # DEBUG MODE IN PRODUCTION
   # ==========================================================================
@@ -185,11 +185,11 @@ rules:
     message: |
       Debug mode should be disabled in production.
       Use environment variables to control debug mode.
-      
+
       Good: DEBUG = os.getenv("DEBUG", "false").lower() == "true"
     severity: WARNING
     languages: [python]
-    
+
   # ==========================================================================
   # LOGGING SENSITIVE DATA
   # ==========================================================================
@@ -203,7 +203,7 @@ rules:
       Sanitize sensitive data before logging.
     severity: ERROR
     languages: [python]
-    
+
   # ==========================================================================
   # UNSAFE YAML LOADING
   # ==========================================================================
@@ -213,12 +213,12 @@ rules:
       - pattern: yaml.load($DATA, Loader=yaml.Loader)
     message: |
       Unsafe YAML loading can execute arbitrary code.
-      
+
       Bad:  yaml.load(data)
       Good: yaml.safe_load(data)
     severity: ERROR
     languages: [python]
-    
+
   # ==========================================================================
   # EVAL/EXEC USAGE
   # ==========================================================================

@@ -5,17 +5,18 @@ Creates real-time compatible audio chunks for WebSocket streaming
 Uses local implementation with numpy for high-quality WAV generation
 """
 
-import json
-import os
-import sys
-import struct
-import math
 import asyncio
+import json
+import math
+import os
 import random
+import struct
+import sys
 from pathlib import Path
 
 try:
     import numpy as np
+
     HAS_NUMPY = True
 except ImportError:
     HAS_NUMPY = False
@@ -23,6 +24,7 @@ except ImportError:
 
 try:
     import websockets
+
     HAS_WEBSOCKETS = True
 except ImportError:
     HAS_WEBSOCKETS = False
@@ -40,20 +42,21 @@ class StreamingWAVGenerator:
 
     def create_wav_header(self, data_size):
         """Create proper WAV file header"""
-        return struct.pack('<4sL4s4sLHHLLHH4sL',
-            b'RIFF',
+        return struct.pack(
+            "<4sL4s4sLHHLLHH4sL",
+            b"RIFF",
             36 + data_size,  # File size
-            b'WAVE',
-            b'fmt ',
+            b"WAVE",
+            b"fmt ",
             16,  # Format chunk size
-            1,   # Audio format (PCM)
+            1,  # Audio format (PCM)
             self.channels,
             self.sample_rate,
             self.sample_rate * self.channels * self.bytes_per_sample,  # Byte rate
             self.channels * self.bytes_per_sample,  # Block align
             self.bits_per_sample,
-            b'data',
-            data_size
+            b"data",
+            data_size,
         )
 
     def generate_sine_wave(self, frequency, duration, amplitude=0.8):
@@ -65,11 +68,13 @@ class StreamingWAVGenerator:
             return (wave * 32767).astype(np.int16).tobytes()
         else:
             # Fallback without numpy
-            audio_data = b''
+            audio_data = b""
             num_samples = int(self.sample_rate * duration)
             for i in range(num_samples):
-                sample = int(amplitude * 32767 * math.sin(2 * math.pi * frequency * i / self.sample_rate))
-                audio_data += struct.pack('<h', sample)
+                sample = int(
+                    amplitude * 32767 * math.sin(2 * math.pi * frequency * i / self.sample_rate)
+                )
+                audio_data += struct.pack("<h", sample)
             return audio_data
 
     def generate_speech_like_audio(self, text, base_frequency=180):
@@ -90,10 +95,10 @@ class StreamingWAVGenerator:
 
             # Add small pause between words
             pause_samples = int(self.sample_rate * 0.05)  # 50ms pause
-            pause_data = b'\x00\x00' * pause_samples
+            pause_data = b"\x00\x00" * pause_samples
             audio_chunks.append(pause_data)
 
-        return b''.join(audio_chunks)
+        return b"".join(audio_chunks)
 
     def create_streaming_chunks(self, audio_data, chunk_size_ms=100):
         """Break audio data into streaming chunks for WebSocket"""
@@ -102,14 +107,16 @@ class StreamingWAVGenerator:
 
         chunks = []
         for i in range(0, len(audio_data), chunk_size_bytes):
-            chunk = audio_data[i:i + chunk_size_bytes]
+            chunk = audio_data[i : i + chunk_size_bytes]
             if len(chunk) > 0:
                 chunks.append(chunk)
 
         return chunks
 
 
-async def stream_audio_to_websocket(generator, text, websocket_url="ws://localhost:8051/ws/session_123"):
+async def stream_audio_to_websocket(
+    generator, text, websocket_url="ws://localhost:8051/ws/session_123"
+):
     """Stream generated audio via WebSocket to avatar animation service"""
     if not HAS_WEBSOCKETS:
         print("❌ websockets package not available for streaming")
@@ -135,7 +142,7 @@ async def stream_audio_to_websocket(generator, text, websocket_url="ws://localho
                     "chunk_id": i,
                     "total_chunks": len(chunks),
                     "timestamp": i * 0.1,  # 100ms per chunk
-                    "session_id": websocket_url.split('/')[-1]
+                    "session_id": websocket_url.split("/")[-1],
                 }
                 await websocket.send(json.dumps(metadata))
 
@@ -157,7 +164,7 @@ def create_demo_files():
     # Read text from prompt.txt if it exists
     prompt_file = "prompt.txt"
     if os.path.exists(prompt_file):
-        with open(prompt_file, "r", encoding="utf-8") as f:
+        with open(prompt_file, encoding="utf-8") as f:
             speech_text = f.read().strip()
         print(f"📖 Using text from {prompt_file}")
     else:
@@ -168,7 +175,7 @@ def create_demo_files():
     audio_dir = Path("assets/audio")
     audio_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"🎙️  Generating streaming-compatible WAV audio...")
+    print("🎙️  Generating streaming-compatible WAV audio...")
     print(f"📝 Text: {speech_text}")
 
     # Initialize generator
@@ -199,12 +206,14 @@ def create_demo_files():
         start_time = i * time_per_word
         end_time = (i + 1) * time_per_word
         confidence = round(random.uniform(0.85, 0.98), 2)
-        words_data.append({
-            "word": word,
-            "start": round(start_time, 2),
-            "end": round(end_time, 2),
-            "confidence": confidence
-        })
+        words_data.append(
+            {
+                "word": word,
+                "start": round(start_time, 2),
+                "end": round(end_time, 2),
+                "confidence": confidence,
+            }
+        )
 
     # Create speech.json with streaming metadata
     speech_data = {
@@ -220,16 +229,16 @@ def create_demo_files():
         "streaming": {
             "chunk_size_ms": 100,
             "websocket_url": "ws://localhost:8051/ws/{session_id}",
-            "supports_realtime": True
+            "supports_realtime": True,
         },
-        "note": "Streaming-compatible WAV with WebSocket integration"
+        "note": "Streaming-compatible WAV with WebSocket integration",
     }
 
     json_path = audio_dir / "speech_streaming.json"
     print(f"📄 Creating streaming timing data: {json_path}")
 
     try:
-        with open(json_path, 'w', encoding='utf-8') as f:
+        with open(json_path, "w", encoding="utf-8") as f:
             json.dump(speech_data, f, indent=2, ensure_ascii=False)
         print("✅ Streaming timing data created successfully")
     except Exception as e:
@@ -293,7 +302,9 @@ def main():
             print("Usage:")
             print("  python3 streaming_audio.py              # Generate demo files")
             print("  python3 streaming_audio.py --stream     # Test WebSocket streaming")
-            print("  python3 streaming_audio.py --stream <session_id>  # Stream to specific session")
+            print(
+                "  python3 streaming_audio.py --stream <session_id>  # Stream to specific session"
+            )
             return
         else:
             print(f"❌ Unknown argument: {sys.argv[1]}")

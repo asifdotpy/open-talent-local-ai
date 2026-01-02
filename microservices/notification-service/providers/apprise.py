@@ -1,10 +1,12 @@
-from typing import Dict, Optional, List
+from typing import Optional
+
 from .base import NotificationProvider
 
 try:
     import apprise
 except Exception:  # Apprise optional
     apprise = None
+
 
 class AppriseProvider(NotificationProvider):
     def __init__(self, services: str = ""):
@@ -15,32 +17,34 @@ class AppriseProvider(NotificationProvider):
                 if url.strip():
                     self.app.add(url.strip())
 
-    async def send_email(self, to: str, subject: str, html: str, text: Optional[str] = None) -> Dict:
+    async def send_email(
+        self, to: str, subject: str, html: str, text: Optional[str] = None
+    ) -> dict:
         if not self.app:
             return {"ok": False, "error": "Apprise not installed"}
         ok = self.app.notify(body=text or html, title=subject)
         return {"ok": ok}
 
-    async def send_sms(self, to: str, text: str) -> Dict:
+    async def send_sms(self, to: str, text: str) -> dict:
         if not self.app:
             return {"ok": False, "error": "Apprise not installed"}
         ok = self.app.notify(body=text)
         return {"ok": ok}
 
-    async def send_push(self, to: str, title: str, body: str, data: Optional[Dict] = None) -> Dict:
+    async def send_push(self, to: str, title: str, body: str, data: Optional[dict] = None) -> dict:
         if not self.app:
             return {"ok": False, "error": "Apprise not installed"}
         ok = self.app.notify(body=body, title=title)
         return {"ok": ok}
 
-    async def get_templates(self) -> List[Dict]:
+    async def get_templates(self) -> list[dict]:
         return []
 
-    async def render(self, template_id: str, payload: Dict) -> Dict:
+    async def render(self, template_id: str, payload: dict) -> dict:
         return {"template_id": template_id, "payload": payload}
 
-    async def preferences(self, user_id: str) -> Dict:
+    async def preferences(self, user_id: str) -> dict:
         return {"user_id": user_id, "channels": {"email": True, "sms": True, "push": True}}
 
-    async def health(self) -> Dict:
+    async def health(self) -> dict:
         return {"provider": "apprise", "ok": self.app is not None}

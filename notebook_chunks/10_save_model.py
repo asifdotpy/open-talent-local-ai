@@ -3,6 +3,7 @@
 # ╚═══════════════════════════════════════════════════════════════════════════╝
 
 import os
+
 from unsloth import FastLanguageModel
 
 # Load configuration (for standalone execution)
@@ -13,19 +14,19 @@ try:
 except NameError:
     # Fallback for standalone execution
     print("⚙️ Loading configuration for standalone execution...")
-    exec(open('04_config.py').read())
+    exec(open("04_config.py").read())
 
 # Check if model and tokenizer are defined. If not, try to load from checkpoint or base model.
-if 'model' not in globals() or 'tokenizer' not in globals():
+if "model" not in globals() or "tokenizer" not in globals():
     print("🔄 Model or tokenizer not found in memory. Attempting to load...")
 
     # First, try to load from the latest checkpoint if available
     checkpoint_dir = config.output_dir
     if os.path.exists(checkpoint_dir):
         # Find the latest checkpoint
-        checkpoints = [d for d in os.listdir(checkpoint_dir) if d.startswith('checkpoint-')]
+        checkpoints = [d for d in os.listdir(checkpoint_dir) if d.startswith("checkpoint-")]
         if checkpoints:
-            latest_checkpoint = max(checkpoints, key=lambda x: int(x.split('-')[1]))
+            latest_checkpoint = max(checkpoints, key=lambda x: int(x.split("-")[1]))
             checkpoint_path = os.path.join(checkpoint_dir, latest_checkpoint)
             print(f"📂 Found checkpoint: {checkpoint_path}")
             try:
@@ -111,9 +112,11 @@ print("   ✅ Skipped to prevent Colab crashes")
 print("\n📊 Model sizes:")
 for name, path in [("LoRA", lora_dir), ("Merged", merged_dir), ("GGUF", gguf_dir)]:
     if os.path.exists(path):
-        size = sum(os.path.getsize(os.path.join(path, f))
-                   for f in os.listdir(path)
-                   if os.path.isfile(os.path.join(path, f)))
+        size = sum(
+            os.path.getsize(os.path.join(path, f))
+            for f in os.listdir(path)
+            if os.path.isfile(os.path.join(path, f))
+        )
         if size > 0:
             print(f"   {name}: {size / 1024**2:.1f} MB")
         else:

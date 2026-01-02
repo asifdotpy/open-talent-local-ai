@@ -16,18 +16,20 @@ Requirements:
     pip install torch transformers unsloth huggingface_hub
 """
 
-import os
 import argparse
-import torch
+import os
+
+from huggingface_hub import HfApi, login
 from unsloth import FastLanguageModel
-from huggingface_hub import login, HfApi
-from transformers import AutoTokenizer
+
 
 def main():
     parser = argparse.ArgumentParser(description="Merge LoRA adapters with base model")
     parser.add_argument("--upload", action="store_true", help="Upload merged model to Hugging Face")
     parser.add_argument("--hf-token", type=str, help="Hugging Face token (or set HF_TOKEN env var)")
-    parser.add_argument("--output-dir", type=str, default="./merged_model", help="Output directory for merged model")
+    parser.add_argument(
+        "--output-dir", type=str, default="./merged_model", help="Output directory for merged model"
+    )
     args = parser.parse_args()
 
     print("🔄 Starting LoRA merge process...")
@@ -55,7 +57,7 @@ def main():
         model_name=BASE_MODEL,
         max_seq_length=2048,
         load_in_4bit=False,  # Full precision for merging
-        device_map="auto",   # Use GPU if available
+        device_map="auto",  # Use GPU if available
     )
 
     # Apply LoRA adapters
@@ -64,7 +66,15 @@ def main():
         lora_path=LORA_REPO,
         r=16,
         lora_alpha=16,
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+        target_modules=[
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "o_proj",
+            "gate_proj",
+            "up_proj",
+            "down_proj",
+        ],
     )
 
     print("🔀 Merging LoRA weights...")
@@ -79,7 +89,9 @@ def main():
     tokenizer.save_pretrained(args.output_dir)
 
     print("✅ Merged model saved successfully!")
-    print(f"📏 Model size: {sum(os.path.getsize(os.path.join(args.output_dir, f)) for f in os.listdir(args.output_dir) if os.path.isfile(os.path.join(args.output_dir, f))) / (1024**3):.2f} GB")
+    print(
+        f"📏 Model size: {sum(os.path.getsize(os.path.join(args.output_dir, f)) for f in os.listdir(args.output_dir) if os.path.isfile(os.path.join(args.output_dir, f))) / (1024**3):.2f} GB"
+    )
 
     # Upload to Hugging Face if requested
     if args.upload:
@@ -91,7 +103,7 @@ def main():
                 folder_path=args.output_dir,
                 repo_id=MERGED_REPO,
                 repo_type="model",
-                commit_message=f"Upload merged Vetta Granite fine-tuned model {VERSION} (16-bit)"
+                commit_message=f"Upload merged Vetta Granite fine-tuned model {VERSION} (16-bit)",
             )
 
             print("✅ Merged model uploaded successfully!")
@@ -150,7 +162,7 @@ This model is designed to conduct professional AI-powered interviews, providing 
                 path_in_repo="README.md",
                 repo_id=MERGED_REPO,
                 repo_type="model",
-                commit_message="Add model card and usage instructions"
+                commit_message="Add model card and usage instructions",
             )
             print("✅ Model card uploaded")
 
@@ -164,6 +176,7 @@ This model is designed to conduct professional AI-powered interviews, providing 
         print(f"Merged model uploaded to: https://huggingface.co/{MERGED_REPO}")
     else:
         print("To upload manually, run: python merge_lora.py --upload")
+
 
 if __name__ == "__main__":
     main()

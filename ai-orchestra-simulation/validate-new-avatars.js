@@ -47,7 +47,7 @@ function parseGLBMorphTargets(buffer) {
     const gltf = JSON.parse(jsonChunk.toString('utf8'));
 
     const morphTargets = new Set();
-    
+
     if (gltf.meshes) {
       for (const mesh of gltf.meshes) {
         if (mesh.primitives) {
@@ -70,13 +70,13 @@ function parseGLBMorphTargets(buffer) {
 
 async function validateAvatar(config, avatarId) {
   const url = `https://models.readyplayer.me/${avatarId}.glb`;
-  
+
   log(colors.cyan, `\n🔍 Testing: ${config}`);
   log(colors.yellow, `   Avatar ID: ${avatarId}`);
 
   try {
     const response = await fetch(url);
-    
+
     if (!response.ok) {
       log(colors.red, `   ❌ Failed: ${response.status}`);
       return null;
@@ -86,7 +86,7 @@ async function validateAvatar(config, avatarId) {
     const buffer = Buffer.from(arrayBuffer);
     const morphTargets = parseGLBMorphTargets(buffer);
 
-    const oculusVisemes = morphTargets.filter(name => 
+    const oculusVisemes = morphTargets.filter(name =>
       name.toLowerCase().startsWith('viseme_')
     );
 
@@ -96,7 +96,7 @@ async function validateAvatar(config, avatarId) {
 
     log(colors.green, `   ✅ Size: ${(buffer.length / 1024).toFixed(2)} KB`);
     log(colors.yellow, `   📊 Total morph targets: ${morphTargets.length}`);
-    
+
     if (oculusVisemes.length > 0) {
       log(colors.green, `   ✅ Oculus visemes: ${oculusVisemes.length}/15`);
       console.log(`      ${oculusVisemes.join(', ')}`);
@@ -175,7 +175,7 @@ async function main() {
     log(colors.yellow, '⚠️  PARTIAL VISEME SUPPORT:\n');
     withVisemes.forEach(r => {
       console.log(`Config: "${r.config}" - ${r.oculusVisemes.length}/15 visemes`);
-      console.log(`   Missing: ${REQUIRED_OCULUS_VISEMES.filter(v => 
+      console.log(`   Missing: ${REQUIRED_OCULUS_VISEMES.filter(v =>
         !r.oculusVisemes.some(ov => ov.toLowerCase() === v.toLowerCase())
       ).join(', ')}\n`);
     });
@@ -185,7 +185,7 @@ async function main() {
     results.forEach(r => {
       console.log(`  "${r.config}": ${r.morphTargets.join(', ')}`);
     });
-    
+
     log(colors.yellow, '\n💡 RECOMMENDATIONS:');
     console.log('1. Continue using enhanced fallback avatar');
     console.log('2. Contact RPM support about Oculus viseme enablement');

@@ -34,25 +34,91 @@ To provide the best experience, we've created specialized guides for different a
 
 ## 🚀 Quick Start (Production Environment)
 
-If you have the prerequisites (Node.js 20, Python 3.12, NPM), start the entire platform with a single command:
+For a simplified production-like setup, please refer to the [official documentation](SETUP_GUIDE.md). For a development setup, please see the **Development Setup** section below.
 
-```bash
-# Clone the repository
-git clone https://github.com/asifdotpy/open-talent-local-ai.git
-cd open-talent
+---
 
-# Bootstrap dependencies
-./manage.sh start
-```
+## 🛠️ Development Setup
 
-### Management Commands
+This section provides a step-by-step guide to setting up the OpenTalent project for development.
 
-Our unified management script handles the entire lifecycle:
+### 1. Prerequisites
 
-- `./manage.sh start` - Start all microservices and the desktop app
-- `./manage.sh stop` - Gracefully stop all components
-- `./manage.sh status` - Check the health and PIDs of active services
-- `./manage.sh restart` - Perform a clean stop-start cycle
+Ensure you have the following installed:
+
+- [Node.js](https://nodejs.org/) (v20+)
+- [Python](https://www.python.org/) (v3.12+)
+- [Ollama](https://ollama.com/)
+
+### 2. Installation
+
+1. **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/asifdotpy/open-talent-local-ai.git
+    cd open-talent
+    ```
+
+2. **Install Node.js dependencies:**
+
+    ```bash
+    cd desktop-app
+    npm install --legacy-peer-deps
+    cd ..
+    ```
+
+3. **Install Python dependencies:**
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+### 3. Running the Application
+
+1. **Start the demo environment:**
+
+    ```bash
+    ./start-demo.sh
+    ```
+
+    This script will start all the necessary services, including the desktop application.
+
+### 4. Troubleshooting
+
+During the setup process, you may encounter the following issues:
+
+- **`start-demo.sh` fails due to a hardcoded path:**
+  - **Solution:** Open the `start-demo.sh` script and change the `WORKSPACE` variable to your project's root directory.
+
+- **Desktop app fails to build due to missing `utils.ts`:**
+  - **Solution:** Create a new file at `desktop-app/src/lib/utils.ts` and add the following content:
+
+        ```typescript
+        import { type ClassValue, clsx } from "clsx";
+        import { twMerge } from "tailwind-merge";
+
+        export function cn(...inputs: ClassValue[]) {
+          return twMerge(clsx(inputs));
+        }
+        ```
+
+- **Desktop app fails to start due to missing `index.html`:**
+  - **Solution:** Create a new file at `desktop-app/public/index.html` and add the following content:
+
+        ```html
+        <!DOCTYPE html>
+        <html lang="en">
+          <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <title>OpenTalent</title>
+          </head>
+          <body>
+            <noscript>You need to enable JavaScript to run this app.</noscript>
+            <div id="root"></div>
+          </body>
+        </html>
+        ```
 
 ---
 

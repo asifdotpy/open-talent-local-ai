@@ -1,6 +1,7 @@
+from unittest.mock import Mock, patch
+
 import pytest
-import numpy as np
-from unittest.mock import Mock, patch, MagicMock
+
 from services.vad_service import VoiceActivityDetector
 
 
@@ -27,8 +28,8 @@ class TestVoiceActivityDetector:
         """Test custom initialization parameters."""
         # Note: VAD service reads environment variables at module level
         # We need to reload the module to test different env values
-        import os
         import importlib
+        import os
 
         old_aggressiveness = os.environ.get("VAD_AGGRESSIVENESS")
         old_sample_rate = os.environ.get("VAD_SAMPLE_RATE")
@@ -39,6 +40,7 @@ class TestVoiceActivityDetector:
 
             # Reload the module to pick up new env vars
             import services.vad_service
+
             importlib.reload(services.vad_service)
 
             service = services.vad_service.VoiceActivityDetector()
@@ -58,7 +60,7 @@ class TestVoiceActivityDetector:
             # Reload again to restore original values
             importlib.reload(services.vad_service)
 
-    @patch('webrtcvad.Vad')
+    @patch("webrtcvad.Vad")
     def test_initialize_vad_success(self, mock_vad_class, vad_service):
         """Test successful VAD initialization."""
         mock_vad_instance = Mock()
@@ -70,7 +72,7 @@ class TestVoiceActivityDetector:
         assert vad_service.vad == mock_vad_instance
         mock_vad_class.assert_called_once_with(vad_service.aggressiveness)
 
-    @patch('webrtcvad.Vad')
+    @patch("webrtcvad.Vad")
     def test_initialize_vad_failure(self, mock_vad_class, vad_service):
         """Test VAD initialization failure."""
         mock_vad_class.side_effect = Exception("VAD init failed")
@@ -84,7 +86,7 @@ class TestVoiceActivityDetector:
         """Test speech detection without VAD (fallback mode)."""
         # Disable VAD to test fallback
         vad_service.use_vad = False
-        audio_chunk = b'\x00\x01' * 160  # 320 bytes = 160 samples at 16-bit
+        audio_chunk = b"\x00\x01" * 160  # 320 bytes = 160 samples at 16-bit
 
         result = vad_service.is_speech(audio_chunk)
 
@@ -93,7 +95,7 @@ class TestVoiceActivityDetector:
     def test_is_speech_success(self, vad_service):
         """Test successful speech detection."""
         # Create valid audio frame (30ms at 16kHz = 480 samples = 960 bytes)
-        audio_frame = b'\x00\x01' * 480
+        audio_frame = b"\x00\x01" * 480
 
         result = vad_service.is_speech(audio_frame)
 
@@ -102,7 +104,7 @@ class TestVoiceActivityDetector:
 
     def test_is_speech_silence(self, vad_service):
         """Test silence detection."""
-        audio_frame = b'\x00\x01' * 480
+        audio_frame = b"\x00\x01" * 480
 
         result = vad_service.is_speech(audio_frame)
 
@@ -112,7 +114,7 @@ class TestVoiceActivityDetector:
     def test_is_speech_invalid_frame_size(self, vad_service):
         """Test speech detection with invalid frame size."""
         # Invalid frame size (not 30ms worth of samples at 16kHz)
-        audio_frame = b'\x00\x01' * 100  # 200 bytes = 100 samples
+        audio_frame = b"\x00\x01" * 100  # 200 bytes = 100 samples
 
         result = vad_service.is_speech(audio_frame)
 
@@ -122,7 +124,7 @@ class TestVoiceActivityDetector:
     def test_is_speech_exception_handling(self, vad_service):
         """Test exception handling in speech detection."""
         # Test with invalid data that might cause exceptions
-        audio_frame = b''  # Empty frame
+        audio_frame = b""  # Empty frame
 
         result = vad_service.is_speech(audio_frame)
 
@@ -132,7 +134,7 @@ class TestVoiceActivityDetector:
     def test_get_stats(self, vad_service):
         """Test getting statistics."""
         # Process some frames to generate stats
-        audio_frame = b'\x00\x01' * 480
+        audio_frame = b"\x00\x01" * 480
         vad_service.is_speech(audio_frame)
 
         stats = vad_service.get_stats()
@@ -144,7 +146,7 @@ class TestVoiceActivityDetector:
         assert "enabled" in stats
         assert "aggressiveness" in stats
 
-    @patch('webrtcvad.Vad')
+    @patch("webrtcvad.Vad")
     def test_different_aggressiveness_levels(self, mock_vad_class):
         """Test different aggressiveness levels."""
         for level in [0, 1, 2, 3]:
@@ -160,7 +162,7 @@ class TestVoiceActivityDetector:
             service.set_aggressiveness(level)
             assert service.aggressiveness == level
 
-    @patch('webrtcvad.Vad')
+    @patch("webrtcvad.Vad")
     def test_multiple_initializations(self, mock_vad_class, vad_service):
         """Test multiple VAD initializations."""
         mock_vad_instance1 = Mock()

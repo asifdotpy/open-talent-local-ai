@@ -1,6 +1,6 @@
 /**
  * CaptionsOverlay.js
- * 
+ *
  * Real-time speech-to-text captions display for WebRTC audio streams.
  * Shows partial and final transcripts from DataChannel messages.
  */
@@ -14,7 +14,7 @@ export class CaptionsOverlay {
     this.transcriptHistory = [];
     this.maxHistoryLines = 3;
     this.isVisible = false;
-    
+
     this.init();
   }
 
@@ -73,29 +73,29 @@ export class CaptionsOverlay {
         0%, 100% { opacity: 1; }
         50% { opacity: 0.7; }
       }
-      
+
       #captions-final::-webkit-scrollbar {
         width: 6px;
       }
-      
+
       #captions-final::-webkit-scrollbar-track {
         background: transparent;
       }
-      
+
       #captions-final::-webkit-scrollbar-thumb {
         background: rgba(255, 255, 255, 0.3);
         border-radius: 3px;
       }
-      
+
       #captions-final::-webkit-scrollbar-thumb:hover {
         background: rgba(255, 255, 255, 0.5);
       }
-      
+
       .caption-line {
         margin-bottom: 4px;
         transition: opacity 0.3s ease;
       }
-      
+
       .caption-confidence-high { color: rgba(255, 255, 255, 0.9); }
       .caption-confidence-medium { color: rgba(255, 255, 255, 0.7); }
       .caption-confidence-low { color: rgba(255, 255, 255, 0.5); }

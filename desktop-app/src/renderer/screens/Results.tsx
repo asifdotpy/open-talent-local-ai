@@ -87,7 +87,7 @@ export default function Results({ summary, onNewInterview }: ResultsProps) {
           <div className="space-y-4">
             {Object.entries(summary).map(([key, value]) => {
               // Skip internal fields and already displayed data
-              if (key.startsWith('_') || key === 'session' || 
+              if (key.startsWith('_') || key === 'session' ||
                   ['analyticsAvailable', 'averageSentiment', 'averageQuality', 'sentimentTrend', 'recommendations', 'detailedAnalytics'].includes(key)) {
                 return null;
               }

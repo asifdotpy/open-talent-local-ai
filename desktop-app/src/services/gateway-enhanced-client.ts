@@ -177,7 +177,7 @@ export const AnalyticsAPI = {
         context: request.context || 'interview_response',
       };
       const response = await DefaultService.analyzeSentimentApiV1AnalyticsSentimentPost(body);
-      
+
       // Map gateway response to our interface
       return {
         score: (response as any)?.score ?? 0,

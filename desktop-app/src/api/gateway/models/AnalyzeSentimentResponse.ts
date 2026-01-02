@@ -24,4 +24,3 @@ export type AnalyzeSentimentResponse = {
      */
     sentences?: null;
 };
-

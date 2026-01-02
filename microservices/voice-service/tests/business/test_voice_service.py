@@ -1,19 +1,17 @@
-"""
-Comprehensive Test Suite for Voice Service
+"""Comprehensive Test Suite for Voice Service
 Tests accuracy (>90% WER), latency (<500ms), quality (MOS 4.1+), memory (<300MB)
 """
 
 import asyncio
-import json
 import os
 import tempfile
 import time
 from pathlib import Path
-import pytest
+
 import httpx
 import numpy as np
+import pytest
 import soundfile as sf
-from typing import Dict, List, Tuple
 
 # Test configuration
 SERVICE_URL = "http://localhost:8002"
@@ -23,7 +21,7 @@ TEST_TEXTS = [
     "This is a test of the speech recognition system",
     "The quick brown fox jumps over the lazy dog",
     "How are you doing today?",
-    "I am testing the voice service functionality"
+    "I am testing the voice service functionality",
 ]
 
 # Performance targets (adjusted for current implementation)
@@ -46,26 +44,23 @@ class VoiceServiceTester:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.client.aclose()
 
-    async def health_check(self) -> Dict:
+    async def health_check(self) -> dict:
         """Check service health status."""
         response = await self.client.get(f"{self.base_url}/health")
         return response.json()
 
-    async def get_info(self) -> Dict:
+    async def get_info(self) -> dict:
         """Get service information."""
         response = await self.client.get(f"{self.base_url}/info")
         return response.json()
 
-    async def test_stt_accuracy(self, audio_file: Path, expected_text: str) -> Dict:
+    async def test_stt_accuracy(self, audio_file: Path, expected_text: str) -> dict:
         """Test STT accuracy on audio file."""
         start_time = time.time()
 
         with open(audio_file, "rb") as f:
             files = {"audio": ("test.wav", f, "audio/wav")}
-            response = await self.client.post(
-                f"{self.base_url}/voice/stt",
-                files=files
-            )
+            response = await self.client.post(f"{self.base_url}/voice/stt", files=files)
 
         latency = (time.time() - start_time) * 1000
 
@@ -73,7 +68,7 @@ class VoiceServiceTester:
             return {
                 "success": False,
                 "error": f"HTTP {response.status_code}: {response.text}",
-                "latency_ms": latency
+                "latency_ms": latency,
             }
 
         result = response.json()
@@ -90,18 +85,15 @@ class VoiceServiceTester:
             "wer": wer,
             "confidence": result.get("confidence", 0),
             "latency_ms": latency,
-            "within_target": wer <= TARGET_WER and latency <= TARGET_LATENCY_MS
+            "within_target": wer <= TARGET_WER and latency <= TARGET_LATENCY_MS,
         }
 
-    async def test_tts_quality(self, text: str, voice: str = "lessac") -> Dict:
+    async def test_tts_quality(self, text: str, voice: str = "lessac") -> dict:
         """Test TTS quality and latency."""
         start_time = time.time()
 
         payload = {"text": text, "voice": voice}
-        response = await self.client.post(
-            f"{self.base_url}/voice/tts",
-            json=payload
-        )
+        response = await self.client.post(f"{self.base_url}/voice/tts", json=payload)
 
         latency = (time.time() - start_time) * 1000
 
@@ -109,7 +101,7 @@ class VoiceServiceTester:
             return {
                 "success": False,
                 "error": f"HTTP {response.status_code}: {response.text}",
-                "latency_ms": latency
+                "latency_ms": latency,
             }
 
         # Save audio for quality analysis
@@ -143,26 +135,19 @@ class VoiceServiceTester:
                 "rms_level": float(rms),
                 "peak_level": float(peak),
                 "file_size_bytes": len(audio_data),
-                "within_target": latency <= TARGET_LATENCY_MS
+                "within_target": latency <= TARGET_LATENCY_MS,
             }
 
         except Exception as e:
-            return {
-                "success": False,
-                "error": f"Audio analysis failed: {e}",
-                "latency_ms": latency
-            }
+            return {"success": False, "error": f"Audio analysis failed: {e}", "latency_ms": latency}
 
-    async def test_vad_functionality(self, audio_file: Path) -> Dict:
+    async def test_vad_functionality(self, audio_file: Path) -> dict:
         """Test VAD functionality."""
         start_time = time.time()
 
         with open(audio_file, "rb") as f:
             files = {"audio": ("test.wav", f, "audio/wav")}
-            response = await self.client.post(
-                f"{self.base_url}/voice/vad",
-                files=files
-            )
+            response = await self.client.post(f"{self.base_url}/voice/vad", files=files)
 
         latency = (time.time() - start_time) * 1000
 
@@ -170,7 +155,7 @@ class VoiceServiceTester:
             return {
                 "success": False,
                 "error": f"HTTP {response.status_code}: {response.text}",
-                "latency_ms": latency
+                "latency_ms": latency,
             }
 
         result = response.json()
@@ -180,7 +165,7 @@ class VoiceServiceTester:
             "latency_ms": latency,
             "speech_segments": len(result.get("speech_segments", [])),
             "total_speech_duration": result.get("total_speech_duration", 0),
-            "within_target": latency <= TARGET_LATENCY_MS
+            "within_target": latency <= TARGET_LATENCY_MS,
         }
 
     def _calculate_wer(self, reference: str, hypothesis: str) -> float:
@@ -265,7 +250,9 @@ class TestVoiceService:
             result = await tester.test_tts_quality(text)
             results.append(result)
             assert result["success"] == True
-            assert result["latency_ms"] <= TARGET_LATENCY_MS, f"TTS latency too high: {result['latency_ms']}ms"
+            assert (
+                result["latency_ms"] <= TARGET_LATENCY_MS
+            ), f"TTS latency too high: {result['latency_ms']}ms"
 
         # Calculate average latency
         avg_latency = sum(r["latency_ms"] for r in results) / len(results)
@@ -276,8 +263,9 @@ class TestVoiceService:
     async def test_memory_usage(self, tester):
         """Test memory usage is within limits."""
         # This is a basic check - in production you'd use memory profiling tools
-        import psutil
         import os
+
+        import psutil
 
         process = psutil.Process(os.getpid())
         memory_mb = process.memory_info().rss / 1024 / 1024
@@ -300,7 +288,9 @@ class TestVoiceService:
 
         for result in results:
             assert result["success"] == True
-            assert result["latency_ms"] <= TARGET_LATENCY_MS * 2  # Allow some overhead for concurrent requests
+            assert (
+                result["latency_ms"] <= TARGET_LATENCY_MS * 2
+            )  # Allow some overhead for concurrent requests
 
     @pytest.mark.asyncio
     async def test_error_handling(self, tester):
@@ -329,7 +319,9 @@ if __name__ == "__main__":
             print("\nTesting TTS...")
             for text in TEST_TEXTS[:3]:
                 result = await tester.test_tts_quality(text)
-                print(f"  '{text[:30]}...' -> {result['latency_ms']:.1f}ms, {result['file_size_bytes']} bytes")
+                print(
+                    f"  '{text[:30]}...' -> {result['latency_ms']:.1f}ms, {result['file_size_bytes']} bytes"
+                )
 
             print("\nBasic tests completed!")
 

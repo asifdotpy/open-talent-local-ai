@@ -1,6 +1,6 @@
 # AGENTS.MD
 
-> **Last Updated:** December 14, 2025  
+> **Last Updated:** December 14, 2025
 > **Architecture:** Desktop-First, Local AI, 100% Offline Capable
 
 ## 📋 Quick Navigation
@@ -17,6 +17,7 @@
 ## ⚠️ Critical Architecture Change (December 5, 2025)
 
 **OpenTalent has pivoted from cloud-based to 100% local AI:**
+
 - ❌ **REMOVED:** OpenAI API, OpenAI TTS, GCP Infrastructure, Keycloak
 - ✅ **ADDED:** Granite 4 Models (350M/2B/8B), Ollama, Piper TTS, Electron Desktop App
 - 🎯 **Goal:** Desktop application with NO cloud dependencies, works offline, complete privacy
@@ -26,6 +27,7 @@
 **OpenTalent** is a desktop-first, offline-capable AI interview platform that runs 100% locally on user hardware. No API keys, no cloud costs, no data ever leaves your device.
 
 **Core Components:**
+
 - **Desktop App** (Electron/Tauri): Cross-platform (Windows/macOS/Linux)
 - **Voice Service** (Piper TTS): Local text-to-speech (50MB-500MB models)
 - **Conversation Service** (Granite 4 via Ollama): Local AI conversation (350M/2B/8B models)
@@ -35,6 +37,7 @@
 ## 🎯 Architectural Philosophy: NO CLOUD DEPENDENCIES
 
 **Core Principles:**
+
 1. **Privacy First**: All data processing happens on user's device
 2. **Offline Capable**: Works 100% offline after initial model download
 3. **Hardware Flexible**: 3 model sizes for different RAM configurations (2GB-32GB)
@@ -53,17 +56,20 @@
 ## Local AI Stack
 
 **Model Framework:**
+
 - **Ollama** (v0.1.0+): Local model serving platform, OpenAI-compatible API
 - **Granite 4 Models**: IBM's open-source conversation models (350M/2B/8B parameters)
 - **GGUF Format**: Quantized models for efficient serving
 - **4-bit/8-bit Quantization**: RAM reduction (75%/50%)
 
 **Desktop Framework:**
+
 - **Electron** (v28.0.0+): Cross-platform desktop app (Windows/macOS/Linux)
 - **React** (v18.0.0+): Frontend UI framework
 - **Node.js** (v20.0.0+): Backend services runtime
 
 **Text-to-Speech:**
+
 - **Piper TTS**: Offline neural TTS (100-500MB RAM)
   - Small model: 50MB download, 100MB RAM, Good quality
   - Medium model: 200MB download, 200MB RAM, Very Good quality
@@ -71,6 +77,7 @@
 - **ONNX Runtime**: Model inference engine
 
 **Avatar Rendering:**
+
 - **Three.js**: 3D rendering library
 - **WebGL**: Hardware-accelerated graphics
 - **Phoneme Lip-Sync**: Audio-driven mouth animation
@@ -87,6 +94,7 @@ Users choose between 3 model sizes based on their hardware:
 
 **Hardware Detection:**
 OpenTalent automatically detects your system's RAM and recommends the optimal model:
+
 - **< 6GB RAM**: Granite-350M (minimal configuration)
 - **6-14GB RAM**: Granite-2B (balanced configuration)
 - **14GB+ RAM**: Granite-8B (maximum quality)
@@ -117,6 +125,7 @@ OpenTalent Desktop App (Electron)
 ```
 
 **Model Storage Structure:**
+
 ```
 ~/OpenTalent/
 ├── models/
@@ -139,17 +148,20 @@ OpenTalent Desktop App (Electron)
 ## Implementation Status
 
 **✅ COMPLETED (Phase 1-3):**
+
 - Project migration to open-talent (46,111 files)
 - Documentation organization (9 directories, 13 markdown files)
 - Development standards (50+ tools, 15+ pre-commit hooks)
 - Local AI architecture specification (LOCAL_AI_ARCHITECTURE.md)
 
 **🔄 IN PROGRESS (Phase 4):**
+
 - Architecture redesign documentation
 - Desktop app planning
 - Model integration strategy
 
 **📋 PLANNED (Phase 5-10):**
+
 - Phase 5: Electron desktop app setup
 - Phase 6: Ollama integration
 - Phase 7: Piper TTS integration
@@ -162,12 +174,14 @@ OpenTalent Desktop App (Electron)
 ### System Requirements
 
 **Minimum (Granite-350M):**
+
 - OS: Windows 10+, macOS 11+, Ubuntu 20.04+
 - RAM: 4GB (2GB for model + 2GB for OS/services)
 - Disk: 2GB free space
 - CPU: 2 cores, 2GHz+
 
 **Recommended (Granite-2B):**
+
 - OS: Windows 10+, macOS 11+, Ubuntu 20.04+
 - RAM: 12GB (8GB for model + 4GB for OS/services)
 - Disk: 5GB free space
@@ -175,6 +189,7 @@ OpenTalent Desktop App (Electron)
 - GPU: Optional (NVIDIA/AMD for acceleration)
 
 **Optimal (Granite-8B):**
+
 - OS: Windows 10+, macOS 11+, Ubuntu 20.04+
 - RAM: 24GB (16GB for model + 8GB for OS/services)
 - Disk: 10GB free space
@@ -187,6 +202,7 @@ OpenTalent Desktop App (Electron)
 OpenTalent is in active development. Installation instructions will be provided when Phase 5 (Desktop App Setup) is complete.
 
 **Planned Installation Flow:**
+
 1. Download OpenTalent installer for your platform (Windows/macOS/Linux)
 2. Run installer (installs Electron app + bundled Ollama/Piper binaries)
 3. Launch OpenTalent
@@ -200,6 +216,7 @@ OpenTalent is in active development. Installation instructions will be provided 
 ### Development Setup
 
 **For Developers:**
+
 ```bash
 # Clone repository
 git clone https://github.com/asif1/open-talent.git
@@ -265,6 +282,7 @@ open-talent/
 | **Maximum (8B)** | 16GB | 500MB | 1GB | 8GB | **25.5GB** |
 
 **RAM Recommendation:**
+
 - 4GB total RAM → Use Granite-350M (tight fit, close other apps)
 - 8GB total RAM → Use Granite-350M (comfortable)
 - 12GB total RAM → Use Granite-2B (comfortable)
@@ -286,6 +304,7 @@ open-talent/
 ## Security & Privacy
 
 **Privacy Advantages of Local AI:**
+
 - ✅ **No Data Transmission**: All conversations stay on your device
 - ✅ **No Cloud Logging**: No conversation history sent to third parties
 - ✅ **GDPR Compliant**: Data never leaves EU if you're in EU
@@ -293,6 +312,7 @@ open-talent/
 - ✅ **Offline Operation**: Works in air-gapped environments
 
 **Data Storage:**
+
 - All conversation data stored locally in `~/OpenTalent/cache/conversations/`
 - Optional: Export conversations to encrypted backup
 - Optional: Delete all data on uninstall
@@ -306,6 +326,7 @@ OpenTalent follows security-first development practices with automated scanning 
 ### 🛡️ Security Infrastructure
 
 **Automated Tools:**
+
 - **Bandit** - Python security linter (detects hardcoded secrets, SQL injection, etc.)
 - **Semgrep** - Pattern-based security scanner (15 custom rules)
 - **Safety** - Dependency vulnerability scanner
@@ -313,6 +334,7 @@ OpenTalent follows security-first development practices with automated scanning 
 - **Ruff** - Fast linter with security rules enabled
 
 **Custom Security Rules:**
+
 ```yaml
 # .semgrep/rules.yaml - 15 patterns including:
 - Loose string enum validation (type safety)
@@ -327,6 +349,7 @@ OpenTalent follows security-first development practices with automated scanning 
 ### 🔒 Security Best Practices Enforced
 
 **Authentication & Authorization:**
+
 - ✅ No hardcoded secrets (environment variables only)
 - ✅ JWT tokens with expiration and blacklist support
 - ✅ Secure password hashing (bcrypt/argon2, not SHA256)
@@ -334,6 +357,7 @@ OpenTalent follows security-first development practices with automated scanning 
 - ✅ Rate limiting on authentication endpoints
 
 **Input Validation:**
+
 - ✅ All endpoints use Pydantic models (no generic dicts)
 - ✅ Python Enums for status fields (no loose string validation)
 - ✅ Email validation with `EmailStr`
@@ -341,6 +365,7 @@ OpenTalent follows security-first development practices with automated scanning 
 - ✅ File upload validation (size, type, sanitization)
 
 **API Security:**
+
 - ✅ CORS whitelist (no wildcard * in production)
 - ✅ Security headers (X-Frame-Options, CSP, HSTS)
 - ✅ HTTPS enforcement in production
@@ -350,6 +375,7 @@ OpenTalent follows security-first development practices with automated scanning 
 ### 🔍 Automated Security Checks
 
 **Pre-Commit Hooks** (run automatically):
+
 ```bash
 # Installed with: pre-commit install
 - Security scan (Bandit)
@@ -360,6 +386,7 @@ OpenTalent follows security-first development practices with automated scanning 
 ```
 
 **CI/CD Pipeline** (GitHub Actions):
+
 ```yaml
 # Runs on every push/PR + weekly audit (Mondays 9 AM)
 - Security scanning (Bandit, Semgrep, Trivy)
@@ -370,6 +397,7 @@ OpenTalent follows security-first development practices with automated scanning 
 ```
 
 **Local Security Audit:**
+
 ```bash
 # Run before commits/PRs
 ./scripts/security-check.sh
@@ -389,18 +417,21 @@ OpenTalent follows security-first development practices with automated scanning 
 ### 📊 Code Quality Standards
 
 **Type Safety:**
+
 - Python 3.12+ with type hints
 - MyPy static type checking
 - Pydantic models for all API payloads
 - Python Enums for status/enum fields (no loose strings)
 
 **Code Quality Metrics:**
+
 - Test coverage: ≥70% (target: 80%)
 - Cyclomatic complexity: <10 per function
 - Code duplication: <5%
 - Security issues: 0 high/critical
 
 **Linting & Formatting:**
+
 - Ruff (fast, all-in-one linter)
 - Black (code formatter, 100 chars/line)
 - isort (import sorting)
@@ -408,6 +439,7 @@ OpenTalent follows security-first development practices with automated scanning 
 ### 🚨 Known Issues & Fixes (December 14, 2025)
 
 **Issue Identified:** Loose string validation instead of Enums
+
 ```python
 # ❌ BAD: Allows ANY string value
 status: str = Field(min_length=1, max_length=100)
@@ -424,6 +456,7 @@ status: ApplicationStatus = Field(...)
 ```
 
 **Status:**
+
 - ✅ **Candidate Service:** Fixed with proper enums (15/15 tests passing)
 - 🟡 **Security Service:** Roles/Permissions need enum conversion (in progress)
 - 🟡 **User Service:** Status fields need enum conversion
@@ -485,6 +518,7 @@ Before production deployment:
 > "Security is not a feature, it's a foundation. Every line of code is a potential attack vector."
 
 OpenTalent's security approach:
+
 1. **Prevent at Design Time:** Use type-safe patterns (Enums, Pydantic)
 2. **Detect at Development Time:** Pre-commit hooks catch issues before commits
 3. **Verify at CI/CD Time:** Automated scans on every PR
@@ -498,6 +532,7 @@ OpenTalent's security approach:
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development standards, coding guidelines, and contribution workflow.
 
 **Key Development Principles:**
+
 - Test-Driven Development (TDD): Write tests before code
 - Frequent commits: Small, atomic commits with conventional commit messages
 - Privacy-first: Never add features that send data to cloud
@@ -506,6 +541,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development standards, coding guideli
 ## Roadmap
 
 **Phase 5 (Current - Desktop App Setup):**
+
 - Set up Electron project structure
 - Bundle Ollama and Piper binaries
 - Implement hardware detection
@@ -513,6 +549,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development standards, coding guideli
 - Build first-time setup wizard
 
 **Phase 6 (Ollama Integration):**
+
 - Integrate Ollama API with conversation service
 - Add Granite model support (350M/2B/8B)
 - Implement 4-bit/8-bit quantization selection
@@ -520,6 +557,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development standards, coding guideli
 - Test conversation quality across all models
 
 **Phase 7 (Piper TTS Integration):**
+
 - Bundle Piper TTS binary for all platforms
 - Implement 3-quality TTS system
 - Add voice selection UI
@@ -527,6 +565,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development standards, coding guideli
 - Implement audio caching
 
 **Phase 8 (Avatar Rendering):**
+
 - Implement WebGL-based avatar renderer
 - Add phoneme lip-sync
 - Create avatar customization UI
@@ -534,6 +573,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development standards, coding guideli
 - Implement avatar state caching
 
 **Phase 9 (Testing & Optimization):**
+
 - Benchmark all configurations
 - Test on low-end hardware (4GB RAM laptop)
 - Test on high-end hardware (32GB RAM workstation)
@@ -542,6 +582,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development standards, coding guideli
 - Profile and fix performance bottlenecks
 
 **Phase 10 (Community Launch):**
+
 - Release installers for Windows/macOS/Linux
 - Publish documentation
 - Create demo videos
@@ -555,10 +596,12 @@ OpenTalent is open source software. License details coming soon.
 ## Support
 
 **Documentation:**
+
 - [LOCAL_AI_ARCHITECTURE.md](LOCAL_AI_ARCHITECTURE.md): Detailed technical specification
 - [CONTRIBUTING.md](CONTRIBUTING.md): Development standards and workflow
 
 **Community:**
+
 - GitHub Issues: Bug reports and feature requests
 - GitHub Discussions: Community support and questions
 

@@ -4,14 +4,15 @@ Vetta AI Service Integration
 Simple wrapper for integrating Vetta AI v4 into microservices
 """
 
-import os
-import torch
-from typing import Optional
 from enum import Enum
+from typing import Optional
+
+import torch
 
 
 class RecruitingTask(Enum):
     """Recruiting task types"""
+
     INTERVIEW = "interview"
     ASSESSMENT = "quality"
     SOURCING = "sourcing"
@@ -24,11 +25,11 @@ class VettaService:
     Lightweight Vetta AI service wrapper
     Use this in your microservices (interview-service, etc.)
     """
-    
+
     def __init__(self, model_path: str = "asifdotpy/vetta-granite-2b-lora-v4"):
         """Initialize Vetta AI model"""
         from unsloth import FastLanguageModel
-        
+
         self.model, self.tokenizer = FastLanguageModel.from_pretrained(
             model_name=model_path,
             max_seq_length=2048,
@@ -37,7 +38,7 @@ class VettaService:
         )
         FastLanguageModel.for_inference(self.model)
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-    
+
     def _format_prompt(self, instruction: str, context: Optional[str] = None) -> str:
         """Format prompt in Alpaca style"""
         prompt = f"### Instruction:\n{instruction}"
@@ -45,29 +46,29 @@ class VettaService:
             prompt += f"\n\nContext:\n{context}"
         prompt += "\n\n### Response:"
         return prompt
-    
+
     def generate(
         self,
         instruction: str,
         context: Optional[str] = None,
         max_tokens: int = 512,
-        temperature: float = 0.7
+        temperature: float = 0.7,
     ) -> str:
         """
         Generate AI response
-        
+
         Args:
             instruction: User instruction/question
             context: Optional context
             max_tokens: Max tokens to generate
             temperature: Sampling temperature
-            
+
         Returns:
             Generated response
         """
         prompt = self._format_prompt(instruction, context)
         inputs = self.tokenizer([prompt], return_tensors="pt").to(self.device)
-        
+
         outputs = self.model.generate(
             **inputs,
             max_new_tokens=max_tokens,
@@ -75,9 +76,9 @@ class VettaService:
             do_sample=True,
             pad_token_id=self.tokenizer.eos_token_id,
         )
-        
+
         full_text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-        
+
         # Extract response
         if "### Response:" in full_text:
             return full_text.split("### Response:")[-1].strip()
@@ -104,14 +105,14 @@ async def assess_candidate(
 ):
     instruction = "Assess this candidate's technical skills"
     context = f"Candidate: {candidate_info}\\n\\nRole: {job_requirements}"
-    
+
     assessment = vetta.generate(
         instruction=instruction,
         context=context,
         max_tokens=256,
         temperature=0.7
     )
-    
+
     return {"assessment": assessment}
 """
 
@@ -131,14 +132,14 @@ vetta = VettaService()
 def assess_interview(request):
     candidate_info = request.POST.get('candidate_info')
     job_requirements = request.POST.get('job_requirements')
-    
+
     instruction = "Assess this candidate's fit for the role"
     context = f"Candidate: {candidate_info}\\n\\nRole: {job_requirements}"
-    
+
     assessment = vetta.generate(
         instruction=instruction,
         context=context
     )
-    
+
     return JsonResponse({'assessment': assessment})
 """

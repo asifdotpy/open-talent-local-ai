@@ -61,7 +61,7 @@ export class ModelManager {
     // Store metadata with enhanced logging
     const vertexCount = this.getVertexCount(model)
     const morphTargets = this.extractMorphTargets(model)
-    
+
     this.modelMetadata.set(modelKey, {
       morphTargets,
       vertexCount,
@@ -72,7 +72,7 @@ export class ModelManager {
     console.log(`✅ Model loaded successfully: ${modelKey}`)
     console.log(`   Vertices: ${vertexCount}`)
     console.log(`   Morph targets: ${morphTargets.size}`)
-    
+
     if (morphTargets.size > 0) {
       console.log(`   Morph target mapping:`)
       let count = 0
@@ -86,7 +86,7 @@ export class ModelManager {
         console.log(`     ... and ${morphTargets.size - 10} more targets`)
       }
     }
-    
+
     // Log mesh details
     let meshCount = 0
     model.traverse((child) => {
@@ -129,7 +129,7 @@ export class ModelManager {
     console.log(`🔍 Validating morph targets. Found: ${morphTargets.size} targets`)
     console.log(`   Required: ${constraints.requiredMorphTargets}`)
     console.log(`   Available: ${Array.from(morphTargets.keys()).join(', ')}`)
-    
+
     const requiredTargets = constraints.requiredMorphTargets || []
 
     for (const required of requiredTargets) {
@@ -301,7 +301,7 @@ export class ModelManager {
     // Create morph targets by modifying vertex positions
     const morphTargets = [
       // === LIP-SYNC MORPH TARGETS ===
-      
+
       // jawOpen - open mouth vertically
       this.createMorphTarget(originalPositions, (x, y, z, index) => {
         if (y > 0.3) return [x, y + 0.3, z] // Upper lip up

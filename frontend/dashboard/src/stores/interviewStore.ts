@@ -184,7 +184,7 @@ export const useInterviewStore = create<InterviewState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const integrationGatewayAPI = await import('../services/integrationGatewayAPI');
-      
+
       // Get the first question from the gateway
       const session = await integrationGatewayAPI.default.interview.start({
         role: currentRoom.job_role,
@@ -218,7 +218,7 @@ export const useInterviewStore = create<InterviewState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const integrationGatewayAPI = await import('../services/integrationGatewayAPI');
-      
+
       // For now, generate next question based on current question index
       const questionNum = (currentRoom.current_question_index || 0) + 1;
       const questions = [
@@ -254,7 +254,7 @@ export const useInterviewStore = create<InterviewState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const integrationGatewayAPI = await import('../services/integrationGatewayAPI');
-      
+
       // Store the answer in the current room
       const updatedAnswers = [
         ...currentRoom.answers,
@@ -288,7 +288,7 @@ export const useInterviewStore = create<InterviewState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const integrationGatewayAPI = await import('../services/integrationGatewayAPI');
-      
+
       // Mock result - in production, this would come from the gateway
       const result: InterviewResult = {
         room_id: currentRoom.room_id,

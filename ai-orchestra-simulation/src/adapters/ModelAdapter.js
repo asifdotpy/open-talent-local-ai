@@ -52,14 +52,14 @@ export class MorphTargetAdapter extends ModelAdapter {
     super(model, config)
     this.phonemeMapper = phonemeMapper
     this.morphTargetMesh = this.findMorphTargetMesh()
-    
+
     // Enhanced logging
     if (this.morphTargetMesh) {
       console.log(`✅ MorphTargetAdapter initialized`)
       console.log(`   Mesh: ${this.morphTargetMesh.name || 'unnamed'}`)
       console.log(`   Morph targets: ${this.morphTargetMesh.morphTargetInfluences?.length || 0}`)
       console.log(`   Vertices: ${this.morphTargetMesh.geometry.attributes.position?.count || 0}`)
-      
+
       if (this.morphTargetMesh.morphTargetDictionary) {
         console.log(`   Available morph targets:`)
         for (const [name, index] of Object.entries(this.morphTargetMesh.morphTargetDictionary)) {
@@ -80,25 +80,25 @@ export class MorphTargetAdapter extends ModelAdapter {
   findMorphTargetMesh() {
     let mesh = null
     let meshCount = 0
-    
+
     this.model.traverse((child) => {
       if (child.isMesh) {
         meshCount++
         console.log(`   Checking mesh ${meshCount}: ${child.name || 'unnamed'}`)
         console.log(`     - Has morphTargetInfluences: ${!!child.morphTargetInfluences}`)
         console.log(`     - Influence count: ${child.morphTargetInfluences?.length || 0}`)
-        
+
         if (child.morphTargetInfluences && child.morphTargetInfluences.length > 0) {
           console.log(`     ✅ Found morph target mesh!`)
           mesh = child
         }
       }
     })
-    
+
     if (!mesh) {
       console.warn(`   ⚠️  No mesh with morph targets found in ${meshCount} mesh(es)`)
     }
-    
+
     return mesh
   }
 

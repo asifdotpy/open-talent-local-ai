@@ -13,4 +13,3 @@ export type InterviewSession = {
     currentQuestion: number;
     isComplete: boolean;
 };
-

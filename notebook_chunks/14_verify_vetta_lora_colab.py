@@ -5,12 +5,13 @@
 # Install required packages (run this first if not installed)
 # !pip install torch transformers unsloth huggingface_hub
 
-import torch
-from unsloth import FastLanguageModel
-from transformers import AutoTokenizer
-from huggingface_hub import login
-from google.colab import userdata
 import time
+
+import torch
+from google.colab import userdata
+from huggingface_hub import login
+from transformers import AutoTokenizer
+from unsloth import FastLanguageModel
 
 # 1. CONFIGURATION
 LORA_REPO = "asifdotpy/vetta-granite-2b-lora-v3"

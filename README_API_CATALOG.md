@@ -3,6 +3,7 @@
 This catalog provides a comprehensive overview of the OpenTalent platform's capabilities, grouped by product module. All endpoints listed have been verified against the stabilized production-ready microservices.
 
 ## 🚀 1. Talent Sourcing & Discovery
+
 *Empowering recruiters to find the best talent across global platforms.*
 
 | Service | Capability | Key Endpoints |
@@ -12,6 +13,7 @@ This catalog provides a comprehensive overview of the OpenTalent platform's capa
 | **Project Service** | Real-time Job Management | `GET /jobs`, `POST /jobs`, `GET /jobs/{id}` |
 
 ## 🎙️ 2. Conversational AI & Interview Intelligence
+
 *Autonomous interviewing with multi-modal feedback.*
 
 | Service | Capability | Key Endpoints |
@@ -23,6 +25,7 @@ This catalog provides a comprehensive overview of the OpenTalent platform's capa
 | **Interview Service** | Session & Feedback Lifecycle | `POST /sessions`, `GET /reports/{id}` |
 
 ## 🧠 3. AI Insights & Explainability
+
 *Transparent, data-backed decision making.*
 
 | Service | Capability | Key Endpoints |
@@ -32,6 +35,7 @@ This catalog provides a comprehensive overview of the OpenTalent platform's capa
 | **Explainability** | Logic Traceability | `GET /explain/{decision_id}`, `GET /trace` |
 
 ## 🛡️ 4. Platform Infrastructure
+
 *Secure, scalable, and integrated foundations.*
 
 | Service | Capability | Key Endpoints |

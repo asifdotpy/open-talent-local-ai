@@ -22,7 +22,7 @@ export class MeshManager {
     scene.traverse((child) => {
       if (child.isMesh) {
         const hasMorphTargets = child.morphTargetDictionary && Object.keys(child.morphTargetDictionary).length > 0;
-        
+
         if (hasMorphTargets) {
           meshesWithMorphTargets.push({
             mesh: child,
@@ -39,7 +39,7 @@ export class MeshManager {
       meshesWithMorphTargets.sort((a, b) => b.morphCount - a.morphCount);
       this.headMesh = meshesWithMorphTargets[0].mesh;
       this.logger.log('SUCCESS', `Found mesh with ${meshesWithMorphTargets[0].morphCount} morph targets:`, meshesWithMorphTargets[0].name);
-      
+
       // Log all morph target names for debugging
       const morphNames = Object.keys(this.headMesh.morphTargetDictionary);
       this.logger.log('INFO', 'Available morph targets:', morphNames.join(', '));
@@ -68,7 +68,7 @@ export class MeshManager {
 
     const geometry = this.headMesh.geometry;
     const material = this.headMesh.material;
-    
+
     // Check for morph targets in the mesh itself (newer Three.js approach)
     const hasMorphTargets = this.headMesh.morphTargetDictionary && Object.keys(this.headMesh.morphTargetDictionary).length > 0;
     const morphTargetCount = hasMorphTargets ? Object.keys(this.headMesh.morphTargetDictionary).length : 0;
@@ -88,16 +88,16 @@ export class MeshManager {
           }
         : 'not computed',
     });
-    
+
     // Log morph target names if available
     if (hasMorphTargets) {
       const morphNames = Object.keys(this.headMesh.morphTargetDictionary);
-      const mouthRelated = morphNames.filter(name => 
-        name.toLowerCase().includes('mouth') || 
+      const mouthRelated = morphNames.filter(name =>
+        name.toLowerCase().includes('mouth') ||
         name.toLowerCase().includes('jaw') ||
         name.toLowerCase().includes('lip')
       );
-      
+
       this.logger.log('SUCCESS', `Found ${mouthRelated.length} mouth-related morph targets:`, mouthRelated.join(', '));
     }
   }
@@ -122,11 +122,11 @@ export class MeshManager {
 
     // Find mouth vertices (simple heuristic: vertices in lower face region)
     const bounds = this.getMeshBounds();
-    
+
     for (let i = 0; i < vertexCount; i++) {
       const y = positions[i * 3 + 1];
       const z = positions[i * 3 + 2];
-      
+
       // Mouth region: lower third of face, front-facing
       if (y < bounds.center.y && y > bounds.min.y + (bounds.max.y - bounds.min.y) * 0.3 && z > bounds.center.z) {
         this.mouthVertexIndices.push(i);
@@ -135,7 +135,7 @@ export class MeshManager {
           positions[i * 3 + 1],
           positions[i * 3 + 2]
         ));
-        
+
         this.mouthCenterY = Math.max(this.mouthCenterY, y);
       }
     }
@@ -251,7 +251,7 @@ export class MeshManager {
 
     const geometry = this.headMesh.geometry;
     geometry.computeBoundingBox();
-    
+
     return {
       min: geometry.boundingBox.min,
       max: geometry.boundingBox.max,
@@ -434,7 +434,7 @@ export class MeshManager {
 
     // The model is a GLTF scene, find the head mesh within it
     const headMesh = this.findHeadMesh(assets.model.scene);
-    
+
     if (!headMesh) {
       throw new Error('Could not find head mesh in the loaded model');
     }

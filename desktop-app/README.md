@@ -7,11 +7,13 @@ Privacy-first AI interview platform built with Electron and Ollama.
 ### Prerequisites
 
 1. **Node.js** (v20.0.0+)
+
    ```bash
    node --version
    ```
 
 2. **Ollama** (for local AI)
+
    ```bash
    # Check if Ollama is installed
    ollama --version
@@ -20,38 +22,43 @@ Privacy-first AI interview platform built with Electron and Ollama.
 ### Installation
 
 1. Install dependencies:
+
    ```bash
    cd desktop-app
    npm install
    ```
 
 2. Install Ollama (if not already installed):
+
    ```bash
    # Linux
    curl -fsSL https://ollama.com/install.sh | sh
-   
+
    # macOS
    brew install ollama
-   
+
    # Windows: Download from https://ollama.com/download
    ```
 
 3. Pull a model:
+
    ```bash
    # Option 1: Granite Code (recommended, smaller)
    ollama pull granite-code:3b
-   
+
    # Option 2: Llama 3.2 (fallback)
    ollama pull llama3.2
-   
+
    # Option 3: Any other chat model
    ollama list  # See available models
    ```
 
 4. Start Ollama server:
+
    ```bash
    ollama serve
    ```
+
    Keep this running in a separate terminal.
 
 ### Running the App
@@ -110,6 +117,7 @@ desktop-app/
 **Error:** "🔴 Ollama Offline"
 
 **Solution:**
+
 ```bash
 # Start Ollama server
 ollama serve
@@ -120,6 +128,7 @@ ollama serve
 **Error:** "No models found. Please install a model."
 
 **Solution:**
+
 ```bash
 # Pull a model
 ollama pull granite-code:3b
@@ -130,10 +139,12 @@ ollama pull llama3.2
 ### Slow Response Times
 
 **Possible causes:**
+
 - Large model on low-end hardware
 - Insufficient RAM
 
 **Solutions:**
+
 - Use a smaller model (granite-code:3b instead of 7b/13b)
 - Close other applications
 - Increase system swap space
@@ -143,6 +154,7 @@ ollama pull llama3.2
 **Error:** "Failed to send message: connect ECONNREFUSED"
 
 **Solution:**
+
 - Ensure Ollama is running (`ollama serve`)
 - Check Ollama is on port 11434: `curl http://localhost:11434/api/tags`
 
@@ -178,4 +190,4 @@ GPL-3.0
 
 ## Support
 
-For issues, visit: https://github.com/asif1/open-talent/issues
+For issues, visit: <https://github.com/asif1/open-talent/issues>

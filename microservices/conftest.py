@@ -3,16 +3,17 @@ Pytest configuration and shared fixtures for all microservices
 Located at: /services/conftest.py
 """
 
-import pytest
-import httpx
 import asyncio
 import os
-from typing import Generator, AsyncGenerator
+from collections.abc import AsyncGenerator, Generator
 
+import httpx
+import pytest
 
 # ============================================================================
 # ASYNCIO CONFIGURATION
 # ============================================================================
+
 
 @pytest.fixture(scope="session")
 def event_loop() -> Generator:
@@ -26,6 +27,7 @@ def event_loop() -> Generator:
 # HTTP CLIENT FIXTURES
 # ============================================================================
 
+
 @pytest.fixture
 async def async_client() -> AsyncGenerator[httpx.AsyncClient, None]:
     """Async HTTP client for making requests to services"""
@@ -36,6 +38,7 @@ async def async_client() -> AsyncGenerator[httpx.AsyncClient, None]:
 # ============================================================================
 # SERVICE URL FIXTURES
 # ============================================================================
+
 
 @pytest.fixture
 def base_service_url() -> str:
@@ -117,6 +120,7 @@ def desktop_service_url(base_service_url) -> str:
 # AUTHENTICATION FIXTURES
 # ============================================================================
 
+
 @pytest.fixture
 def test_token() -> str:
     """Test JWT token for authenticated requests"""
@@ -132,32 +136,24 @@ def auth_headers(test_token) -> dict:
 @pytest.fixture
 def admin_headers(test_token) -> dict:
     """Authorization headers for admin user"""
-    return {
-        "Authorization": f"Bearer {test_token}",
-        "X-User-Role": "admin"
-    }
+    return {"Authorization": f"Bearer {test_token}", "X-User-Role": "admin"}
 
 
 # ============================================================================
 # TEST DATA FIXTURES
 # ============================================================================
 
+
 @pytest.fixture
 def valid_credentials() -> dict:
     """Valid login credentials for testing"""
-    return {
-        "email": "testuser@example.com",
-        "password": "TestPassword123!"
-    }
+    return {"email": "testuser@example.com", "password": "TestPassword123!"}
 
 
 @pytest.fixture
 def invalid_credentials() -> dict:
     """Invalid login credentials for testing"""
-    return {
-        "email": "testuser@example.com",
-        "password": "wrongpassword"
-    }
+    return {"email": "testuser@example.com", "password": "wrongpassword"}
 
 
 @pytest.fixture
@@ -167,18 +163,14 @@ def new_user_data() -> dict:
         "email": "newuser@example.com",
         "password": "SecurePassword123!",
         "first_name": "Test",
-        "last_name": "User"
+        "last_name": "User",
     }
 
 
 @pytest.fixture
 def user_update_data() -> dict:
     """User update data"""
-    return {
-        "first_name": "Updated",
-        "last_name": "Name",
-        "phone": "+1987654321"
-    }
+    return {"first_name": "Updated", "last_name": "Name", "phone": "+1987654321"}
 
 
 @pytest.fixture
@@ -188,17 +180,14 @@ def email_notification_data() -> dict:
         "to": "user@example.com",
         "subject": "Test Subject",
         "html": "<h1>Test Email</h1>",
-        "text": "Test Email"
+        "text": "Test Email",
     }
 
 
 @pytest.fixture
 def sms_notification_data() -> dict:
     """SMS notification data"""
-    return {
-        "to": "+1234567890",
-        "text": "Test SMS message"
-    }
+    return {"to": "+1234567890", "text": "Test SMS message"}
 
 
 @pytest.fixture
@@ -207,7 +196,7 @@ def push_notification_data() -> dict:
     return {
         "to": "device_token_123",
         "title": "Test Notification",
-        "body": "This is a test notification"
+        "body": "This is a test notification",
     }
 
 
@@ -220,7 +209,7 @@ def interview_data() -> dict:
         "interview_type": "technical",
         "scheduled_time": "2024-12-20T14:00:00Z",
         "interviewer_id": "interviewer123",
-        "duration_minutes": 60
+        "duration_minutes": 60,
     }
 
 
@@ -232,7 +221,7 @@ def interview_feedback_data() -> dict:
         "technical_skills": 4,
         "communication": 4,
         "comments": "Good candidate",
-        "recommendation": "hire"
+        "recommendation": "hire",
     }
 
 
@@ -244,7 +233,7 @@ def candidate_data() -> dict:
         "first_name": "John",
         "last_name": "Candidate",
         "phone": "+1234567890",
-        "resume_url": "https://example.com/resume.pdf"
+        "resume_url": "https://example.com/resume.pdf",
     }
 
 
@@ -255,30 +244,24 @@ def avatar_data() -> dict:
         "name": "TestAvatar",
         "model": "default_humanoid",
         "skin_tone": "medium",
-        "hair_style": "style1"
+        "hair_style": "style1",
     }
 
 
 @pytest.fixture
 def synthesis_data() -> dict:
     """Voice synthesis data"""
-    return {
-        "text": "Hello, this is a test message",
-        "voice": "default",
-        "speed": 1.0,
-        "pitch": 1.0
-    }
+    return {"text": "Hello, this is a test message", "voice": "default", "speed": 1.0, "pitch": 1.0}
 
 
 # ============================================================================
 # PYTEST HOOKS
 # ============================================================================
 
+
 def pytest_configure(config):
     """Configure pytest"""
-    config.addinivalue_line(
-        "markers", "asyncio: mark test as async"
-    )
+    config.addinivalue_line("markers", "asyncio: mark test as async")
 
 
 def pytest_collection_modifyitems(config, items):
@@ -292,17 +275,14 @@ def pytest_collection_modifyitems(config, items):
 # HELPER FUNCTIONS
 # ============================================================================
 
+
 async def make_authenticated_request(
-    client: httpx.AsyncClient,
-    method: str,
-    url: str,
-    auth_headers: dict,
-    **kwargs
+    client: httpx.AsyncClient, method: str, url: str, auth_headers: dict, **kwargs
 ) -> httpx.Response:
     """Helper function to make authenticated HTTP requests"""
     kwargs.setdefault("headers", {})
     kwargs["headers"].update(auth_headers)
-    
+
     if method.upper() == "GET":
         return await client.get(url, **kwargs)
     elif method.upper() == "POST":
@@ -321,10 +301,8 @@ async def make_authenticated_request(
 # SERVICE HEALTH CHECK
 # ============================================================================
 
-async def check_service_health(
-    client: httpx.AsyncClient,
-    service_url: str
-) -> bool:
+
+async def check_service_health(client: httpx.AsyncClient, service_url: str) -> bool:
     """Check if a service is healthy"""
     try:
         response = await client.get(f"{service_url}/health", timeout=5.0)

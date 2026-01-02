@@ -291,7 +291,7 @@ export class Application {
     // Start audio visualization if in audio-only mode
     if (!this.config.features.enableAvatar && this.audioVisualization) {
       this.audioVisualization.start();
-      
+
       // Attempt to auto-play audio (will be blocked by browser if no user interaction)
       const htmlAudio = document.getElementById('speech-audio');
       if (htmlAudio) {
@@ -431,4 +431,3 @@ export class Application {
     this.logger.log('INFO', 'Application disposed');
   }
 }
-

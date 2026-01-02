@@ -1,6 +1,6 @@
 /**
  * StructuredLogger - Production-ready logging system
- * 
+ *
  * Features:
  * - Multiple log levels (DEBUG, INFO, WARN, ERROR)
  * - JSON and text formats
@@ -144,7 +144,7 @@ export class StructuredLogger {
    */
   _outputJSON(entry) {
     const output = JSON.stringify(entry);
-    
+
     if (entry.level === 'ERROR') {
       console.error(output);
     } else if (entry.level === 'WARN') {
@@ -171,7 +171,7 @@ export class StructuredLogger {
     delete context.timestamp;
     delete context.namespace;
 
-    const contextStr = Object.keys(context).length > 0 
+    const contextStr = Object.keys(context).length > 0
       ? ' ' + JSON.stringify(context, null, 2)
       : '';
 

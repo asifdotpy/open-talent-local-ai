@@ -2,11 +2,11 @@
 Core interviewer logic for Vetta AI
 """
 
-from typing import Dict, List, Optional, Any
-from datetime import datetime
 import logging
+from typing import Any
 
 logger = logging.getLogger(__name__)
+
 
 class Interviewer:
     """Core interviewer logic"""
@@ -27,10 +27,10 @@ class Interviewer:
                 "If you encountered {scenario}, how would you handle it?",
                 "How would you prioritize {competing_demands}?",
                 "What would you do if {constraint}?",
-            ]
+            ],
         }
 
-    def generate_question(self, candidate_profile: Dict, interview_history: Dict) -> str:
+    def generate_question(self, candidate_profile: dict, interview_history: dict) -> str:
         """Generate next interview question based on context"""
         try:
             # Analyze candidate profile
@@ -67,7 +67,7 @@ class Interviewer:
             logger.error("Error generating question", error=str(e))
             return "Can you tell me about your relevant experience for this position?"
 
-    def evaluate_response(self, question: str, response: str, context: Dict) -> Dict[str, Any]:
+    def evaluate_response(self, question: str, response: str, context: dict) -> dict[str, Any]:
         """Evaluate candidate response"""
         try:
             # Basic evaluation criteria
@@ -76,7 +76,7 @@ class Interviewer:
                 "feedback": "Clear and relevant response",
                 "strengths": ["Communication skills", "Technical knowledge"],
                 "weaknesses": [],
-                "recommendations": ["Consider providing more specific examples"]
+                "recommendations": ["Consider providing more specific examples"],
             }
 
             # Analyze response length
@@ -85,8 +85,10 @@ class Interviewer:
                 evaluation["weaknesses"].append("Response too brief")
 
             # Check for technical terms if technical question
-            if "technical" in question.lower() and not any(term in response.lower()
-                for term in ["code", "implementation", "solution", "approach"]):
+            if "technical" in question.lower() and not any(
+                term in response.lower()
+                for term in ["code", "implementation", "solution", "approach"]
+            ):
                 evaluation["score"] -= 0.5
                 evaluation["weaknesses"].append("Could be more technical")
 
@@ -103,10 +105,10 @@ class Interviewer:
                 "feedback": "Response recorded",
                 "strengths": [],
                 "weaknesses": ["Evaluation error"],
-                "recommendations": []
+                "recommendations": [],
             }
 
-    def should_continue_interview(self, session_data: Dict, evaluation: Dict) -> bool:
+    def should_continue_interview(self, session_data: dict, evaluation: dict) -> bool:
         """Determine if interview should continue"""
         score = evaluation.get("score", 5.0)
         questions_asked = len(session_data.get("questions_asked", []))
@@ -114,7 +116,7 @@ class Interviewer:
         # Continue if score is decent and not too many questions
         return score >= 6.0 and questions_asked < 8
 
-    def generate_final_assessment(self, interview_summary: Dict) -> str:
+    def generate_final_assessment(self, interview_summary: dict) -> str:
         """Generate comprehensive final assessment"""
         try:
             scores = interview_summary.get("assessment_scores", {})
@@ -144,7 +146,7 @@ Recommendation: {'Strong candidate - proceed to next round' if avg_score >= 7.0 
             logger.error("Error generating final assessment", error=str(e))
             return "Interview completed. Review individual responses for detailed assessment."
 
-    def _select_technical_context(self, skills: List[str], job_requirements: Dict) -> Dict:
+    def _select_technical_context(self, skills: list[str], job_requirements: dict) -> dict:
         """Select context for technical questions"""
         # Use job requirements or candidate skills
         technologies = job_requirements.get("technologies", skills)
@@ -154,24 +156,20 @@ Recommendation: {'Strong candidate - proceed to next round' if avg_score >= 7.0 
         else:
             technology = "relevant technologies"
 
-        return {
-            "technology": technology,
-            "problem_type": "technical",
-            "domain": technology
-        }
+        return {"technology": technology, "problem_type": "technical", "domain": technology}
 
-    def _select_behavioral_context(self) -> Dict:
+    def _select_behavioral_context(self) -> dict:
         """Select context for behavioral questions"""
         return {
             "challenge": "a difficult technical problem",
             "situation": "conflicting priorities",
-            "process": "code review"
+            "process": "code review",
         }
 
-    def _select_situational_context(self) -> Dict:
+    def _select_situational_context(self) -> dict:
         """Select context for situational questions"""
         return {
             "scenario": "a production system outage",
             "competing_demands": "multiple urgent tasks",
-            "constraint": "a tight deadline"
+            "constraint": "a tight deadline",
         }

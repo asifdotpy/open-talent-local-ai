@@ -32,7 +32,7 @@ export class MorphTargetAnimationController {
     console.log('[CHECKPOINT 1] Mesh:', this.mesh);
     console.log('[CHECKPOINT 1] Has morphTargetInfluences:', !!this.mesh?.morphTargetInfluences);
     console.log('[CHECKPOINT 1] Has morphTargetDictionary:', !!this.mesh?.morphTargetDictionary);
-    
+
     this.logger.log('ANIMATION', 'Initializing MorphTargetAnimationController...');
 
     // Check if mesh has morph targets
@@ -54,7 +54,7 @@ export class MorphTargetAnimationController {
 
     console.log('[CHECKPOINT 1] Mouth morph targets found:', this.mouthMorphTargets);
     console.log('[CHECKPOINT 1] Initialization result:', Object.keys(this.mouthMorphTargets).length > 0);
-    
+
     this.logger.log('SUCCESS', `MorphTargetAnimationController initialized with ${Object.keys(this.mouthMorphTargets).length} mouth morph targets`);
     this.logger.log('INFO', `Mouth targets: ${Object.keys(this.mouthMorphTargets).join(', ')}`);
     return true;
@@ -68,7 +68,7 @@ export class MorphTargetAnimationController {
       mouthFunnel: ['mouthfunnel', 'mouth_funnel', 'pucker'],
       mouthSmile: ['mouthsmile', 'mouth_smile', 'smile'],
       mouthClose: ['mouthclose', 'mouth_close', 'closed'],
-      
+
       // Enhanced mouth shapes for better phoneme coverage
       mouthPucker: ['mouthpucker', 'mouth_pucker', 'pucker'],
       mouthRollUpper: ['mouthrollupper', 'mouth_roll_upper', 'roll_upper'],
@@ -79,12 +79,12 @@ export class MorphTargetAnimationController {
       mouthSmile_R: ['mouthsmile_r', 'mouth_smile_r', 'smile_right'],
       mouthFrown_L: ['mouthfrown_l', 'mouth_frown_l', 'frown_left'],
       mouthFrown_R: ['mouthfrown_r', 'mouth_frown_r', 'frown_right'],
-      
+
       // Jaw movements
       jawForward: ['jawforward', 'jaw_forward', 'jaw_fwd'],
       jawLeft: ['jawleft', 'jaw_left'],
       jawRight: ['jawright', 'jaw_right'],
-      
+
       // Additional articulatory targets
       mouthUpperUp_L: ['mouthupperup_l', 'mouth_upper_up_l', 'upper_lift_left'],
       mouthUpperUp_R: ['mouthupperup_r', 'mouth_upper_up_r', 'upper_lift_right'],
@@ -94,25 +94,25 @@ export class MorphTargetAnimationController {
       mouthPress_R: ['mouthpress_r', 'mouth_press_r', 'press_right'],
       mouthDimple_L: ['mouthdimple_l', 'mouth_dimple_l', 'dimple_left'],
       mouthDimple_R: ['mouthdimple_r', 'mouth_dimple_r', 'dimple_right'],
-      
+
       // Expression targets for emotional context
       browInnerUp: ['browinnerup', 'brow_inner_up', 'inner_brow'],
       browDown_L: ['browdown_l', 'brow_down_l', 'brow_left'],
       browDown_R: ['browdown_r', 'brow_down_r', 'brow_right'],
       browOuterUp_L: ['browouterup_l', 'brow_outer_up_l', 'outer_brow_left'],
       browOuterUp_R: ['browouterup_r', 'brow_outer_up_r', 'outer_brow_right'],
-      
+
       // Eye targets for expressiveness
       eyeWide_L: ['eyewide_l', 'eye_wide_l', 'wide_eye_left'],
       eyeWide_R: ['eyewide_r', 'eye_wide_r', 'wide_eye_right'],
       eyeSquint_L: ['eyesquint_l', 'eye_squint_l', 'squint_left'],
       eyeSquint_R: ['eyesquint_r', 'eye_squint_r', 'squint_right'],
-      
+
       // Cheek targets
       cheekPuff: ['cheekpuff', 'cheek_puff', 'puff'],
       cheekSquint_L: ['cheeksquint_l', 'cheek_squint_l', 'cheek_left'],
       cheekSquint_R: ['cheeksquint_r', 'cheek_squint_r', 'cheek_right'],
-      
+
       // Nose and other facial targets
       noseSneer_L: ['nosesneer_l', 'nose_sneer_l', 'sneer_left'],
       noseSneer_R: ['nosesneer_r', 'nose_sneer_r', 'sneer_right'],
@@ -123,7 +123,7 @@ export class MorphTargetAnimationController {
     for (const [targetName, patterns] of Object.entries(arKitTargets)) {
       for (const [morphName, index] of Object.entries(this.morphTargets)) {
         const lowerMorphName = morphName.toLowerCase();
-        
+
         // Check if this morph target matches any of the patterns
         if (patterns.some(pattern => lowerMorphName.includes(pattern))) {
           this.mouthMorphTargets[targetName] = index;
@@ -173,7 +173,7 @@ export class MorphTargetAnimationController {
     console.log('[CHECKPOINT 2] Animation start() called');
     console.log('[CHECKPOINT 2] HTML Audio element:', this.htmlAudioElement);
     console.log('[CHECKPOINT 2] THREE.Audio object:', this.audio);
-    
+
     // Prefer HTML audio element for reliable playback and synchronization
     if (this.htmlAudioElement) {
       if (this.htmlAudioElement.paused) {
@@ -201,10 +201,10 @@ export class MorphTargetAnimationController {
     this.clock.start();
     this.animationState.isPlaying = true;
     this.lastLoggedTime = 0;
-    
+
     console.log('[CHECKPOINT 2] Animation state:', this.animationState);
     console.log('[CHECKPOINT 2] Clock started:', this.clock.running);
-    
+
     this.logger.log('SUCCESS', 'Morph target animation started');
     return true;
   }
@@ -219,16 +219,16 @@ export class MorphTargetAnimationController {
   update() {
     if (!this.animationState.isPlaying || !this.mesh || Object.keys(this.mouthMorphTargets).length === 0) {
       if (!this._loggedSkip) {
-        console.log('[CHECKPOINT 3] Update() skipped - isPlaying:', this.animationState.isPlaying, 
+        console.log('[CHECKPOINT 3] Update() skipped - isPlaying:', this.animationState.isPlaying,
                     'hasMesh:', !!this.mesh, 'morphTargets:', Object.keys(this.mouthMorphTargets || {}).length);
         this._loggedSkip = true;
       }
       return;
     }
-    
+
     this._frameCount = (this._frameCount || 0) + 1;
     if (this._frameCount % 60 === 0) { // Log every 60 frames (~1 second)
-      console.log('[CHECKPOINT 3] Update() running - frame:', this._frameCount, 
+      console.log('[CHECKPOINT 3] Update() running - frame:', this._frameCount,
                   'elapsed:', this.clock.getElapsedTime().toFixed(2));
     }
 
@@ -238,16 +238,16 @@ export class MorphTargetAnimationController {
 
   updateMouthAnimation(elapsedTime) {
     if (!this.speechData || Object.keys(this.mouthMorphTargets).length === 0) return;
-    
+
     // Use HTML audio element's currentTime for accurate synchronization
     if (this.htmlAudioElement && !this.htmlAudioElement.paused) {
       elapsedTime = this.htmlAudioElement.currentTime;
     }
-    
+
     // CHECKPOINT 4: Audio-Animation Sync
     const audioTime = this.htmlAudioElement?.currentTime || this.audio?.context?.currentTime || 0;
     if (!this._lastSyncLog || Date.now() - this._lastSyncLog > 1000) {
-      console.log('[CHECKPOINT 4] Time sync - Elapsed:', elapsedTime.toFixed(2), 
+      console.log('[CHECKPOINT 4] Time sync - Elapsed:', elapsedTime.toFixed(2),
                   'Audio time:', audioTime.toFixed(2));
       this._lastSyncLog = Date.now();
     }
@@ -256,11 +256,11 @@ export class MorphTargetAnimationController {
     const currentWordIndex = this.speechData.words.findIndex(
       (w) => elapsedTime >= w.start && elapsedTime <= w.end
     );
-    
+
     // CHECKPOINT 5: Word/Phoneme Detection
     if (currentWordIndex !== this._lastWordIndex && currentWordIndex !== -1) {
       const word = this.speechData.words[currentWordIndex];
-      console.log('[CHECKPOINT 5] New word:', word?.word, 'at', elapsedTime.toFixed(2), 
+      console.log('[CHECKPOINT 5] New word:', word?.word, 'at', elapsedTime.toFixed(2),
                   'phonemes:', word?.phonemes?.map(p => p.phoneme).join('-'));
       this._lastWordIndex = currentWordIndex;
     }
@@ -309,7 +309,7 @@ export class MorphTargetAnimationController {
       console.log('[CHECKPOINT 5] Active phoneme:', activePhoneme);
       this._lastPhoneme = activePhoneme;
     }
-    
+
     // Calculate mouth displacement based on phoneme
     const displacement = this.calculateMouthDisplacement(activePhoneme);
     this.animationState.lastDisplacement = displacement;
@@ -327,58 +327,58 @@ export class MorphTargetAnimationController {
       'AA': { jawOpen: 1.0, mouthFunnel: 0.2, mouthStretch_L: 0.3, mouthStretch_R: 0.3 },
       'AO': { jawOpen: 0.9, mouthFunnel: 0.6, mouthPucker: 0.3 },
       'A': { jawOpen: 0.8, mouthFunnel: 0.1 },
-      
+
       // Medium vowels with smile components
       'AE': { jawOpen: 0.7, mouthSmile: 0.4, mouthStretch_R: 0.2 },
       'AH': { jawOpen: 0.8, mouthRollLower: 0.2 },
       'E': { jawOpen: 0.6, mouthSmile: 0.5, mouthUpperUp_L: 0.2 },
       'EH': { jawOpen: 0.7, mouthSmile_L: 0.3 },
-      
+
       // Rounded vowels - funnel dominant
       'O': { jawOpen: 0.7, mouthFunnel: 1.0, mouthRollUpper: 0.3 },
       'OW': { jawOpen: 0.6, mouthFunnel: 0.8, mouthPucker: 0.4 },
       'U': { jawOpen: 0.5, mouthFunnel: 0.7, mouthPucker: 0.5 },
       'UW': { jawOpen: 0.4, mouthFunnel: 0.8, mouthPucker: 0.6, mouthRollLower: 0.3 },
-      
+
       // Smile-dominant vowels
       'I': { jawOpen: 0.4, mouthSmile: 0.7, mouthUpperUp_R: 0.3 },
       'IY': { jawOpen: 0.3, mouthSmile: 0.8, mouthStretch_R: 0.2, mouthUpperUp_L: 0.2 },
-      
+
       // Consonants - various articulations
       'M': { mouthClose: 1.0, mouthPress_L: 0.3 },
       'P': { mouthClose: 1.0, mouthPress_R: 0.3 },
       'B': { mouthClose: 0.8, mouthPress_L: 0.2 },
-      
+
       // Dental and fricative consonants
       'TH': { jawOpen: 0.3, mouthClose: 0.4, mouthRollLower: 0.3 },
       'F': { mouthClose: 0.6, mouthRollLower: 0.5, mouthPress_R: 0.3 },
       'V': { mouthClose: 0.5, mouthRollLower: 0.4, mouthPress_L: 0.3 },
-      
+
       // Sibilant consonants
       'S': { mouthClose: 0.5, mouthSmile: 0.4, mouthRollLower: 0.3 },
       'Z': { mouthClose: 0.4, mouthSmile: 0.3, mouthRollLower: 0.2 },
       'SH': { mouthClose: 0.6, mouthRollUpper: 0.5, mouthFrown_R: 0.2 },
       'CH': { mouthClose: 0.7, mouthRollUpper: 0.4 },
-      
+
       // Liquid consonants
       'L': { jawOpen: 0.4, mouthSmile_R: 0.3, mouthRollUpper: 0.2 },
       'R': { mouthRollUpper: 0.6, jawOpen: 0.4, mouthSmile_L: 0.2 },
-      
+
       // Nasal consonants
       'N': { jawOpen: 0.3, mouthClose: 0.3 },
       'NG': { jawOpen: 0.2, mouthFrown_L: 0.2 },
-      
+
       // Plosive consonants
       'T': { jawOpen: 0.2, mouthClose: 0.2 },
       'K': { jawOpen: 0.2, mouthFrown_R: 0.1 },
       'G': { jawOpen: 0.2, mouthFrown_L: 0.1 },
       'D': { jawOpen: 0.3, mouthClose: 0.2 },
-      
+
       // Approximant consonants
       'W': { mouthPucker: 0.7, mouthFunnel: 0.5, mouthRollUpper: 0.3 },
       'Y': { mouthSmile: 0.6, jawOpen: 0.4, mouthUpperUp_L: 0.3 },
       'HH': { jawOpen: 0.1, mouthStretch_L: 0.2 },
-      
+
       // Silence and pause
       'SIL': this.getNeutralMorphState(),
       'PAU': { mouthSmile: 0.1, mouthUpperUp_R: 0.05 }
@@ -387,21 +387,21 @@ export class MorphTargetAnimationController {
     // Normalize phoneme name
     const normalizedPhoneme = phoneme.toUpperCase();
     const baseValues = phonemeMap[normalizedPhoneme] || this.getNeutralMorphState();
-    
+
     // Scale by config displacement factor
     const scale = this.config.animation.mouthDisplacement;
     const result = {};
-    
+
     for (const [targetName, value] of Object.entries(baseValues)) {
       result[targetName] = value * scale;
     }
-    
+
     // CHECKPOINT 6: Displacement Calculation
     if (phoneme !== this._lastCalcPhoneme) {
       console.log('[CHECKPOINT 6] Displacement for phoneme "' + phoneme + '":', result, 'scale:', scale);
       this._lastCalcPhoneme = phoneme;
     }
-    
+
     return result;
   }
 
@@ -425,7 +425,7 @@ export class MorphTargetAnimationController {
       console.error('[CHECKPOINT 7] Cannot apply - no mesh or influences');
       return;
     }
-    
+
     const appliedValues = {};
 
     // Apply each morph target influence
@@ -435,11 +435,11 @@ export class MorphTargetAnimationController {
       this.mesh.morphTargetInfluences[targetIndex] = clamped;
       appliedValues[targetName] = clamped;
     }
-    
+
     // CHECKPOINT 7: Morph Target Application
     if (!this._lastApplyLog || Date.now() - this._lastApplyLog > 500) {
       console.log('[CHECKPOINT 7] Applied morph values:', appliedValues);
-      console.log('[CHECKPOINT 7] Actual influences (first 10):', 
+      console.log('[CHECKPOINT 7] Actual influences (first 10):',
                   Array.from(this.mesh.morphTargetInfluences).slice(0, 10).map(v => v.toFixed(2)));
       this._lastApplyLog = Date.now();
     }
@@ -482,10 +482,10 @@ export class MorphTargetAnimationController {
     // Smooth transition to new intensity
     const currentValue = this.mesh.morphTargetInfluences[targetIndex];
     const targetValue = Math.max(0, Math.min(1, intensity));
-    
+
     // For now, set immediately (could be enhanced with smooth interpolation)
     this.mesh.morphTargetInfluences[targetIndex] = targetValue;
-    
+
     this.logger?.debug(`Set morph target ${targetIndex} to ${targetValue}`);
   }
 
@@ -499,7 +499,7 @@ export class MorphTargetAnimationController {
     for (let i = 0; i < this.mesh.morphTargetInfluences.length; i++) {
       this.mesh.morphTargetInfluences[i] = 0;
     }
-    
+
     this.logger?.debug('Reset all morph targets to neutral');
   }
 }

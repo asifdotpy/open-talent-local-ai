@@ -8,6 +8,7 @@ import json
 import sys
 from pathlib import Path
 
+
 def check_file_exists(filepath, description):
     """Check if a file exists and report status."""
     if filepath.exists():
@@ -17,6 +18,7 @@ def check_file_exists(filepath, description):
         print(f"❌ {description}: {filepath} (MISSING)")
         return False
 
+
 def validate_training_data():
     """Validate the training data file."""
     data_file = Path("microservices/granite-interview-service/data/interview_v1.json")
@@ -25,7 +27,7 @@ def validate_training_data():
         return False
 
     try:
-        with open(data_file, 'r') as f:
+        with open(data_file) as f:
             data = json.load(f)
 
         if not isinstance(data, list):
@@ -38,7 +40,7 @@ def validate_training_data():
             print(f"✅ Training data has {len(data)} examples")
 
         # Check data structure
-        required_fields = ['instruction', 'input', 'output']
+        required_fields = ["instruction", "input", "output"]
         for i, item in enumerate(data[:3]):  # Check first 3 examples
             missing_fields = [field for field in required_fields if field not in item]
             if missing_fields:
@@ -52,17 +54,19 @@ def validate_training_data():
         print(f"❌ Invalid JSON in training data: {e}")
         return False
 
+
 def validate_colab_notebook():
     """Validate the Colab notebook exists."""
     notebook_file = Path("notebooks/granite_fine_tuning_colab.ipynb")
     return check_file_exists(notebook_file, "Colab notebook")
+
 
 def validate_directories():
     """Validate required directories exist."""
     dirs = [
         "microservices/granite-interview-service",
         "microservices/granite-interview-service/data",
-        "notebooks"
+        "notebooks",
     ]
 
     all_exist = True
@@ -76,6 +80,7 @@ def validate_directories():
 
     return all_exist
 
+
 def main():
     """Main validation function."""
     print("🔍 Granite Fine-Tuning Setup Validator")
@@ -87,13 +92,14 @@ def main():
         project_root = Path.cwd().parent
         print(f"📁 Changing to project root: {project_root}")
         import os
+
         os.chdir(project_root)
         print()
 
     checks = [
         ("Directories", validate_directories),
         ("Training Data", validate_training_data),
-        ("Colab Notebook", validate_colab_notebook)
+        ("Colab Notebook", validate_colab_notebook),
     ]
 
     results = []
@@ -132,6 +138,7 @@ def main():
         print("🔧 Please fix the issues above before proceeding.")
         print("   Run: ./scripts/setup-colab-fine-tuning.sh")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

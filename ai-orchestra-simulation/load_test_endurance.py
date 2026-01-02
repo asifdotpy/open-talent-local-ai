@@ -5,13 +5,14 @@ Tests 25 concurrent users for 30 minutes
 """
 
 import asyncio
-import httpx
-import time
 import json
-import statistics
-from datetime import datetime
-import psutil
 import os
+import statistics
+import time
+from datetime import datetime
+
+import httpx
+import psutil
 
 # Configuration
 SERVER_URL = "http://localhost:3001"
@@ -28,6 +29,7 @@ SAMPLE_PHONEMES = [
     {"phoneme": "UH", "start": 0.4, "end": 0.5},
 ]
 
+
 class EnduranceTester:
     def __init__(self):
         self.results = []
@@ -39,18 +41,11 @@ class EnduranceTester:
 
     async def make_request(self, client, user_id, request_id):
         """Make a single render request"""
-        payload = {
-            "phonemes": SAMPLE_PHONEMES,
-            "duration": 0.5
-        }
+        payload = {"phonemes": SAMPLE_PHONEMES, "duration": 0.5}
 
         start_time = time.time()
         try:
-            response = await client.post(
-                f"{SERVER_URL}/render/lipsync",
-                json=payload,
-                timeout=60.0
-            )
+            response = await client.post(f"{SERVER_URL}/render/lipsync", json=payload, timeout=60.0)
 
             end_time = time.time()
             response_time = end_time - start_time
@@ -59,29 +54,29 @@ class EnduranceTester:
 
             if response.status_code == 200:
                 content_length = len(response.content)
-                processing_time = response.headers.get('X-Processing-Time', '0ms')
-                processing_time = int(processing_time.replace('ms', ''))
+                processing_time = response.headers.get("X-Processing-Time", "0ms")
+                processing_time = int(processing_time.replace("ms", ""))
 
                 result = {
-                    'user_id': user_id,
-                    'request_id': request_id,
-                    'status': 'success',
-                    'response_time': response_time,
-                    'processing_time': processing_time,
-                    'content_length': content_length,
-                    'timestamp': datetime.now().isoformat()
+                    "user_id": user_id,
+                    "request_id": request_id,
+                    "status": "success",
+                    "response_time": response_time,
+                    "processing_time": processing_time,
+                    "content_length": content_length,
+                    "timestamp": datetime.now().isoformat(),
                 }
                 self.results.append(result)
                 return result
             else:
                 error = {
-                    'user_id': user_id,
-                    'request_id': request_id,
-                    'status': 'error',
-                    'error_code': response.status_code,
-                    'error_message': response.text[:200],
-                    'response_time': response_time,
-                    'timestamp': datetime.now().isoformat()
+                    "user_id": user_id,
+                    "request_id": request_id,
+                    "status": "error",
+                    "error_code": response.status_code,
+                    "error_message": response.text[:200],
+                    "response_time": response_time,
+                    "timestamp": datetime.now().isoformat(),
                 }
                 self.errors.append(error)
                 return error
@@ -90,12 +85,12 @@ class EnduranceTester:
             end_time = time.time()
             response_time = end_time - start_time
             error = {
-                'user_id': user_id,
-                'request_id': request_id,
-                'status': 'exception',
-                'error_message': str(e)[:200],
-                'response_time': response_time,
-                'timestamp': datetime.now().isoformat()
+                "user_id": user_id,
+                "request_id": request_id,
+                "status": "exception",
+                "error_message": str(e)[:200],
+                "response_time": response_time,
+                "timestamp": datetime.now().isoformat(),
             }
             self.errors.append(error)
             return error
@@ -113,19 +108,19 @@ class EnduranceTester:
     def get_system_stats(self):
         """Get current system resource usage"""
         return {
-            'cpu_percent': psutil.cpu_percent(interval=1),
-            'memory_percent': psutil.virtual_memory().percent,
-            'memory_used_mb': psutil.virtual_memory().used / 1024 / 1024,
-            'disk_usage_percent': psutil.disk_usage('/').percent,
-            'load_average': os.getloadavg() if hasattr(os, 'getloadavg') else None,
-            'network_connections': len(psutil.net_connections()),
-            'open_files': len(psutil.Process().open_files()) if psutil.Process() else 0,
-            'timestamp': datetime.now().isoformat()
+            "cpu_percent": psutil.cpu_percent(interval=1),
+            "memory_percent": psutil.virtual_memory().percent,
+            "memory_used_mb": psutil.virtual_memory().used / 1024 / 1024,
+            "disk_usage_percent": psutil.disk_usage("/").percent,
+            "load_average": os.getloadavg() if hasattr(os, "getloadavg") else None,
+            "network_connections": len(psutil.net_connections()),
+            "open_files": len(psutil.Process().open_files()) if psutil.Process() else 0,
+            "timestamp": datetime.now().isoformat(),
         }
 
     async def run_test(self):
         """Run the endurance test"""
-        print(f"🏃 Starting Endurance Test")
+        print("🏃 Starting Endurance Test")
         print(f"   Server: {SERVER_URL}")
         print(f"   Concurrent Users: {CONCURRENT_USERS}")
         print(f"   Test Duration: {TEST_DURATION} seconds ({TEST_DURATION//60} minutes)")
@@ -169,7 +164,7 @@ class EnduranceTester:
                 break
 
         # Save system stats
-        with open('load_test_endurance_system_stats.json', 'w') as f:
+        with open("load_test_endurance_system_stats.json", "w") as f:
             json.dump(system_stats, f, indent=2)
 
     async def monitor_performance(self):
@@ -181,22 +176,36 @@ class EnduranceTester:
                 window_end = time.time()
 
                 # Calculate metrics for this window
-                window_results = [r for r in self.results if window_start <= datetime.fromisoformat(r['timestamp']).timestamp() <= window_end]
-                window_errors = [e for e in self.errors if window_start <= datetime.fromisoformat(e['timestamp']).timestamp() <= window_end]
+                window_results = [
+                    r
+                    for r in self.results
+                    if window_start
+                    <= datetime.fromisoformat(r["timestamp"]).timestamp()
+                    <= window_end
+                ]
+                window_errors = [
+                    e
+                    for e in self.errors
+                    if window_start
+                    <= datetime.fromisoformat(e["timestamp"]).timestamp()
+                    <= window_end
+                ]
 
                 if window_results:
-                    avg_response_time = statistics.mean([r['response_time'] for r in window_results])
+                    avg_response_time = statistics.mean(
+                        [r["response_time"] for r in window_results]
+                    )
                     success_rate = len(window_results) / (len(window_results) + len(window_errors))
                     throughput = len(window_results) / 300  # requests per second
 
                     window_data = {
-                        'window_start': datetime.fromtimestamp(window_start).isoformat(),
-                        'window_end': datetime.fromtimestamp(window_end).isoformat(),
-                        'requests': len(window_results),
-                        'errors': len(window_errors),
-                        'avg_response_time': avg_response_time,
-                        'success_rate': success_rate,
-                        'throughput_rps': throughput
+                        "window_start": datetime.fromtimestamp(window_start).isoformat(),
+                        "window_end": datetime.fromtimestamp(window_end).isoformat(),
+                        "requests": len(window_results),
+                        "errors": len(window_errors),
+                        "avg_response_time": avg_response_time,
+                        "success_rate": success_rate,
+                        "throughput_rps": throughput,
                     }
                     self.performance_windows.append(window_data)
 
@@ -204,7 +213,7 @@ class EnduranceTester:
                 break
 
         # Save performance windows
-        with open('load_test_endurance_performance.json', 'w') as f:
+        with open("load_test_endurance_performance.json", "w") as f:
             json.dump(self.performance_windows, f, indent=2)
 
     async def generate_report(self):
@@ -215,66 +224,70 @@ class EnduranceTester:
         error_requests = len(self.errors)
 
         if self.results:
-            response_times = [r['response_time'] for r in self.results]
-            processing_times = [r['processing_time'] for r in self.results]
+            response_times = [r["response_time"] for r in self.results]
+            processing_times = [r["processing_time"] for r in self.results]
 
             report = {
-                'test_info': {
-                    'test_type': 'Endurance Test',
-                    'server_url': SERVER_URL,
-                    'concurrent_users': CONCURRENT_USERS,
-                    'test_duration_seconds': total_time,
-                    'test_duration_minutes': total_time / 60,
-                    'requests_per_user': REQUESTS_PER_USER,
-                    'timestamp': datetime.now().isoformat()
+                "test_info": {
+                    "test_type": "Endurance Test",
+                    "server_url": SERVER_URL,
+                    "concurrent_users": CONCURRENT_USERS,
+                    "test_duration_seconds": total_time,
+                    "test_duration_minutes": total_time / 60,
+                    "requests_per_user": REQUESTS_PER_USER,
+                    "timestamp": datetime.now().isoformat(),
                 },
-                'summary': {
-                    'total_requests': total_requests,
-                    'successful_requests': successful_requests,
-                    'error_requests': error_requests,
-                    'success_rate': f"{(successful_requests/total_requests)*100:.2f}%" if total_requests > 0 else "0%",
-                    'requests_per_second': f"{total_requests/total_time:.2f}",
-                    'average_response_time': f"{statistics.mean(response_times):.3f}s",
-                    'median_response_time': f"{statistics.median(response_times):.3f}s",
-                    'min_response_time': f"{min(response_times):.3f}s",
-                    'max_response_time': f"{max(response_times):.3f}s",
-                    '95th_percentile_response_time': f"{statistics.quantiles(response_times, n=20)[18]:.3f}s",
-                    '99th_percentile_response_time': f"{statistics.quantiles(response_times, n=20)[19]:.3f}s",
-                    'average_processing_time': f"{statistics.mean(processing_times):.1f}ms",
+                "summary": {
+                    "total_requests": total_requests,
+                    "successful_requests": successful_requests,
+                    "error_requests": error_requests,
+                    "success_rate": f"{(successful_requests/total_requests)*100:.2f}%"
+                    if total_requests > 0
+                    else "0%",
+                    "requests_per_second": f"{total_requests/total_time:.2f}",
+                    "average_response_time": f"{statistics.mean(response_times):.3f}s",
+                    "median_response_time": f"{statistics.median(response_times):.3f}s",
+                    "min_response_time": f"{min(response_times):.3f}s",
+                    "max_response_time": f"{max(response_times):.3f}s",
+                    "95th_percentile_response_time": f"{statistics.quantiles(response_times, n=20)[18]:.3f}s",
+                    "99th_percentile_response_time": f"{statistics.quantiles(response_times, n=20)[19]:.3f}s",
+                    "average_processing_time": f"{statistics.mean(processing_times):.1f}ms",
                 },
-                'endurance_analysis': self.analyze_endurance(),
-                'performance_trends': self.performance_windows,
-                'errors': self.errors[:30],  # First 30 errors
-                'recommendations': self.generate_recommendations()
+                "endurance_analysis": self.analyze_endurance(),
+                "performance_trends": self.performance_windows,
+                "errors": self.errors[:30],  # First 30 errors
+                "recommendations": self.generate_recommendations(),
             }
         else:
             report = {
-                'test_info': {
-                    'test_type': 'Endurance Test',
-                    'server_url': SERVER_URL,
-                    'concurrent_users': CONCURRENT_USERS,
-                    'test_duration_seconds': total_time,
-                    'timestamp': datetime.now().isoformat()
+                "test_info": {
+                    "test_type": "Endurance Test",
+                    "server_url": SERVER_URL,
+                    "concurrent_users": CONCURRENT_USERS,
+                    "test_duration_seconds": total_time,
+                    "timestamp": datetime.now().isoformat(),
                 },
-                'summary': {
-                    'total_requests': total_requests,
-                    'successful_requests': successful_requests,
-                    'error_requests': error_requests,
-                    'success_rate': '0%',
-                    'error': 'No successful requests'
+                "summary": {
+                    "total_requests": total_requests,
+                    "successful_requests": successful_requests,
+                    "error_requests": error_requests,
+                    "success_rate": "0%",
+                    "error": "No successful requests",
                 },
-                'errors': self.errors,
-                'recommendations': ['Server appears to be down or unreachable during endurance test']
+                "errors": self.errors,
+                "recommendations": [
+                    "Server appears to be down or unreachable during endurance test"
+                ],
             }
 
         # Save detailed results
-        with open('load_test_endurance_results.json', 'w') as f:
+        with open("load_test_endurance_results.json", "w") as f:
             json.dump(self.results, f, indent=2)
 
-        with open('load_test_endurance_errors.json', 'w') as f:
+        with open("load_test_endurance_errors.json", "w") as f:
             json.dump(self.errors, f, indent=2)
 
-        with open('load_test_endurance_report.json', 'w') as f:
+        with open("load_test_endurance_report.json", "w") as f:
             json.dump(report, f, indent=2)
 
         # Print summary to console
@@ -285,23 +298,23 @@ class EnduranceTester:
         print(f"Errors: {error_requests}")
         print(f"Success Rate: {report['summary'].get('success_rate', 'N/A')}")
         print(f"Requests/sec: {report['summary'].get('requests_per_second', 'N/A')}")
-        if 'average_response_time' in report['summary']:
+        if "average_response_time" in report["summary"]:
             print(f"Avg Response Time: {report['summary']['average_response_time']}")
             print(f"95th Percentile: {report['summary']['95th_percentile_response_time']}")
             print(f"99th Percentile: {report['summary']['99th_percentile_response_time']}")
         print(f"Test Duration: {total_time:.2f}s ({total_time/60:.1f} minutes)")
 
-        if 'endurance_analysis' in report:
+        if "endurance_analysis" in report:
             print("\n🏃 ENDURANCE ANALYSIS:")
-            for key, value in report['endurance_analysis'].items():
+            for key, value in report["endurance_analysis"].items():
                 print(f"   {key}: {value}")
 
-        if report['recommendations']:
+        if report["recommendations"]:
             print("\n💡 RECOMMENDATIONS:")
-            for rec in report['recommendations']:
+            for rec in report["recommendations"]:
                 print(f"   • {rec}")
 
-        print(f"\n📁 Results saved to load_test_endurance_*.json files")
+        print("\n📁 Results saved to load_test_endurance_*.json files")
 
     def analyze_endurance(self):
         """Analyze endurance characteristics"""
@@ -309,9 +322,13 @@ class EnduranceTester:
             return {}
 
         # Analyze performance degradation over time
-        response_times = [w['avg_response_time'] for w in self.performance_windows if 'avg_response_time' in w]
-        success_rates = [w['success_rate'] for w in self.performance_windows if 'success_rate' in w]
-        throughputs = [w['throughput_rps'] for w in self.performance_windows if 'throughput_rps' in w]
+        response_times = [
+            w["avg_response_time"] for w in self.performance_windows if "avg_response_time" in w
+        ]
+        success_rates = [w["success_rate"] for w in self.performance_windows if "success_rate" in w]
+        throughputs = [
+            w["throughput_rps"] for w in self.performance_windows if "throughput_rps" in w
+        ]
 
         degradation_analysis = "Unknown"
         if len(response_times) > 1:
@@ -344,14 +361,20 @@ class EnduranceTester:
         # Memory leak detection (if system stats available)
         memory_trend = "Unknown"
         try:
-            with open('load_test_endurance_system_stats.json', 'r') as f:
+            with open("load_test_endurance_system_stats.json") as f:
                 system_stats = json.load(f)
                 if len(system_stats) > 5:
-                    memory_values = [s['memory_used_mb'] for s in system_stats if 'memory_used_mb' in s]
+                    memory_values = [
+                        s["memory_used_mb"] for s in system_stats if "memory_used_mb" in s
+                    ]
                     if len(memory_values) > 1:
                         first_memory = memory_values[0]
                         last_memory = memory_values[-1]
-                        memory_growth = ((last_memory - first_memory) / first_memory) * 100 if first_memory > 0 else 0
+                        memory_growth = (
+                            ((last_memory - first_memory) / first_memory) * 100
+                            if first_memory > 0
+                            else 0
+                        )
 
                         if memory_growth < 5:
                             memory_trend = f"Stable (+{memory_growth:.1f}%)"
@@ -363,11 +386,13 @@ class EnduranceTester:
             pass
 
         return {
-            'performance_degradation': degradation_analysis,
-            'success_rate_stability': success_stability,
-            'memory_trend': memory_trend,
-            'total_windows_analyzed': len(self.performance_windows),
-            'average_throughput': f"{statistics.mean(throughputs):.2f} rps" if throughputs else "N/A"
+            "performance_degradation": degradation_analysis,
+            "success_rate_stability": success_stability,
+            "memory_trend": memory_trend,
+            "total_windows_analyzed": len(self.performance_windows),
+            "average_throughput": f"{statistics.mean(throughputs):.2f} rps"
+            if throughputs
+            else "N/A",
         }
 
     def generate_recommendations(self):
@@ -375,27 +400,38 @@ class EnduranceTester:
         recommendations = []
 
         if len(self.errors) > len(self.results) * 0.15:  # More than 15% errors
-            recommendations.append("CRITICAL: High error rate during endurance - investigate resource leaks")
+            recommendations.append(
+                "CRITICAL: High error rate during endurance - investigate resource leaks"
+            )
 
         if self.results:
-            avg_response_time = statistics.mean([r['response_time'] for r in self.results])
+            avg_response_time = statistics.mean([r["response_time"] for r in self.results])
             if avg_response_time > 8.0:
-                recommendations.append("WARNING: Average response time > 8s during endurance - monitor resource usage")
+                recommendations.append(
+                    "WARNING: Average response time > 8s during endurance - monitor resource usage"
+                )
 
             success_rate = len(self.results) / (len(self.results) + len(self.errors))
             if success_rate < 0.9:
-                recommendations.append("CRITICAL: Success rate < 90% during endurance - not suitable for production")
+                recommendations.append(
+                    "CRITICAL: Success rate < 90% during endurance - not suitable for production"
+                )
 
             # Check for performance degradation
             if self.performance_windows:
-                response_times = [w.get('avg_response_time', 0) for w in self.performance_windows]
+                response_times = [w.get("avg_response_time", 0) for w in self.performance_windows]
                 if len(response_times) > 1 and response_times[-1] > response_times[0] * 1.5:
-                    recommendations.append("WARNING: Significant performance degradation over time - possible memory/resource leaks")
+                    recommendations.append(
+                        "WARNING: Significant performance degradation over time - possible memory/resource leaks"
+                    )
 
         if len(recommendations) == 0:
-            recommendations.append("✅ Endurance test passed - server maintains performance over 30 minutes")
+            recommendations.append(
+                "✅ Endurance test passed - server maintains performance over 30 minutes"
+            )
 
         return recommendations
+
 
 async def main():
     """Main entry point"""
@@ -423,6 +459,7 @@ async def main():
     # Run the test
     tester = EnduranceTester()
     await tester.run_test()
+
 
 if __name__ == "__main__":
     asyncio.run(main())

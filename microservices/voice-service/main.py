@@ -8,14 +8,7 @@ import os
 import tempfile
 from typing import Optional
 
-from fastapi import (
-    Body,
-    FastAPI,
-    File,
-    HTTPException,
-    UploadFile,
-    WebSocket,
-)
+from fastapi import Body, FastAPI, File, HTTPException, UploadFile, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel

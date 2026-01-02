@@ -1,10 +1,10 @@
 /**
  * Unit Tests for Core Components
  * TDD PRINCIPLE: Tests define architectural contracts - code must conform
- * 
+ *
  * Tests: AppConfig static interface, Logger API, configuration validation,
  *        type safety, feature flag contracts
- * 
+ *
  * Run: node tests/unit-core-tdd.test.js
  */
 
@@ -42,7 +42,7 @@ test('AppConfig MUST provide DEFAULT_CONFIG as static property', () => {
 test('AppConfig MUST provide getEnvironment() static method', () => {
   assert.strictEqual(typeof AppConfig.getEnvironment, 'function',
     'CONTRACT VIOLATION: AppConfig must provide static getEnvironment() method');
-  
+
   const env = AppConfig.getEnvironment();
   assert.ok(typeof env === 'string' && (env === 'development' || env === 'production'),
     'CONTRACT VIOLATION: getEnvironment() must return "development" or "production"');
@@ -199,7 +199,7 @@ test('Logger MUST provide log() method', () => {
 test('Logger MUST handle all standard log levels without throwing', () => {
   const log = new Logger();
   const levels = ['debug', 'info', 'warn', 'error'];
-  
+
   levels.forEach(level => {
     assert.doesNotThrow(() => {
       log.log(`Test ${level} message`, level);
@@ -229,7 +229,7 @@ console.log('\n✅ CONFIGURATION VALIDATION CONTRACT');
 
 test('AppConfig.validate() MUST throw on missing required sections', () => {
   const invalidConfig = { features: {}, scene: {} }; // Missing camera, animation, etc.
-  
+
   assert.throws(() => {
     AppConfig.validate(invalidConfig);
   }, 'CONTRACT VIOLATION: validate() must reject config missing required sections');
@@ -240,7 +240,7 @@ test('AppConfig.validate() MUST throw on invalid scene.backgroundColor type', ()
     ...AppConfig.DEFAULT_CONFIG,
     scene: { ...AppConfig.DEFAULT_CONFIG.scene, backgroundColor: 'invalid' }
   };
-  
+
   assert.throws(() => {
     AppConfig.validate(invalidConfig);
   }, 'CONTRACT VIOLATION: validate() must reject non-number backgroundColor');
@@ -251,7 +251,7 @@ test('AppConfig.validate() MUST throw on invalid camera coordinates', () => {
     ...AppConfig.DEFAULT_CONFIG,
     camera: { ...AppConfig.DEFAULT_CONFIG.camera, position: { x: 'invalid', y: 0, z: 0 } }
   };
-  
+
   assert.throws(() => {
     AppConfig.validate(invalidConfig);
   }, 'CONTRACT VIOLATION: validate() must reject non-number camera coordinates');

@@ -97,13 +97,15 @@ The repository includes scripts to start all necessary services (Ollama, Piper, 
 
 If you prefer to run the components separately:
 
-1.  **Start Microservices:** (Requires Ollama to be running or mocked)
+1. **Start Microservices:** (Requires Ollama to be running or mocked)
+
     ```bash
     # Example: Start all services using the run script
     ./run_all_services.sh
     ```
 
-2.  **Start Desktop App (Electron):**
+2. **Start Desktop App (Electron):**
+
     ```bash
     cd desktop-app
     npm run dev
@@ -151,7 +153,7 @@ pytest
 **Document Created:** December 31, 2025
 **Author:** Manus AI
 **Source:** Project Audit and Repository Analysis
-[1]: https://github.com/asifdotpy/open-talent-local-ai "OpenTalent Repository"
-[2]: https://nodejs.org/en/download/package-manager "Node.js Installation"
-[3]: https://www.python.org/downloads/ "Python Installation"
-[4]: https://ollama.com/ "Ollama Local LLM Server"
+[1]: <https://github.com/asifdotpy/open-talent-local-ai> "OpenTalent Repository"
+[2]: <https://nodejs.org/en/download/package-manager> "Node.js Installation"
+[3]: <https://www.python.org/downloads/> "Python Installation"
+[4]: <https://ollama.com/> "Ollama Local LLM Server"

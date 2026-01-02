@@ -148,7 +148,7 @@ const InterviewApp: React.FC<InterviewAppProps> = ({ onSwitchToDemo, config: app
           <div className="status-indicator">
             <div className={`status-dot ${ollamaStatus ? 'online' : 'offline'}`} />
             <span>
-              Service: {ollamaStatus ? 'Online' : 'Offline'} 
+              Service: {ollamaStatus ? 'Online' : 'Offline'}
               {serviceMode && <span className="service-mode"> ({serviceMode === 'integration' ? '🔥 Gateway' : '🦙 Direct Ollama'})</span>}
             </span>
           </div>

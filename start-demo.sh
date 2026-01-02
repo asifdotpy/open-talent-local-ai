@@ -13,7 +13,7 @@
 # Stop: Ctrl+C or ./stop-demo.sh
 # ═══════════════════════════════════════════════════════════════════════════
 
-WORKSPACE="/home/asif1/open-talent"
+WORKSPACE="/app"
 OLLAMA_MODEL="granite4:350m-h"  # Lightweight model for demo
 LOG_DIR="/tmp/opentalent-demo"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")

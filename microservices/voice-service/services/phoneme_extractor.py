@@ -1,5 +1,4 @@
-"""
-Phoneme Extractor Service for Voice Service
+"""Phoneme Extractor Service for Voice Service
 
 Provides phoneme timing extraction for lip-sync animation.
 Uses phonemizer for phoneme identification and estimated timing.
@@ -7,20 +6,18 @@ Uses phonemizer for phoneme identification and estimated timing.
 
 import logging
 import re
-from typing import Dict, List, Optional
-from pathlib import Path
-import json
+from typing import Optional
 
 try:
     from phonemizer import phonemize
+
     PHONEMIZER_AVAILABLE = True
 except ImportError:
     PHONEMIZER_AVAILABLE = False
 
 
 class PhonemeExtractor:
-    """
-    Extracts phonemes and timing information for lip-sync animation.
+    """Extracts phonemes and timing information for lip-sync animation.
 
     Uses phonemizer for accurate phoneme identification and provides
     estimated timing based on phoneme count and syllable structure.
@@ -37,31 +34,30 @@ class PhonemeExtractor:
 
         # Basic phoneme mapping for fallback
         self.basic_phonemes = {
-            'a': ['AH'],
-            'e': ['EH'],
-            'i': ['IH'],
-            'o': ['OW'],
-            'u': ['UH'],
-            'th': ['TH'],
-            'sh': ['SH'],
-            'ch': ['CH'],
-            'ph': ['F'],
-            'wh': ['W'],
-            'qu': ['K', 'W'],
-            'ck': ['K'],
-            'ng': ['NG'],
-            'er': ['ER'],
-            'tion': ['SH', 'AH', 'N'],
-            'ture': ['CH', 'ER'],
-            'sure': ['ZH', 'ER'],
-            'cious': ['SH', 'AH', 'S'],
-            'tious': ['SH', 'AH', 'S'],
-            'sious': ['ZH', 'AH', 'S'],
+            "a": ["AH"],
+            "e": ["EH"],
+            "i": ["IH"],
+            "o": ["OW"],
+            "u": ["UH"],
+            "th": ["TH"],
+            "sh": ["SH"],
+            "ch": ["CH"],
+            "ph": ["F"],
+            "wh": ["W"],
+            "qu": ["K", "W"],
+            "ck": ["K"],
+            "ng": ["NG"],
+            "er": ["ER"],
+            "tion": ["SH", "AH", "N"],
+            "ture": ["CH", "ER"],
+            "sure": ["ZH", "ER"],
+            "cious": ["SH", "AH", "S"],
+            "tious": ["SH", "AH", "S"],
+            "sious": ["ZH", "AH", "S"],
         }
 
-    def extract_phonemes(self, text: str, duration: float = 0.0) -> Dict:
-        """
-        Extract phonemes and timing from text.
+    def extract_phonemes(self, text: str, duration: float = 0.0) -> dict:
+        """Extract phonemes and timing from text.
 
         Args:
             text: Input text
@@ -80,13 +76,13 @@ class PhonemeExtractor:
             self.logger.error(f"Phoneme extraction failed: {e}")
             return self._extract_basic(text, duration)
 
-    def _extract_with_phonemizer(self, text: str, duration: float = 0.0) -> Dict:
+    def _extract_with_phonemizer(self, text: str, duration: float = 0.0) -> dict:
         """Extract phonemes using phonemizer library."""
         # Get phoneme string from phonemizer
-        phoneme_text = phonemize(text, language='en-us', backend='espeak', strip=True)
+        phoneme_text = phonemize(text, language="en-us", backend="espeak", strip=True)
 
         # Split text into words for alignment
-        word_list = re.findall(r'\b\w+\b', text.lower())
+        word_list = re.findall(r"\b\w+\b", text.lower())
 
         # Estimate duration if not provided
         if duration <= 0:
@@ -108,7 +104,7 @@ class PhonemeExtractor:
             phonemes_in_word = max(1, syllable_count * 2)  # ~2 phonemes per syllable
 
             word_start = current_time
-            word_duration = duration * (len(word) / max(1, len(text.replace(' ', ''))))
+            word_duration = duration * (len(word) / max(1, len(text.replace(" ", ""))))
             word_end = word_start + word_duration
 
             word_phonemes = []
@@ -120,37 +116,38 @@ class PhonemeExtractor:
                     phoneme_start = word_start + (i * phoneme_duration)
                     phoneme_end = phoneme_start + phoneme_duration
 
-                    phoneme_symbol = phoneme_parts[phoneme_idx] if phoneme_idx < len(phoneme_parts) else "AH"
+                    phoneme_symbol = (
+                        phoneme_parts[phoneme_idx] if phoneme_idx < len(phoneme_parts) else "AH"
+                    )
 
-                    phonemes.append({
-                        "phoneme": phoneme_symbol.upper(),
-                        "start": round(phoneme_start, 3),
-                        "end": round(phoneme_end, 3),
-                        "duration": round(phoneme_duration, 3)
-                    })
+                    phonemes.append(
+                        {
+                            "phoneme": phoneme_symbol.upper(),
+                            "start": round(phoneme_start, 3),
+                            "end": round(phoneme_end, 3),
+                            "duration": round(phoneme_duration, 3),
+                        }
+                    )
                     word_phonemes.append(phoneme_symbol.upper())
                     phoneme_idx += 1
 
-            words.append({
-                "word": word,
-                "start": round(word_start, 3),
-                "end": round(word_end, 3),
-                "phonemes": word_phonemes
-            })
+            words.append(
+                {
+                    "word": word,
+                    "start": round(word_start, 3),
+                    "end": round(word_end, 3),
+                    "phonemes": word_phonemes,
+                }
+            )
 
             current_time = word_end
 
-        return {
-            "phonemes": phonemes,
-            "words": words,
-            "text": text,
-            "duration": duration
-        }
+        return {"phonemes": phonemes, "words": words, "text": text, "duration": duration}
 
-    def _segment_phonemes(self, phoneme_text: str, num_words: int) -> List[str]:
+    def _segment_phonemes(self, phoneme_text: str, num_words: int) -> list[str]:
         """Segment phoneme text into individual phoneme symbols."""
         # Split on spaces and common phoneme boundaries
-        parts = re.split(r'[ː\s]+', phoneme_text)
+        parts = re.split(r"[ː\s]+", phoneme_text)
 
         # Further split compound phonemes
         phonemes = []
@@ -160,7 +157,7 @@ class PhonemeExtractor:
             else:
                 # Split longer sequences into individual phonemes
                 for char in part:
-                    if char not in ['ː', 'ˈ', 'ˌ']:  # Skip stress markers
+                    if char not in ["ː", "ˈ", "ˌ"]:  # Skip stress markers
                         phonemes.append(char)
 
         # Filter out empty strings
@@ -170,9 +167,9 @@ class PhonemeExtractor:
         while len(phonemes) < num_words * 2:
             phonemes.append("AH")
 
-        return phonemes[:num_words * 3]  # Limit to reasonable number
+        return phonemes[: num_words * 3]  # Limit to reasonable number
 
-    def _extract_basic(self, text: str, duration: float = 0.0) -> Dict:
+    def _extract_basic(self, text: str, duration: float = 0.0) -> dict:
         """Basic phoneme extraction without phonemizer."""
         # Estimate duration if not provided
         if duration <= 0:
@@ -182,7 +179,7 @@ class PhonemeExtractor:
         words = []
 
         # Split text into words
-        word_list = re.findall(r'\b\w+\b', text.lower())
+        word_list = re.findall(r"\b\w+\b", text.lower())
 
         current_time = 0.0
         total_phonemes = 0
@@ -207,28 +204,27 @@ class PhonemeExtractor:
                 phoneme_start = current_time
                 phoneme_end = current_time + time_per_phoneme
 
-                phonemes.append({
-                    "phoneme": phoneme,
-                    "start": round(phoneme_start, 3),
-                    "end": round(phoneme_end, 3),
-                    "duration": round(time_per_phoneme, 3)
-                })
+                phonemes.append(
+                    {
+                        "phoneme": phoneme,
+                        "start": round(phoneme_start, 3),
+                        "end": round(phoneme_end, 3),
+                        "duration": round(time_per_phoneme, 3),
+                    }
+                )
 
                 current_time = phoneme_end
 
-            words.append({
-                "word": word,
-                "start": round(word_start, 3),
-                "end": round(word_end, 3),
-                "phonemes": word_phonemes
-            })
+            words.append(
+                {
+                    "word": word,
+                    "start": round(word_start, 3),
+                    "end": round(word_end, 3),
+                    "phonemes": word_phonemes,
+                }
+            )
 
-        return {
-            "phonemes": phonemes,
-            "words": words,
-            "text": text,
-            "duration": duration
-        }
+        return {"phonemes": phonemes, "words": words, "text": text, "duration": duration}
 
     def _count_syllables(self, word: str) -> int:
         """Estimate syllable count in a word."""
@@ -260,7 +256,7 @@ class PhonemeExtractor:
         while i < len(word):
             # Check for digraphs first
             if i < len(word) - 1:
-                digraph = word[i:i+2]
+                digraph = word[i : i + 2]
                 if digraph in self.basic_phonemes:
                     count += len(self.basic_phonemes[digraph])
                     i += 2
@@ -276,7 +272,7 @@ class PhonemeExtractor:
 
         return max(1, count)
 
-    def _get_basic_phonemes(self, word: str) -> List[str]:
+    def _get_basic_phonemes(self, word: str) -> list[str]:
         """Get basic phoneme list for a word."""
         word = word.lower()
         phonemes = []
@@ -285,7 +281,7 @@ class PhonemeExtractor:
         while i < len(word):
             # Check for digraphs first
             if i < len(word) - 1:
-                digraph = word[i:i+2]
+                digraph = word[i : i + 2]
                 if digraph in self.basic_phonemes:
                     phonemes.extend(self.basic_phonemes[digraph])
                     i += 2
@@ -315,9 +311,9 @@ if __name__ == "__main__":
     print(f"Words: {len(result['words'])}")
 
     print("\nPhoneme timing:")
-    for p in result['phonemes'][:10]:  # Show first 10
+    for p in result["phonemes"][:10]:  # Show first 10
         print(f"  {p['phoneme']}: {p['start']:.3f}-{p['end']:.3f}s")
 
     print("\nWord timing:")
-    for w in result['words']:
+    for w in result["words"]:
         print(f"  {w['word']}: {w['start']:.3f}-{w['end']:.3f}s")

@@ -8,7 +8,7 @@ export function makeGuardrails(pack: CompetencyPack){
 
   function blockUnsafeQuestions(req: Request, res: Response, next: NextFunction){
     const q = String(req.body?.question ?? "");
-    for (const r of patterns){ if (new RegExp(r.pattern,"i").test(q)){ 
+    for (const r of patterns){ if (new RegExp(r.pattern,"i").test(q)){
       return res.status(400).json({ error: "Unsafe question blocked", reason: r.reason, suggestion: safeRewrites[0]?.safe });
     }}
     next();

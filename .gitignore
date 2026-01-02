@@ -153,6 +153,7 @@ out/
 # Gatsby
 .cache/
 public/
+!desktop-app/public
 
 # Vite
 vite.config.js.timestamp-*
@@ -540,6 +541,7 @@ test-results/
 nohup.out
 temp/
 tmp/
+installation_notes.md
 
 #===============================================================================
 # DEVELOPMENT-ONLY MARKDOWN FILES

@@ -40,9 +40,9 @@ print_section() {
 run_test() {
   local test_file=$1
   local test_name=$2
-  
+
   print_section "$test_name"
-  
+
   if node "$test_file" 2>&1 | tee /tmp/test_output.txt; then
     TOTAL_PASSED=$((TOTAL_PASSED + 1))
     echo -e "${GREEN}✅ $test_name passed${NC}\n"
@@ -95,15 +95,15 @@ print_header "🧪 AI Orchestra Simulation - Test Suite"
 # ============================================================================
 if [ "$RUN_UNIT" = true ]; then
   print_header "UNIT TESTS"
-  
+
   if [ -f "$SCRIPT_DIR/unit-core.test.js" ]; then
     run_test "$SCRIPT_DIR/unit-core.test.js" "Core Components"
   fi
-  
+
   if [ -f "$SCRIPT_DIR/unit-animation.test.js" ]; then
     run_test "$SCRIPT_DIR/unit-animation.test.js" "Animation System"
   fi
-  
+
   if [ -f "$SCRIPT_DIR/svg-math.test.js" ]; then
     run_test "$SCRIPT_DIR/svg-math.test.js" "SVG Math Utilities"
   fi
@@ -114,11 +114,11 @@ fi
 # ============================================================================
 if [ "$RUN_INTEGRATION" = true ]; then
   print_header "INTEGRATION TESTS"
-  
+
   if [ -f "$SCRIPT_DIR/integration-config.test.js" ]; then
     run_test "$SCRIPT_DIR/integration-config.test.js" "Configuration System"
   fi
-  
+
   if [ -f "$SCRIPT_DIR/integration-server.test.js" ]; then
     # Check if server is running
     if curl -s http://localhost:3001/health > /dev/null 2>&1; then
@@ -128,11 +128,11 @@ if [ "$RUN_INTEGRATION" = true ]; then
       echo -e "   Start with: npm start\n"
     fi
   fi
-  
+
   if [ -f "$SCRIPT_DIR/phase1-integration.test.js" ]; then
     run_test "$SCRIPT_DIR/phase1-integration.test.js" "Phase 1 Integration"
   fi
-  
+
   if [ -f "$SCRIPT_DIR/live-streaming.test.js" ]; then
     run_test "$SCRIPT_DIR/live-streaming.test.js" "Live Streaming"
   fi
@@ -143,13 +143,13 @@ fi
 # ============================================================================
 if [ "$RUN_E2E" = true ]; then
   print_header "END-TO-END TESTS"
-  
+
   if [ -f "$SCRIPT_DIR/e2e-face-glb.test.js" ] || [ -f "$SCRIPT_DIR/e2e-face-glb.js" ]; then
     TEST_FILE="${SCRIPT_DIR}/e2e-face-glb.js"
     [ ! -f "$TEST_FILE" ] && TEST_FILE="${SCRIPT_DIR}/e2e-face-glb.test.js"
     run_test "$TEST_FILE" "face.glb Integration"
   fi
-  
+
   if [ -f "$SCRIPT_DIR/test-complete-pipeline.html" ]; then
     echo -e "${YELLOW}📋 Complete Pipeline (Browser)${NC}"
     echo -e "${YELLOW}   ℹ️  Open in browser: tests/test-complete-pipeline.html${NC}\n"

@@ -2,7 +2,7 @@
  * Lip-Sync Quality Validation Tool
  * Validates 52 ARKit blendshapes with complex phoneme sequences
  * Measures animation quality and performance
- * 
+ *
  * Run: npm run validate-lip-sync
  */
 
@@ -20,10 +20,10 @@ console.log('🎤 Lip-Sync Quality Validation Suite\n');
 // ============================================================================
 function validatePhonemeCoverage() {
   console.log('📋 Validating Phoneme Coverage...');
-  
+
   const mapper = new PhonemeMapper(null, { useFaceGLB: true });
   const phonemes = mapper.getSupportedPhonemes();
-  
+
   const analysis = {
     totalPhonemes: phonemes.length,
     vowels: 0,
@@ -31,11 +31,11 @@ function validatePhonemeCoverage() {
     special: 0,
     coverage: {},
   };
-  
+
   // Categorize
   const vowelList = ['aa', 'ae', 'ah', 'ao', 'ee', 'eh', 'er', 'ih', 'iy', 'oh', 'ow', 'oy', 'uh', 'uw'];
   const specialList = ['sil', 'pau'];
-  
+
   for (const phoneme of phonemes) {
     if (vowelList.includes(phoneme)) {
       analysis.vowels++;
@@ -44,7 +44,7 @@ function validatePhonemeCoverage() {
     } else {
       analysis.consonants++;
     }
-    
+
     const mapping = mapper.phonemeMap[phoneme];
     analysis.coverage[phoneme] = {
       primary: mapping.primary,
@@ -54,13 +54,13 @@ function validatePhonemeCoverage() {
       isBlended: mapping.secondary !== null
     };
   }
-  
+
   console.log(`  ✅ Total phonemes: ${analysis.totalPhonemes}`);
   console.log(`     - Vowels: ${analysis.vowels}`);
   console.log(`     - Consonants: ${analysis.consonants}`);
   console.log(`     - Special: ${analysis.special}`);
   console.log(`     - Blended (secondary targets): ${Object.values(analysis.coverage).filter(c => c.isBlended).length}`);
-  
+
   return analysis;
 }
 
@@ -69,21 +69,21 @@ function validatePhonemeCoverage() {
 // ============================================================================
 function validateMorphTargetUtilization() {
   console.log('\n🎭 Analyzing Morph Target Utilization...');
-  
+
   const mapper = new PhonemeMapper(null, { useFaceGLB: true });
   const targetUsage = {};
-  
+
   // Track which targets are used
   for (const phoneme of mapper.getSupportedPhonemes()) {
     const mapping = mapper.phonemeMap[phoneme];
-    
+
     if (mapping.primary) {
       if (!targetUsage[mapping.primary]) {
         targetUsage[mapping.primary] = [];
       }
       targetUsage[mapping.primary].push(phoneme);
     }
-    
+
     if (mapping.secondary) {
       if (!targetUsage[mapping.secondary]) {
         targetUsage[mapping.secondary] = [];
@@ -91,7 +91,7 @@ function validateMorphTargetUtilization() {
       targetUsage[mapping.secondary].push(`${phoneme} (secondary)`);
     }
   }
-  
+
   const analysis = {
     targetsUsed: Object.keys(targetUsage).length,
     targetList: targetUsage,
@@ -104,13 +104,13 @@ function validateMorphTargetUtilization() {
         phonemes: phonemes
       }))
   };
-  
+
   console.log(`  ✅ Active morph targets: ${analysis.targetsUsed}`);
   console.log(`  ✅ Most utilized targets:`);
   for (const { target, usage } of analysis.mostUsedTargets) {
     console.log(`     - ${target}: ${usage} phonemes`);
   }
-  
+
   return analysis;
 }
 
@@ -119,7 +119,7 @@ function validateMorphTargetUtilization() {
 // ============================================================================
 function validateComplexSequences() {
   console.log('\n🗣️  Testing Complex Speech Sequences...');
-  
+
   const mockController = {
     morphHistory: [],
     setMorphTarget(index, intensity, duration) {
@@ -129,9 +129,9 @@ function validateComplexSequences() {
       this.morphHistory = [];
     }
   };
-  
+
   const mapper = new PhonemeMapper(mockController, { useFaceGLB: true });
-  
+
   const sequences = [
     {
       name: 'Simple greeting: "hello"',
@@ -177,19 +177,19 @@ function validateComplexSequences() {
       ]
     }
   ];
-  
+
   const results = [];
-  
+
   for (const sequence of sequences) {
     mockController.morphHistory = [];
-    
+
     for (const { phoneme, duration } of sequence.phonemes) {
       mapper.animatePhoneme(phoneme, duration);
     }
-    
+
     const totalAnimations = mockController.morphHistory.length;
     const uniqueTargets = new Set(mockController.morphHistory.map(m => m.index)).size;
-    
+
     results.push({
       sequence: sequence.name,
       phonemeCount: sequence.phonemes.length,
@@ -197,11 +197,11 @@ function validateComplexSequences() {
       uniqueTargets,
       totalDuration: sequence.phonemes.reduce((sum, p) => sum + p.duration, 0)
     });
-    
+
     console.log(`  ✅ ${sequence.name}`);
     console.log(`     - Phonemes: ${sequence.phonemes.length}, Animations: ${totalAnimations}, Unique targets: ${uniqueTargets}`);
   }
-  
+
   return {
     sequenceCount: sequences.length,
     results
@@ -213,10 +213,10 @@ function validateComplexSequences() {
 // ============================================================================
 function validateARKitQuality() {
   console.log('\n⭐ Validating ARKit Blendshape Quality...');
-  
+
   const loader = new FaceGLBLoader();
   const mapper = new PhonemeMapper(null, { useFaceGLB: true });
-  
+
   // Check critical lip-sync targets
   const lipSyncTargets = [
     { name: 'jawOpen', index: 24, desc: 'Open mouth vertically' },
@@ -224,13 +224,13 @@ function validateARKitQuality() {
     { name: 'mouthClose', index: 36, desc: 'Closed mouth (M/P/B sounds)' },
     { name: 'mouthSmile', index: 38, desc: 'Smile shape (E/I sounds)' }
   ];
-  
+
   const analysis = {
     lipSyncTargetsAvailable: [],
     expressionTargetsAvailable: [],
     totalCoverage: 0
   };
-  
+
   // Check lip-sync
   for (const target of lipSyncTargets) {
     const idx = loader.getMorphTargetIndex(target.name);
@@ -244,7 +244,7 @@ function validateARKitQuality() {
     });
     if (matches) analysis.totalCoverage++;
   }
-  
+
   // Check expression targets
   const expressionTargets = ['browInnerUp', 'eyeWide_L', 'eyeWide_R', 'cheekPuff', 'mouthFrown_L'];
   for (const targetName of expressionTargets) {
@@ -256,14 +256,14 @@ function validateARKitQuality() {
     });
     if (idx !== null) analysis.totalCoverage++;
   }
-  
+
   console.log(`  ✅ Lip-sync targets: ${analysis.lipSyncTargetsAvailable.filter(t => t.valid).length}/${lipSyncTargets.length}`);
   console.log(`     - jawOpen: ${analysis.lipSyncTargetsAvailable[0].valid ? '✓' : '✗'} (idx: ${analysis.lipSyncTargetsAvailable[0].actualIndex})`);
   console.log(`     - mouthFunnel: ${analysis.lipSyncTargetsAvailable[1].valid ? '✓' : '✗'} (idx: ${analysis.lipSyncTargetsAvailable[1].actualIndex})`);
   console.log(`     - mouthClose: ${analysis.lipSyncTargetsAvailable[2].valid ? '✓' : '✗'} (idx: ${analysis.lipSyncTargetsAvailable[2].actualIndex})`);
   console.log(`     - mouthSmile: ${analysis.lipSyncTargetsAvailable[3].valid ? '✓' : '✗'} (idx: ${analysis.lipSyncTargetsAvailable[3].actualIndex})`);
   console.log(`  ✅ Expression targets available: ${analysis.expressionTargetsAvailable.filter(t => t.available).length}/${expressionTargets.length}`);
-  
+
   return analysis;
 }
 
@@ -272,11 +272,11 @@ function validateARKitQuality() {
 // ============================================================================
 function validatePerformance() {
   console.log('\n⚡ Performance Benchmarks...');
-  
+
   const mapper = new PhonemeMapper(null, { useFaceGLB: true });
-  
+
   const benchmarks = {};
-  
+
   // Benchmark 1: Phoneme lookup
   const lookupStart = performance.now();
   for (let i = 0; i < 10000; i++) {
@@ -287,7 +287,7 @@ function validatePerformance() {
     totalTime: performance.now() - lookupStart,
     avgTime: (performance.now() - lookupStart) / 10000
   };
-  
+
   // Benchmark 2: Index lookup
   const indexStart = performance.now();
   for (let i = 0; i < 10000; i++) {
@@ -298,7 +298,7 @@ function validatePerformance() {
     totalTime: performance.now() - indexStart,
     avgTime: (performance.now() - indexStart) / 10000
   };
-  
+
   // Benchmark 3: Phoneme normalization
   const normStart = performance.now();
   for (let i = 0; i < 1000; i++) {
@@ -310,11 +310,11 @@ function validatePerformance() {
     totalTime: performance.now() - normStart,
     avgTime: (performance.now() - normStart) / 2000
   };
-  
+
   console.log(`  ✅ Phoneme lookup: ${benchmarks.phonemeLookup.avgTime.toFixed(4)}ms per operation`);
   console.log(`  ✅ Index lookup: ${benchmarks.indexLookup.avgTime.toFixed(4)}ms per operation`);
   console.log(`  ✅ Normalization: ${benchmarks.normalization.avgTime.toFixed(4)}ms per operation`);
-  
+
   return benchmarks;
 }
 
@@ -323,7 +323,7 @@ function validatePerformance() {
 // ============================================================================
 function analyzeIntensityDistribution() {
   console.log('\n📊 Phoneme Intensity Analysis...');
-  
+
   const mapper = new PhonemeMapper(null, { useFaceGLB: true });
   const intensities = {
     full: 0,
@@ -332,10 +332,10 @@ function analyzeIntensityDistribution() {
     low: 0,
     zero: 0
   };
-  
+
   for (const phoneme of mapper.getSupportedPhonemes()) {
     const mapping = mapper.phonemeMap[phoneme];
-    
+
     const primary = mapping.primaryIntensity;
     if (primary === 1.0) intensities.full++;
     else if (primary >= 0.7) intensities.high++;
@@ -343,14 +343,14 @@ function analyzeIntensityDistribution() {
     else if (primary > 0) intensities.low++;
     else intensities.zero++;
   }
-  
+
   console.log(`  📈 Primary target intensity distribution:`);
   console.log(`     - Full (1.0): ${intensities.full}`);
   console.log(`     - High (0.7-1.0): ${intensities.high}`);
   console.log(`     - Medium (0.4-0.7): ${intensities.medium}`);
   console.log(`     - Low (0-0.4): ${intensities.low}`);
   console.log(`     - Zero: ${intensities.zero}`);
-  
+
   return intensities;
 }
 
@@ -366,7 +366,7 @@ async function generateReport() {
     },
     sections: {}
   };
-  
+
   try {
     report.sections.phonemeCoverage = validatePhonemeCoverage();
     report.sections.morphTargetUtilization = validateMorphTargetUtilization();
@@ -374,7 +374,7 @@ async function generateReport() {
     report.sections.arKitQuality = validateARKitQuality();
     report.sections.performance = validatePerformance();
     report.sections.intensityDistribution = analyzeIntensityDistribution();
-    
+
     // Final assessment
     console.log('\n' + '═'.repeat(70));
     console.log('\n✅ FINAL ASSESSMENT: Production-Ready\n');
@@ -390,21 +390,21 @@ async function generateReport() {
     console.log(`  3. Target 60fps with <16ms frame budget`);
     console.log(`  4. Monitor GPU load with many morph targets (limit to 4-6 active)`);
     console.log('\n' + '═'.repeat(70) + '\n');
-    
+
     // Save report
     if (!fs.existsSync('reports')) {
       fs.mkdirSync('reports', { recursive: true });
     }
-    
+
     fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
     console.log(`📄 Detailed report saved to: ${reportPath}\n`);
-    
+
   } catch (error) {
     console.error('\n❌ Validation failed:', error.message);
     report.summary.status = 'FAILED';
     report.summary.error = error.message;
   }
-  
+
   return report;
 }
 

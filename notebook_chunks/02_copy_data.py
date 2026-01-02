@@ -1,15 +1,17 @@
-import shutil
 import os
-import time # Import time for delay
+import shutil
+import time  # Import time for delay
 
-source_data_path = '/content/drive/MyDrive/Open Talent/data'
-destination_colab_path = '.' # Copy to the current working directory
+source_data_path = "/content/drive/MyDrive/Open Talent/data"
+destination_colab_path = "."  # Copy to the current working directory
 
 # First check for existence
 if not os.path.exists(source_data_path):
     print(f"❌ Source directory '{source_data_path}' not found on first check.")
-    print("It's possible Google Drive momentarily disconnected. Retrying check after a short delay...")
-    time.sleep(5) # Wait for 5 seconds
+    print(
+        "It's possible Google Drive momentarily disconnected. Retrying check after a short delay..."
+    )
+    time.sleep(5)  # Wait for 5 seconds
 
 if os.path.exists(source_data_path):
     print(f"Copying contents from '{source_data_path}' to '{destination_colab_path}'...")
@@ -26,10 +28,14 @@ if os.path.exists(source_data_path):
 
     print("✅ Contents copied successfully!")
     # Verify contents in the current directory
-    print(f"Contents of current directory (after copy):")
+    print("Contents of current directory (after copy):")
     for item in os.listdir(destination_colab_path):
-        if item.startswith('vetta_') or item == 'enhanced_vetta_data.py' or item == 'README.md': # Only show relevant copied files
+        if (
+            item.startswith("vetta_") or item == "enhanced_vetta_data.py" or item == "README.md"
+        ):  # Only show relevant copied files
             print(f"- {item}")
 else:
     print(f"❌ Source directory '{source_data_path}' still not found after retry.")
-    print("This indicates a persistent issue. Please ensure your Google Drive is correctly mounted and consider restarting the Colab runtime.")
+    print(
+        "This indicates a persistent issue. Please ensure your Google Drive is correctly mounted and consider restarting the Colab runtime."
+    )

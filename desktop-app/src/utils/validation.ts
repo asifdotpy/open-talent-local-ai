@@ -133,8 +133,8 @@ export class InputValidator {
   static validateTotalQuestions(
     totalQuestions: unknown
   ): ValidationResult {
-    const num = typeof totalQuestions === 'number' 
-      ? totalQuestions 
+    const num = typeof totalQuestions === 'number'
+      ? totalQuestions
       : parseInt(String(totalQuestions), 10);
 
     if (isNaN(num)) {

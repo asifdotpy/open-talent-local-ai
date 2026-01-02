@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
-"""
-Test script for RNNoise integration in voice service.
+"""Test script for RNNoise integration in voice service.
 Tests noise suppression functionality.
 """
 
-import numpy as np
-import tempfile
-import soundfile as sf
 from fractions import Fraction
-from services.audio_processing_service import RNNoiseTrack
+
+import numpy as np
 from aiortc import AudioStreamTrack
 from av import AudioFrame
 
+from services.audio_processing_service import RNNoiseTrack
+
+
 class MockAudioTrack(AudioStreamTrack):
     """Mock audio track for testing"""
+
     kind = "audio"
 
     def __init__(self, audio_data, sample_rate=48000):
@@ -26,9 +27,9 @@ class MockAudioTrack(AudioStreamTrack):
         # Create frames from audio data
         frame_size = int(sample_rate * 0.02)  # 20ms frames
         for i in range(0, len(audio_data), frame_size):
-            chunk = audio_data[i:i+frame_size]
+            chunk = audio_data[i : i + frame_size]
             if len(chunk) > 0:
-                frame = AudioFrame.from_ndarray(chunk.reshape(1, -1), format='s16', layout='mono')
+                frame = AudioFrame.from_ndarray(chunk.reshape(1, -1), format="s16", layout="mono")
                 frame.sample_rate = sample_rate
                 frame.pts = i
                 frame.time_base = Fraction(1, sample_rate)
@@ -41,6 +42,7 @@ class MockAudioTrack(AudioStreamTrack):
             return frame
         else:
             raise Exception("End of audio")
+
 
 def test_rnnoise():
     """Test RNNoise noise suppression"""
@@ -73,6 +75,7 @@ def test_rnnoise():
     processed_frames = []
     try:
         import asyncio
+
         async def process():
             while True:
                 frame = await rnnoise_track.recv()
@@ -98,8 +101,12 @@ def test_rnnoise():
         def calculate_snr(signal, noise):
             return 10 * np.log10(np.mean(signal**2) / np.mean(noise**2))
 
-        original_snr = calculate_snr(clean_signal[:len(processed_audio)], noise[:len(processed_audio)])
-        processed_snr = calculate_snr(processed_audio, processed_audio - clean_signal[:len(processed_audio)])
+        original_snr = calculate_snr(
+            clean_signal[: len(processed_audio)], noise[: len(processed_audio)]
+        )
+        processed_snr = calculate_snr(
+            processed_audio, processed_audio - clean_signal[: len(processed_audio)]
+        )
 
         print(".2f")
         print(".2f")
@@ -110,6 +117,7 @@ def test_rnnoise():
     else:
         print("❌ No frames processed")
         return False
+
 
 if __name__ == "__main__":
     test_rnnoise()

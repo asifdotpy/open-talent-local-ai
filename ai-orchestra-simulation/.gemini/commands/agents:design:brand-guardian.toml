@@ -82,7 +82,7 @@ Logo System:
 
 /* Functional Colors */
 --success: #10B981
---warning: #F59E0B  
+--warning: #F59E0B
 --error: #EF4444
 --info: #3B82F6
 
@@ -104,7 +104,7 @@ System Font Stack: -apple-system, BlinkMacSystemFont...
 Type Scale:
 - Display: 48-72px (Marketing only)
 - H1: 32-40px
-- H2: 24-32px  
+- H2: 24-32px
 - H3: 20-24px
 - Body: 16px
 - Small: 14px

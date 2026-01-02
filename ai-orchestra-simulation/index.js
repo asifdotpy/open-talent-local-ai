@@ -1,9 +1,9 @@
 /**
  * AI Orchestra Simulation - Shared Avatar Animation Library
- * 
+ *
  * This module exports the core avatar rendering and animation components
  * for use by other services (e.g., avatar-service).
- * 
+ *
  * @module ai-orchestra-simulation
  */
 
@@ -58,7 +58,7 @@ export { AvatarRendererServer } from './avatar-renderer-v2.js';
 
 /**
  * Create a new avatar application instance with default configuration
- * 
+ *
  * @param {Object} config - Application configuration
  * @returns {Application} Configured application instance
  */
@@ -69,7 +69,7 @@ export function createAvatarApplication(config = {}) {
 
 /**
  * Create animation controller based on mesh capabilities
- * 
+ *
  * @param {THREE.Mesh} mesh - The 3D mesh
  * @param {Object} config - Configuration
  * @param {Object} speechData - Speech data for lip-sync
@@ -80,11 +80,11 @@ export function createAvatarApplication(config = {}) {
 export function createAnimationController(mesh, config, speechData, audioObject, meshManager) {
     // Try morph target animation first (better performance)
     const morphController = new MorphTargetAnimationController(mesh, config, speechData, audioObject, meshManager);
-    
+
     if (morphController.initialize()) {
         return morphController;
     }
-    
+
     // Fallback to vertex-based animation
     const vertexController = new AnimationController(mesh, config, speechData, audioObject, meshManager);
     vertexController.initialize();

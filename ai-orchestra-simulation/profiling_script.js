@@ -2,10 +2,10 @@
 
 /**
  * Automated Performance Profiling Script
- * 
+ *
  * Purpose: Measure exact performance bottlenecks in avatar rendering
  * Output: Detailed timing breakdown for optimization decisions
- * 
+ *
  * Usage: node profiling_script.js [--iterations=10] [--output=profile.json]
  */
 
@@ -59,17 +59,17 @@ const results = {
  */
 async function profileTTS(text) {
   const startTime = performance.now();
-  
+
   try {
     const response = await axios.post(`${VOICE_SERVICE_URL}/voice/tts`, {
       text,
       voice: 'en-US',
       extract_phonemes: true
     });
-    
+
     const duration = performance.now() - startTime;
     const data = response.data;
-    
+
     return {
       success: true,
       duration,
@@ -93,12 +93,12 @@ async function profileTTS(text) {
  */
 async function profileAvatarRender(ttsData, text) {
   const startTime = performance.now();
-  
+
   // Save audio to temp file
   const audioPath = `/tmp/profiling_audio_${Date.now()}.wav`;
   const audioBuffer = Buffer.from(ttsData.audio_data, 'base64');
   fs.writeFileSync(audioPath, audioBuffer);
-  
+
   try {
     const response = await axios.post(`${AVATAR_SERVICE_URL}/render/lipsync`, {
       phonemes: ttsData.phonemes || [],
@@ -109,12 +109,12 @@ async function profileAvatarRender(ttsData, text) {
       maxContentLength: 100 * 1024 * 1024, // 100MB
       timeout: 120000 // 2 minutes
     });
-    
+
     const duration = performance.now() - startTime;
-    
+
     // Clean up temp file
     try { fs.unlinkSync(audioPath); } catch(e) {}
-    
+
     return {
       success: true,
       duration,
@@ -125,7 +125,7 @@ async function profileAvatarRender(ttsData, text) {
   } catch (error) {
     // Clean up temp file
     try { fs.unlinkSync(audioPath); } catch(e) {}
-    
+
     return {
       success: false,
       duration: performance.now() - startTime,
@@ -142,41 +142,41 @@ async function profileEndToEnd(testCase) {
   console.log(`📊 Profiling: ${testCase.name}`);
   console.log(`📝 Text: "${testCase.text}"`);
   console.log(`${'='.repeat(60)}\n`);
-  
+
   const caseResults = {
     testCase: testCase.name,
     text: testCase.text,
     iterations: [],
     averages: {}
   };
-  
+
   for (let i = 1; i <= ITERATIONS; i++) {
     console.log(`\n🔄 Iteration ${i}/${ITERATIONS}`);
     console.log(`${'─'.repeat(40)}`);
-    
+
     const iterationStart = performance.now();
     const iteration = {
       number: i,
       stages: {}
     };
-    
+
     // Stage 1: TTS Generation
     console.log('⏱️  Stage 1: TTS Generation...');
     const ttsStart = performance.now();
     const ttsResult = await profileTTS(testCase.text);
     const ttsDuration = performance.now() - ttsStart;
-    
+
     iteration.stages.tts = {
       duration: ttsDuration,
       ...ttsResult
     };
-    
+
     console.log(`   ✅ TTS: ${ttsDuration.toFixed(2)}ms`);
     if (ttsResult.success) {
       console.log(`      Audio size: ${(ttsResult.audioSize / 1024).toFixed(2)} KB`);
       console.log(`      Phonemes: ${ttsResult.phonemeCount}`);
       console.log(`      Duration: ${ttsResult.audioDuration.toFixed(2)}s`);
-      
+
       // Store TTS data for rendering
       iteration.ttsData = {
         audio_data: ttsResult.audioData,
@@ -187,7 +187,7 @@ async function profileEndToEnd(testCase) {
       console.log(`      ❌ Error: ${ttsResult.error}`);
       continue;
     }
-    
+
     // Stage 2: Avatar Rendering
     console.log('⏱️  Stage 2: Avatar Rendering...');
     const renderStart = performance.now();
@@ -196,12 +196,12 @@ async function profileEndToEnd(testCase) {
       testCase.text
     );
     const renderDuration = performance.now() - renderStart;
-    
+
     iteration.stages.rendering = {
       duration: renderDuration,
       ...renderResult
     };
-    
+
     console.log(`   ✅ Rendering: ${(renderDuration / 1000).toFixed(2)}s`);
     if (renderResult.success) {
       console.log(`      Video size: ${(renderResult.videoSize / 1024).toFixed(2)} KB`);
@@ -211,7 +211,7 @@ async function profileEndToEnd(testCase) {
       console.log(`      ❌ Error: ${renderResult.error}`);
       continue;
     }
-    
+
     // Total
     const totalDuration = performance.now() - iterationStart;
     iteration.total = {
@@ -219,23 +219,23 @@ async function profileEndToEnd(testCase) {
       ttsPercentage: (ttsDuration / totalDuration * 100).toFixed(1),
       renderPercentage: (renderDuration / totalDuration * 100).toFixed(1)
     };
-    
+
     console.log(`\n📊 Iteration ${i} Summary:`);
     console.log(`   Total: ${(totalDuration / 1000).toFixed(2)}s`);
     console.log(`   TTS: ${ttsDuration.toFixed(2)}ms (${iteration.total.ttsPercentage}%)`);
     console.log(`   Rendering: ${(renderDuration / 1000).toFixed(2)}s (${iteration.total.renderPercentage}%)`);
-    
+
     caseResults.iterations.push(iteration);
-    
+
     // Brief pause between iterations
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
-  
+
   // Calculate averages
-  const successfulIterations = caseResults.iterations.filter(iter => 
+  const successfulIterations = caseResults.iterations.filter(iter =>
     iter.stages.tts?.success && iter.stages.rendering?.success
   );
-  
+
   if (successfulIterations.length > 0) {
     caseResults.averages = {
       tts: {
@@ -255,7 +255,7 @@ async function profileEndToEnd(testCase) {
       }
     };
   }
-  
+
   return caseResults;
 }
 
@@ -273,11 +273,11 @@ function printSummary(results) {
   console.log(`\n\n${'='.repeat(80)}`);
   console.log('📋 PROFILING SUMMARY');
   console.log(`${'='.repeat(80)}\n`);
-  
+
   console.log(`🖥️  System: ${results.system.platform} ${results.system.arch}`);
   console.log(`⚙️  CPUs: ${results.system.cpus}`);
   console.log(`💾 Memory: ${results.system.freeMemory} / ${results.system.totalMemory} free\n`);
-  
+
   results.testCases.forEach(tc => {
     if (tc.averages.total) {
       console.log(`\n📊 ${tc.testCase}`);
@@ -290,24 +290,24 @@ function printSummary(results) {
       console.log(`   Video Size:          ${(tc.averages.rendering.videoSize / 1024).toFixed(2)} KB`);
     }
   });
-  
+
   console.log(`\n\n🎯 KEY FINDINGS:`);
   console.log(`${'─'.repeat(60)}`);
-  
+
   const avgRenderPercentage = average(results.testCases
     .filter(tc => tc.averages.total)
     .map(tc => tc.averages.total.renderPercentage)
   );
-  
+
   const avgRealtimeMultiplier = average(results.testCases
     .filter(tc => tc.averages.rendering)
     .map(tc => tc.averages.rendering.realtimeMultiplier)
   );
-  
+
   console.log(`\n🔴 BOTTLENECK: Avatar Rendering (${avgRenderPercentage.toFixed(1)}% of total time)`);
   console.log(`📈 Current Performance: ${avgRealtimeMultiplier.toFixed(2)}x realtime`);
   console.log(`🎯 Target Performance: 0.5x - 2.0x realtime`);
-  
+
   if (avgRealtimeMultiplier < 0.5) {
     console.log(`\n❌ STATUS: CRITICAL - ${(0.5 / avgRealtimeMultiplier).toFixed(1)}x speedup needed`);
     console.log(`\n💡 RECOMMENDATIONS:`);
@@ -328,7 +328,7 @@ function printSummary(results) {
     console.log(`   2. Add comprehensive test suite`);
     console.log(`   3. Monitor performance in production`);
   }
-  
+
   console.log(`\n\n📄 Full results saved to: ${OUTPUT_FILE}`);
   console.log(`${'='.repeat(80)}\n`);
 }
@@ -341,7 +341,7 @@ async function main() {
   console.log(`📊 Iterations per test case: ${ITERATIONS}`);
   console.log(`🎯 Test cases: ${TEST_CASES.length}`);
   console.log(`📁 Output file: ${OUTPUT_FILE}\n`);
-  
+
   // Check service health
   console.log('🔍 Checking service health...');
   try {
@@ -351,7 +351,7 @@ async function main() {
     console.error(`   ❌ Avatar service unavailable: ${AVATAR_SERVICE_URL}`);
     process.exit(1);
   }
-  
+
   try {
     await axios.get(`${VOICE_SERVICE_URL}/health`);
     console.log(`   ✅ Voice service: ${VOICE_SERVICE_URL}`);
@@ -359,19 +359,19 @@ async function main() {
     console.error(`   ❌ Voice service unavailable: ${VOICE_SERVICE_URL}`);
     process.exit(1);
   }
-  
+
   // Run profiling for each test case
   for (const testCase of TEST_CASES) {
     const caseResults = await profileEndToEnd(testCase);
     results.testCases.push(caseResults);
   }
-  
+
   // Print summary
   printSummary(results);
-  
+
   // Save to file
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(results, null, 2));
-  
+
   console.log('✅ Profiling complete!\n');
 }
 

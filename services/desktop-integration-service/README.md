@@ -1,8 +1,8 @@
 # Desktop Integration Service
 
-**Service Name:** desktop-integration-service  
-**Port:** 8009  
-**Version:** 1.0.0  
+**Service Name:** desktop-integration-service
+**Port:** 8009
+**Version:** 1.0.0
 **Purpose:** Unified API gateway for OpenTalent Desktop App integration
 
 ## Overview
@@ -29,35 +29,41 @@ Service      Service    Service
 ## Key Features
 
 ### 1. API Gateway & Routing
+
 - Single entry point for desktop app
 - Intelligent request routing to appropriate microservices
 - Service discovery and health monitoring
 - Load balancing across service instances
 
 ### 2. Data Aggregation
+
 - Combines data from multiple services into unified responses
 - Reduces desktop app API calls (1 request vs. 5+ requests)
 - Optimized payload structures for desktop use cases
 
 ### 3. Desktop-Specific Optimizations
+
 - Lightweight responses for bandwidth efficiency
 - Caching layer for frequently accessed data
 - Offline data synchronization support
 - Desktop-friendly error messages
 
 ### 4. Security & Rate Limiting
+
 - API key management for desktop clients
 - Request rate limiting per client
 - Input validation and sanitization
 - CORS configuration for Electron apps
 
 ### 5. Model Management
+
 - Unified model configuration across services
 - Model availability checking
 - Hardware requirement validation
 - Automatic model selection based on system specs
 
 ### 6. Interview Orchestration
+
 - End-to-end interview flow management
 - Question generation with context
 - Response analysis and scoring
@@ -68,6 +74,7 @@ Service      Service    Service
 ### Health & Status
 
 #### `GET /health`
+
 ```json
 {
   "status": "healthy",
@@ -82,6 +89,7 @@ Service      Service    Service
 ```
 
 #### `GET /api/v1/system/status`
+
 ```json
 {
   "desktop_integration_service": "1.0.0",
@@ -94,6 +102,7 @@ Service      Service    Service
 ### Model Management
 
 #### `GET /api/v1/models`
+
 List all available models across all services.
 
 ```json
@@ -124,6 +133,7 @@ List all available models across all services.
 ```
 
 #### `POST /api/v1/models/select`
+
 Automatically select best model based on system specs.
 
 ```json
@@ -148,6 +158,7 @@ Response:
 ### Interview Management
 
 #### `POST /api/v1/interviews/start`
+
 Start a new interview session.
 
 ```json
@@ -181,6 +192,7 @@ Response:
 ```
 
 #### `POST /api/v1/interviews/{session_id}/respond`
+
 Submit candidate response and get next question.
 
 ```json
@@ -209,6 +221,7 @@ Response:
 ```
 
 #### `GET /api/v1/interviews/{session_id}/summary`
+
 Get interview summary and assessment.
 
 ```json
@@ -250,6 +263,7 @@ Get interview summary and assessment.
 ### Aggregate Endpoints
 
 #### `GET /api/v1/dashboard`
+
 Get complete dashboard data in one request.
 
 ```json
@@ -279,11 +293,13 @@ Get complete dashboard data in one request.
 ## Service Dependencies
 
 **Required Services:**
+
 - `granite-interview-service` (port 8005) - Custom Granite models for interview intelligence
 - `conversation-service` (port 8003) - Conversation orchestration
 - `ollama` (port 11434) - Model serving infrastructure
 
 **Optional Services:**
+
 - `voice-service` (port 8002) - TTS/STT capabilities
 - `avatar-service` (port 8001) - 3D avatar rendering
 - `analytics-service` (port 8007) - Usage analytics
@@ -539,12 +555,14 @@ desktop_integration_model_inference_total
 ## Roadmap
 
 ### Phase 1 (Current)
+
 - ✅ Basic API gateway functionality
 - ✅ Model management endpoints
 - ✅ Interview orchestration
 - ✅ Service health monitoring
 
 ### Phase 2 (Future)
+
 - [ ] Advanced caching with Redis
 - [ ] WebSocket support for real-time updates
 - [ ] Batch operations for multiple interviews
@@ -552,6 +570,7 @@ desktop_integration_model_inference_total
 - [ ] Advanced analytics aggregation
 
 ### Phase 3 (Future)
+
 - [ ] Multi-tenant support
 - [ ] Interview recording storage
 - [ ] Advanced rate limiting (per feature)
@@ -560,15 +579,15 @@ desktop_integration_model_inference_total
 
 ## Support
 
-**Documentation:** This README  
-**API Docs:** http://localhost:8009/docs  
-**Issues:** GitHub Issues  
-**Contact:** dev@opentalent.ai
+**Documentation:** This README
+**API Docs:** <http://localhost:8009/docs>
+**Issues:** GitHub Issues
+**Contact:** <dev@opentalent.ai>
 
 ---
 
-**Last Updated:** December 13, 2025  
-**Maintainer:** OpenTalent Core Team  
+**Last Updated:** December 13, 2025
+**Maintainer:** OpenTalent Core Team
 **License:** MIT
 
 ---
@@ -576,28 +595,29 @@ desktop_integration_model_inference_total
 ## Phase 0A Implementation Status: ✅ COMPLETE
 
 **Completed Deliverables:**
+
 - ✅ Settings module (`app/config/settings.py`) - 60 lines
   - Environment configuration with pydantic BaseSettings
   - 7 service URLs configurable
   - Service timeouts, cache TTLs, feature flags
-  
+
 - ✅ Service Discovery (`app/core/service_discovery.py`) - 160 lines
   - ServiceDiscovery class for health monitoring
   - ServiceHealthCache for 5-second caching
   - Parallel health checks on 7 microservices
   - Status aggregation: online/degraded/offline
-  
+
 - ✅ Pydantic Models (`app/models/schemas.py`) - 120 lines
   - 10 validation models (Message, InterviewSession, ModelInfo, etc.)
   - Desktop app contract matching (InterviewSession)
   - Type safety and auto-documentation
-  
+
 - ✅ FastAPI Application (`app/main.py`) - 600 lines
   - 6 endpoint groups: health, models, interviews, dashboard
   - CORS middleware configured
   - Async HTTP client pooling
   - Fallback templates for offline operation
-  
+
 - ✅ Test Suite (`tests/test_phase_0a.py`) - 300+ lines
   - Settings validation tests
   - Pydantic model contract tests
@@ -605,6 +625,7 @@ desktop_integration_model_inference_total
   - Integration tests with TestClient
 
 **Architecture:**
+
 ```
 OpenTalent Desktop App (Electron)
          ↓ HTTP
@@ -618,14 +639,16 @@ Conversation Service (8003) & Ollama (11434)
 ```
 
 **Testing Phase 0A:**
+
 ```bash
 cd microservices/desktop-integration-service
 python tests/test_phase_0a.py
 ```
 
 **Roadmap:**
+
 - Phase 0B: Health & Models Endpoints Testing (1.5 hrs)
-- Phase 0C: Interview Orchestration Testing (3 hrs)  
+- Phase 0C: Interview Orchestration Testing (3 hrs)
 - Phase 0D: Docker Integration & E2E Testing (2 hrs)
 
 **Status Updated:** December 13, 2025

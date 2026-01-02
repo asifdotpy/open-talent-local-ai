@@ -10,21 +10,19 @@ Fixtures:
 - candidate_claims: Candidate JWT claims
 """
 
-import pytest
 import asyncio
-from typing import AsyncGenerator, Generator
-from sqlalchemy import create_engine, text
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from httpx import AsyncClient
-from fastapi.testclient import TestClient
-import jwt
+from collections.abc import AsyncGenerator
 from datetime import datetime, timedelta
 
-from app.main import app
-from app.database import get_session, Base
+import jwt
+import pytest
 from app.config import settings
+from app.database import Base, get_session
+from app.main import app
 from app.utils import JWTClaims
-
+from httpx import AsyncClient
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 # Test database URL (use same compose DB or separate test DB)
 TEST_DATABASE_URL = settings.database_url.replace("/user_service", "/user_service_test")
@@ -42,35 +40,33 @@ def event_loop():
 async def test_engine():
     """Create test database engine."""
     engine = create_async_engine(TEST_DATABASE_URL, echo=False)
-    
+
     # Create test database if not exists
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    
+
     yield engine
-    
+
     # Cleanup
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
-    
+
     await engine.dispose()
 
 
 @pytest.fixture(scope="function")
 async def test_db(test_engine) -> AsyncGenerator[AsyncSession, None]:
     """Create test database session with RLS context."""
-    async_session = async_sessionmaker(
-        test_engine, class_=AsyncSession, expire_on_commit=False
-    )
-    
+    async_session = async_sessionmaker(test_engine, class_=AsyncSession, expire_on_commit=False)
+
     async with async_session() as session:
         # Set default RLS context for tests
         await session.execute(text("SET app.user_email = 'test@example.com'"))
         await session.execute(text("SET app.user_role = 'admin'"))
         await session.execute(text("SET app.tenant_id = 'test-tenant'"))
-        
+
         yield session
-        
+
         # Rollback after each test
         await session.rollback()
 
@@ -78,15 +74,15 @@ async def test_db(test_engine) -> AsyncGenerator[AsyncSession, None]:
 @pytest.fixture(scope="function")
 async def test_client(test_db) -> AsyncGenerator[AsyncClient, None]:
     """Create FastAPI test client with database override."""
-    
+
     async def override_get_session():
         yield test_db
-    
+
     app.dependency_overrides[get_session] = override_get_session
-    
+
     async with AsyncClient(app=app, base_url="http://test") as client:
         yield client
-    
+
     app.dependency_overrides.clear()
 
 

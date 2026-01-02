@@ -1,6 +1,6 @@
 /**
  * Production Configuration
- * 
+ *
  * Production-specific configuration overrides
  */
 

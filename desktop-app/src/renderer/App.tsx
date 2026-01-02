@@ -110,7 +110,7 @@ function App({ onComplete }: AppProps) {
   return (
     <div className="container">
       {renderProgressBar()}
-      
+
       <h1>OpenTalent Setup</h1>
 
       {step === 1 && (

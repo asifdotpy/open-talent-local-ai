@@ -13,7 +13,7 @@ const Navbar = () => {
                         <Icons.Logo className="w-8 h-8" />
                         <span className="text-xl font-bold">{CONFIG.project.name}</span>
                     </div>
-                    
+
                     {/* Desktop Menu */}
                     <div className="hidden md:flex items-center space-x-8">
                         {CONFIG.navigation.map((link) => (
@@ -31,7 +31,7 @@ const Navbar = () => {
 
                     {/* Mobile Menu Button */}
                     <div className="md:hidden flex items-center">
-                        <button 
+                        <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             className="text-slate-300 hover:text-white p-2"
                         >
@@ -45,19 +45,19 @@ const Navbar = () => {
             {isMenuOpen && (
                 <div className="md:hidden bg-slate-900 border-b border-slate-800 py-4 px-4 space-y-4">
                     {CONFIG.navigation.map((link) => (
-                        <a 
-                            key={link.name} 
-                            href={link.href} 
+                        <a
+                            key={link.name}
+                            href={link.href}
                             onClick={() => setIsMenuOpen(false)}
                             className="block text-slate-300 hover:text-white transition text-lg"
                         >
                             {link.name}
                         </a>
                     ))}
-                    <a 
-                        href={CONFIG.project.githubUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
+                    <a
+                        href={CONFIG.project.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="flex items-center gap-2 text-slate-300 hover:text-white transition text-lg"
                     >
                         <Icons.GitHub /> GitHub

@@ -130,7 +130,7 @@ export class PlatformRegistry {
    */
   public async scan(platformName: string, request: any): Promise<any> {
     const scanner = this.get(platformName);
-    
+
     if (!scanner) {
       throw new Error(`Platform '${platformName}' is not registered. Available platforms: ${this.listPlatforms().join(', ')}`);
     }
@@ -182,7 +182,7 @@ export class PlatformRegistry {
    */
   public getPlatformsByCapability(capability: string): string[] {
     const platforms: string[] = [];
-    
+
     this.platforms.forEach((scanner, name) => {
       if (scanner.metadata.capabilities.includes(capability)) {
         platforms.push(name);

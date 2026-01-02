@@ -13,7 +13,7 @@ cat << 'EOF'
     console.log('[CHECKPOINT 2] Animation start() called');
     console.log('[CHECKPOINT 2] Audio object:', this.audio);
     console.log('[CHECKPOINT 2] Audio isPlaying:', this.audio?.isPlaying);
-    
+
     if (this.audio) {
       if (!this.audio.isPlaying) {
         this.audio.play();
@@ -29,10 +29,10 @@ cat << 'EOF'
     this.clock.start();
     this.animationState.isPlaying = true;
     this.lastLoggedTime = 0;
-    
+
     console.log('[CHECKPOINT 2] Animation state:', this.animationState);
     console.log('[CHECKPOINT 2] Clock started:', this.clock.running);
-    
+
     this.logger.log('SUCCESS', 'Morph target animation started');
     return true;
   }
@@ -44,7 +44,7 @@ cat << 'EOF'
     console.log('[CHECKPOINT 2] Animation start() called');
     console.log('[CHECKPOINT 2] HTML Audio element:', this.htmlAudioElement);
     console.log('[CHECKPOINT 2] THREE.Audio object:', this.audio);
-    
+
     // Prefer HTML audio element for reliable playback and synchronization
     if (this.htmlAudioElement) {
       if (this.htmlAudioElement.paused) {
@@ -72,10 +72,10 @@ cat << 'EOF'
     this.clock.start();
     this.animationState.isPlaying = true;
     this.lastLoggedTime = 0;
-    
+
     console.log('[CHECKPOINT 2] Animation state:', this.animationState);
     console.log('[CHECKPOINT 2] Clock started:', this.clock.running);
-    
+
     this.logger.log('SUCCESS', 'Morph target animation started');
     return true;
   }
@@ -83,18 +83,18 @@ EOF
 
 # =============================================================================
 # PATCH 2: Update updateMouthAnimation() method to use HTML audio currentTime
-# Location: Lines 169-195 (approximately) 
+# Location: Lines 169-195 (approximately)
 # =============================================================================
 
 # FIND THIS (first 15 lines of updateMouthAnimation):
 cat << 'EOF'
   updateMouthAnimation(elapsedTime) {
     if (!this.speechData || Object.keys(this.mouthMorphTargets).length === 0) return;
-    
+
     // CHECKPOINT 4: Audio-Animation Sync
     const audioTime = this.audio?.context?.currentTime || 0;
     if (!this._lastSyncLog || Date.now() - this._lastSyncLog > 1000) {
-      console.log('[CHECKPOINT 4] Time sync - Clock:', elapsedTime.toFixed(2), 
+      console.log('[CHECKPOINT 4] Time sync - Clock:', elapsedTime.toFixed(2),
                   'Audio context time:', audioTime.toFixed(2));
       this._lastSyncLog = Date.now();
     }
@@ -109,16 +109,16 @@ EOF
 cat << 'EOF'
   updateMouthAnimation(elapsedTime) {
     if (!this.speechData || Object.keys(this.mouthMorphTargets).length === 0) return;
-    
+
     // Use HTML audio element's currentTime for accurate synchronization
     if (this.htmlAudioElement && !this.htmlAudioElement.paused) {
       elapsedTime = this.htmlAudioElement.currentTime;
     }
-    
+
     // CHECKPOINT 4: Audio-Animation Sync
     const audioTime = this.htmlAudioElement?.currentTime || this.audio?.context?.currentTime || 0;
     if (!this._lastSyncLog || Date.now() - this._lastSyncLog > 1000) {
-      console.log('[CHECKPOINT 4] Time sync - Elapsed:', elapsedTime.toFixed(2), 
+      console.log('[CHECKPOINT 4] Time sync - Elapsed:', elapsedTime.toFixed(2),
                   'Audio time:', audioTime.toFixed(2));
       this._lastSyncLog = Date.now();
     }

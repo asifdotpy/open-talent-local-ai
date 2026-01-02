@@ -1,6 +1,6 @@
 /**
  * SessionManager - WebSocket session lifecycle management
- * 
+ *
  * Handles WebSocket connections, session state, and resource management.
  * Features:
  * - Connection pooling with limits
@@ -85,7 +85,7 @@ export class SessionManager extends EventEmitter {
     };
 
     this.sessions.set(sessionId, session);
-    
+
     this.logger.log('Session created', {
       sessionId,
       totalSessions: this.sessions.size,
@@ -175,9 +175,9 @@ export class SessionManager extends EventEmitter {
     if (session) {
       session.isActive = false;
       session.isPaused = false;
-      
+
       const duration = session.startTime ? (Date.now() - session.startTime) / 1000 : 0;
-      
+
       this.logger.log('Streaming stopped', {
         sessionId,
         duration: `${duration.toFixed(2)}s`,
@@ -254,7 +254,7 @@ export class SessionManager extends EventEmitter {
     this.sessions.delete(sessionId);
 
     const lifespan = (Date.now() - session.createdAt) / 1000;
-    
+
     this.logger.log('Session closed', {
       sessionId,
       reason,
@@ -284,7 +284,7 @@ export class SessionManager extends EventEmitter {
 
     for (const [sessionId, session] of this.sessions.entries()) {
       const idleTime = now - session.lastActivity;
-      
+
       if (idleTime > this.config.sessionTimeout) {
         staleSessionIds.push(sessionId);
       }
@@ -325,7 +325,7 @@ export class SessionManager extends EventEmitter {
    */
   async shutdown() {
     this.isShuttingDown = true;
-    
+
     this.logger.log('SessionManager shutting down', {
       activeSessions: this.sessions.size
     });

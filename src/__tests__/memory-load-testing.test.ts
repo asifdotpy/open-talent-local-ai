@@ -97,7 +97,7 @@ describe('Memory & Load Testing', () => {
         context: 'x'.repeat(100000),
         incidentType: 'discrimination',
       };
-      
+
       while (quotaMonitor.getRemainingBytes() > 100000) {
         try {
           await database.save(largeTestimony);
@@ -108,7 +108,7 @@ describe('Memory & Load Testing', () => {
           }
         }
       }
-      
+
       expect(count).toBeGreaterThan(100);
       expect(quotaMonitor.getUsagePercent()).toBeGreaterThan(90);
     });
@@ -116,23 +116,23 @@ describe('Memory & Load Testing', () => {
     it('should warn when approaching quota limit', () => {
       quotaMonitor.addData(42.5 * 1024 * 1024);
       expect(quotaMonitor.isNearQuota()).toBe(false);
-      
+
       quotaMonitor.addData(3.5 * 1024 * 1024);
       expect(quotaMonitor.isNearQuota()).toBe(true);
     });
 
     it('should handle quota exceeded error gracefully', async () => {
       quotaMonitor.addData(49 * 1024 * 1024);
-      
+
       const largeData = { context: 'x'.repeat(2000000) };
-      
+
       await expect(database.save(largeData)).rejects.toThrow('quota exceeded');
     });
 
     it('should allow cleanup when quota is exceeded', async () => {
       quotaMonitor.addData(50 * 1024 * 1024);
       expect(quotaMonitor.getRemainingBytes()).toBe(0);
-      
+
       await database.clear();
       expect(quotaMonitor.getUsagePercent()).toBe(0);
     });
@@ -140,13 +140,13 @@ describe('Memory & Load Testing', () => {
 
   describe('Concurrent Operations', () => {
     it('should handle 10 concurrent save operations', async () => {
-      const saves = Array.from({ length: 10 }, (_, i) => 
+      const saves = Array.from({ length: 10 }, (_, i) =>
         database.save({
           context: `Testimony ${i}`,
           incidentType: 'discrimination',
         })
       );
-      
+
       const results = await Promise.all(saves);
       expect(results.length).toBe(10);
     });
@@ -156,7 +156,7 @@ describe('Memory & Load Testing', () => {
         voiceService.startRecording(),
         transcriptionService.transcribe('/audio/test.wav'),
       ]);
-      
+
       expect(operations.length).toBe(2);
     });
 
@@ -164,23 +164,23 @@ describe('Memory & Load Testing', () => {
       for (let i = 0; i < 10; i++) {
         const session = await voiceService.startRecording();
         expect(session.sessionId).toBeDefined();
-        
+
         await voiceService.stopRecording();
         voiceService.dispose();
       }
-      
+
       expect(voiceService.startRecording).toHaveBeenCalledTimes(10);
     });
 
     it('should maintain stability under load', async () => {
       const operations = [];
-      
+
       for (let i = 0; i < 50; i++) {
         operations.push(
           database.save({ context: `Testimony ${i}` })
         );
       }
-      
+
       const results = await Promise.all(operations);
       expect(results.length).toBe(50);
     });
@@ -191,7 +191,7 @@ describe('Memory & Load Testing', () => {
       for (let i = 0; i < 50; i++) {
         await database.save({ context: `Testimony ${i}` });
       }
-      
+
       await database.clear();
       const remaining = await database.getAll();
       expect(remaining.length).toBe(0);
@@ -201,23 +201,23 @@ describe('Memory & Load Testing', () => {
       for (let i = 0; i < 10; i++) {
         await database.save({ context: `Testimony ${i}` });
       }
-      
+
       database.save.mockRejectedValueOnce(new Error('Service error'));
-      
+
       try {
         await database.save({ context: 'Error test' });
       } catch (error) {
         // Expected
       }
-      
-      database.save.mockImplementation(() => 
+
+      database.save.mockImplementation(() =>
         Promise.resolve('testimonial-' + Date.now())
       );
-      
+
       for (let i = 0; i < 10; i++) {
         await database.save({ context: `Testimony after error ${i}` });
       }
-      
+
       expect(database.save).toHaveBeenCalled();
     });
   });
@@ -231,9 +231,9 @@ describe('Memory & Load Testing', () => {
         });
         ids.push(id);
       }
-      
+
       expect(ids.length).toBe(20);
-      
+
       await database.clear();
       const remaining = await database.getAll();
       expect(remaining.length).toBe(0);
@@ -243,7 +243,7 @@ describe('Memory & Load Testing', () => {
       await voiceService.startRecording();
       await voiceService.stopRecording();
       voiceService.dispose();
-      
+
       expect(voiceService.dispose).toHaveBeenCalled();
     });
   });
@@ -255,7 +255,7 @@ describe('Memory & Load Testing', () => {
         { name: 'database-save', mem: 5 },
         { name: 'phoneme-extraction', mem: 25 },
       ];
-      
+
       const sorted = operations.sort((a, b) => b.mem - a.mem);
       expect(sorted[0].name).toBe('transcription');
     });
@@ -265,7 +265,7 @@ describe('Memory & Load Testing', () => {
         { name: 'transcription', cpu: 85 },
         { name: 'database-query', cpu: 15 },
       ];
-      
+
       const sorted = operations.sort((a, b) => b.cpu - a.cpu);
       expect(sorted[0].name).toBe('transcription');
     });

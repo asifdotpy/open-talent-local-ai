@@ -15,4 +15,3 @@ export type AnalyzeSentimentRequest = {
      */
     context?: (string | null);
 };
-

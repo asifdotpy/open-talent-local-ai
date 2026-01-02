@@ -19,4 +19,3 @@ export type InterviewConfig = {
      */
     totalQuestions?: number;
 };
-

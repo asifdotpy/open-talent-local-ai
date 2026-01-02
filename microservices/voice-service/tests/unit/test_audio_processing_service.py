@@ -1,7 +1,8 @@
-import pytest
+from unittest.mock import AsyncMock, Mock, patch
+
 import numpy as np
-from unittest.mock import Mock, patch, AsyncMock
-import asyncio
+import pytest
+
 from services.audio_processing_service import RNNoiseTrack
 
 
@@ -41,7 +42,7 @@ class TestRNNoiseTrack:
         rnnoise_track.track.recv.return_value = mock_frame
 
         # Mock RNNoise processing
-        with patch.object(rnnoise_track.rnnoise, 'denoise_frame') as mock_denoise:
+        with patch.object(rnnoise_track.rnnoise, "denoise_frame") as mock_denoise:
             mock_denoise.return_value = (np.array([0.8]), np.random.rand(1, 480).astype(np.int16))
 
             result_frame = await rnnoise_track.recv()
@@ -62,7 +63,7 @@ class TestRNNoiseTrack:
         mock_frame.time_base = "1/48000"
         rnnoise_track.track.recv.return_value = mock_frame
 
-        with patch.object(rnnoise_track.rnnoise, 'denoise_frame') as mock_denoise:
+        with patch.object(rnnoise_track.rnnoise, "denoise_frame") as mock_denoise:
             mock_denoise.return_value = (np.array([0.8]), np.random.rand(1, 480).astype(np.int16))
 
             result_frame = await rnnoise_track.recv()
@@ -80,7 +81,7 @@ class TestRNNoiseTrack:
         rnnoise_track.track.recv.return_value = mock_frame
 
         # Mock RNNoise to raise an exception
-        with patch.object(rnnoise_track.rnnoise, 'denoise_frame') as mock_denoise:
+        with patch.object(rnnoise_track.rnnoise, "denoise_frame") as mock_denoise:
             mock_denoise.side_effect = Exception("RNNoise error")
 
             result_frame = await rnnoise_track.recv()
@@ -121,7 +122,7 @@ class TestRNNoiseTrack:
 
         rnnoise_track.track.recv.side_effect = [mock_frame1, mock_frame2]
 
-        with patch.object(rnnoise_track.rnnoise, 'denoise_frame') as mock_denoise:
+        with patch.object(rnnoise_track.rnnoise, "denoise_frame") as mock_denoise:
             mock_denoise.return_value = (np.array([0.8]), np.random.rand(1, 480).astype(np.int16))
 
             # First call should return silence (insufficient data)
@@ -141,7 +142,7 @@ class TestRNNoiseTrack:
         mock_frame.time_base = "1/48000"
         rnnoise_track.track.recv.return_value = mock_frame
 
-        with patch.object(rnnoise_track.rnnoise, 'denoise_frame') as mock_denoise:
+        with patch.object(rnnoise_track.rnnoise, "denoise_frame") as mock_denoise:
             mock_denoise.return_value = (np.array([0.8]), np.random.rand(1, 480).astype(np.int16))
 
             # First frame

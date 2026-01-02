@@ -23,4 +23,3 @@ export type SynthesizeSpeechRequest = {
      */
     pitch?: number;
 };
-

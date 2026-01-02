@@ -3,7 +3,7 @@
 /**
  * Phase 1 Integration Test Runner
  * Tests complete WebGL avatar rendering with Voice Service integration
- * 
+ *
  * Usage: node run-phase1-test.js
  */
 
@@ -107,7 +107,7 @@ global.URL = {
 
 global.fetch = async (url, options) => {
   console.log(`📡 HTTP Request: ${options?.method || 'GET'} ${url}`);
-  
+
   if (url.includes('/api/synthesize')) {
     return {
       ok: true,
@@ -129,7 +129,7 @@ global.fetch = async (url, options) => {
       })
     };
   }
-  
+
   throw new Error(`Unmocked fetch: ${url}`);
 };
 
@@ -149,24 +149,24 @@ async function runTest() {
   try {
     console.log('\n✅ Environment: Node.js (Mock Browser)\n');
     console.log('📋 Test Phases:\n');
-    
+
     // Phase 1: Component Initialization
     console.log('1️⃣  INITIALIZATION');
     console.log('   Creating Phase1IntegrationTest instance...');
     const test = new Phase1IntegrationTest();
     console.log('   ✓ Test instance created\n');
-    
+
     // Phase 2: Voice Service Setup
     console.log('2️⃣  VOICE SERVICE SETUP');
     console.log('   Initializing VoiceServiceIntegration...');
-    
+
     let voiceReady = false;
     if (test.voiceService) {
       test.voiceService.setOnAudioReady?.(() => {
         console.log('   ✓ Audio ready from Voice Service');
         voiceReady = true;
       });
-      
+
       // Synthesize test speech
       try {
         await test.voiceService.synthesizeSpeech('Hello world!');
@@ -179,15 +179,15 @@ async function runTest() {
       console.log('   ⚠ VoiceService not initialized (mock mode)');
       voiceReady = true;
     }
-    
+
     console.log();
-    
+
     // Phase 3: Audio Processing
     console.log('3️⃣  AUDIO PROCESSING');
     console.log(`   Audio Duration: ${test.voiceService.getDuration().toFixed(2)}s`);
     console.log(`   Phonemes: ${test.voiceService.phonemeSequence.length}`);
     console.log('   ✓ Audio processed successfully\n');
-    
+
     // Phase 4: Animation Setup
     console.log('4️⃣  ANIMATION SETUP');
     if (test.animationController) {
@@ -198,7 +198,7 @@ async function runTest() {
       }
     }
     console.log();
-    
+
     // Phase 5: Video Recording Setup
     console.log('5️⃣  VIDEO RECORDING SETUP');
     if (test.videoRecorder) {
@@ -211,15 +211,15 @@ async function runTest() {
       }
     }
     console.log();
-    
+
     // Phase 6: Simulation Loop
     console.log('6️⃣  SIMULATION LOOP');
     console.log('   Simulating render loop (60fps target)...');
-    
+
     const simDuration = 100; // Simulate 100ms
     const frameTime = 1000 / 60; // 60fps = 16.67ms per frame
     const frameCount = Math.ceil(simDuration / frameTime);
-    
+
     for (let i = 0; i < frameCount; i++) {
       if (test.animationController) {
         test.animationController.update?.();
@@ -231,21 +231,21 @@ async function runTest() {
         test.voiceService.updatePhoneme?.();
       }
     }
-    
+
     console.log(`   ✓ Simulated ${frameCount} frames @ 60fps\n`);
-    
+
     // Phase 7: Synchronization Check
     console.log('7️⃣  SYNCHRONIZATION CHECK');
     const audioDuration = test.voiceService.getDuration() * 1000;
     console.log(`   Audio Duration: ${audioDuration.toFixed(0)}ms`);
     console.log(`   Target Sync Error: <50ms`);
     console.log('   ✓ Sync verification method available\n');
-    
+
     // Phase 8: Results
     console.log('8️⃣  TEST RESULTS\n');
     console.log('━'.repeat(70));
     console.log('✅ PHASE 1 INTEGRATION TEST: PASSED\n');
-    
+
     console.log('📊 Metrics:');
     console.log(`   • Audio Duration: ${audioDuration.toFixed(2)}ms`);
     console.log(`   • Phonemes Available: ${test.voiceService.phonemeSequence.length}`);
@@ -253,19 +253,19 @@ async function runTest() {
     console.log(`   • Video Recorder: Ready`);
     console.log(`   • Simulated Frames: ${frameCount}`);
     console.log();
-    
+
     console.log('🚀 Next Steps:');
     console.log('   1. Integration test passed ✓');
     console.log('   2. Run browser-based tests with real rendering');
     console.log('   3. Benchmark performance (60fps, <50ms sync)');
     console.log('   4. Cross-browser testing');
     console.log('   5. Prepare demo video\n');
-    
+
     console.log('━'.repeat(70));
     console.log('\n✨ Phase 1 Foundation Ready for Browser Integration\n');
-    
+
     return true;
-    
+
   } catch (error) {
     console.error('\n❌ TEST FAILED:', error.message);
     console.error(error.stack);

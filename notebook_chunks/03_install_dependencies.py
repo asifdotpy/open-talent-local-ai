@@ -8,7 +8,9 @@ print("🚀 Starting dependency installation...")
 # Conditional package installation - only install if not already correct
 import subprocess
 import sys
+
 from packaging import version
+
 
 def check_package_version(package, version_spec):
     """Check if installed package version satisfies the version spec."""

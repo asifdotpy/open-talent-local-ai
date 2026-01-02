@@ -286,7 +286,7 @@ export class ThreeJSRenderer {
     this._drawTextFast(pixels, width, height, `Phoneme: ${phoneme}`, 50, 50, 0xFFFFFFFF)
     this._drawTextFast(pixels, width, height, `Time: ${currentTime.toFixed(2)}s`, 50, 80, 0xFFFFFFFF)
     this._drawTextFast(pixels, width, height, `Jaw: ${(jawOpen * 100).toFixed(0)}%`, 50, 110, 0xFFFFFF00)
-    
+
     // Add emotion information if available
     if (emotionWeights) {
       this._drawTextFast(pixels, width, height, `Emotion: ${emotionWeights.length > 0 ? 'Active' : 'None'}`, 50, 140, 0xFF00FF00)

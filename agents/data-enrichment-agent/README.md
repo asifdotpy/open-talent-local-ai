@@ -1,12 +1,13 @@
 # Data Enrichment Agent
 
-**Port:** 8097  
-**Purpose:** Local-first profile enrichment (FREE tier primary, optional PAID vendor tier)  
+**Port:** 8097
+**Purpose:** Local-first profile enrichment (FREE tier primary, optional PAID vendor tier)
 **Status:** ✅ Phase 2 Complete - Stack Overflow & Google X-Ray Added
 
 ## Architecture: LOCAL-FIRST + Optional PAID Tier
 
 ### FREE Tier (Default - No API Keys Required)
+
 | Method | Cost | Quality | Coverage | Status | Speed |
 |--------|------|---------|----------|--------|-------|
 | **GitHub API** | $0.00 | ⭐⭐⭐⭐ | 500M+ devs | ✅ **Working** | 1-2 sec |
@@ -15,6 +16,7 @@
 | **LinkedIn Public** | $0.00 | ⭐⭐ | Search results | 🔄 **Fallback** | N/A |
 
 ### PAID Tier (Optional - Premium Quality)
+
 | Vendor | Cost/Profile | Quality | Coverage | Status |
 |--------|-------------|---------|----------|--------|
 | **Proxycurl** | $0.04 | ⭐⭐⭐⭐⭐ | 800M+ | 🔄 Coming soon |
@@ -23,6 +25,7 @@
 ## ✅ Phase 2 Implementation Status
 
 **Completed Features:**
+
 - ✅ GitHub API integration (60 req/hour, no auth)
 - ✅ Stack Overflow API integration (public API, no auth)
 - ✅ Google X-Ray browser automation (Playwright)
@@ -33,6 +36,7 @@
 - ✅ Health/Methods endpoints updated
 
 **Current Limitations:**
+
 - ⚠️ Google X-Ray: Blocked by Google anti-bot measures (falls back to minimal profile)
 - 🔄 PAID Tier: Framework ready, vendors not yet integrated
 
@@ -50,11 +54,13 @@
 ## API Endpoints
 
 ### Health Check
+
 ```bash
 GET http://localhost:8097/health
 ```
 
 **Response:**
+
 ```json
 {
   "status": "✅ healthy",
@@ -78,6 +84,7 @@ GET http://localhost:8097/health
 ```
 
 ### Enrich Profiles (FREE Tier)
+
 ```bash
 POST http://localhost:8097/enrich
 Content-Type: application/json
@@ -94,6 +101,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "request_id": "enrich_discovery_001_1733847600.0",
@@ -104,11 +112,13 @@ Content-Type: application/json
 ```
 
 ### List Available Methods
+
 ```bash
 GET http://localhost:8097/methods
 ```
 
 **Response:**
+
 ```json
 {
   "free_tier": [
@@ -159,6 +169,7 @@ python main.py
 ## Usage Examples
 
 ### Example 1: GitHub Profile Enrichment
+
 ```bash
 curl -X POST http://localhost:8097/enrich \
   -H "Content-Type: application/json" \
@@ -172,6 +183,7 @@ curl -X POST http://localhost:8097/enrich \
 **Result:** Linus Torvalds profile with bio, location, social links
 
 ### Example 2: Stack Overflow Profile Enrichment
+
 ```bash
 curl -X POST http://localhost:8097/enrich \
   -H "Content-Type: application/json" \
@@ -185,6 +197,7 @@ curl -X POST http://localhost:8097/enrich \
 **Result:** Jon Skeet profile with 1.5M+ reputation, badges, location
 
 ### Example 3: LinkedIn Profile Search (Limited)
+
 ```bash
 curl -X POST http://localhost:8097/enrich \
   -H "Content-Type: application/json" \
@@ -200,8 +213,9 @@ curl -X POST http://localhost:8097/enrich \
 ## Performance Results
 
 **Test Results (December 10, 2025):**
+
 - ✅ GitHub: 100% success rate, ~1.5 sec per profile
-- ✅ Stack Overflow: 100% success rate, ~2 sec per profile  
+- ✅ Stack Overflow: 100% success rate, ~2 sec per profile
 - ⚠️ Google X-Ray: Limited by anti-bot measures, ~15 sec timeout
 - ✅ Cache: Working, reduces duplicate requests
 - ✅ Audit Logging: GDPR compliant, all enrichments logged
@@ -209,13 +223,15 @@ curl -X POST http://localhost:8097/enrich \
 ## Roadmap
 
 **Phase 2 (Current):** ✅ **COMPLETED**
+
 - ✅ GitHub API integration
-- ✅ Stack Overflow API integration  
+- ✅ Stack Overflow API integration
 - ✅ Google X-Ray browser automation
 - ✅ Smart routing logic
 - ✅ Testing and validation
 
 **Phase 3 (Next):** PAID Tier Integration
+
 - 🔄 Proxycurl API integration
 - 🔄 Nubela API integration
 - 🔄 Credit system implementation
@@ -229,6 +245,6 @@ curl -X POST http://localhost:8097/enrich \
 
 ---
 
-**Version:** 2.1 (Phase 2 Complete)  
-**Status:** ✅ Ready for Production (FREE Tier)  
+**Version:** 2.1 (Phase 2 Complete)
+**Status:** ✅ Ready for Production (FREE Tier)
 **Last Updated:** December 10, 2025

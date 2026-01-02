@@ -1,6 +1,6 @@
 /**
  * AvatarServer - Express + WebSocket server for avatar rendering
- * 
+ *
  * Provides HTTP API and WebSocket streaming for real-time avatar animation.
  * Modular architecture with pluggable renderers and session management.
  */
@@ -134,9 +134,9 @@ export class AvatarServer {
       const requestId = crypto.randomBytes(4).toString('hex');
       req.requestId = requestId;
       req.startTime = Date.now();
-      
+
       this.logger.log(`[${requestId}] ${req.method} ${req.url}`);
-      
+
       res.on('finish', () => {
         const duration = Date.now() - req.startTime;
         this.logger.log(`[${requestId}] ${res.statusCode} - ${duration}ms`);

@@ -1,23 +1,29 @@
 #!/usr/bin/env python3
-import os
 import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SERVICES_DIR = ROOT / "services"
 
-DECORATOR_RE = re.compile(r"@(?:(?:app|router)\.(get|post|put|delete|patch|options)|app\.websocket)")
-ROUTE_CALL_RE = re.compile(r"\b(?:app|router)\.(?:get|post|put|delete|patch|options|add_api_route)\(\s*['\"]/")
+DECORATOR_RE = re.compile(
+    r"@(?:(?:app|router)\.(get|post|put|delete|patch|options)|app\.websocket)"
+)
+ROUTE_CALL_RE = re.compile(
+    r"\b(?:app|router)\.(?:get|post|put|delete|patch|options|add_api_route)\(\s*['\"]/"
+)
 APP_INCLUDE_ROUTER_RE = re.compile(r"\bapp\.include_router\(\s*([a-zA-Z_][a-zA-Z0-9_\.]*)")
 PORT_RE = re.compile(r"uvicorn\.run\(app, host=.*port=([0-9]+)\)")
+
 
 def count_decorators(text: str) -> int:
     # Count direct decorators on app/router and websocket
     return len(DECORATOR_RE.findall(text))
 
+
 def count_route_calls(text: str) -> int:
     # Count explicit app/router get/post/... and add_api_route calls
     return len(ROUTE_CALL_RE.findall(text))
+
 
 def scan_service(service_path: Path):
     endpoint_count = 0
@@ -38,11 +44,11 @@ def scan_service(service_path: Path):
             # Attempt to resolve local router files heuristically
             # Common patterns: `router`, `routes`, `api`, `routers.something`
             candidates = []
-            parts = module_ref.split('.')
+            parts = module_ref.split(".")
             # Build relative paths under service_path for each part chain
             for i in range(len(parts)):
-                rel = parts[:i+1]
-                candidates.append(service_path / '/'.join(rel))
+                rel = parts[: i + 1]
+                candidates.append(service_path / "/".join(rel))
             # Also try common filenames
             candidates += [
                 service_path / "router.py",
@@ -79,9 +85,12 @@ def scan_service(service_path: Path):
 
     return endpoint_count, sorted(ports)
 
+
 def main():
     results = []
-    for service in sorted(d.name for d in SERVICES_DIR.iterdir() if d.is_dir() and d.name.endswith("-service")):
+    for service in sorted(
+        d.name for d in SERVICES_DIR.iterdir() if d.is_dir() and d.name.endswith("-service")
+    ):
         count, ports = scan_service(SERVICES_DIR / service)
         results.append((service, count, ",".join(ports) or ""))
     # Print markdown table
@@ -89,6 +98,7 @@ def main():
     print("|---------|-----------|-------|")
     for s, c, pt in results:
         print(f"| {s} | {c} | {pt} |")
+
 
 if __name__ == "__main__":
     main()

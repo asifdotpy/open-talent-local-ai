@@ -70,7 +70,7 @@ export class TranscriptionService {
 
     try {
       const modelId = this.getModelId();
-      
+
       console.log(`Loading ${modelId} model...`);
 
       // Load pipeline

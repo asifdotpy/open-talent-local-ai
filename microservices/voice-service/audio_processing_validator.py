@@ -1,25 +1,26 @@
 #!/usr/bin/env python3
-"""
-Audio Processing Validators for Voice Service
+"""Audio Processing Validators for Voice Service
 Comprehensive validation suite for audio quality, latency, and processing metrics
 """
 
 import asyncio
 import logging
+import os
+import tempfile
+from dataclasses import dataclass
+from typing import Optional
+
 import numpy as np
 import soundfile as sf
-import time
-from typing import Dict, List, Optional, Tuple, Any
-from dataclasses import dataclass
 from scipy import signal
-import tempfile
-import os
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class AudioMetrics:
     """Container for audio processing metrics"""
+
     snr_db: float
     thd_percent: float  # Total Harmonic Distortion
     latency_ms: float
@@ -30,18 +31,20 @@ class AudioMetrics:
     channels: int
     duration_seconds: float
 
+
 @dataclass
 class ValidationResult:
     """Result of audio processing validation"""
+
     passed: bool
     metrics: AudioMetrics
-    errors: List[str]
-    warnings: List[str]
-    recommendations: List[str]
+    errors: list[str]
+    warnings: list[str]
+    recommendations: list[str]
+
 
 class AudioProcessingValidator:
-    """
-    Comprehensive validator for audio processing pipeline
+    """Comprehensive validator for audio processing pipeline
     Tests SNR, latency, compression, and quality metrics
     """
 
@@ -65,10 +68,9 @@ class AudioProcessingValidator:
         processed_audio: np.ndarray,
         original_bitrate: Optional[int] = None,
         compressed_bitrate: Optional[int] = None,
-        processing_latency_ms: Optional[float] = None
+        processing_latency_ms: Optional[float] = None,
     ) -> ValidationResult:
-        """
-        Comprehensive validation of audio processing pipeline
+        """Comprehensive validation of audio processing pipeline
 
         Args:
             input_audio: Original audio samples
@@ -109,7 +111,7 @@ class AudioProcessingValidator:
                 opus_bitrate_kbps=compressed_bitrate or 0,
                 sample_rate=self.sample_rate,
                 channels=self.channels,
-                duration_seconds=len(processed_audio) / self.sample_rate
+                duration_seconds=len(processed_audio) / self.sample_rate,
             )
 
             # Validate against thresholds
@@ -120,7 +122,7 @@ class AudioProcessingValidator:
                 metrics=metrics,
                 errors=errors,
                 warnings=warnings,
-                recommendations=recommendations
+                recommendations=recommendations,
             )
 
         except Exception as e:
@@ -130,7 +132,7 @@ class AudioProcessingValidator:
                 metrics=AudioMetrics(0, 0, 0, 0, 0, 0, self.sample_rate, self.channels, 0),
                 errors=[f"Validation failed: {str(e)}"],
                 warnings=[],
-                recommendations=["Check audio processing pipeline for errors"]
+                recommendations=["Check audio processing pipeline for errors"],
             )
 
     def _calculate_snr(self, original: np.ndarray, processed: np.ndarray) -> float:
@@ -142,11 +144,11 @@ class AudioProcessingValidator:
             proc = processed[:min_len]
 
             # Calculate signal power (original audio)
-            signal_power = np.mean(orig ** 2)
+            signal_power = np.mean(orig**2)
 
             # Calculate noise power (difference between original and processed)
             noise = orig - proc
-            noise_power = np.mean(noise ** 2)
+            noise_power = np.mean(noise**2)
 
             if noise_power <= 0 or signal_power <= 0:
                 return 0.0
@@ -162,7 +164,7 @@ class AudioProcessingValidator:
         """Calculate Total Harmonic Distortion percentage"""
         try:
             # Find fundamental frequency bin
-            freqs = np.fft.fftfreq(len(audio), 1/self.sample_rate)
+            freqs = np.fft.fftfreq(len(audio), 1 / self.sample_rate)
             fundamental_idx = np.argmin(np.abs(freqs - fundamental_freq))
 
             # Get FFT
@@ -189,9 +191,7 @@ class AudioProcessingValidator:
             return 0.0
 
     def _calculate_compression_ratio(
-        self,
-        original_bitrate: Optional[int],
-        compressed_bitrate: Optional[int]
+        self, original_bitrate: Optional[int], compressed_bitrate: Optional[int]
     ) -> float:
         """Calculate compression ratio"""
         if original_bitrate and compressed_bitrate and compressed_bitrate > 0:
@@ -205,7 +205,7 @@ class AudioProcessingValidator:
             # Apply low-pass filter to focus on noise frequencies (< 300Hz)
             nyquist = self.sample_rate / 2
             cutoff = 300 / nyquist
-            b, a = signal.butter(4, cutoff, btype='low')
+            b, a = signal.butter(4, cutoff, btype="low")
 
             orig_filtered = signal.filtfilt(b, a, original)
             proc_filtered = signal.filtfilt(b, a, processed)
@@ -228,7 +228,7 @@ class AudioProcessingValidator:
         """Estimate processing latency in milliseconds"""
         try:
             # Cross-correlation to find delay
-            correlation = signal.correlate(processed, original, mode='full')
+            correlation = signal.correlate(processed, original, mode="full")
             delay_samples = np.argmax(correlation) - len(original) + 1
             delay_ms = (delay_samples / self.sample_rate) * 1000
             return max(0.0, delay_ms)
@@ -240,9 +240,9 @@ class AudioProcessingValidator:
     def _validate_metrics(
         self,
         metrics: AudioMetrics,
-        errors: List[str],
-        warnings: List[str],
-        recommendations: List[str]
+        errors: list[str],
+        warnings: list[str],
+        recommendations: list[str],
     ) -> bool:
         """Validate metrics against acceptable thresholds for voice processing"""
         passed = True
@@ -265,16 +265,22 @@ class AudioProcessingValidator:
             recommendations.append("Optimize audio processing pipeline for lower latency")
             passed = False
         elif metrics.latency_ms > 50:
-            warnings.append(f"Moderate latency: {metrics.latency_ms:.1f}ms (target <50ms for real-time)")
+            warnings.append(
+                f"Moderate latency: {metrics.latency_ms:.1f}ms (target <50ms for real-time)"
+            )
 
         # RNNoise effectiveness - important for voice quality
         if metrics.rnnoise_effectiveness < 0.2:  # More lenient threshold
-            warnings.append(f"Low RNNoise effectiveness: {metrics.rnnoise_effectiveness:.2f} (target >0.5)")
+            warnings.append(
+                f"Low RNNoise effectiveness: {metrics.rnnoise_effectiveness:.2f} (target >0.5)"
+            )
             recommendations.append("Tune RNNoise parameters or check audio input quality")
 
         # Duration validation
         if metrics.duration_seconds < 0.5:
-            warnings.append(f"Short audio duration: {metrics.duration_seconds:.1f}s (minimum 0.5s recommended)")
+            warnings.append(
+                f"Short audio duration: {metrics.duration_seconds:.1f}s (minimum 0.5s recommended)"
+            )
 
         return passed
 
@@ -284,7 +290,7 @@ class AudioProcessingValidator:
         processed_file: str,
         original_bitrate: Optional[int] = None,
         compressed_bitrate: Optional[int] = None,
-        processing_latency_ms: Optional[float] = None
+        processing_latency_ms: Optional[float] = None,
     ) -> ValidationResult:
         """Validate audio files directly"""
         try:
@@ -302,11 +308,16 @@ class AudioProcessingValidator:
             if input_sr != self.sample_rate:
                 input_audio = self._resample_audio(input_audio, input_sr, self.sample_rate)
             if processed_sr != self.sample_rate:
-                processed_audio = self._resample_audio(processed_audio, processed_sr, self.sample_rate)
+                processed_audio = self._resample_audio(
+                    processed_audio, processed_sr, self.sample_rate
+                )
 
             return await self.validate_audio_pipeline(
-                input_audio, processed_audio,
-                original_bitrate, compressed_bitrate, processing_latency_ms
+                input_audio,
+                processed_audio,
+                original_bitrate,
+                compressed_bitrate,
+                processing_latency_ms,
             )
 
         except Exception as e:
@@ -316,13 +327,14 @@ class AudioProcessingValidator:
                 metrics=AudioMetrics(0, 0, 0, 0, 0, 0, self.sample_rate, self.channels, 0),
                 errors=[f"File validation failed: {str(e)}"],
                 warnings=[],
-                recommendations=["Check audio file formats and paths"]
+                recommendations=["Check audio file formats and paths"],
             )
 
     def _resample_audio(self, audio: np.ndarray, from_sr: int, to_sr: int) -> np.ndarray:
         """Resample audio to target sample rate"""
         try:
             from scipy import signal
+
             resample_ratio = to_sr / from_sr
             resampled = signal.resample(audio, int(len(audio) * resample_ratio))
             return resampled
@@ -339,8 +351,8 @@ class AudioProcessingValidator:
         duration_seconds: float = 3.0,
         include_noise: bool = True,
         include_speech_like: bool = True,
-        frequency: int = 1000
-    ) -> Tuple[np.ndarray, str]:
+        frequency: int = 1000,
+    ) -> tuple[np.ndarray, str]:
         """Generate test audio for validation testing"""
         try:
             # Generate base sine wave
@@ -373,9 +385,9 @@ class AudioProcessingValidator:
 
     def print_validation_report(self, result: ValidationResult):
         """Print a formatted validation report"""
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("🎵 AUDIO PROCESSING VALIDATION REPORT")
-        print("="*60)
+        print("=" * 60)
 
         print("📊 METRICS:")
         print(".1f")
@@ -409,35 +421,34 @@ class AudioProcessingValidator:
             for rec in result.recommendations:
                 print(f"  • {rec}")
 
-        print("="*60)
+        print("=" * 60)
 
 
 # Convenience functions for common validation scenarios
 
+
 async def validate_rnnoise_processing(
-    input_audio: np.ndarray,
-    output_audio: np.ndarray,
-    latency_ms: Optional[float] = None
+    input_audio: np.ndarray, output_audio: np.ndarray, latency_ms: Optional[float] = None
 ) -> ValidationResult:
     """Validate RNNoise processing specifically"""
     validator = AudioProcessingValidator()
     return await validator.validate_audio_pipeline(
-        input_audio, output_audio,
-        processing_latency_ms=latency_ms
+        input_audio, output_audio, processing_latency_ms=latency_ms
     )
 
+
 async def validate_opus_compression(
-    original_file: str,
-    compressed_file: str,
-    target_bitrate_kbps: int = 64
+    original_file: str, compressed_file: str, target_bitrate_kbps: int = 64
 ) -> ValidationResult:
     """Validate Opus compression quality"""
     validator = AudioProcessingValidator()
     return await validator.validate_file(
-        original_file, compressed_file,
+        original_file,
+        compressed_file,
         original_bitrate=384,  # PCM 48kHz 16-bit mono
-        compressed_bitrate=target_bitrate_kbps
+        compressed_bitrate=target_bitrate_kbps,
     )
+
 
 async def quick_audio_check(audio_file: str) -> bool:
     """Quick validation check for basic audio file integrity"""
@@ -456,9 +467,7 @@ if __name__ == "__main__":
         # Generate test audio
         print("Generating test audio...")
         test_audio, test_file = await validator.generate_test_audio(
-            duration_seconds=2.0,
-            include_noise=True,
-            frequency=800
+            duration_seconds=2.0, include_noise=True, frequency=800
         )
 
         if len(test_audio) > 0:
@@ -469,8 +478,7 @@ if __name__ == "__main__":
 
             # Validate
             result = await validator.validate_audio_pipeline(
-                test_audio, processed_audio,
-                processing_latency_ms=25.0
+                test_audio, processed_audio, processing_latency_ms=25.0
             )
 
             validator.print_validation_report(result)

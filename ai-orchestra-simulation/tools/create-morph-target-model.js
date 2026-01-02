@@ -14,7 +14,7 @@ for (let i = 0; i < mouthOpenTarget.length; i += 3) {
   const x = mouthOpenTarget[i];
   const y = mouthOpenTarget[i + 1];
   const z = mouthOpenTarget[i + 2];
-  
+
   // Deform vertices in mouth area (lower y area)
   if (y < 0.3 && y > -0.5 && Math.abs(x) < 0.3) {
     mouthOpenTarget[i + 1] -= 0.3; // Push down for mouth opening
@@ -26,7 +26,7 @@ const mouthClosedTarget = new Float32Array(positions);
 for (let i = 0; i < mouthClosedTarget.length; i += 3) {
   const x = mouthClosedTarget[i];
   const y = mouthClosedTarget[i + 1];
-  
+
   if (y < 0.3 && y > -0.5 && Math.abs(x) < 0.3) {
     mouthClosedTarget[i + 1] += 0.15;
   }

@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
+
 from fastapi.testclient import TestClient
 
 from main import app
@@ -10,11 +11,7 @@ AUTH = {"Authorization": "Bearer test-token"}
 
 def test_interview_crud_happy_path():
     # Create candidate
-    cand = {
-        "email": "interview.user@example.com",
-        "first_name": "Interview",
-        "last_name": "User"
-    }
+    cand = {"email": "interview.user@example.com", "first_name": "Interview", "last_name": "User"}
     r = client.post("/api/v1/candidates", json=cand, headers=AUTH)
     assert r.status_code == 201
     candidate_id = r.json()["id"]
@@ -26,7 +23,7 @@ def test_interview_crud_happy_path():
         "interviewer": "Jane Recruiter",
         "location": "Zoom",
         "notes": "Focus on Python skills",
-        "status": "scheduled"
+        "status": "scheduled",
     }
     r2 = client.post(f"/api/v1/candidates/{candidate_id}/interviews", json=payload, headers=AUTH)
     assert r2.status_code == 201
@@ -47,7 +44,9 @@ def test_interview_crud_happy_path():
 
     # Update interview
     upd = {"status": "completed", "notes": "Strong performance"}
-    r5 = client.put(f"/api/v1/candidates/{candidate_id}/interviews/{interview_id}", json=upd, headers=AUTH)
+    r5 = client.put(
+        f"/api/v1/candidates/{candidate_id}/interviews/{interview_id}", json=upd, headers=AUTH
+    )
     assert r5.status_code == 200
     assert r5.json()["status"] == "completed"
 
@@ -58,11 +57,7 @@ def test_interview_crud_happy_path():
 
 def test_interview_unauthorized_and_not_found():
     # Create candidate
-    cand = {
-        "email": "interview.noauth@example.com",
-        "first_name": "No",
-        "last_name": "Auth"
-    }
+    cand = {"email": "interview.noauth@example.com", "first_name": "No", "last_name": "Auth"}
     r = client.post("/api/v1/candidates", json=cand, headers=AUTH)
     assert r.status_code == 201
     candidate_id = r.json()["id"]
@@ -71,14 +66,16 @@ def test_interview_unauthorized_and_not_found():
     payload = {
         "title": "Unauthorized Try",
         "scheduled_at": (datetime.utcnow() + timedelta(days=2)).isoformat(),
-        "status": "scheduled"
+        "status": "scheduled",
     }
     r2 = client.post(f"/api/v1/candidates/{candidate_id}/interviews", json=payload)
     assert r2.status_code == 401
 
     # Get interview with unknown ID
     unknown_interview = str(uuid.uuid4())
-    r3 = client.get(f"/api/v1/candidates/{candidate_id}/interviews/{unknown_interview}", headers=AUTH)
+    r3 = client.get(
+        f"/api/v1/candidates/{candidate_id}/interviews/{unknown_interview}", headers=AUTH
+    )
     assert r3.status_code == 404
 
     # List for unknown candidate

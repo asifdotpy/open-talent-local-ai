@@ -1,7 +1,7 @@
 /**
  * Quick validation script for metaHumanHead.glb
  * Run in Node.js environment (requires three.js in Node.js)
- * 
+ *
  * Note: This is a simplified check. For full validation, use test-metahuman-model.html in browser
  */
 
@@ -33,7 +33,7 @@ try {
 try {
     const buffer = readFileSync(MODEL_PATH);
     const magic = buffer.toString('ascii', 0, 4);
-    
+
     if (magic === 'glTF') {
         console.log('✅ Format: GLB (Binary GLTF)');
     } else {
@@ -47,4 +47,3 @@ console.log('\n━━━━━━━━━━━━━━━━━━━━━�
 console.log('📝 Note: Full validation requires browser environment');
 console.log('   Use: tests/test-metahuman-model.html\n');
 console.log('   Or: Open http://localhost:9000/tests/test-metahuman-model.html\n');
-

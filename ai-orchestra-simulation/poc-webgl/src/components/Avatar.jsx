@@ -211,13 +211,13 @@ export function RPMAvatar({ avatarUrl }) {
 
     // Create custom GLTFLoader with KTX2 texture support
     const loader = new GLTFLoader();
-    
+
     // Setup KTX2 loader for compressed textures
     const ktx2Loader = new KTX2Loader();
     ktx2Loader.setTranscoderPath('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/basis/');
     ktx2Loader.detectSupport(new THREE.WebGLRenderer());
     loader.setKTX2Loader(ktx2Loader);
-    
+
     // Setup Meshopt decoder for geometry compression
     loader.setMeshoptDecoder(MeshoptDecoder);
 
@@ -261,11 +261,11 @@ export function RPMAvatar({ avatarUrl }) {
 
       // Traverse to find face mesh with morph targets
       let foundValidFaceMesh = false;
-      
+
       clonedScene.traverse((node) => {
         // Skip if we already found a valid face mesh
         if (foundValidFaceMesh) return;
-        
+
         if (node.name === 'FallbackAvatar') {
           // This is our fallback avatar head with morph targets
           console.log('🎭 Found fallback avatar head with morph targets:', node.name);
@@ -277,10 +277,10 @@ export function RPMAvatar({ avatarUrl }) {
           // Check if this mesh has Oculus visemes OR ARKit blend shapes
           const oculusVisemes = ['viseme_sil', 'viseme_PP', 'viseme_FF', 'viseme_TH', 'viseme_DD', 'viseme_kk', 'viseme_CH', 'viseme_SS', 'viseme_nn', 'viseme_RR', 'viseme_aa', 'viseme_E', 'viseme_I', 'viseme_O', 'viseme_U'];
           const arkitMouthShapes = ['jawOpen', 'mouthFunnel', 'mouthPucker', 'mouthLeft', 'mouthRight', 'mouthSmile_L', 'mouthSmile_R', 'mouthFrown_L', 'mouthFrown_R', 'mouthClose'];
-          
+
           const availableOculus = oculusVisemes.filter(viseme => node.morphTargetDictionary[viseme] !== undefined);
           const availableARKit = arkitMouthShapes.filter(shape => node.morphTargetDictionary[shape] !== undefined);
-          
+
           // Use this mesh if it has either:
           // - At least 10 Oculus visemes (67% coverage) OR
           // - At least 6 ARKit mouth shapes (60% coverage)
@@ -304,7 +304,7 @@ export function RPMAvatar({ avatarUrl }) {
           }
         }
       });
-      
+
       // If no valid face mesh found, create fallback avatar
       if (!foundValidFaceMesh) {
         console.warn('❌ Avatar has insufficient morph targets! Creating enhanced fallback avatar...');

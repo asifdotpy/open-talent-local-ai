@@ -21,7 +21,7 @@ linux:
   target:
     - AppImage
   category: Development
-  
+
 mac:
   target:
     - dmg

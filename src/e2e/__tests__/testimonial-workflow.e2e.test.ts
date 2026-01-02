@@ -1,7 +1,7 @@
 /**
  * E2E Test Suite: Complete Testimonial Workflow
  * Tests full user journey: Record → Transcribe → Fill Form → Submit → Store
- * 
+ *
  * Coverage:
  * - 10+ test scenarios
  * - Cross-service integration (Voice → Transcription → Form → Database)
@@ -153,7 +153,7 @@ describe('E2E: Complete Testimonial Workflow', () => {
         confidence: 0.45, // Below 50% threshold
         language: 'en',
       };
-      
+
       // Should warn but allow save with flag
       expect(lowConfidenceTranscription.confidence).toBeLessThan(0.7);
       const testimonialData = {
@@ -167,11 +167,11 @@ describe('E2E: Complete Testimonial Workflow', () => {
     it('should preserve audio path through entire workflow', async () => {
       const audioPath = '/audio/test-123.wav';
       const recording = { audioPath, duration: 5000 };
-      
+
       // Transcribe uses same path
       await transcriptionService.transcribe(recording.audioPath);
       expect(transcriptionService.transcribe).toHaveBeenCalledWith(audioPath);
-      
+
       // Database stores same path
       const testimony = { audioPath, context: 'test' };
       await database.save(testimony);
@@ -187,12 +187,12 @@ describe('E2E: Complete Testimonial Workflow', () => {
         confidence: 0.92,
         language: 'en',
       };
-      
+
       const saved = await database.save({
         context: transcription.text,
         confidence: transcription.confidence,
       });
-      
+
       const retrieved = await database.getById(saved);
       expect(retrieved.context).toBe(originalContext);
     });
@@ -204,10 +204,10 @@ describe('E2E: Complete Testimonial Workflow', () => {
         confidence: 0.88,
         language: 'en',
       });
-      
+
       const transcription = await transcriptionService.transcribe('/audio/special.wav');
       const saved = await database.save({ context: transcription.text });
-      
+
       expect(database.save).toHaveBeenCalledWith(
         expect.objectContaining({ context: specialText })
       );
@@ -220,10 +220,10 @@ describe('E2E: Complete Testimonial Workflow', () => {
         incidentType: 'discrimination',
         anonymous: true,
       };
-      
+
       const saved = await database.save(metadata);
       const retrieved = await database.getById(saved);
-      
+
       expect(retrieved.recordedAt).toBe(metadata.recordedAt);
       expect(retrieved.location).toBe(metadata.location);
       expect(retrieved.incidentType).toBe(metadata.incidentType);
@@ -236,7 +236,7 @@ describe('E2E: Complete Testimonial Workflow', () => {
       transcriptionService.transcribe.mockRejectedValue(
         new Error('Transcription service unavailable')
       );
-      
+
       try {
         await transcriptionService.transcribe('/audio/test.wav');
       } catch (error: any) {
@@ -247,14 +247,14 @@ describe('E2E: Complete Testimonial Workflow', () => {
     it('should handle database save failure and retry', async () => {
       // First attempt fails
       database.save.mockRejectedValueOnce(new Error('Storage quota exceeded'));
-      
+
       // Verify error handling
       try {
         await database.save({ context: 'test' });
       } catch (error: any) {
         expect(error.message).toContain('quota');
       }
-      
+
       // Retry should work
       database.save.mockResolvedValueOnce('testimonial-456');
       const saved = await database.save({ context: 'test' });
@@ -266,7 +266,7 @@ describe('E2E: Complete Testimonial Workflow', () => {
         context: 'test',
         incidentType: 'invalid_type', // Not in enum
       };
-      
+
       // Should validate or throw
       expect(invalidData.incidentType).not.toMatch(/^(discrimination|harassment|wage|safety|other)$/);
     });
@@ -275,30 +275,30 @@ describe('E2E: Complete Testimonial Workflow', () => {
   describe('Performance Characteristics', () => {
     it('should complete full workflow within target time (< 15 seconds)', async () => {
       const startTime = Date.now();
-      
+
       await voiceService.checkMicrophoneAccess();
       const session = await voiceService.startRecording();
       await avatarService.playLipSyncAnimation();
       await voiceService.stopRecording();
       const transcription = await transcriptionService.transcribe('/audio/test.wav');
       await database.save({ context: transcription.text });
-      
+
       const duration = Date.now() - startTime;
       expect(duration).toBeLessThan(15000); // 15 seconds
     });
 
     it('should allow concurrent recording and transcription prep', async () => {
       const startTime = Date.now();
-      
+
       // Parallel operations
       const [microphone, transcriptionState] = await Promise.all([
         voiceService.checkMicrophoneAccess(),
         Promise.resolve(transcriptionService.getState()),
       ]);
-      
+
       expect(microphone).toBe(true);
       expect(transcriptionState.isReady).toBe(true);
-      
+
       const duration = Date.now() - startTime;
       expect(duration).toBeLessThan(1000); // Should be parallel
     });
@@ -312,13 +312,13 @@ describe('E2E: Complete Testimonial Workflow', () => {
           language: 'en',
         }), 500))
       );
-      
+
       const transcribePromise = transcriptionService.transcribe('/audio/test.wav');
-      
+
       // UI operations should not be blocked
       const avatarState = avatarService.getState();
       expect(avatarState.isInitialized).toBe(true);
-      
+
       const transcription = await transcribePromise;
       expect(transcription.text).toBe('test');
     });
@@ -327,7 +327,7 @@ describe('E2E: Complete Testimonial Workflow', () => {
   describe('Edge Cases & Boundary Conditions', () => {
     it('should handle very short audio recording (< 1 second)', async () => {
       const shortRecording = { audioPath: '/audio/short.wav', duration: 500 };
-      
+
       // Should still allow transcription
       await transcriptionService.transcribe(shortRecording.audioPath);
       expect(transcriptionService.transcribe).toHaveBeenCalled();
@@ -335,7 +335,7 @@ describe('E2E: Complete Testimonial Workflow', () => {
 
     it('should handle very long audio recording (> 10 minutes)', async () => {
       const longRecording = { audioPath: '/audio/long.wav', duration: 600000 };
-      
+
       // Should handle long audio
       await transcriptionService.transcribe(longRecording.audioPath);
       expect(transcriptionService.transcribe).toHaveBeenCalled();
@@ -347,10 +347,10 @@ describe('E2E: Complete Testimonial Workflow', () => {
         confidence: 0.0,
         language: 'en',
       });
-      
+
       const transcription = await transcriptionService.transcribe('/audio/empty.wav');
       expect(transcription.text).toBe('');
-      
+
       // Should not save empty context
       if (!transcription.text) {
         expect(database.save).not.toHaveBeenCalled();
@@ -359,12 +359,12 @@ describe('E2E: Complete Testimonial Workflow', () => {
 
     it('should handle maximum witness count (10 witnesses)', async () => {
       const witnesses = Array.from({ length: 10 }, (_, i) => `Witness ${i + 1}`);
-      
+
       const testimony = {
         context: 'test',
         witnessNames: witnesses,
       };
-      
+
       await database.save(testimony);
       expect(database.save).toHaveBeenCalledWith(
         expect.objectContaining({ witnessNames: witnesses })
@@ -375,7 +375,7 @@ describe('E2E: Complete Testimonial Workflow', () => {
       const saves = Array.from({ length: 5 }, (_, i) => ({
         context: `Testimonial ${i}`,
       }));
-      
+
       await Promise.all(saves.map(s => database.save(s)));
       expect(database.save).toHaveBeenCalledTimes(5);
     });
@@ -385,12 +385,12 @@ describe('E2E: Complete Testimonial Workflow', () => {
     it('should maintain avatar state during entire recording session', async () => {
       const initialState = avatarService.getState();
       expect(initialState.isInitialized).toBe(true);
-      
+
       // Avatar state should not change during operations
       await voiceService.startRecording();
       const midState = avatarService.getState();
       expect(midState.isInitialized).toBe(true);
-      
+
       await voiceService.stopRecording();
       const finalState = avatarService.getState();
       expect(finalState.isInitialized).toBe(true);
@@ -399,7 +399,7 @@ describe('E2E: Complete Testimonial Workflow', () => {
     it('should handle avatar animation during transcription', async () => {
       await avatarService.playLipSyncAnimation();
       const phonemes = transcriptionService.extractPhonemes('test text');
-      
+
       expect(avatarService.playLipSyncAnimation).toHaveBeenCalled();
       expect(phonemes.length).toBeGreaterThan(0);
     });
@@ -409,7 +409,7 @@ describe('E2E: Complete Testimonial Workflow', () => {
       await voiceService.startRecording();
       await voiceService.stopRecording();
       await transcriptionService.transcribe('/audio/test.wav');
-      
+
       // Should be able to start new workflow
       const newSession = await voiceService.startRecording();
       expect(newSession.sessionId).toBeDefined();

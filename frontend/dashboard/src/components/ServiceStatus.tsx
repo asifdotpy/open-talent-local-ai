@@ -19,14 +19,14 @@ export const ServiceStatus = () => {
     try {
       setIsLoading(true);
       const response = await integrationGatewayAPI.health.getSystemStatus();
-      
+
       // Parse the response to get service counts
       const services = response.services || {};
       const onlineCount = Object.values(services).filter(s => s === true).length;
       const totalCount = Object.keys(services).length;
-      
+
       const status = onlineCount >= 6 ? 'online' : onlineCount >= 3 ? 'degraded' : 'offline';
-      
+
       setStatusData({
         status,
         onlineCount,

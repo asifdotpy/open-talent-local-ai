@@ -1,6 +1,6 @@
 /**
  * Default Configuration
- * 
+ *
  * Base configuration values that can be overridden by environment-specific configs
  */
 

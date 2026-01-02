@@ -1,4 +1,5 @@
 import os
+
 from pydantic import BaseModel
 
 
@@ -10,14 +11,14 @@ class Settings(BaseModel):
         "postgresql+asyncpg://supabase_user:supabase_pass@localhost:54322/user_service",
     )
     echo_sql: bool = os.getenv("USER_SERVICE_ECHO_SQL", "false").lower() == "true"
-    
+
     # Security Service Integration
     security_service_url: str = os.getenv(
         "SECURITY_SERVICE_URL",
         "http://localhost:8010",
     )
     security_service_timeout: int = int(os.getenv("SECURITY_SERVICE_TIMEOUT", "5"))
-    
+
     # JWT Configuration (must match Security Service)
     jwt_secret_key: str = os.getenv(
         "SECURITY_SECRET_KEY",

@@ -9,9 +9,10 @@ This document contains the comprehensive instructions for a high-level coding ag
 You are tasked with finalizing the **OpenTalent** local-AI interview platform for its production release. The project has reached 90% technical completion but requires critical remediation of desktop-app blockers, backend schema implementation, and API gateway synchronization.
 
 ### 1. Context & Repository State
-*   **Architecture**: Electron (Desktop) + 14 Python Microservices (Backend) + Ollama (Local AI).
-*   **Current Status**: Phase 5 (Desktop Setup) / Week 4 (Outreach & Enrichment).
-*   **Core Docs**: Read `README.md`, `AGENTS.md`, and `SETUP_GUIDE.md` for the latest architecture and setup instructions.
+
+* **Architecture**: Electron (Desktop) + 14 Python Microservices (Backend) + Ollama (Local AI).
+* **Current Status**: Phase 5 (Desktop Setup) / Week 4 (Outreach & Enrichment).
+* **Core Docs**: Read `README.md`, `AGENTS.md`, and `SETUP_GUIDE.md` for the latest architecture and setup instructions.
 
 ---
 
@@ -62,10 +63,11 @@ echo "🚀 ALL SYSTEMS GO: OpenTalent is ready for release!"
 ---
 
 ### 4. Final Deliverables
-1.  **Stable Codebase**: Zero TypeScript errors and 100% passing Jest/Pytest suites.
-2.  **Synchronized Gateway**: All 14 services correctly registered and reachable via port 8009.
-3.  **Complete Schemas**: Pydantic models implemented for all 271+ endpoints.
-4.  **Release Tag**: Repository tagged as `v1.0.0-release`.
+
+1. **Stable Codebase**: Zero TypeScript errors and 100% passing Jest/Pytest suites.
+2. **Synchronized Gateway**: All 14 services correctly registered and reachable via port 8009.
+3. **Complete Schemas**: Pydantic models implemented for all 271+ endpoints.
+4. **Release Tag**: Repository tagged as `v1.0.0-release`.
 
 **Constraint**: Do not introduce new features. Focus exclusively on stabilization, schema implementation, and integration synchronization. **Hands off agents**—ensure all logic is implemented in the core services.
 

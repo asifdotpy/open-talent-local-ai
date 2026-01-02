@@ -25,7 +25,7 @@ export class GUIManager {
 
     this.createAudioControls();
     this.createPerformanceMonitor();
-    
+
     if (!this.audioOnly) {
       this.createDebugInfo();
     }
@@ -35,12 +35,12 @@ export class GUIManager {
 
   createAnimationControls() {
     const animFolder = this.gui.addFolder('Animation');
-    
+
     // Animation state controls
     animFolder.add({ play: () => this.animationController.start() }, 'play').name('Start Animation');
     animFolder.add({ stop: () => this.animationController.stop() }, 'stop').name('Stop Animation');
     animFolder.add({ reset: () => this.animationController.resetToOriginalState() }, 'reset').name('Reset Mesh');
-    
+
     // Add lip-sync toggle for performance control
     const lipSyncControl = { enabled: false }; // Start disabled for performance
     animFolder.add(lipSyncControl, 'enabled').name('Enable Lip-Sync').onChange((value) => {
@@ -60,7 +60,7 @@ export class GUIManager {
         console.log('Lip-sync disabled - FPS should improve');
       }
     });
-    
+
     animFolder.open();
   }
 
@@ -122,12 +122,12 @@ export class GUIManager {
 
   createPerformanceMonitor() {
     const perfFolder = this.gui.addFolder('Performance');
-    
+
     // Create dummy objects for GUI binding
     const perfStats = { fps: 0, memory: 0 };
     perfFolder.add(perfStats, 'fps', 0, 120).name('FPS').listen();
     perfFolder.add(perfStats, 'memory', 0, 200).name('Memory (MB)').listen();
-    
+
     // Update function to refresh values
     this.updatePerformanceStats = () => {
       const report = this.performanceMonitor.getPerformanceReport();
@@ -136,26 +136,26 @@ export class GUIManager {
         perfStats.memory = report.current.memory || 0;
       }
     };
-    
+
     perfFolder.open();
   }
 
   createDebugInfo() {
     const debugFolder = this.gui.addFolder('Debug Info');
-    
+
     // Create dummy objects for GUI binding
-    const debugStats = { 
-      strategy: 'Vertex-based', 
-      vertexCount: 0, 
-      confidence: 0, 
-      issues: 'None' 
+    const debugStats = {
+      strategy: 'Vertex-based',
+      vertexCount: 0,
+      confidence: 0,
+      issues: 'None'
     };
-    
+
     debugFolder.add(debugStats, 'strategy').name('Strategy').listen();
     debugFolder.add(debugStats, 'vertexCount').name('Mouth Vertices').listen();
     debugFolder.add(debugStats, 'confidence').name('Confidence').listen();
     debugFolder.add(debugStats, 'issues').name('Issues').listen();
-    
+
     // Update function to refresh values
     this.updateDebugStats = () => {
       // Guard for audio-only mode or missing animation controller
@@ -172,10 +172,10 @@ export class GUIManager {
       const issues = Array.isArray(diagnostics.issues) ? diagnostics.issues : [];
       debugStats.issues = issues.join(', ') || 'None';
     };
-    
+
     debugFolder.open();
   }
-  
+
   update() {
     if (this.updatePerformanceStats) {
       this.updatePerformanceStats();
@@ -192,4 +192,3 @@ export class GUIManager {
     this.logger.log('SUCCESS', 'GUI manager disposed');
   }
 }
-

@@ -1,20 +1,20 @@
 Verification Snapshot (Code Scan - Dec 15, 2025)
 ------------------------------------------------
 Service                        Endpoints   Ports
-ai-auditing-service            4           
-analytics-service              16          
-audio-service                  0           
+ai-auditing-service            4
+analytics-service              16
+audio-service                  0
 avatar-service                 36          8001
 candidate-service              76          8008
 conversation-service           8           8003
-desktop-integration-service    26          
-explainability-service         18          
-granite-interview-service      24          
-interview-service              49          
-notification-service           14          
-project-service                6           
+desktop-integration-service    26
+explainability-service         18
+granite-interview-service      24
+interview-service              49
+notification-service           14
+project-service                6
 scout-service                  22          8000
-security-service               42          
+security-service               42
 user-service                   28          8001,8007
 voice-service                  60          8015
 

@@ -19,4 +19,3 @@ export type StartInterviewRequest = {
      */
     totalQuestions?: number;
 };
-

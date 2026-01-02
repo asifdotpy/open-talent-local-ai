@@ -14,14 +14,14 @@ OpenTalent is an open-source, desktop-first AI recruitment platform. The Service
 
 The core software of OpenTalent is licensed under the **MIT License**. This means you are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, subject to the conditions outlined in the MIT License (included in the repository as `LICENSE`).
 
-*   **Your Contributions:** Any contributions you make to the OpenTalent project will be subject to the MIT License.
+* **Your Contributions:** Any contributions you make to the OpenTalent project will be subject to the MIT License.
 
 ## 4. User Responsibilities
 
 You agree to use the Service only for lawful purposes and in a way that does not infringe the rights of, restrict, or inhibit anyone else's use and enjoyment of the Service.
 
-*   **Data Responsibility:** Since all candidate and user data is stored locally on your device, you are solely responsible for the security, backup, and compliance of that data, including adherence to all applicable data protection laws (e.g., GDPR, CCPA) in your jurisdiction.
-*   **Third-Party Keys:** If you use the "Bring Your Own Key" (BYOK) model for third-party services (e.g., LinkedIn, GitHub), you are responsible for complying with the terms of service and privacy policies of those third parties.
+* **Data Responsibility:** Since all candidate and user data is stored locally on your device, you are solely responsible for the security, backup, and compliance of that data, including adherence to all applicable data protection laws (e.g., GDPR, CCPA) in your jurisdiction.
+* **Third-Party Keys:** If you use the "Bring Your Own Key" (BYOK) model for third-party services (e.g., LinkedIn, GitHub), you are responsible for complying with the terms of service and privacy policies of those third parties.
 
 ## 5. Disclaimer of Warranties
 

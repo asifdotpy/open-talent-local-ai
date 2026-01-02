@@ -259,7 +259,8 @@ async def render_lipsync(request: RenderRequest):
             text=True,
             timeout=120,  # Increased from 30 to 120 seconds for video encoding
             cwd=renderer_dir,
-            env={**os.environ, "SKIP_RENDERING": "false"}, check=False,  # Enable real video rendering
+            env={**os.environ, "SKIP_RENDERING": "false"},
+            check=False,  # Enable real video rendering
         )
     except subprocess.TimeoutExpired:
         logger.error("Renderer subprocess timed out after 120s")

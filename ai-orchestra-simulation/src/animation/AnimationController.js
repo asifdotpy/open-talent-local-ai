@@ -36,8 +36,8 @@ export class AnimationController {
       smoothingFactor: config.animation?.phonemeSmoothing || 0.1,
       transitionDuration: config.animation?.phonemeTransitionDuration || 50,
     });
-    
-    this.morphTargetInfluences = this.mesh && this.mesh.morphTargetInfluences 
+
+    this.morphTargetInfluences = this.mesh && this.mesh.morphTargetInfluences
       ? new Array(this.mesh.morphTargetInfluences.length).fill(0)
       : [];
 
@@ -46,10 +46,10 @@ export class AnimationController {
 
   initialize() {
     this.logger.log('ANIMATION', 'Initializing AnimationController...');
-    
+
     // Get mouth tracking data from mesh manager
     this.mouthData = this.meshManager.getMouthData();
-    
+
     if (this.mouthData && this.mouthData.vertexIndices.length > 0) {
       this.logger.log('SUCCESS', `AnimationController initialized with ${this.mouthData.vertexIndices.length} mouth vertices`);
     } else {
@@ -86,7 +86,7 @@ export class AnimationController {
     } else {
       this.logger.log('WARNING', 'No audio object available');
     }
-    
+
     this.clock.start();
     this.animationState.isPlaying = true;
     this.lastLoggedTime = 0;
@@ -107,12 +107,12 @@ export class AnimationController {
     }
 
     const elapsedTime = this.clock.getElapsedTime();
-    
+
     // Throttle updates to reduce performance impact (update every 3 frames)
     if (this.frameCount++ % 3 !== 0) {
       return;
     }
-    
+
     this.updateMouthAnimation(elapsedTime);
 
     // Phase 1: Update phoneme mapper
@@ -197,7 +197,7 @@ export class AnimationController {
     for (let i = 0; i < this.mouthData.vertexIndices.length; i++) {
       const vertexIndex = this.mouthData.vertexIndices[i];
       const originalPos = this.mouthData.originalPositions[i];
-      
+
       const oldY = positions[vertexIndex * 3 + 1];
       // Move vertex downward (negative Y) for mouth opening
       positions[vertexIndex * 3 + 1] = originalPos.y - displacement;
@@ -212,7 +212,7 @@ export class AnimationController {
 
   resetToOriginalState() {
     if (!this.mesh || !this.mouthData) return;
-    
+
     const geometry = this.mesh.geometry;
     const positions = geometry.attributes.position.array;
 
@@ -220,7 +220,7 @@ export class AnimationController {
     for (let i = 0; i < this.mouthData.vertexIndices.length; i++) {
       const vertexIndex = this.mouthData.vertexIndices[i];
       const originalPos = this.mouthData.originalPositions[i];
-      
+
       positions[vertexIndex * 3] = originalPos.x;
       positions[vertexIndex * 3 + 1] = originalPos.y;
       positions[vertexIndex * 3 + 2] = originalPos.z;
@@ -242,7 +242,7 @@ export class AnimationController {
     }
 
     const clampedValue = Math.max(0, Math.min(1, value));
-    
+
     // Apply directly for now; could add easing in Phase 2
     this.morphTargetInfluences[morphIndex] = clampedValue;
     this.mesh.morphTargetInfluences[morphIndex] = clampedValue;
@@ -292,4 +292,3 @@ export class AnimationController {
     this.stop();
   }
 }
-
