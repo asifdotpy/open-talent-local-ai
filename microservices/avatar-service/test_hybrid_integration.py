@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""
-Test script for the avatar service with local implementation.
+"""Test script for the avatar service with local implementation.
 This tests the service endpoints and mock implementations.
 """
 
 import asyncio
+
 import httpx
-import os
 
 
 async def test_service_endpoints():
@@ -49,9 +48,9 @@ async def test_service_endpoints():
 
 def print_integration_summary():
     """Print summary of the local implementation approach."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🔧 AVATAR SERVICE LOCAL IMPLEMENTATION SUMMARY")
-    print("="*60)
+    print("=" * 60)
     print("✅ Current Status:")
     print("   • Mock avatar rendering (ready)")
     print("   • Enterprise health monitoring")
@@ -76,9 +75,9 @@ async def main():
     endpoints_ok = await test_service_endpoints()
 
     # Print results
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("📊 TEST RESULTS")
-    print("="*60)
+    print("=" * 60)
     print(f"Service Endpoints: {'✅ PASS' if endpoints_ok else '❌ FAIL'}")
 
     overall_success = endpoints_ok

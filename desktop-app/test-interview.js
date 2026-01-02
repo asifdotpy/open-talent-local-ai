@@ -37,10 +37,10 @@ async function testInterviewService() {
   // Test 3: Start an interview
   console.log('Test 3: Starting a Software Engineer interview...');
   // Try custom 2B model first, fall back to 1B if not available
-  const modelToUse = models.some(m => m.name === 'vetta-granite-2b-gguf-v4') 
+  const modelToUse = models.some(m => m.name === 'vetta-granite-2b-gguf-v4')
     ? 'vetta-granite-2b-gguf-v4'
     : 'llama3.2:1b';
-  
+
   console.log(`   Using model: ${modelToUse}`);
   const session = await service.startInterview('Software Engineer', modelToUse, 5);
   console.log(`✅ Interview started successfully!`);
@@ -60,7 +60,7 @@ async function testInterviewService() {
   console.log('Test 4: Sending a sample response...');
   const sampleResponse = 'I have experience with arrays, linked lists, trees, and hash tables. I recently used a hash table to optimize a search algorithm from O(n) to O(1) lookup time.';
   console.log(`💬 Candidate Response: "${sampleResponse}"\n`);
-  
+
   const updatedSession = await service.sendResponse(session, sampleResponse);
   console.log(`✅ Response processed successfully!`);
   console.log(`   Current Question: ${updatedSession.currentQuestion}/${updatedSession.config.totalQuestions}`);

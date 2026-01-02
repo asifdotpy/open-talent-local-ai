@@ -25,7 +25,7 @@ export class ExpressionController {
     // Morph target mapping
     this.lipSyncTargets = ['jawOpen', 'mouthFunnel', 'mouthClose', 'mouthSmile']
     this.expressionTargets = ['eyebrowRaise', 'eyebrowFrown', 'eyeWiden', 'eyeNarrow', 'mouthFrown', 'cheekRaise']
-    
+
     // Performance tracking
     this.lastUpdateTime = Date.now()
   }
@@ -68,7 +68,7 @@ export class ExpressionController {
   /**
    * Get blended morph target weights for rendering
    * Combines lip-sync phoneme weights with emotional expression weights
-   * 
+   *
    * @param {Object} phonemeWeights - Weights from PhonemeMapper for lip-sync
    *   Example: { jawOpen: 0.5, mouthFunnel: 0.3, mouthClose: 0, mouthSmile: 0 }
    * @returns {Object} Complete morph target weights for all 10 targets
@@ -97,7 +97,7 @@ export class ExpressionController {
     this.lipSyncTargets.forEach(target => {
       const phonemeWeight = phonemeWeights[target] || 0
       const emotionWeight = emotionWeights[target] || 0
-      
+
       // Lip-sync overrides emotion for mouth movements
       // Use max blend to ensure phonemes are visible
       blendedWeights[target] = Math.max(
@@ -113,8 +113,8 @@ export class ExpressionController {
 
     // Special handling: mouthSmile from emotion can enhance lip-sync smile
     if (phonemeWeights.mouthSmile > 0 && emotionWeights.mouthSmile > 0) {
-      blendedWeights.mouthSmile = Math.min(1.0, 
-        phonemeWeights.mouthSmile * this.lipSyncWeight + 
+      blendedWeights.mouthSmile = Math.min(1.0,
+        phonemeWeights.mouthSmile * this.lipSyncWeight +
         emotionWeights.mouthSmile * this.emotionWeight * 0.3
       )
     }
@@ -134,7 +134,7 @@ export class ExpressionController {
    */
   getBlendedMorphWeightsArray(phonemeWeights = {}) {
     const weights = this.getBlendedMorphWeights(phonemeWeights)
-    
+
     // Return in the order defined by morphTargetDictionary
     return [
       weights.jawOpen,
@@ -162,7 +162,7 @@ export class ExpressionController {
     }
 
     const weightsArray = this.getBlendedMorphWeightsArray(phonemeWeights)
-    
+
     // Apply weights to mesh
     for (let i = 0; i < weightsArray.length && i < mesh.morphTargetInfluences.length; i++) {
       mesh.morphTargetInfluences[i] = weightsArray[i]
@@ -225,7 +225,7 @@ export class ExpressionController {
   static getEmotionForPhase(phase, sentiment = 0) {
     const baseEmotion = EmotionEngine.getEmotionFromSentiment(sentiment, 'interview')
     const intensityMultiplier = EmotionEngine.getIntensityMultiplier(phase)
-    
+
     // Create adjusted emotion with phase-appropriate intensity
     const adjustedEmotion = {
       ...baseEmotion,

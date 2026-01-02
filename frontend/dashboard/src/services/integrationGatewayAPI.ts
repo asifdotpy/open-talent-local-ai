@@ -3,7 +3,7 @@ import axios from 'axios';
 /**
  * Integration Gateway API Client
  * Unified API client for OpenTalent Desktop Integration Service (port 8009)
- * 
+ *
  * Provides access to:
  * - Interview orchestration (start, respond, summary)
  * - Model management (list, select)

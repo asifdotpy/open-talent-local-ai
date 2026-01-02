@@ -61,18 +61,18 @@ class OllamaService {
    */
   async startInterview(role = 'Software Engineer', model = 'granite-code:3b') {
     const systemPrompt = this.getInterviewPrompt(role);
-    
+
     try {
       const response = await this.client.post('/api/chat', {
         model: model,
         messages: [
-          { 
-            role: 'system', 
-            content: systemPrompt 
+          {
+            role: 'system',
+            content: systemPrompt
           },
-          { 
-            role: 'user', 
-            content: 'Please start the interview and ask me the first question.' 
+          {
+            role: 'user',
+            content: 'Please start the interview and ask me the first question.'
           }
         ],
         stream: false
@@ -89,7 +89,7 @@ class OllamaService {
    */
   getInterviewPrompt(role) {
     const prompts = {
-      'Software Engineer': `You are an experienced technical interviewer conducting a job interview for a Junior Software Engineer position. 
+      'Software Engineer': `You are an experienced technical interviewer conducting a job interview for a Junior Software Engineer position.
 
 Your interview will consist of exactly 5 questions covering:
 1. Data structures and algorithms knowledge

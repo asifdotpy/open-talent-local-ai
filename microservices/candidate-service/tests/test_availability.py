@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
+
 from fastapi.testclient import TestClient
 
 from main import app
@@ -13,7 +14,7 @@ def test_availability_crud_happy_path():
     cand = {
         "email": "availability.user@example.com",
         "first_name": "Availability",
-        "last_name": "Tester"
+        "last_name": "Tester",
     }
     r = client.post("/api/v1/candidates", json=cand, headers=AUTH)
     assert r.status_code == 201
@@ -27,7 +28,7 @@ def test_availability_crud_happy_path():
         "end_time": end.isoformat(),
         "timezone": "America/New_York",
         "is_available": True,
-        "notes": "Morning slot preferred"
+        "notes": "Morning slot preferred",
     }
     r2 = client.post(f"/api/v1/candidates/{candidate_id}/availability", json=payload, headers=AUTH)
     assert r2.status_code == 201
@@ -49,7 +50,9 @@ def test_availability_crud_happy_path():
 
     # Update availability
     upd = {"is_available": False, "notes": "Rescheduled"}
-    r5 = client.put(f"/api/v1/candidates/{candidate_id}/availability/{avail_id}", json=upd, headers=AUTH)
+    r5 = client.put(
+        f"/api/v1/candidates/{candidate_id}/availability/{avail_id}", json=upd, headers=AUTH
+    )
     assert r5.status_code == 200
     assert r5.json()["is_available"] is False
     assert r5.json()["notes"] == "Rescheduled"
@@ -61,11 +64,7 @@ def test_availability_crud_happy_path():
 
 def test_availability_unauthorized_and_not_found():
     # Create candidate
-    cand = {
-        "email": "availability.noauth@example.com",
-        "first_name": "No",
-        "last_name": "Auth"
-    }
+    cand = {"email": "availability.noauth@example.com", "first_name": "No", "last_name": "Auth"}
     r = client.post("/api/v1/candidates", json=cand, headers=AUTH)
     assert r.status_code == 201
     candidate_id = r.json()["id"]
@@ -73,10 +72,7 @@ def test_availability_unauthorized_and_not_found():
     # Create availability without auth
     start = datetime.utcnow() + timedelta(days=2)
     end = start + timedelta(hours=1)
-    payload = {
-        "start_time": start.isoformat(),
-        "end_time": end.isoformat()
-    }
+    payload = {"start_time": start.isoformat(), "end_time": end.isoformat()}
     r2 = client.post(f"/api/v1/candidates/{candidate_id}/availability", json=payload)
     assert r2.status_code == 401
 

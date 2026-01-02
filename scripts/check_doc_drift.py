@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import re
-from pathlib import Path
 import sys
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = [
@@ -16,6 +16,7 @@ TABLE_RE = re.compile(r"\|\s*(?P<service>[a-zA-Z0-9\-]+-service)\s*\|\s*(?P<coun
 
 def run_scan():
     import subprocess
+
     res = subprocess.run([sys.executable, str(SCAN_SCRIPT)], capture_output=True, text=True)
     res.check_returncode()
     return res.stdout

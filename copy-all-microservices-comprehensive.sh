@@ -62,63 +62,63 @@ echo "--- Copying services with root main.py ---"
 for service in "${ROOT_MAIN_SERVICES[@]}"; do
   src="$MICROSERVICES_DIR/$service"
   dst="$SERVICES_DIR/$service"
-  
+
   if [ ! -d "$src" ]; then
     echo "⚠ SKIP: $service (source not found)"
     continue
   fi
-  
+
   # Ensure destination exists
   mkdir -p "$dst"
-  
+
   # Copy main.py if it exists in root
   if [ -f "$src/main.py" ]; then
     cp "$src/main.py" "$dst/main.py"
     echo "✓ $service: main.py"
   fi
-  
+
   # Copy requirements.txt if exists
   if [ -f "$src/requirements.txt" ]; then
     cp "$src/requirements.txt" "$dst/requirements.txt"
     echo "  + requirements.txt"
   fi
-  
+
   # Copy Dockerfile if exists
   if [ -f "$src/Dockerfile" ]; then
     cp "$src/Dockerfile" "$dst/Dockerfile"
     echo "  + Dockerfile"
   fi
-  
+
   # Copy .env.example if exists
   if [ -f "$src/.env.example" ]; then
     cp "$src/.env.example" "$dst/.env.example"
     echo "  + .env.example"
   fi
-  
+
   # Copy pyproject.toml if exists
   if [ -f "$src/pyproject.toml" ]; then
     cp "$src/pyproject.toml" "$dst/pyproject.toml"
     echo "  + pyproject.toml"
   fi
-  
+
   # Copy providers/ if exists (for notification-service)
   if [ -d "$src/providers" ]; then
     cp -r "$src/providers" "$dst/providers"
     echo "  + providers/"
   fi
-  
+
   # Copy app/ if exists (user-service, etc)
   if [ -d "$src/app" ]; then
     cp -r "$src/app" "$dst/app"
     echo "  + app/"
   fi
-  
+
   # Copy migrations/ if exists (user-service)
   if [ -d "$src/migrations" ]; then
     cp -r "$src/migrations" "$dst/migrations"
     echo "  + migrations/"
   fi
-  
+
   # Preserve existing tests/ and merge if needed
   if [ -d "$src/tests" ] && [ ! -d "$dst/tests" ]; then
     cp -r "$src/tests" "$dst/tests"
@@ -141,63 +141,63 @@ echo "--- Copying services with app/main.py (full structure) ---"
 for service in "${APP_MAIN_SERVICES[@]}"; do
   src="$MICROSERVICES_DIR/$service"
   dst="$SERVICES_DIR/$service"
-  
+
   if [ ! -d "$src" ]; then
     echo "⚠ SKIP: $service (source not found)"
     continue
   fi
-  
+
   # Ensure destination exists
   mkdir -p "$dst"
-  
+
   # Copy entire app/ directory (contains main.py + structure)
   if [ -d "$src/app" ]; then
     cp -r "$src/app" "$dst/app"
     echo "✓ $service: app/ (with main.py)"
   fi
-  
+
   # Copy requirements.txt
   if [ -f "$src/requirements.txt" ]; then
     cp "$src/requirements.txt" "$dst/requirements.txt"
     echo "  + requirements.txt"
   fi
-  
+
   # Copy Dockerfile
   if [ -f "$src/Dockerfile" ]; then
     cp "$src/Dockerfile" "$dst/Dockerfile"
     echo "  + Dockerfile"
   fi
-  
+
   # Copy docker-compose.yml if exists
   if [ -f "$src/docker-compose.yml" ]; then
     cp "$src/docker-compose.yml" "$dst/docker-compose.yml"
     echo "  + docker-compose.yml"
   fi
-  
+
   # Copy pyproject.toml
   if [ -f "$src/pyproject.toml" ]; then
     cp "$src/pyproject.toml" "$dst/pyproject.toml"
     echo "  + pyproject.toml"
   fi
-  
+
   # Copy data/ if exists (granite-interview-service)
   if [ -d "$src/data" ]; then
     cp -r "$src/data" "$dst/data"
     echo "  + data/"
   fi
-  
+
   # Copy start.sh if exists
   if [ -f "$src/start.sh" ]; then
     cp "$src/start.sh" "$dst/start.sh"
     chmod +x "$dst/start.sh"
     echo "  + start.sh"
   fi
-  
+
   # Copy config/ if exists in app/
   if [ -d "$src/app/config" ]; then
     echo "  + app/config/"
   fi
-  
+
   # Preserve existing tests/
   if [ -d "$src/tests" ] && [ ! -d "$dst/tests" ]; then
     cp -r "$src/tests" "$dst/tests"
@@ -219,27 +219,27 @@ echo "--- Copying full-structure services ---"
 for service in "${FULL_DIR_SERVICES[@]}"; do
   src="$MICROSERVICES_DIR/$service"
   dst="$SERVICES_DIR/$service"
-  
+
   if [ ! -d "$src" ]; then
     echo "⚠ SKIP: $service (source not found)"
     continue
   fi
-  
+
   # Remove destination if it exists (except tests/)
   if [ -d "$dst" ]; then
     # Backup tests/ from destination
     if [ -d "$dst/tests" ]; then
       cp -r "$dst/tests" "$dst/tests_backup_local"
     fi
-    
+
     # Remove old destination
     rm -rf "$dst"
   fi
-  
+
   # Copy entire source
   cp -r "$src" "$dst"
   echo "✓ $service: entire directory"
-  
+
   # Restore local tests/ if had backup
   if [ -d "$dst/tests_backup_local" ]; then
     # Merge: keep source tests, add any local-only tests
@@ -252,7 +252,7 @@ for service in "${FULL_DIR_SERVICES[@]}"; do
     done
     rm -rf "$dst/tests_backup_local"
   fi
-  
+
   # Copy app/ contents if top-level main.py doesn't exist
   if [ ! -f "$dst/main.py" ] && [ -f "$dst/app/main.py" ]; then
     echo "  + app/main.py (app/ structure)"
@@ -266,7 +266,7 @@ MISSING=0
 for service_dir in "$SERVICES_DIR"/*; do
   if [ -d "$service_dir" ]; then
     service_name=$(basename "$service_dir")
-    
+
     # Check for root main.py or app/main.py
     if [ -f "$service_dir/main.py" ]; then
       echo "✓ $service_name/main.py"
@@ -288,7 +288,7 @@ declare -A port_map
 for service_dir in "$SERVICES_DIR"/*; do
   if [ -d "$service_dir" ]; then
     service_name=$(basename "$service_dir")
-    
+
     # Check root main.py
     if [ -f "$service_dir/main.py" ]; then
       port=$(grep -oP '(?<=port=)\d+' "$service_dir/main.py" | head -1 || echo "unknown")
@@ -301,7 +301,7 @@ for service_dir in "$SERVICES_DIR"/*; do
         fi
       fi
     fi
-    
+
     # Check app/main.py
     if [ -f "$service_dir/app/main.py" ]; then
       port=$(grep -oP '(?<=port=)\d+' "$service_dir/app/main.py" | head -1 || echo "unknown")

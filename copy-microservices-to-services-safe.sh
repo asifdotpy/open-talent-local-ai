@@ -2,7 +2,7 @@
 
 ################################################################################
 # Copy Microservices to Services Directory (Preserves Existing Tests)
-# 
+#
 # Purpose: Migrate working microservices code to services/ while preserving
 #          existing test files in services/
 #
@@ -51,25 +51,25 @@ SKIPPED=0
 for service in "${SERVICES[@]}"; do
     SOURCE="$MICROSERVICES_DIR/$service"
     DEST="$SERVICES_DIR/$service"
-    
+
     if [ ! -d "$SOURCE" ]; then
         echo "⏭️  SKIP: $service (source not found in microservices/)"
         ((SKIPPED++))
         continue
     fi
-    
+
     # Check if source has main.py (indicates working service)
     if [ ! -f "$SOURCE/main.py" ]; then
         echo "⏭️  SKIP: $service (no main.py found)"
         ((SKIPPED++))
         continue
     fi
-    
+
     # Ensure destination directory exists
     mkdir -p "$DEST"
-    
+
     echo "📋 Copying: $service"
-    
+
     # Copy everything EXCEPT tests/, __pycache__, .pytest_cache, .env
     # Use rsync with excludes for safety
     rsync -av \
@@ -81,7 +81,7 @@ for service in "${SERVICES[@]}"; do
         --exclude='.venv*' \
         --exclude='venv*' \
         "$SOURCE/" "$DEST/"
-    
+
     # Verify key files exist
     if [ -f "$DEST/main.py" ]; then
         echo "   ✅ main.py copied"
@@ -90,14 +90,14 @@ for service in "${SERVICES[@]}"; do
         echo "   ❌ ERROR: main.py not found after copy!"
         exit 1
     fi
-    
+
     # Verify tests/ directory still exists (from original services/)
     if [ -d "$DEST/tests" ]; then
         echo "   ✅ Existing tests/ preserved"
     else
         echo "   ⚠️  No tests/ directory (will be created on first test run)"
     fi
-    
+
     echo ""
 done
 

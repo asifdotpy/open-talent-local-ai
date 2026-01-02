@@ -23,27 +23,32 @@ Email, SMS, and Push Notification Service with provider abstraction.
 ## API Endpoints
 
 ### Health & Info
+
 - `GET /` - Root endpoint
 - `GET /health` - Health check with provider status
 - `GET /api/v1/provider` - Get active provider info
 
 ### Notifications
+
 - `POST /api/v1/notify/email` - Send email notification
 - `POST /api/v1/notify/sms` - Send SMS notification (E.164 phone format)
 - `POST /api/v1/notify/push` - Send push notification
 
 ### Templates
+
 - `GET /api/v1/notify/templates` - List available templates
 
 ## Quick Start
 
 ### Run Service
+
 ```bash
 cd services/notification-service
 uvicorn main:app --port 8011 --reload
 ```
 
 ### Run Tests
+
 ```bash
 # All tests (in-process via ASGITransport)
 pytest services/notification-service/tests/test_notification_service.py -v
@@ -58,6 +63,7 @@ pytest services/notification-service/tests/test_notification_service.py -q
 ## Example Payloads
 
 ### Email Notification
+
 ```json
 {
   "to": "user@example.com",
@@ -69,6 +75,7 @@ pytest services/notification-service/tests/test_notification_service.py -q
 ```
 
 ### SMS Notification (E.164 Format)
+
 ```json
 {
   "to": "+14155552671",
@@ -78,6 +85,7 @@ pytest services/notification-service/tests/test_notification_service.py -q
 ```
 
 ### Push Notification
+
 ```json
 {
   "to": "device_token_abc123",
@@ -98,6 +106,7 @@ pytest services/notification-service/tests/test_notification_service.py -q
 ## Phone Number Validation
 
 SMS notifications require E.164 international format:
+
 - Must start with optional `+`
 - Must start with digit 1-9 (no leading zeros)
 - 2-15 digits total

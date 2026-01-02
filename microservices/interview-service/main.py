@@ -9,13 +9,7 @@ from enum import Enum
 from typing import Any, Optional
 
 import httpx
-from fastapi import (
-    FastAPI,
-    HTTPException,
-    Request,
-    WebSocket,
-    WebSocketDisconnect,
-)
+from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
@@ -977,8 +971,7 @@ async def webrtc_signaling(room_id: str, signal: WebRTCSignal):
 
 @app.get("/api/v1/rooms/{room_id}/webrtc/status", tags=["webrtc"])
 async def get_webrtc_status(room_id: str):
-    """Get WebRTC connection status for all participants in a room.
-    """
+    """Get WebRTC connection status for all participants in a room."""
     if room_id not in rooms_store:
         raise HTTPException(status_code=404, detail="Room not found")
 

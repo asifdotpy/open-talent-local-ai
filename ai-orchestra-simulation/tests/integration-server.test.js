@@ -1,7 +1,7 @@
 /**
  * Integration Tests for Server API
  * Tests: AvatarServer endpoints, WebSocket, health checks
- * 
+ *
  * Requires server running on port 3001
  * Run: node tests/integration-server.test.js
  */
@@ -72,7 +72,7 @@ console.log('\n📚 API Documentation');
 await test('GET /docs returns Swagger UI', async () => {
   const response = await fetch(`${BASE_URL}/docs`, { timeout: 5000 });
   assert.strictEqual(response.status, 200, 'Should return 200');
-  assert.ok(response.headers.get('content-type').includes('text/html'), 
+  assert.ok(response.headers.get('content-type').includes('text/html'),
     'Should return HTML');
 });
 
@@ -106,7 +106,7 @@ await test('POST /render/lipsync accepts phoneme data', async () => {
     timeout: 10000
   });
 
-  assert.ok([200, 202, 400].includes(response.status), 
+  assert.ok([200, 202, 400].includes(response.status),
     `Should return 200, 202, or 400, got ${response.status}`);
 });
 
@@ -122,7 +122,7 @@ await test('WebSocket connects successfully', async () => {
     }, 5000);
 
     const ws = new WebSocket(WS_URL);
-    
+
     ws.on('open', () => {
       clearTimeout(timeout);
       ws.close();
@@ -143,7 +143,7 @@ await test('WebSocket accepts start_stream message', async () => {
     }, 5000);
 
     const ws = new WebSocket(WS_URL);
-    
+
     ws.on('open', () => {
       ws.send(JSON.stringify({
         type: 'start_stream',

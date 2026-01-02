@@ -1,11 +1,13 @@
-import os
 import asyncio
-from .novu import NovuProvider
+import os
+
 from .apprise import AppriseProvider
 from .base import NotificationProvider
+from .novu import NovuProvider
 
 RETRY_ATTEMPTS = int(os.getenv("NOTIFY_RETRY_ATTEMPTS", "2"))
 RETRY_BACKOFF_SEC = float(os.getenv("NOTIFY_RETRY_BACKOFF_SEC", "0.3"))
+
 
 class FallbackProvider(NotificationProvider):
     def __init__(self, primary: NotificationProvider, fallback: NotificationProvider):
@@ -55,6 +57,7 @@ class FallbackProvider(NotificationProvider):
         except Exception as e:
             fb = await self.fallback.health()
             return {"active": "fallback", "error": str(e), **fb}
+
 
 def get_provider() -> NotificationProvider:
     provider = os.getenv("NOTIFY_PROVIDER", "apprise").lower()

@@ -3,11 +3,10 @@
 Script to revert Trello changes - move task back and remove completion comment
 """
 
-import requests
-import json
+import os
 from datetime import datetime
 
-import os
+import requests
 
 # Load Trello credentials from environment variables (now stored as GitHub organization secrets)
 TRELLO_API_KEY = os.environ.get("TRELLO_API_KEY")
@@ -23,6 +22,7 @@ AUTH_PARAMS = f"?key={TRELLO_API_KEY}&token={TRELLO_TOKEN}"
 # The task we incorrectly updated
 CARD_ID = "1ybtNl0M"  # From the previous URL
 
+
 def get_card_actions(card_id):
     """Get recent actions on a card to find the comment we added"""
     url = f"{BASE_URL}/cards/{card_id}/actions{AUTH_PARAMS}&filter=commentCard&limit=10"
@@ -35,6 +35,7 @@ def get_card_actions(card_id):
         print(f"❌ Error getting card actions: {e}")
         return []
 
+
 def delete_comment(action_id):
     """Delete a specific comment action"""
     url = f"{BASE_URL}/actions/{action_id}{AUTH_PARAMS}"
@@ -42,11 +43,12 @@ def delete_comment(action_id):
     try:
         response = requests.delete(url)
         response.raise_for_status()
-        print(f"✅ Deleted incorrect completion comment")
+        print("✅ Deleted incorrect completion comment")
         return True
     except requests.exceptions.RequestException as e:
         print(f"❌ Error deleting comment: {e}")
         return False
+
 
 def move_back_to_in_progress(card_id):
     """Move task back to In Progress or appropriate list"""
@@ -61,23 +63,23 @@ def move_back_to_in_progress(card_id):
         # Find appropriate list (In Progress, To Do, etc.)
         target_list = None
         for list_item in lists:
-            list_name = list_item['name'].lower()
-            if 'in progress' in list_name or 'doing' in list_name or 'active' in list_name:
+            list_name = list_item["name"].lower()
+            if "in progress" in list_name or "doing" in list_name or "active" in list_name:
                 target_list = list_item
                 break
 
         # Fallback to "To Do" or similar
         if not target_list:
             for list_item in lists:
-                list_name = list_item['name'].lower()
-                if 'to do' in list_name or 'todo' in list_name or 'backlog' in list_name:
+                list_name = list_item["name"].lower()
+                if "to do" in list_name or "todo" in list_name or "backlog" in list_name:
                     target_list = list_item
                     break
 
         if target_list:
             # Move card back
             move_url = f"{BASE_URL}/cards/{card_id}{AUTH_PARAMS}"
-            data = {'idList': target_list['id']}
+            data = {"idList": target_list["id"]}
 
             response = requests.put(move_url, data=data)
             response.raise_for_status()
@@ -91,6 +93,7 @@ def move_back_to_in_progress(card_id):
         print(f"❌ Error moving task: {e}")
         return False
 
+
 def main():
     print("🔄 REVERTING TRELLO CHANGES - Routine Check Only")
     print("=" * 55)
@@ -101,8 +104,11 @@ def main():
     # Find and delete our completion comment
     deleted_comment = False
     for action in actions:
-        if action['type'] == 'commentCard' and 'AWS Instance Sync - COMPLETED' in action['data']['text']:
-            if delete_comment(action['id']):
+        if (
+            action["type"] == "commentCard"
+            and "AWS Instance Sync - COMPLETED" in action["data"]["text"]
+        ):
+            if delete_comment(action["id"]):
                 deleted_comment = True
             break
 
@@ -124,7 +130,7 @@ This was a routine checkpoint to verify Trello API connectivity and task trackin
 The AWS deployment work is planned and will be properly tracked when executed."""
 
     try:
-        response = requests.post(clarify_url, data={'text': clarify_comment})
+        response = requests.post(clarify_url, data={"text": clarify_comment})
         response.raise_for_status()
         print("✅ Added clarification comment")
     except requests.exceptions.RequestException as e:
@@ -132,6 +138,7 @@ The AWS deployment work is planned and will be properly tracked when executed.""
 
     print(f"\n🔗 Task URL: https://trello.com/c/{CARD_ID}")
     print("✅ Trello changes successfully reverted!")
+
 
 if __name__ == "__main__":
     main()

@@ -8,17 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0-release] - 2026-01-02
 
 ### Added
+
 - **Production-Ready Documentation**: Introduced a comprehensive `SETUP_GUIDE.md` for fresh machine installations and updated the `README.md` with the latest project status and quick-start instructions.
 - **Full Schema Coverage**: Implemented Pydantic models for the **Security** and **Notification** services, achieving 100% schema coverage across all 271+ API endpoints for robust data validation.
 - **Enhanced Gateway Exposure**: Successfully exposed high-value endpoints via the **Desktop Integration Service**, including Scout Service talent search (GitHub/LinkedIn) and Voice Service real-time TTS/STT streaming.
 - **Automated Release Verification**: Added a `verify-release.sh` script to perform end-to-end system checks, including TypeScript compilation, Jest test suites, and service discovery health.
 
 ### Changed
+
 - **API Gateway Synchronization**: Re-registered the **Scout Service** in the central service discovery and corrected the **Candidate Service** port mapping (from 8008 to 8006) to ensure 100% service reachability.
 - **Desktop App Stabilization**: Refactored the `desktop-app` to resolve all TypeScript compilation errors, including the restoration of the missing `cn` utility and alignment of the `PipelineConfig` interface.
 - **Runtime Compatibility**: Implemented a polyfill for `AbortSignal.timeout` in the `jobDescriptionParser`, ensuring compatibility with the Electron/Node.js runtime environment.
 
 ### Fixed
+
 - **Critical Integration Blockers**: Resolved the "Module Not Found" errors in the `qualityScoringClient` and fixed the API contract mismatches in the `scoutCoordinatorClient` test suite.
 - **Service Discovery Failures**: Fixed the health check logic in the gateway to correctly identify and route traffic to all 14 microservices.
 - **Candidate Results View**: Stabilized the main results display by resolving syntax errors in the `CandidateResults.tsx` component.

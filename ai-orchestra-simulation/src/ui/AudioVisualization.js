@@ -112,7 +112,7 @@ export class AudioVisualization {
   start() {
     if (!this.isActive && this.analyser) {
       this.isActive = true;
-      
+
       // Resume audio context if suspended (required by browser autoplay policies)
       if (this.audioContext && this.audioContext.state === 'suspended') {
         this.audioContext.resume().then(() => {
@@ -121,7 +121,7 @@ export class AudioVisualization {
           console.error('[AudioVisualization] Failed to resume audio context:', error);
         });
       }
-      
+
       this.animate();
       console.log('[AudioVisualization] Started visualization');
     }

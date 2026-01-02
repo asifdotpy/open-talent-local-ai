@@ -67,7 +67,7 @@ echo ""
 echo "5️⃣ Checking Desktop App..."
 if [ -f "desktop-app/package.json" ]; then
     echo "   ✅ Desktop app directory found"
-    
+
     if [ -d "desktop-app/node_modules" ]; then
         echo "   ✅ Dependencies installed"
     else

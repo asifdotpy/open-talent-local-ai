@@ -63,10 +63,10 @@ describe('E2E: Complete Testimonial Workflow', () => {
   describe('Performance Characteristics', () => {
     it('should complete full workflow within reasonable time', async () => {
       const startTime = Date.now();
-      
+
       // Simulate operations
       await new Promise(resolve => setTimeout(resolve, 100));
-      
+
       const duration = Date.now() - startTime;
       expect(duration).toBeLessThan(5000);
     });

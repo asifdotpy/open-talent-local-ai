@@ -1,10 +1,10 @@
 /**
  * Unit Tests for Animation System
  * TDD PRINCIPLE: Tests define architectural contracts - code must conform
- * 
+ *
  * Tests: PhonemeMapper API, ARKit blendshape mappings, phoneme coverage,
  *        intensity validation, type safety
- * 
+ *
  * Run: node tests/unit-animation-tdd.test.js
  */
 
@@ -64,7 +64,7 @@ console.log('\n📋 PHONEME COVERAGE CONTRACT');
 test('PhonemeMapper MUST support minimum 39 phonemes (14 vowels + 23 consonants + 2 special)', () => {
   const mapper = new PhonemeMapper();
   const phonemeCount = Object.keys(mapper.phonemeMap).length;
-  
+
   assert.ok(phonemeCount >= 39,
     `CONTRACT VIOLATION: Must support at least 39 phonemes, found ${phonemeCount}`);
 });
@@ -72,7 +72,7 @@ test('PhonemeMapper MUST support minimum 39 phonemes (14 vowels + 23 consonants 
 test('PhonemeMapper MUST map all English vowels', () => {
   const mapper = new PhonemeMapper();
   const requiredVowels = ['aa', 'ae', 'ah', 'ao', 'ee', 'eh', 'er', 'ih', 'iy', 'oh', 'ow', 'oy', 'uh', 'uw'];
-  
+
   requiredVowels.forEach(vowel => {
     assert.ok(mapper.phonemeMap[vowel],
       `CONTRACT VIOLATION: Must include vowel mapping for '${vowel}'`);
@@ -82,7 +82,7 @@ test('PhonemeMapper MUST map all English vowels', () => {
 test('PhonemeMapper MUST map all standard consonants', () => {
   const mapper = new PhonemeMapper();
   const requiredConsonants = ['b', 'ch', 'd', 'f', 'g', 'hh', 'jh', 'k', 'l', 'm', 'n', 'ng', 'p', 'r', 's', 'sh', 't', 'th', 'v', 'w', 'y', 'z', 'zh'];
-  
+
   requiredConsonants.forEach(consonant => {
     assert.ok(mapper.phonemeMap[consonant],
       `CONTRACT VIOLATION: Must include consonant mapping for '${consonant}'`);
@@ -92,7 +92,7 @@ test('PhonemeMapper MUST map all standard consonants', () => {
 test('PhonemeMapper MUST map special phonemes (silence, pause)', () => {
   const mapper = new PhonemeMapper();
   const requiredSpecial = ['sil', 'pau'];
-  
+
   requiredSpecial.forEach(special => {
     assert.ok(mapper.phonemeMap[special],
       `CONTRACT VIOLATION: Must include special phoneme '${special}'`);
@@ -106,10 +106,10 @@ console.log('\n🎭 ARKIT BLENDSHAPE MAPPING CONTRACT');
 
 test('PhonemeMapper MUST provide arKitMorphTargets with minimum 52 targets', () => {
   const mapper = new PhonemeMapper();
-  
+
   assert.ok(mapper.arKitMorphTargets,
     'CONTRACT VIOLATION: Must provide arKitMorphTargets property');
-  
+
   const targetCount = Object.keys(mapper.arKitMorphTargets).length;
   assert.ok(targetCount >= 52,
     `CONTRACT VIOLATION: Must provide at least 52 ARKit targets (face.glb standard), found ${targetCount}`);
@@ -118,7 +118,7 @@ test('PhonemeMapper MUST provide arKitMorphTargets with minimum 52 targets', () 
 test('PhonemeMapper MUST include required mouth morph targets', () => {
   const mapper = new PhonemeMapper();
   const requiredMouthTargets = ['jawOpen', 'mouthClose', 'mouthFunnel', 'mouthPucker', 'mouthSmile'];
-  
+
   requiredMouthTargets.forEach(target => {
     assert.ok(mapper.arKitMorphTargets[target] !== undefined,
       `CONTRACT VIOLATION: Must include ARKit morph target '${target}'`);
@@ -127,7 +127,7 @@ test('PhonemeMapper MUST include required mouth morph targets', () => {
 
 test('PhonemeMapper MUST map morph target indices as non-negative integers', () => {
   const mapper = new PhonemeMapper();
-  
+
   Object.entries(mapper.arKitMorphTargets).forEach(([name, index]) => {
     assert.ok(Number.isInteger(index) && index >= 0,
       `CONTRACT VIOLATION: Morph target '${name}' index must be non-negative integer, got ${index}`);
@@ -141,7 +141,7 @@ console.log('\n🔧 PHONEME MAPPING STRUCTURE CONTRACT');
 
 test('PhonemeMapper MUST provide primary morph target for all non-silence phonemes', () => {
   const mapper = new PhonemeMapper();
-  
+
   Object.entries(mapper.phonemeMap).forEach(([phoneme, mapping]) => {
     if (phoneme !== 'sil') {
       assert.ok(mapping.primary !== undefined && mapping.primary !== null,
@@ -152,13 +152,13 @@ test('PhonemeMapper MUST provide primary morph target for all non-silence phonem
 
 test('PhonemeMapper MUST provide intensity values in range 0-1', () => {
   const mapper = new PhonemeMapper();
-  
+
   Object.entries(mapper.phonemeMap).forEach(([phoneme, mapping]) => {
     if (mapping.primaryIntensity !== undefined) {
       assert.ok(mapping.primaryIntensity >= 0 && mapping.primaryIntensity <= 1,
         `CONTRACT VIOLATION: Phoneme '${phoneme}' primaryIntensity must be 0-1, got ${mapping.primaryIntensity}`);
     }
-    
+
     if (mapping.secondaryIntensity !== undefined) {
       assert.ok(mapping.secondaryIntensity >= 0 && mapping.secondaryIntensity <= 1,
         `CONTRACT VIOLATION: Phoneme '${phoneme}' secondaryIntensity must be 0-1, got ${mapping.secondaryIntensity}`);
@@ -168,7 +168,7 @@ test('PhonemeMapper MUST provide intensity values in range 0-1', () => {
 
 test('PhonemeMapper MUST provide consistent mapping structure (primary, secondary, intensities)', () => {
   const mapper = new PhonemeMapper();
-  
+
   Object.entries(mapper.phonemeMap).forEach(([phoneme, mapping]) => {
     assert.ok('primary' in mapping,
       `CONTRACT VIOLATION: Phoneme '${phoneme}' mapping must include 'primary' key`);
@@ -202,7 +202,7 @@ test('PhonemeMapper MUST provide getSupportedPhonemes() method', () => {
   const mapper = new PhonemeMapper();
   assert.strictEqual(typeof mapper.getSupportedPhonemes, 'function',
     'CONTRACT VIOLATION: Must provide getSupportedPhonemes() method');
-  
+
   const supported = mapper.getSupportedPhonemes();
   assert.ok(Array.isArray(supported) && supported.length >= 39,
     'CONTRACT VIOLATION: getSupportedPhonemes() must return array of at least 39 phonemes');

@@ -1,9 +1,9 @@
 /**
  * GUIConstraints.js
- * 
+ *
  * Configuration constraints for GUI parameter ranges.
  * Defines min/max/step values for interactive controls.
- * 
+ *
  * Extracted from app.js for better configuration management.
  */
 

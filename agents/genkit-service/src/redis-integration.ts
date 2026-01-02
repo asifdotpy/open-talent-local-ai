@@ -160,7 +160,7 @@ export class RedisIntegration {
   private async handleMessage(channel: string, message: string): Promise<void> {
     try {
       console.log(`📨 Received message on ${channel}`);
-      
+
       if (channel === TOPICS.SCANNING) {
         const scanRequest: ScanRequest = JSON.parse(message);
         await this.handleScanRequest(scanRequest);
@@ -204,7 +204,7 @@ export class RedisIntegration {
 
         // Extract candidates from platform-specific response
         const candidates = this.extractCandidates(result.platform, result.result);
-        
+
         if (candidates.length > 0) {
           // Publish CANDIDATE_FOUND event
           await this.publishCandidateFound({

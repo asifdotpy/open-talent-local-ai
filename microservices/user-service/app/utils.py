@@ -1,15 +1,16 @@
-from fastapi import Header, HTTPException, status, Depends
-from typing import Optional, Dict, Any
-from pydantic import BaseModel
-import jwt
+from typing import Any, Optional
+
 import httpx
-from datetime import datetime
+import jwt
+from fastapi import Depends, Header, HTTPException, status
+from pydantic import BaseModel
 
 from .config import settings
 
 
 class JWTClaims(BaseModel):
     """JWT claims extracted from verified token."""
+
     email: str
     user_id: Optional[str] = None
     role: Optional[str] = None
@@ -18,7 +19,7 @@ class JWTClaims(BaseModel):
     iat: Optional[int] = None
 
 
-async def verify_jwt_with_security_service(token: str) -> Dict[str, Any]:
+async def verify_jwt_with_security_service(token: str) -> dict[str, Any]:
     """Verify JWT token with Security Service via HTTP."""
     try:
         async with httpx.AsyncClient(timeout=settings.security_service_timeout) as client:
@@ -36,7 +37,7 @@ async def verify_jwt_with_security_service(token: str) -> Dict[str, Any]:
         return {"valid": False, "error": "Security Service unavailable"}
 
 
-def verify_jwt_locally(token: str) -> Optional[Dict[str, Any]]:
+def verify_jwt_locally(token: str) -> Optional[dict[str, Any]]:
     """Fallback: Verify JWT token locally using shared secret."""
     try:
         payload = jwt.decode(
@@ -64,7 +65,7 @@ async def get_jwt_claims(authorization: Optional[str] = Header(None)) -> JWTClai
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Missing Authorization header",
         )
-    
+
     try:
         scheme, token = authorization.split(" ", 1)
     except ValueError:
@@ -72,16 +73,16 @@ async def get_jwt_claims(authorization: Optional[str] = Header(None)) -> JWTClai
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid Authorization header",
         )
-    
+
     if scheme.lower() != "bearer" or not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token scheme",
         )
-    
+
     # Try Security Service first
     verification = await verify_jwt_with_security_service(token)
-    
+
     if verification.get("valid"):
         # Security Service verified - now decode locally for full claims
         payload = verify_jwt_locally(token)
@@ -93,7 +94,7 @@ async def get_jwt_claims(authorization: Optional[str] = Header(None)) -> JWTClai
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",
         )
-    
+
     # Extract claims for RLS (Row-Level Security)
     claims = JWTClaims(
         email=payload.get("email", ""),
@@ -103,13 +104,13 @@ async def get_jwt_claims(authorization: Optional[str] = Header(None)) -> JWTClai
         exp=payload.get("exp"),
         iat=payload.get("iat"),
     )
-    
+
     if not claims.email:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token missing email claim",
         )
-    
+
     return claims
 
 
@@ -121,6 +122,7 @@ async def get_current_user(authorization: Optional[str] = Header(None)) -> str:
 
 def require_role(*allowed_roles: str):
     """Dependency to enforce role-based access control."""
+
     async def role_checker(claims: JWTClaims = Depends(get_jwt_claims)):
         if not claims.role or claims.role not in allowed_roles:
             raise HTTPException(
@@ -128,18 +130,19 @@ def require_role(*allowed_roles: str):
                 detail=f"Access denied. Required roles: {', '.join(allowed_roles)}",
             )
         return claims
+
     return role_checker
 
 
 async def get_db_with_rls_context(claims: JWTClaims = Depends(get_jwt_claims)):
     """
     Get database session with RLS context from JWT claims.
-    
+
     This dependency:
     1. Extracts JWT claims (email, role, tenant_id)
     2. Sets PostgreSQL session variables for RLS policies
     3. Returns AsyncSession with RLS context applied
-    
+
     Usage:
         @router.get("/api/v1/users")
         async def list_users(
@@ -151,7 +154,7 @@ async def get_db_with_rls_context(claims: JWTClaims = Depends(get_jwt_claims)):
             ...
     """
     from .database import get_session_with_rls
-    
+
     async for session in get_session_with_rls(
         user_email=claims.email,
         user_role=claims.role,

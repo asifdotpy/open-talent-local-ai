@@ -168,7 +168,7 @@ export class SceneManager {
     this.camera.add(this.audioListener);
     this.audio = new THREE.Audio(this.audioListener);
     this.scene.add(this.audio);
-    
+
     // Setup HTML audio element as fallback for reliable playback
     this.htmlAudioElement = document.getElementById('speech-audio');
     if (!this.htmlAudioElement) {
@@ -179,7 +179,7 @@ export class SceneManager {
       this.htmlAudioElement.style.display = 'none';
       document.body.appendChild(this.htmlAudioElement);
     }
-    
+
     this.logger.log('INFO', 'Audio system initialized with THREE.Audio and HTML audio fallback');
   }
 

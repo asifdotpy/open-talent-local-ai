@@ -137,14 +137,14 @@ export class EmotionEngine {
     this.transitionDuration = config.transitionDuration || 500 // milliseconds
     this.transitionStartTime = 0
     this.easingFunction = EasingFunctions[config.easing || 'smooth']
-    
+
     // Idle animation state
     this.idleTime = 0
     this.blinkTimer = 0
     this.blinkInterval = config.blinkInterval || 3000 // ms between blinks
     this.blinkDuration = config.blinkDuration || 150 // ms
     this.isBlinking = false
-    
+
     // Emotion history for context-aware behavior
     this.emotionHistory = []
     this.maxHistoryLength = 10
@@ -166,7 +166,7 @@ export class EmotionEngine {
       timestamp: Date.now(),
       intensity: emotion.intensity
     })
-    
+
     if (this.emotionHistory.length > this.maxHistoryLength) {
       this.emotionHistory.shift()
     }
@@ -233,10 +233,10 @@ export class EmotionEngine {
     // Apply blink animation (overrides eye targets during blink)
     if (this.isBlinking) {
       const blinkProgress = this.blinkTimer / this.blinkDuration
-      const blinkWeight = blinkProgress < 0.5 
+      const blinkWeight = blinkProgress < 0.5
         ? blinkProgress * 2 // Close eyes
         : (1 - blinkProgress) * 2 // Open eyes
-      
+
       weights.eyeWiden = Math.max(0, weights.eyeWiden - blinkWeight)
       weights.eyeNarrow = Math.max(0, weights.eyeNarrow + blinkWeight * 0.3)
     }
@@ -319,7 +319,7 @@ export class EmotionEngine {
     if (sentiment < -0.5) return EmotionStates.SAD
     if (sentiment < -0.2) return EmotionStates.THOUGHTFUL
     if (Math.abs(sentiment) < 0.1 && Math.random() > 0.8) return EmotionStates.SURPRISED
-    
+
     return EmotionStates.NEUTRAL
   }
 

@@ -82,7 +82,7 @@ async function testRole(roleConfig, roleIndex) {
     // Start interview session
     console.log(`Starting ${roleConfig.role} interview...`);
     const startTime = Date.now();
-    
+
     const sessionResponse = await axios.post(`${BASE_URL}/interview/start`, {
       role: roleConfig.role,
       model: 'granite4:350m-h',
@@ -99,7 +99,7 @@ async function testRole(roleConfig, roleIndex) {
       console.log(`\n  Q${i + 1}: "${question}"`);
 
       const questionStartTime = Date.now();
-      
+
       const responseData = await axios.post(`${BASE_URL}/interview/respond`, {
         sessionId: sessionId,
         response: question
@@ -285,7 +285,7 @@ function saveResults() {
   reportContent += `- RAM Usage: ~300-400MB (estimated)\n`;
   reportContent += `- CPU Usage: Moderate\n`;
   const avgFirstResponse = (results.tests[0].questions[0].responseTime / 1000).toFixed(2);
-  const avgSubsequent = (results.tests.reduce((sum, t) => sum + t.questions.slice(1).reduce((s, q) => s + q.responseTime, 0), 0) / 
+  const avgSubsequent = (results.tests.reduce((sum, t) => sum + t.questions.slice(1).reduce((s, q) => s + q.responseTime, 0), 0) /
     results.tests.reduce((sum, t) => sum + (t.questions.length - 1), 0) / 1000).toFixed(2);
   reportContent += `- First Response Time: ${avgFirstResponse} seconds (target <5s) ✅\n`;
   reportContent += `- Subsequent Response Time: ${avgSubsequent} seconds (target <2s) ✅\n`;

@@ -65,14 +65,14 @@ process.on('exit', () => {
  */
 async function getExpressionFrame(renderer, currentTime, emotionWeights, cacheKey) {
   const key = `${cacheKey}_expr_${currentTime.toFixed(3)}`
-  
+
   if (expressionFrameCache.has(key)) {
     return expressionFrameCache.get(key).buffer
   }
-  
+
   // Render expression-only frame
   const buffer = await renderer.renderFrame([], currentTime, emotionWeights)
-  
+
   // Cache it
   if (expressionFrameCache.size >= MAX_EXPRESSION_CACHE_SIZE) {
     const oldestKey = expressionFrameCache.keys().next().value
@@ -82,7 +82,7 @@ async function getExpressionFrame(renderer, currentTime, emotionWeights, cacheKe
     buffer: buffer,
     timestamp: Date.now()
   })
-  
+
   return buffer
 }
 
@@ -91,14 +91,14 @@ async function getExpressionFrame(renderer, currentTime, emotionWeights, cacheKe
  */
 async function getPhonemeFrame(renderer, phonemes, currentTime, cacheKey) {
   const key = `${cacheKey}_phon_${currentTime.toFixed(3)}`
-  
+
   if (phonemeFrameCache.has(key)) {
     return phonemeFrameCache.get(key).buffer
   }
-  
+
   // Render phoneme-only frame (no emotions)
   const buffer = await renderer.renderFrame(phonemes, currentTime, null)
-  
+
   // Cache it
   if (phonemeFrameCache.size >= MAX_PHONEME_CACHE_SIZE) {
     const oldestKey = phonemeFrameCache.keys().next().value
@@ -108,7 +108,7 @@ async function getPhonemeFrame(renderer, phonemes, currentTime, cacheKey) {
     buffer: buffer,
     timestamp: Date.now()
   })
-  
+
   return buffer
 }
 
@@ -180,14 +180,14 @@ async function renderFramesBatch(renderer, phonemes, totalFrames, fps, tempDir, 
 
     for (let frame = batchStart; frame < batchEnd; frame++) {
       const currentTime = frame / fps
-      
+
       // Get emotion weights if expression controller is provided
       let emotionWeights = null
       if (expressionController) {
         expressionController.update(currentTime * 1000) // Convert to ms
         emotionWeights = expressionController.getBlendedMorphWeightsArray({})
       }
-      
+
       batchPromises.push(
         renderer.renderFrame(phonemes, currentTime, emotionWeights).then(buffer => {
           const framePath = path.join(tempDir, `frame_${frame.toString().padStart(6, '0')}.png`)
@@ -220,14 +220,14 @@ async function renderFramesSequential(renderer, phonemes, totalFrames, fps, temp
 
   for (let frame = 0; frame < totalFrames; frame++) {
     const currentTime = frame / fps
-    
+
     // Get emotion weights if expression controller is provided
     let emotionWeights = null
     if (expressionController) {
       expressionController.update(currentTime * 1000) // Convert to ms
       emotionWeights = expressionController.getBlendedMorphWeightsArray({})
     }
-    
+
     const buffer = await renderer.renderFrame(phonemes, currentTime, emotionWeights)
     const framePath = path.join(tempDir, `frame_${frame.toString().padStart(6, '0')}.png`)
     await fs.promises.writeFile(framePath, buffer)

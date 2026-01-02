@@ -1,9 +1,9 @@
 /**
  * VideoRecorder - Captures WebGL canvas to MP4 video
- * 
+ *
  * Phase 1: Client-Side WebGL Rendering
  * Captures Three.js scene at 60fps and syncs with audio
- * 
+ *
  * Usage:
  *   const recorder = new VideoRecorder(canvas, audioContext);
  *   await recorder.startRecording();
@@ -158,7 +158,7 @@ export class VideoRecorder {
         this.mediaRecorder.onstop = async () => {
           try {
             const blob = new Blob(this.recordedBlobs, { type: 'video/webm' });
-            
+
             const duration = (performance.now() - this.startTime) / 1000;
             this.logger.log('Recording stopped', {
               duration: duration.toFixed(2),
@@ -222,7 +222,7 @@ export class VideoRecorder {
 
       // If WebM requested, return as-is
       if (format === 'webm' || format === 'mp4') {
-        this.logger.log('Video exported', { 
+        this.logger.log('Video exported', {
           format,
           size: `${(blob.size / 1024 / 1024).toFixed(2)} MB`,
         });
@@ -241,7 +241,7 @@ export class VideoRecorder {
    * Get recording statistics
    */
   getStats() {
-    const duration = this.isRecording 
+    const duration = this.isRecording
       ? (performance.now() - this.startTime) / 1000
       : 0;
 

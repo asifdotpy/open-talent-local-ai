@@ -2,7 +2,7 @@
  * Integration Interview Service
  * Routes all operations through the Desktop Integration Service (port 8009)
  * Falls back to direct Ollama if integration service unavailable
- * 
+ *
  * Now uses enhanced gateway client with typed wrappers for voice, analytics, etc.
  */
 
@@ -41,7 +41,7 @@ export class IntegrationInterviewService {
     try {
       const health = await IntegrationClient.fetchIntegrationHealth();
       this.isIntegrationHealthy = health !== null;
-      
+
       // Auto-switch to integration mode if available
       if (this.isIntegrationHealthy) {
         this.mode = 'integration';
@@ -102,7 +102,7 @@ export class IntegrationInterviewService {
             source: m.source,
           }));
         }
-        
+
         // Fallback to Ollama if integration returns no models
         console.warn('[IntegrationInterviewService] No models from integration service, falling back to Ollama');
         this.mode = 'ollama';

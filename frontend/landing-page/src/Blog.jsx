@@ -10,7 +10,7 @@ const Blog = () => {
                     </h2>
                     <div className="w-24 h-1 bg-primary-500 mx-auto rounded-full"></div>
                 </header>
-                
+
                 <div className="prose prose-invert prose-slate max-w-none space-y-12 text-lg text-slate-300 leading-relaxed">
                     <article>
                         <p className="first-letter:text-5xl first-letter:font-bold first-letter:text-white first-letter:mr-3 first-letter:float-left">
@@ -34,7 +34,7 @@ const Blog = () => {
                         <p>
                             The platform is built on a robust microservices architecture, providing a unified gateway to several powerful features:
                         </p>
-                        
+
                         <div className="grid md:grid-cols-2 gap-6 not-prose">
                             {[
                                 {

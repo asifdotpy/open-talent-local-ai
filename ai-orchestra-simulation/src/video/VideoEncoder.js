@@ -1,6 +1,6 @@
 /**
  * VideoEncoder - FFmpeg-based video encoding service
- * 
+ *
  * Handles conversion of frame sequences to video files with optional audio.
  * Supports multiple codecs and formats (WebM, MP4, etc.).
  */
@@ -58,7 +58,7 @@ export class VideoEncoder {
 
       ffmpegProcess.on('close', (code) => {
         const duration = Date.now() - startTime;
-        
+
         if (code === 0) {
           this.logger.log('Video encoding completed', {
             outputPath,
@@ -91,8 +91,8 @@ export class VideoEncoder {
     // Add audio input if provided
     if (audioPath) {
       // Convert file:// URL to local path if needed
-      const audioFile = audioPath.startsWith('file://') 
-        ? audioPath.substring(7) 
+      const audioFile = audioPath.startsWith('file://')
+        ? audioPath.substring(7)
         : audioPath;
       args.push('-i', audioFile);
     }

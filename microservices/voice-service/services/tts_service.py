@@ -1,18 +1,15 @@
-
 import os
 import subprocess
-from pathlib import Path
-from loguru import logger
 from typing import Optional
 
+from loguru import logger
+
+
 class PiperTTSService:
-    """
-    Piper TTS Service - Local, Fast, High-Quality Text-to-Speech
-    """
+    """Piper TTS Service - Local, Fast, High-Quality Text-to-Speech"""
 
     def __init__(self, piper_path: str, model_path: str):
-        """
-        Initialize Piper TTS
+        """Initialize Piper TTS
 
         Args:
             piper_path: Path to piper executable
@@ -21,7 +18,7 @@ class PiperTTSService:
         self.piper_path = piper_path
         self.model_path = model_path
 
-        logger.info(f"Initializing Piper TTS")
+        logger.info("Initializing Piper TTS")
         logger.info(f"  Piper path: {self.piper_path}")
         logger.info(f"  Model path: {self.model_path}")
 
@@ -33,7 +30,8 @@ class PiperTTSService:
                 [self.piper_path, "--version"],
                 capture_output=True,
                 text=True,
-                timeout=5
+                timeout=5,
+                check=False,
             )
 
             if result.returncode != 0:
@@ -64,8 +62,7 @@ class PiperTTSService:
             return False
 
     def synthesize(self, text: str, output_file: str = "tts_output.wav") -> Optional[str]:
-        """
-        Synthesize speech from text
+        """Synthesize speech from text
 
         Args:
             text: Text to synthesize
@@ -79,15 +76,11 @@ class PiperTTSService:
 
             # Run Piper TTS
             process = subprocess.Popen(
-                [
-                    self.piper_path,
-                    "--model", self.model_path,
-                    "--output_file", output_file
-                ],
+                [self.piper_path, "--model", self.model_path, "--output_file", output_file],
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                text=True
+                text=True,
             )
 
             # Send text to Piper

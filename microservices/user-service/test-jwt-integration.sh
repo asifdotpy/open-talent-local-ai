@@ -116,7 +116,7 @@ if command -v jq &> /dev/null; then
         PAYLOAD="$PAYLOAD$(printf '=%.0s' $(seq 1 $PADDING))"
     fi
     DECODED=$(echo "$PAYLOAD" | base64 -d 2>/dev/null || echo "{}")
-    
+
     if echo "$DECODED" | jq -e '.email' &> /dev/null; then
         EMAIL=$(echo "$DECODED" | jq -r '.email')
         EXP=$(echo "$DECODED" | jq -r '.exp')

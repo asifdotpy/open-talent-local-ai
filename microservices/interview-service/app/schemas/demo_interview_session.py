@@ -1,17 +1,20 @@
-"""
-Pydantic models for Demo Interview Session
+"""Pydantic models for Demo Interview Session
 """
 
-from pydantic import BaseModel, Field
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel
+
 
 class DemoInterviewSessionBase(BaseModel):
     session_id: str
     candidate_name: Optional[str] = None
 
+
 class DemoInterviewSessionCreate(DemoInterviewSessionBase):
     pass
+
 
 class DemoInterviewSessionResponse(DemoInterviewSessionBase):
     id: int

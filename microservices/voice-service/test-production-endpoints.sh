@@ -31,11 +31,11 @@ test_endpoint() {
     local expected_status=$4
     local data=$5
     local content_type=$6
-    
+
     TOTAL=$((TOTAL + 1))
-    
+
     echo -n "Testing: $name ... "
-    
+
     if [ "$method" = "GET" ]; then
         response=$(curl -s -w "\n%{http_code}" -X GET "$BASE_URL$endpoint")
     elif [ "$method" = "POST" ] && [ -n "$content_type" ]; then
@@ -45,10 +45,10 @@ test_endpoint() {
     else
         response=$(curl -s -w "\n%{http_code}" -X $method "$BASE_URL$endpoint")
     fi
-    
+
     http_code=$(echo "$response" | tail -n1)
     body=$(echo "$response" | sed '$d')
-    
+
     if [ "$http_code" = "$expected_status" ]; then
         echo -e "${GREEN}✓ PASS${NC} (HTTP $http_code)"
         PASSED=$((PASSED + 1))
@@ -113,7 +113,7 @@ echo ""
 webrtc_status=$(curl -s "$BASE_URL/webrtc/status" 2>/dev/null || echo "{}")
 if echo "$webrtc_status" | grep -q "webrtc_available"; then
     test_endpoint "WebRTC Status (GET /webrtc/status)" "GET" "/webrtc/status" "200"
-    
+
     # Test WebRTC start (expects session_id)
     webrtc_start_payload='{"session_id":"test-session-123","job_description":"Test position"}'
     test_endpoint "WebRTC Start (POST /webrtc/start)" "POST" "/webrtc/start" "200" "$webrtc_start_payload" "application/json"
@@ -148,11 +148,11 @@ if echo "$health_response" | jq -e '.status' > /dev/null 2>&1 && \
    echo "$health_response" | jq -e '.services' > /dev/null 2>&1; then
     echo -e "${GREEN}✓ Health response has required fields${NC}"
     PASSED=$((PASSED + 1))
-    
+
     # Check if services are ready
     stt_status=$(echo "$health_response" | jq -r '.services.stt')
     tts_status=$(echo "$health_response" | jq -r '.services.tts')
-    
+
     if [ "$stt_status" = "ready" ] && [ "$tts_status" = "ready" ]; then
         echo -e "${GREEN}✓ Core services (STT/TTS) are ready${NC}"
         PASSED=$((PASSED + 1))
@@ -175,7 +175,7 @@ if echo "$openapi_schema" | jq -e '.openapi' > /dev/null 2>&1 && \
    echo "$openapi_schema" | jq -e '.paths' > /dev/null 2>&1; then
     echo -e "${GREEN}✓ OpenAPI schema is valid${NC}"
     PASSED=$((PASSED + 1))
-    
+
     # Count endpoints
     endpoint_count=$(echo "$openapi_schema" | jq '.paths | length')
     echo -e "  ${GREEN}Found $endpoint_count documented endpoints${NC}"

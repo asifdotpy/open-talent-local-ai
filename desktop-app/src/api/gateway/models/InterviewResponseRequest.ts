@@ -20,4 +20,3 @@ export type InterviewResponseRequest = {
      */
     session?: (InterviewSession | null);
 };
-

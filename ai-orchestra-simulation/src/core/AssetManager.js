@@ -16,12 +16,12 @@ export class AssetManager {
 
   createLoaders() {
     const gltfLoader = new GLTFLoader();
-    
+
     // Setup KTX2 loader for texture support
     const ktx2Loader = new KTX2Loader()
       .setTranscoderPath('https://cdn.jsdelivr.net/npm/three@0.164.0/examples/jsm/libs/basis/')
       .detectSupport(new THREE.WebGLRenderer({ antialias: true }));
-    
+
     gltfLoader.setKTX2Loader(ktx2Loader);
     gltfLoader.setMeshoptDecoder(MeshoptDecoder);
 

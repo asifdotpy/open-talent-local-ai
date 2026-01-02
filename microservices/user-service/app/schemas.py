@@ -1,5 +1,6 @@
 from datetime import datetime
-from typing import Optional, Any
+from typing import Any, Optional
+
 from pydantic import BaseModel, EmailStr, Field
 
 from .models import UserRole, UserStatus

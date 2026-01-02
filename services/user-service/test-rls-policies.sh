@@ -21,12 +21,12 @@ echo "📊 Test 1: Check RLS is enabled on tables..."
 PSQL_CMD="psql '$DB_URL' -t -c"
 
 RLS_STATUS=$($PSQL_CMD "
-SELECT 
-    tablename, 
+SELECT
+    tablename,
     CASE WHEN rowsecurity THEN 'ENABLED' ELSE 'DISABLED' END as rls_status
 FROM pg_tables pt
 JOIN pg_class pc ON pt.tablename = pc.relname
-WHERE schemaname = 'public' 
+WHERE schemaname = 'public'
     AND tablename IN ('users', 'user_profiles', 'user_preferences', 'user_activity', 'user_sessions')
 ORDER BY tablename;
 " 2>/dev/null || echo "ERROR")
@@ -43,12 +43,12 @@ echo ""
 
 echo "📋 Test 2: List RLS policies..."
 POLICIES=$($PSQL_CMD "
-SELECT 
+SELECT
     schemaname,
     tablename,
     policyname,
     cmd as operation,
-    CASE 
+    CASE
         WHEN roles = '{public}' THEN 'PUBLIC'
         ELSE array_to_string(roles, ', ')
     END as applies_to
@@ -71,7 +71,7 @@ echo ""
 
 echo "🔍 Test 3: Count policies per table..."
 POLICY_COUNTS=$($PSQL_CMD "
-SELECT 
+SELECT
     tablename,
     COUNT(*) as policy_count
 FROM pg_policies

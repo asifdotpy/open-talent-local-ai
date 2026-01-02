@@ -1,6 +1,6 @@
 /**
  * BaseRenderer - Abstract base class for avatar renderers
- * 
+ *
  * Defines the interface that all renderer implementations must follow.
  * Supports both Canvas-based 2D rendering and Three.js 3D rendering.
  */

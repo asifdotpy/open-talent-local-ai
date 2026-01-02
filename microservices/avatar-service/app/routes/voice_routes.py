@@ -1,10 +1,14 @@
-"""
-Voice generation API routes.
+"""Voice generation API routes.
 """
 
 from fastapi import APIRouter
 
-from app.models.voice import VoiceRequest, VoiceResponse, HealthResponse, VoiceListResponse
+from app.models.voice import (
+    HealthResponse,
+    VoiceListResponse,
+    VoiceRequest,
+    VoiceResponse,
+)
 from app.services.voice_service import voice_service
 
 router = APIRouter()
@@ -19,10 +23,7 @@ async def read_root():
 @router.get("/health", response_model=HealthResponse, tags=["Status"])
 async def health_check():
     """Health check endpoint for the Avatar Service."""
-    return HealthResponse(
-        status="healthy",
-        voice_integration="AI Voice"
-    )
+    return HealthResponse(status="healthy", voice_integration="AI Voice")
 
 
 @router.post("/api/v1/generate-voice", response_model=VoiceResponse, tags=["Voice"])

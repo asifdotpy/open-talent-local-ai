@@ -1,9 +1,9 @@
 /**
  * main.js
- * 
+ *
  * Main entry point for the AI Orchestra Simulation.
  * Orchestrates application initialization, asset loading, and event handling.
- * 
+ *
  * This modular implementation replaces the monolithic app.js with a clean
  * architecture that leverages the existing src/ module system.
  */
@@ -32,17 +32,17 @@ function createStartButton() {
   button.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.3)';
   button.style.transition = 'all 0.3s ease';
   button.style.zIndex = '1000';
-  
+
   button.addEventListener('mouseenter', () => {
     button.style.backgroundColor = '#357abd';
     button.style.transform = 'translate(-50%, -50%) scale(1.05)';
   });
-  
+
   button.addEventListener('mouseleave', () => {
     button.style.backgroundColor = '#4a90e2';
     button.style.transform = 'translate(-50%, -50%) scale(1)';
   });
-  
+
   document.body.appendChild(button);
   return button;
 }
@@ -71,7 +71,7 @@ async function main() {
         // Initialize captions overlay
         const { CaptionsOverlay } = await import('./src/ui/CaptionsOverlay.js');
         captions = new CaptionsOverlay(container);
-        
+
         const { WebRTCClient } = await import('./src/network/WebRTCClient.js');
         const sessionId = `interview-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
         rtc = new WebRTCClient({
@@ -98,10 +98,10 @@ async function main() {
           },
           log: console,
         });
-        
+
         // Expose captions globally for toggle access
         window.captions = captions;
-        
+
         console.log(`[MAIN] WebRTC client prepared with session: ${sessionId}`);
       }
     } catch (e) {
@@ -126,16 +126,16 @@ async function main() {
 
         // Initialize application (loads assets, sets up scene)
         await app.initialize();
-        
+
         // Expose app globally for WebRTC hook
         window.app = app;
 
         // Hide start button
         startButton.style.display = 'none';
-        
+
         // Start application loop (but not animation - user controls via GUI)
         app.start();
-        
+
         console.log('[MAIN] Application started successfully (use GUI to control lip-sync)');
       } catch (error) {
         console.error('[MAIN] Failed to start application:', error);
@@ -143,7 +143,7 @@ async function main() {
         startButton.innerText = 'Click to Retry';
         startButton.style.cursor = 'pointer';
         startButton.style.backgroundColor = '#e74c3c';
-        
+
         // Show error message to user
         alert(`Failed to start application: ${error.message}\n\nPlease check the console for details.`);
       }

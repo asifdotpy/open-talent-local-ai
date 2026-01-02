@@ -1,7 +1,8 @@
 from fastapi import FastAPI
+
+from .config import settings
 from .database import init_db
 from .routers import router
-from .config import settings
 
 
 def create_app() -> FastAPI:

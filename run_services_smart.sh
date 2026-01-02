@@ -96,7 +96,7 @@ log_header() {
 # Function to detect virtual environment
 detect_venv() {
     local service_path="$1"
-    
+
     if [ -d "$service_path/venv" ]; then
         echo "$service_path/venv"
     elif [ -d "$service_path/.venv" ]; then
@@ -109,9 +109,9 @@ detect_venv() {
 # Check prerequisites
 check_prerequisites() {
     log_header "Checking Prerequisites"
-    
+
     local missing_tools=0
-    
+
     # Check Python
     if ! command -v python3 &> /dev/null; then
         log_error "Python 3 not found"
@@ -119,7 +119,7 @@ check_prerequisites() {
     else
         log_success "Python 3: $(python3 --version)"
     fi
-    
+
     # Check pip
     if ! command -v pip &> /dev/null && ! command -v pip3 &> /dev/null; then
         log_error "pip not found"
@@ -127,14 +127,14 @@ check_prerequisites() {
     else
         log_success "pip: Available"
     fi
-    
+
     # Check curl
     if ! command -v curl &> /dev/null; then
         log_warning "curl not found (needed for health checks)"
     else
         log_success "curl: Available"
     fi
-    
+
     if [ $missing_tools -gt 0 ]; then
         log_error "Missing $missing_tools prerequisite(s). Please install and try again."
         exit 1
@@ -167,7 +167,7 @@ start_service() {
     local port=$2
     local service_dir="$MICROSERVICES_DIR/$service_name"
     local log_file="$LOG_DIR/${service_name}_${TIMESTAMP}.log"
-    
+
     # Get service-specific Python executable
     local service_py_bin="${SERVICE_PYTHON[$service_name]}"
     local service_py_version="$($service_py_bin -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
@@ -187,7 +187,7 @@ start_service() {
 
     # Detect virtual environment
     local venv_path=$(detect_venv "$service_dir")
-    
+
     # Ensure venv exists and has bin directory
     if [ -z "$venv_path" ] || [ ! -d "$venv_path/bin" ]; then
         log_warning "Virtual environment missing or incomplete. Recreating with $service_py_bin..."
@@ -207,7 +207,7 @@ start_service() {
     if [ ! -f "$python_exe" ]; then
         python_exe="$venv_path/bin/python"
     fi
-    
+
     if [ ! -f "$python_exe" ]; then
         log_error "$service_name: Python executable not found in venv"
         return 1
@@ -242,14 +242,14 @@ start_service() {
     fi
 
     log_info "Using Python: $python_exe"
-    
+
     # Start the service in background
     (
         cd "$service_dir"
         export PYTHONUNBUFFERED=1
         "$python_exe" -m uvicorn "$uvicorn_app" --host 0.0.0.0 --port $port >> "$log_file" 2>&1
     ) &
-    
+
     local pid=$!
     sleep 2
 
@@ -297,7 +297,7 @@ wait_for_service() {
 # Cleanup function
 cleanup() {
     log_header "Shutting Down Services"
-    
+
     local pids_file="$LOG_DIR/pids_${TIMESTAMP}.txt"
     if [ -f "$pids_file" ]; then
         while IFS=':' read -r service_name pid port; do
@@ -306,9 +306,9 @@ cleanup() {
                 kill $pid 2>/dev/null || true
             fi
         done < "$pids_file"
-        
+
         sleep 1
-        
+
         # Force kill any remaining processes
         while IFS=':' read -r service_name pid port; do
             if kill -0 $pid 2>/dev/null; then
@@ -317,7 +317,7 @@ cleanup() {
             fi
         done < "$pids_file"
     fi
-    
+
     log_success "All services stopped"
     exit 0
 }
@@ -396,7 +396,7 @@ if [ $failed_count -eq 0 ]; then
     echo -e "${BLUE}✨ Ready for testing! Use service endpoints above.${NC}" | tee -a "$MAIN_LOG_FILE"
     echo "" | tee -a "$MAIN_LOG_FILE"
     log_info "Press Ctrl+C to stop all services"
-    
+
     # Keep the script running
     wait
 else

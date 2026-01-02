@@ -39,4 +39,3 @@ export type ModelInfo = {
      */
     source?: (string | null);
 };
-

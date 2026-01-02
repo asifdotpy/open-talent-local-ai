@@ -5,23 +5,25 @@ Provides real-time WebSocket streaming for live avatar interviews
 Compatible with the ai-orchestra-simulation streaming architecture
 """
 
-import json
-import os
-import sys
-import struct
-import math
-import asyncio
-import websockets
-from pathlib import Path
-import random
 import argparse
+import asyncio
+import json
+import math
+import os
+import random
+import struct
+import sys
+
+import websockets
 
 try:
     import numpy as np
+
     HAS_NUMPY = True
 except ImportError:
     HAS_NUMPY = False
     print("⚠️  NumPy not available. Install with: pip install numpy websockets")
+
 
 class StreamingWAVGenerator:
     """Generate streaming WAV audio data compatible with WebSocket streaming"""
@@ -34,20 +36,21 @@ class StreamingWAVGenerator:
 
     def create_wav_header(self, data_size):
         """Create proper WAV file header"""
-        return struct.pack('<4sL4s4sLHHLLHH4sL',
-            b'RIFF',
+        return struct.pack(
+            "<4sL4s4sLHHLLHH4sL",
+            b"RIFF",
             36 + data_size,  # File size
-            b'WAVE',
-            b'fmt ',
+            b"WAVE",
+            b"fmt ",
             16,  # Format chunk size
-            1,   # Audio format (PCM)
+            1,  # Audio format (PCM)
             self.channels,
             self.sample_rate,
             self.sample_rate * self.channels * self.bytes_per_sample,  # Byte rate
             self.channels * self.bytes_per_sample,  # Block align
             self.bits_per_sample,
-            b'data',
-            data_size
+            b"data",
+            data_size,
         )
 
     def generate_sine_wave(self, frequency, duration, amplitude=0.8):
@@ -59,11 +62,13 @@ class StreamingWAVGenerator:
             return (wave * 32767).astype(np.int16).tobytes()
         else:
             # Fallback without numpy
-            audio_data = b''
+            audio_data = b""
             num_samples = int(self.sample_rate * duration)
             for i in range(num_samples):
-                sample = int(amplitude * 32767 * math.sin(2 * math.pi * frequency * i / self.sample_rate))
-                audio_data += struct.pack('<h', sample)
+                sample = int(
+                    amplitude * 32767 * math.sin(2 * math.pi * frequency * i / self.sample_rate)
+                )
+                audio_data += struct.pack("<h", sample)
             return audio_data
 
     def generate_speech_like_audio(self, text, base_frequency=180):
@@ -84,10 +89,10 @@ class StreamingWAVGenerator:
 
             # Add small pause between words
             pause_samples = int(self.sample_rate * 0.05)  # 50ms pause
-            pause_data = b'\x00\x00' * pause_samples
+            pause_data = b"\x00\x00" * pause_samples
             audio_chunks.append(pause_data)
 
-        return b''.join(audio_chunks)
+        return b"".join(audio_chunks)
 
     def create_streaming_chunks(self, audio_data, chunk_size_ms=100):
         """Break audio data into streaming chunks for WebSocket"""
@@ -96,13 +101,16 @@ class StreamingWAVGenerator:
 
         chunks = []
         for i in range(0, len(audio_data), chunk_size_bytes):
-            chunk = audio_data[i:i + chunk_size_bytes]
+            chunk = audio_data[i : i + chunk_size_bytes]
             if len(chunk) > 0:
                 chunks.append(chunk)
 
         return chunks
 
-async def stream_audio_to_websocket(generator, text, websocket_url="ws://localhost:8051/ws/session_123", session_id="demo"):
+
+async def stream_audio_to_websocket(
+    generator, text, websocket_url="ws://localhost:8051/ws/session_123", session_id="demo"
+):
     """Stream generated audio via WebSocket to avatar animation service"""
     try:
         # Replace session_id placeholder in URL
@@ -124,7 +132,7 @@ async def stream_audio_to_websocket(generator, text, websocket_url="ws://localho
                 "audio_format": "wav",
                 "sample_rate": generator.sample_rate,
                 "total_chunks": len(chunks),
-                "text": text
+                "text": text,
             }
             await websocket.send(json.dumps(start_metadata))
 
@@ -138,7 +146,7 @@ async def stream_audio_to_websocket(generator, text, websocket_url="ws://localho
                     "chunk_id": i,
                     "total_chunks": len(chunks),
                     "timestamp": i * 0.1,  # 100ms per chunk
-                    "session_id": session_id
+                    "session_id": session_id,
                 }
                 await websocket.send(json.dumps(metadata))
 
@@ -150,7 +158,7 @@ async def stream_audio_to_websocket(generator, text, websocket_url="ws://localho
                 "type": "session_end",
                 "session_id": session_id,
                 "total_chunks": len(chunks),
-                "duration": len(chunks) * 0.1
+                "duration": len(chunks) * 0.1,
             }
             await websocket.send(json.dumps(end_metadata))
 
@@ -160,14 +168,16 @@ async def stream_audio_to_websocket(generator, text, websocket_url="ws://localho
         print(f"❌ WebSocket streaming failed: {e}")
         print("💡 Make sure the avatar animation service is running on the specified WebSocket URL")
 
+
 def load_text_from_file():
     """Load text from prompt.txt or use default"""
     prompt_file = "prompt.txt"
     if os.path.exists(prompt_file):
-        with open(prompt_file, "r", encoding="utf-8") as f:
+        with open(prompt_file, encoding="utf-8") as f:
             return f.read().strip()
     else:
         return "Welcome to the AI Orchestra live streaming demonstration. This showcases real-time facial animation with WebSocket audio streaming."
+
 
 async def demo_streaming(args):
     """Demonstrate WebSocket streaming capability"""
@@ -185,6 +195,7 @@ async def demo_streaming(args):
     # Start streaming
     await stream_audio_to_websocket(generator, text, args.websocket_url, args.session_id)
 
+
 def main():
     """Main entry point with argument parsing"""
     parser = argparse.ArgumentParser(
@@ -195,31 +206,24 @@ Examples:
   python stream_audio.py --websocket-url ws://localhost:8051/ws/demo_session
   python stream_audio.py --session-id interview_001 --text "Hello, welcome to your interview"
   python stream_audio.py --demo  # Use default settings
-        """
+        """,
     )
 
     parser.add_argument(
         "--websocket-url",
         default="ws://localhost:8051/ws/{session_id}",
-        help="WebSocket URL for streaming (default: ws://localhost:8051/ws/{session_id})"
+        help="WebSocket URL for streaming (default: ws://localhost:8051/ws/{session_id})",
     )
 
     parser.add_argument(
-        "--session-id",
-        default="demo",
-        help="Session ID for the streaming session (default: demo)"
+        "--session-id", default="demo", help="Session ID for the streaming session (default: demo)"
     )
 
     parser.add_argument(
-        "--text",
-        help="Text to stream (default: load from prompt.txt or use demo text)"
+        "--text", help="Text to stream (default: load from prompt.txt or use demo text)"
     )
 
-    parser.add_argument(
-        "--demo",
-        action="store_true",
-        help="Run demo with default settings"
-    )
+    parser.add_argument("--demo", action="store_true", help="Run demo with default settings")
 
     args = parser.parse_args()
 
@@ -244,6 +248,7 @@ Examples:
         text = args.text or load_text_from_file()
         generator = StreamingWAVGenerator()
         asyncio.run(stream_audio_to_websocket(generator, text, args.websocket_url, args.session_id))
+
 
 if __name__ == "__main__":
     main()

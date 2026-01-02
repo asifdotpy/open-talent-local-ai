@@ -24,7 +24,7 @@ class PerformanceMonitor {
     const end = performance.now();
     const start = this.marks.get(label);
     if (!start) throw new Error(`Mark "${label}" not found`);
-    
+
     const duration = end - start;
     if (!this.measures.has(label)) {
       this.measures.set(label, []);
@@ -36,7 +36,7 @@ class PerformanceMonitor {
   getStats(label: string) {
     const values = this.measures.get(label) || [];
     if (values.length === 0) return null;
-    
+
     return {
       min: Math.min(...values),
       max: Math.max(...values),
@@ -78,7 +78,7 @@ describe('Performance Benchmarks', () => {
 
     transcriptionService = {
       transcribe: jest.fn().mockImplementation(() => {
-        return new Promise(resolve => 
+        return new Promise(resolve =>
           setTimeout(() => resolve({
             text: 'Transcribed testimonial text',
             confidence: 0.92,
@@ -127,7 +127,7 @@ describe('Performance Benchmarks', () => {
       perfMonitor.mark('avatar-init');
       await avatarService.initialize();
       const duration = perfMonitor.measure('avatar-init');
-      
+
       expect(duration).toBeLessThan(1000);
     });
 
@@ -135,18 +135,18 @@ describe('Performance Benchmarks', () => {
       perfMonitor.mark('expression-switch');
       await avatarService.setExpression('happy');
       const duration = perfMonitor.measure('expression-switch');
-      
+
       expect(duration).toBeLessThan(100);
     });
 
     it('should handle rapid expression changes', async () => {
       const expressions = ['happy', 'sad', 'neutral'];
       perfMonitor.mark('rapid-expressions');
-      
+
       for (const expr of expressions) {
         await avatarService.setExpression(expr);
       }
-      
+
       const duration = perfMonitor.measure('rapid-expressions');
       expect(duration).toBeLessThan(500);
     });
@@ -155,9 +155,9 @@ describe('Performance Benchmarks', () => {
   describe('Transcription Performance', () => {
     it('should transcribe audio within 2 seconds', async () => {
       perfMonitor.mark('transcription');
-      
+
       const result = await transcriptionService.transcribe('/audio/5sec.wav');
-      
+
       const duration = perfMonitor.measure('transcription');
       expect(duration).toBeLessThan(2000);
       expect(result.text).toBeDefined();
@@ -165,11 +165,11 @@ describe('Performance Benchmarks', () => {
 
     it('should extract phonemes efficiently', async () => {
       const text = 'This is a test testimonial about workplace discrimination.';
-      
+
       perfMonitor.mark('phoneme-extraction');
       const phonemes = transcriptionService.extractPhonemes(text);
       const duration = perfMonitor.measure('phoneme-extraction');
-      
+
       expect(duration).toBeLessThan(100);
       expect(phonemes.length).toBeGreaterThan(0);
     });
@@ -181,11 +181,11 @@ describe('Performance Benchmarks', () => {
         context: 'Test testimony',
         incidentType: 'discrimination',
       };
-      
+
       perfMonitor.mark('save');
       await database.save(testimony);
       const duration = perfMonitor.measure('save');
-      
+
       expect(duration).toBeLessThan(500);
     });
 
@@ -193,11 +193,11 @@ describe('Performance Benchmarks', () => {
       const testimonies = Array.from({ length: 10 }, (_, i) => ({
         context: `Testimony ${i}`,
       }));
-      
+
       perfMonitor.mark('bulk-save');
-      
+
       await Promise.all(testimonies.map(t => database.save(t)));
-      
+
       const duration = perfMonitor.measure('bulk-save');
       expect(duration).toBeLessThan(10000);
     });
@@ -209,7 +209,7 @@ describe('Performance Benchmarks', () => {
         () => avatarService.setExpression('happy'),
         () => voiceService.startRecording(),
       ];
-      
+
       for (const interaction of interactions) {
         perfMonitor.mark('interaction');
         await interaction();
@@ -220,13 +220,13 @@ describe('Performance Benchmarks', () => {
 
     it('should handle concurrent operations', async () => {
       perfMonitor.mark('concurrent');
-      
+
       await Promise.all([
         avatarService.setExpression('happy'),
         avatarService.playLipSyncAnimation(),
         Promise.resolve(transcriptionService.getState()),
       ]);
-      
+
       const duration = perfMonitor.measure('concurrent');
       expect(duration).toBeLessThan(200);
     });
@@ -235,12 +235,12 @@ describe('Performance Benchmarks', () => {
   describe('Full Workflow Performance', () => {
     it('should complete full workflow within target time', async () => {
       perfMonitor.mark('full-workflow');
-      
+
       await voiceService.startRecording();
       await transcriptionService.transcribe('/audio/test.wav');
       await avatarService.playLipSyncAnimation();
       await database.save({ context: 'test' });
-      
+
       const duration = perfMonitor.measure('full-workflow');
       expect(duration).toBeLessThan(5000);
     });

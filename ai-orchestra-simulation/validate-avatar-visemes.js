@@ -56,7 +56,7 @@ function parseGLBMorphTargets(buffer) {
 
     // Extract morph targets from all meshes
     const morphTargets = new Set();
-    
+
     if (gltf.meshes) {
       for (const mesh of gltf.meshes) {
         if (mesh.primitives) {
@@ -81,14 +81,14 @@ function parseGLBMorphTargets(buffer) {
 
 async function validateAvatar(avatarId) {
   const url = `https://models.readyplayer.me/${avatarId}.glb`;
-  
+
   log(colors.cyan, `\n🔍 Testing Avatar: ${avatarId}`);
   log(colors.yellow, `   URL: ${url}`);
 
   try {
     // Download GLB file
     const response = await fetch(url);
-    
+
     if (!response.ok) {
       log(colors.red, `   ❌ Download failed: ${response.status} ${response.statusText}`);
       return { avatarId, success: false, error: `HTTP ${response.status}` };
@@ -96,24 +96,24 @@ async function validateAvatar(avatarId) {
 
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    
+
     log(colors.green, `   ✅ Downloaded: ${(buffer.length / 1024).toFixed(2)} KB`);
 
     // Parse morph targets
     const morphTargets = parseGLBMorphTargets(buffer);
-    
+
     if (morphTargets.length === 0) {
       log(colors.yellow, `   ⚠️  No morph targets found (might need different parsing)`);
-      
+
       // Try alternative: save and inspect manually
       const filename = `/tmp/avatar_${avatarId}.glb`;
       writeFileSync(filename, buffer);
       log(colors.yellow, `   💾 Saved to: ${filename}`);
       log(colors.yellow, `   ℹ️  Use Blender or GLB viewer to inspect morph targets`);
-      
-      return { 
-        avatarId, 
-        success: false, 
+
+      return {
+        avatarId,
+        success: false,
         morphTargets: [],
         savedPath: filename,
         note: 'Manual inspection needed'
@@ -121,7 +121,7 @@ async function validateAvatar(avatarId) {
     }
 
     // Check for Oculus visemes
-    const foundOculusVisemes = morphTargets.filter(name => 
+    const foundOculusVisemes = morphTargets.filter(name =>
       name.toLowerCase().includes('viseme_')
     );
 
@@ -132,7 +132,7 @@ async function validateAvatar(avatarId) {
     log(colors.bright, `\n   📊 Morph Target Analysis:`);
     log(colors.yellow, `      Total morph targets: ${morphTargets.length}`);
     log(colors.yellow, `      Oculus visemes found: ${foundOculusVisemes.length}/15`);
-    
+
     if (foundOculusVisemes.length > 0) {
       log(colors.green, `      ✅ Has visemes: ${foundOculusVisemes.join(', ')}`);
     }
@@ -173,15 +173,15 @@ async function validateAvatar(avatarId) {
 async function main() {
   log(colors.bright, '\n🎭 Avatar Viseme Validator\n');
   log(colors.bright, '==========================\n');
-  
+
   log(colors.cyan, `Testing ${TEST_AVATARS.length} avatars...\n`);
 
   const results = [];
-  
+
   for (const avatarId of TEST_AVATARS) {
     const result = await validateAvatar(avatarId);
     results.push(result);
-    
+
     // Small delay between requests
     await new Promise(resolve => setTimeout(resolve, 500));
   }

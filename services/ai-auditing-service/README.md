@@ -45,8 +45,8 @@ pytest services/ai-auditing-service/tests/test_planned_endpoints.py -v
 
 - Centralized in `services/ai-auditing-service/rules.py`.
 - Exposes:
-	- `RULES`: dict of rule-id → `AuditRule` (source of truth for available rules).
-	- `KNOWN_RULE_IDS`: set of valid rule IDs derived from `RULES`.
+  - `RULES`: dict of rule-id → `AuditRule` (source of truth for available rules).
+  - `KNOWN_RULE_IDS`: set of valid rule IDs derived from `RULES`.
 - `main.py` initializes `AuditConfig.default_ruleset` from `RULES.keys()` to avoid drift.
 - `schemas.py` validates `AuditConfig.default_ruleset` against `KNOWN_RULE_IDS` and enforces `max_findings >= 1`.
 
@@ -56,11 +56,11 @@ pytest services/ai-auditing-service/tests/test_planned_endpoints.py -v
 
 ```python
 RULES["your_new_rule"] = AuditRule(
-		id="your_new_rule",
-		name="Your New Rule",
-		description="What the rule detects.",
-		severity=Severity.MEDIUM,
-		enabled=True,
+  id="your_new_rule",
+  name="Your New Rule",
+  description="What the rule detects.",
+  severity=Severity.MEDIUM,
+  enabled=True,
 )
 ```
 

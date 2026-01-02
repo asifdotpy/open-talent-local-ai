@@ -1,6 +1,7 @@
 """Test pagination for list endpoints"""
 import pytest
 from fastapi.testclient import TestClient
+
 from main import app
 
 client = TestClient(app)
@@ -18,12 +19,12 @@ def setup_test_data():
             "first_name": f"User{i}",
             "last_name": f"Test{i}",
             "phone": "+12345678900",
-            "resume_url": "https://example.com/resume.pdf"
+            "resume_url": "https://example.com/resume.pdf",
         }
         r = client.post("/api/v1/candidates", json=payload, headers=AUTH)
         if r.status_code == 201:
             candidates.append(r.json())
-    
+
     # Create 10 applications
     if candidates:
         for i in range(10):
@@ -31,12 +32,12 @@ def setup_test_data():
                 "candidate_id": candidates[i % len(candidates)]["id"],
                 "job_id": f"job-{i}",
                 "cover_letter": f"I am interested in job {i}",
-                "status": "applied"
+                "status": "applied",
             }
             client.post("/api/v1/applications", json=payload, headers=AUTH)
-    
+
     yield
-    
+
     # Cleanup is handled by the app's cleanup on candidate deletion
 
 
@@ -92,7 +93,7 @@ def test_list_candidates_pagination_has_previous():
     r = client.get("/api/v1/candidates?offset=0&limit=5", headers=AUTH)
     data = r.json()
     assert data["has_previous"] is False
-    
+
     # Offset > 0 should have previous
     r = client.get("/api/v1/candidates?offset=5&limit=5", headers=AUTH)
     data = r.json()
@@ -144,23 +145,26 @@ def test_list_interviews_pagination():
         "first_name": "Interview",
         "last_name": "Test",
         "phone": "+12345678900",
-        "resume_url": "https://example.com/resume.pdf"
+        "resume_url": "https://example.com/resume.pdf",
     }
     r = client.post("/api/v1/candidates", json=payload, headers=AUTH)
     candidate_id = r.json()["id"]
-    
+
     # Create some interviews
     from datetime import datetime, timedelta
+
     for i in range(5):
         interview_payload = {
             "title": f"Interview {i}",
             "scheduled_at": (datetime.now() + timedelta(days=i)).isoformat(),
             "interviewer": f"Interviewer {i}",
             "location": "Remote",
-            "status": "scheduled"
+            "status": "scheduled",
         }
-        client.post(f"/api/v1/candidates/{candidate_id}/interviews", json=interview_payload, headers=AUTH)
-    
+        client.post(
+            f"/api/v1/candidates/{candidate_id}/interviews", json=interview_payload, headers=AUTH
+        )
+
     # Test pagination
     r = client.get(f"/api/v1/candidates/{candidate_id}/interviews?offset=0&limit=2", headers=AUTH)
     assert r.status_code == 200
@@ -178,21 +182,23 @@ def test_list_assessments_pagination():
         "first_name": "Assessment",
         "last_name": "Test",
         "phone": "+12345678900",
-        "resume_url": "https://example.com/resume.pdf"
+        "resume_url": "https://example.com/resume.pdf",
     }
     r = client.post("/api/v1/candidates", json=payload, headers=AUTH)
     candidate_id = r.json()["id"]
-    
+
     # Create some assessments
     for i in range(5):
         assess_payload = {
             "title": f"Assessment {i}",
             "description": f"Description {i}",
             "assessment_type": "coding",
-            "status": "pending"
+            "status": "pending",
         }
-        client.post(f"/api/v1/candidates/{candidate_id}/assessments", json=assess_payload, headers=AUTH)
-    
+        client.post(
+            f"/api/v1/candidates/{candidate_id}/assessments", json=assess_payload, headers=AUTH
+        )
+
     # Test pagination
     r = client.get(f"/api/v1/candidates/{candidate_id}/assessments?offset=0&limit=2", headers=AUTH)
     assert r.status_code == 200
@@ -210,22 +216,25 @@ def test_list_availability_pagination():
         "first_name": "Availability",
         "last_name": "Test",
         "phone": "+12345678900",
-        "resume_url": "https://example.com/resume.pdf"
+        "resume_url": "https://example.com/resume.pdf",
     }
     r = client.post("/api/v1/candidates", json=payload, headers=AUTH)
     candidate_id = r.json()["id"]
-    
+
     # Create some availability slots
     from datetime import datetime, timedelta
+
     for i in range(5):
         avail_payload = {
             "start_time": (datetime.now() + timedelta(days=i)).isoformat(),
             "end_time": (datetime.now() + timedelta(days=i, hours=1)).isoformat(),
             "timezone": "UTC",
-            "is_available": True
+            "is_available": True,
         }
-        client.post(f"/api/v1/candidates/{candidate_id}/availability", json=avail_payload, headers=AUTH)
-    
+        client.post(
+            f"/api/v1/candidates/{candidate_id}/availability", json=avail_payload, headers=AUTH
+        )
+
     # Test pagination
     r = client.get(f"/api/v1/candidates/{candidate_id}/availability?offset=0&limit=2", headers=AUTH)
     assert r.status_code == 200
@@ -243,20 +252,17 @@ def test_list_skills_pagination():
         "first_name": "Skills",
         "last_name": "Test",
         "phone": "+12345678900",
-        "resume_url": "https://example.com/resume.pdf"
+        "resume_url": "https://example.com/resume.pdf",
     }
     r = client.post("/api/v1/candidates", json=payload, headers=AUTH)
     candidate_id = r.json()["id"]
-    
+
     # Add some skills
     skills = ["Python", "FastAPI", "PostgreSQL", "React", "Docker"]
     for skill in skills:
-        skill_payload = {
-            "skill": skill,
-            "proficiency": "advanced"
-        }
+        skill_payload = {"skill": skill, "proficiency": "advanced"}
         client.post(f"/api/v1/candidates/{candidate_id}/skills", json=skill_payload, headers=AUTH)
-    
+
     # Test pagination
     r = client.get(f"/api/v1/candidates/{candidate_id}/skills?offset=0&limit=2", headers=AUTH)
     assert r.status_code == 200
@@ -291,13 +297,13 @@ def test_pagination_metadata_consistency():
     r = client.get("/api/v1/candidates?offset=10&limit=5", headers=AUTH)
     assert r.status_code == 200
     data = r.json()
-    
+
     # Verify calculations
     expected_page = (10 // 5) + 1  # = 3
     assert data["page"] == expected_page
-    
+
     expected_has_previous = 10 > 0  # = True
     assert data["has_previous"] == expected_has_previous
-    
-    expected_has_next = (10 + 5) < data["total"]
+
+    expected_has_next = data["total"] > (10 + 5)
     assert data["has_next"] == expected_has_next

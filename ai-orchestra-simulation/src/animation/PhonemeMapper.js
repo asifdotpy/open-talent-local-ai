@@ -1,9 +1,9 @@
 /**
  * PhonemeMapper - Maps phonemes to ARKit morph targets (face.glb)
- * 
+ *
  * Uses 52 named ARKit blendshapes from face.glb for production-grade lip-sync
  * Supports blended morph targets (primary + secondary) for realistic animations
- * 
+ *
  * Phoneme set: 14 vowels + 23 consonants + 2 special = 39 phonemes
  */
 
@@ -46,321 +46,321 @@ export class PhonemeMapper {
     // Primary: main mouth shape | Secondary: secondary shape for blending | Tertiary: additional refinement
     this.phonemeMap = {
       // VOWELS (14) - Enhanced with asymmetric and detailed mouth shapes
-      'aa': { 
-        primary: 'jawOpen', 
-        secondary: 'mouthFunnel', 
+      'aa': {
+        primary: 'jawOpen',
+        secondary: 'mouthFunnel',
         tertiary: 'mouthStretch_L',
-        primaryIntensity: 1.0, 
-        secondaryIntensity: 0.4, 
-        tertiaryIntensity: 0.2 
+        primaryIntensity: 1.0,
+        secondaryIntensity: 0.4,
+        tertiaryIntensity: 0.2
       },
-      'ae': { 
-        primary: 'jawOpen', 
-        secondary: 'mouthSmile', 
+      'ae': {
+        primary: 'jawOpen',
+        secondary: 'mouthSmile',
         tertiary: 'mouthStretch_R',
-        primaryIntensity: 0.8, 
-        secondaryIntensity: 0.5, 
-        tertiaryIntensity: 0.1 
+        primaryIntensity: 0.8,
+        secondaryIntensity: 0.5,
+        tertiaryIntensity: 0.1
       },
-      'ah': { 
-        primary: 'jawOpen', 
-        secondary: null, 
+      'ah': {
+        primary: 'jawOpen',
+        secondary: null,
         tertiary: 'mouthRollLower',
-        primaryIntensity: 1.0, 
-        secondaryIntensity: 0, 
-        tertiaryIntensity: 0.3 
+        primaryIntensity: 1.0,
+        secondaryIntensity: 0,
+        tertiaryIntensity: 0.3
       },
-      'ao': { 
-        primary: 'mouthFunnel', 
-        secondary: 'jawOpen', 
+      'ao': {
+        primary: 'mouthFunnel',
+        secondary: 'jawOpen',
         tertiary: 'mouthPucker',
-        primaryIntensity: 0.9, 
-        secondaryIntensity: 0.6, 
-        tertiaryIntensity: 0.4 
+        primaryIntensity: 0.9,
+        secondaryIntensity: 0.6,
+        tertiaryIntensity: 0.4
       },
-      'ee': { 
-        primary: 'mouthSmile', 
-        secondary: 'mouthStretch_L', 
+      'ee': {
+        primary: 'mouthSmile',
+        secondary: 'mouthStretch_L',
         tertiary: 'mouthUpperUp_L',
-        primaryIntensity: 0.9, 
-        secondaryIntensity: 0.5, 
-        tertiaryIntensity: 0.3 
+        primaryIntensity: 0.9,
+        secondaryIntensity: 0.5,
+        tertiaryIntensity: 0.3
       },
-      'eh': { 
-        primary: 'jawOpen', 
-        secondary: 'mouthSmile_L', 
+      'eh': {
+        primary: 'jawOpen',
+        secondary: 'mouthSmile_L',
         tertiary: null,
-        primaryIntensity: 0.7, 
-        secondaryIntensity: 0.4, 
-        tertiaryIntensity: 0 
+        primaryIntensity: 0.7,
+        secondaryIntensity: 0.4,
+        tertiaryIntensity: 0
       },
-      'er': { 
-        primary: 'mouthRollUpper', 
-        secondary: 'jawOpen', 
+      'er': {
+        primary: 'mouthRollUpper',
+        secondary: 'jawOpen',
         tertiary: null,
-        primaryIntensity: 0.6, 
-        secondaryIntensity: 0.3, 
-        tertiaryIntensity: 0 
+        primaryIntensity: 0.6,
+        secondaryIntensity: 0.3,
+        tertiaryIntensity: 0
       },
-      'ih': { 
-        primary: 'jawOpen', 
-        secondary: 'mouthSmile_R', 
+      'ih': {
+        primary: 'jawOpen',
+        secondary: 'mouthSmile_R',
         tertiary: null,
-        primaryIntensity: 0.5, 
-        secondaryIntensity: 0.3, 
-        tertiaryIntensity: 0 
+        primaryIntensity: 0.5,
+        secondaryIntensity: 0.3,
+        tertiaryIntensity: 0
       },
-      'iy': { 
-        primary: 'mouthSmile', 
-        secondary: 'mouthUpperUp_R', 
+      'iy': {
+        primary: 'mouthSmile',
+        secondary: 'mouthUpperUp_R',
         tertiary: 'mouthStretch_R',
-        primaryIntensity: 1.0, 
-        secondaryIntensity: 0.4, 
-        tertiaryIntensity: 0.2 
+        primaryIntensity: 1.0,
+        secondaryIntensity: 0.4,
+        tertiaryIntensity: 0.2
       },
-      'oh': { 
-        primary: 'mouthFunnel', 
-        secondary: 'jawOpen', 
+      'oh': {
+        primary: 'mouthFunnel',
+        secondary: 'jawOpen',
         tertiary: 'mouthRollUpper',
-        primaryIntensity: 1.0, 
-        secondaryIntensity: 0.6, 
-        tertiaryIntensity: 0.3 
+        primaryIntensity: 1.0,
+        secondaryIntensity: 0.6,
+        tertiaryIntensity: 0.3
       },
-      'ow': { 
-        primary: 'mouthFunnel', 
-        secondary: 'jawOpen', 
+      'ow': {
+        primary: 'mouthFunnel',
+        secondary: 'jawOpen',
         tertiary: 'mouthPucker',
-        primaryIntensity: 0.8, 
-        secondaryIntensity: 0.5, 
-        tertiaryIntensity: 0.4 
+        primaryIntensity: 0.8,
+        secondaryIntensity: 0.5,
+        tertiaryIntensity: 0.4
       },
-      'oy': { 
-        primary: 'mouthSmile', 
-        secondary: 'jawOpen', 
+      'oy': {
+        primary: 'mouthSmile',
+        secondary: 'jawOpen',
         tertiary: 'mouthFunnel',
-        primaryIntensity: 0.7, 
-        secondaryIntensity: 0.5, 
-        tertiaryIntensity: 0.3 
+        primaryIntensity: 0.7,
+        secondaryIntensity: 0.5,
+        tertiaryIntensity: 0.3
       },
-      'uh': { 
-        primary: 'mouthPucker', 
-        secondary: 'jawOpen', 
+      'uh': {
+        primary: 'mouthPucker',
+        secondary: 'jawOpen',
         tertiary: null,
-        primaryIntensity: 0.8, 
-        secondaryIntensity: 0.4, 
-        tertiaryIntensity: 0 
+        primaryIntensity: 0.8,
+        secondaryIntensity: 0.4,
+        tertiaryIntensity: 0
       },
-      'uw': { 
-        primary: 'mouthPucker', 
-        secondary: 'mouthFunnel', 
+      'uw': {
+        primary: 'mouthPucker',
+        secondary: 'mouthFunnel',
         tertiary: 'mouthRollLower',
-        primaryIntensity: 1.0, 
-        secondaryIntensity: 0.7, 
-        tertiaryIntensity: 0.3 
+        primaryIntensity: 1.0,
+        secondaryIntensity: 0.7,
+        tertiaryIntensity: 0.3
       },
 
       // CONSONANTS (23) - Enhanced with detailed articulatory features
-      'b': { 
-        primary: 'mouthClose', 
-        secondary: null, 
+      'b': {
+        primary: 'mouthClose',
+        secondary: null,
         tertiary: 'mouthPress_L',
-        primaryIntensity: 1.0, 
-        secondaryIntensity: 0, 
-        tertiaryIntensity: 0.2 
+        primaryIntensity: 1.0,
+        secondaryIntensity: 0,
+        tertiaryIntensity: 0.2
       },
-      'ch': { 
-        primary: 'mouthClose', 
-        secondary: 'jawOpen', 
+      'ch': {
+        primary: 'mouthClose',
+        secondary: 'jawOpen',
         tertiary: 'mouthRollUpper',
-        primaryIntensity: 0.8, 
-        secondaryIntensity: 0.4, 
-        tertiaryIntensity: 0.3 
+        primaryIntensity: 0.8,
+        secondaryIntensity: 0.4,
+        tertiaryIntensity: 0.3
       },
-      'd': { 
-        primary: 'jawOpen', 
-        secondary: 'mouthClose', 
+      'd': {
+        primary: 'jawOpen',
+        secondary: 'mouthClose',
         tertiary: null,
-        primaryIntensity: 0.3, 
-        secondaryIntensity: 0.2, 
-        tertiaryIntensity: 0 
+        primaryIntensity: 0.3,
+        secondaryIntensity: 0.2,
+        tertiaryIntensity: 0
       },
-      'f': { 
-        primary: 'mouthClose', 
-        secondary: 'mouthRollLower', 
+      'f': {
+        primary: 'mouthClose',
+        secondary: 'mouthRollLower',
         tertiary: 'mouthPress_R',
-        primaryIntensity: 0.7, 
-        secondaryIntensity: 0.6, 
-        tertiaryIntensity: 0.3 
+        primaryIntensity: 0.7,
+        secondaryIntensity: 0.6,
+        tertiaryIntensity: 0.3
       },
-      'g': { 
-        primary: 'jawOpen', 
-        secondary: null, 
+      'g': {
+        primary: 'jawOpen',
+        secondary: null,
         tertiary: 'mouthFrown_L',
-        primaryIntensity: 0.2, 
-        secondaryIntensity: 0, 
-        tertiaryIntensity: 0.1 
+        primaryIntensity: 0.2,
+        secondaryIntensity: 0,
+        tertiaryIntensity: 0.1
       },
-      'hh': { 
-        primary: 'jawOpen', 
-        secondary: null, 
+      'hh': {
+        primary: 'jawOpen',
+        secondary: null,
         tertiary: 'mouthStretch_L',
-        primaryIntensity: 0.1, 
-        secondaryIntensity: 0, 
-        tertiaryIntensity: 0.2 
+        primaryIntensity: 0.1,
+        secondaryIntensity: 0,
+        tertiaryIntensity: 0.2
       },
-      'jh': { 
-        primary: 'mouthClose', 
-        secondary: 'jawOpen', 
+      'jh': {
+        primary: 'mouthClose',
+        secondary: 'jawOpen',
         tertiary: 'mouthSmile_L',
-        primaryIntensity: 0.6, 
-        secondaryIntensity: 0.3, 
-        tertiaryIntensity: 0.2 
+        primaryIntensity: 0.6,
+        secondaryIntensity: 0.3,
+        tertiaryIntensity: 0.2
       },
-      'k': { 
-        primary: 'jawOpen', 
-        secondary: null, 
+      'k': {
+        primary: 'jawOpen',
+        secondary: null,
         tertiary: 'mouthFrown_R',
-        primaryIntensity: 0.15, 
-        secondaryIntensity: 0, 
-        tertiaryIntensity: 0.1 
+        primaryIntensity: 0.15,
+        secondaryIntensity: 0,
+        tertiaryIntensity: 0.1
       },
-      'l': { 
-        primary: 'jawOpen', 
-        secondary: 'mouthSmile_R', 
+      'l': {
+        primary: 'jawOpen',
+        secondary: 'mouthSmile_R',
         tertiary: 'mouthRollUpper',
-        primaryIntensity: 0.4, 
-        secondaryIntensity: 0.2, 
-        tertiaryIntensity: 0.1 
+        primaryIntensity: 0.4,
+        secondaryIntensity: 0.2,
+        tertiaryIntensity: 0.1
       },
-      'm': { 
-        primary: 'mouthClose', 
-        secondary: null, 
+      'm': {
+        primary: 'mouthClose',
+        secondary: null,
         tertiary: 'mouthPress_L',
-        primaryIntensity: 1.0, 
-        secondaryIntensity: 0, 
-        tertiaryIntensity: 0.3 
+        primaryIntensity: 1.0,
+        secondaryIntensity: 0,
+        tertiaryIntensity: 0.3
       },
-      'n': { 
-        primary: 'jawOpen', 
-        secondary: 'mouthClose', 
+      'n': {
+        primary: 'jawOpen',
+        secondary: 'mouthClose',
         tertiary: null,
-        primaryIntensity: 0.3, 
-        secondaryIntensity: 0.2, 
-        tertiaryIntensity: 0 
+        primaryIntensity: 0.3,
+        secondaryIntensity: 0.2,
+        tertiaryIntensity: 0
       },
-      'ng': { 
-        primary: 'jawOpen', 
-        secondary: null, 
+      'ng': {
+        primary: 'jawOpen',
+        secondary: null,
         tertiary: 'mouthFrown_L',
-        primaryIntensity: 0.1, 
-        secondaryIntensity: 0, 
-        tertiaryIntensity: 0.2 
+        primaryIntensity: 0.1,
+        secondaryIntensity: 0,
+        tertiaryIntensity: 0.2
       },
-      'p': { 
-        primary: 'mouthClose', 
-        secondary: null, 
+      'p': {
+        primary: 'mouthClose',
+        secondary: null,
         tertiary: 'mouthPress_R',
-        primaryIntensity: 1.0, 
-        secondaryIntensity: 0, 
-        tertiaryIntensity: 0.2 
+        primaryIntensity: 1.0,
+        secondaryIntensity: 0,
+        tertiaryIntensity: 0.2
       },
-      'r': { 
-        primary: 'mouthRollUpper', 
-        secondary: 'jawOpen', 
+      'r': {
+        primary: 'mouthRollUpper',
+        secondary: 'jawOpen',
         tertiary: 'mouthSmile_L',
-        primaryIntensity: 0.7, 
-        secondaryIntensity: 0.4, 
-        tertiaryIntensity: 0.2 
+        primaryIntensity: 0.7,
+        secondaryIntensity: 0.4,
+        tertiaryIntensity: 0.2
       },
-      's': { 
-        primary: 'mouthClose', 
-        secondary: 'mouthSmile', 
+      's': {
+        primary: 'mouthClose',
+        secondary: 'mouthSmile',
         tertiary: 'mouthRollLower',
-        primaryIntensity: 0.6, 
-        secondaryIntensity: 0.4, 
-        tertiaryIntensity: 0.3 
+        primaryIntensity: 0.6,
+        secondaryIntensity: 0.4,
+        tertiaryIntensity: 0.3
       },
-      'sh': { 
-        primary: 'mouthClose', 
-        secondary: 'mouthRollUpper', 
+      'sh': {
+        primary: 'mouthClose',
+        secondary: 'mouthRollUpper',
         tertiary: 'mouthFrown_R',
-        primaryIntensity: 0.7, 
-        secondaryIntensity: 0.5, 
-        tertiaryIntensity: 0.2 
+        primaryIntensity: 0.7,
+        secondaryIntensity: 0.5,
+        tertiaryIntensity: 0.2
       },
-      't': { 
-        primary: 'jawOpen', 
-        secondary: null, 
+      't': {
+        primary: 'jawOpen',
+        secondary: null,
         tertiary: 'mouthClose',
-        primaryIntensity: 0.2, 
-        secondaryIntensity: 0, 
-        tertiaryIntensity: 0.1 
+        primaryIntensity: 0.2,
+        secondaryIntensity: 0,
+        tertiaryIntensity: 0.1
       },
-      'th': { 
-        primary: 'jawOpen', 
-        secondary: 'mouthClose', 
+      'th': {
+        primary: 'jawOpen',
+        secondary: 'mouthClose',
         tertiary: 'mouthRollLower',
-        primaryIntensity: 0.5, 
-        secondaryIntensity: 0.4, 
-        tertiaryIntensity: 0.2 
+        primaryIntensity: 0.5,
+        secondaryIntensity: 0.4,
+        tertiaryIntensity: 0.2
       },
-      'v': { 
-        primary: 'mouthClose', 
-        secondary: 'mouthRollLower', 
+      'v': {
+        primary: 'mouthClose',
+        secondary: 'mouthRollLower',
         tertiary: 'mouthPress_L',
-        primaryIntensity: 0.7, 
-        secondaryIntensity: 0.5, 
-        tertiaryIntensity: 0.3 
+        primaryIntensity: 0.7,
+        secondaryIntensity: 0.5,
+        tertiaryIntensity: 0.3
       },
-      'w': { 
-        primary: 'mouthPucker', 
-        secondary: 'mouthFunnel', 
+      'w': {
+        primary: 'mouthPucker',
+        secondary: 'mouthFunnel',
         tertiary: 'mouthRollUpper',
-        primaryIntensity: 0.8, 
-        secondaryIntensity: 0.6, 
-        tertiaryIntensity: 0.3 
+        primaryIntensity: 0.8,
+        secondaryIntensity: 0.6,
+        tertiaryIntensity: 0.3
       },
-      'y': { 
-        primary: 'mouthSmile', 
-        secondary: 'jawOpen', 
+      'y': {
+        primary: 'mouthSmile',
+        secondary: 'jawOpen',
         tertiary: 'mouthUpperUp_L',
-        primaryIntensity: 0.6, 
-        secondaryIntensity: 0.4, 
-        tertiaryIntensity: 0.2 
+        primaryIntensity: 0.6,
+        secondaryIntensity: 0.4,
+        tertiaryIntensity: 0.2
       },
-      'z': { 
-        primary: 'mouthClose', 
-        secondary: 'mouthSmile', 
+      'z': {
+        primary: 'mouthClose',
+        secondary: 'mouthSmile',
         tertiary: 'mouthRollLower',
-        primaryIntensity: 0.5, 
-        secondaryIntensity: 0.3, 
-        tertiaryIntensity: 0.2 
+        primaryIntensity: 0.5,
+        secondaryIntensity: 0.3,
+        tertiaryIntensity: 0.2
       },
-      'zh': { 
-        primary: 'mouthClose', 
-        secondary: 'mouthRollUpper', 
+      'zh': {
+        primary: 'mouthClose',
+        secondary: 'mouthRollUpper',
         tertiary: 'mouthFrown_L',
-        primaryIntensity: 0.6, 
-        secondaryIntensity: 0.4, 
-        tertiaryIntensity: 0.2 
+        primaryIntensity: 0.6,
+        secondaryIntensity: 0.4,
+        tertiaryIntensity: 0.2
       },
 
       // SPECIAL (2)
-      'sil': { 
-        primary: null, 
-        secondary: null, 
+      'sil': {
+        primary: null,
+        secondary: null,
         tertiary: null,
-        primaryIntensity: 0, 
-        secondaryIntensity: 0, 
-        tertiaryIntensity: 0 
+        primaryIntensity: 0,
+        secondaryIntensity: 0,
+        tertiaryIntensity: 0
       },
-      'pau': { 
-        primary: 'mouthSmile', 
-        secondary: null, 
+      'pau': {
+        primary: 'mouthSmile',
+        secondary: null,
         tertiary: 'mouthUpperUp_R',
-        primaryIntensity: 0.1, 
-        secondaryIntensity: 0, 
-        tertiaryIntensity: 0.05 
+        primaryIntensity: 0.1,
+        secondaryIntensity: 0,
+        tertiaryIntensity: 0.05
       }
     };
 

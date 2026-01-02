@@ -17,12 +17,7 @@ from pydantic import BaseModel
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-from agents.shared import (
-    MessageBus,
-    MessageType,
-    Topics,
-    get_config,
-)
+from agents.shared import MessageBus, MessageType, Topics, get_config
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

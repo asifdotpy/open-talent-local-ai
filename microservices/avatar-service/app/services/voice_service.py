@@ -1,15 +1,11 @@
-"""
-Voice generation service - Local implementation planned.
+"""Voice generation service - Local implementation planned.
 
 Currently provides mock responses. Local TTS/STT research and implementation
 will be added in future updates.
 """
 
-import os
-from typing import List
-from fastapi import HTTPException
 
-from app.models.voice import VoiceRequest, VoiceResponse, VoiceInfo, VoiceListResponse
+from app.models.voice import VoiceListResponse, VoiceRequest, VoiceResponse
 
 
 class VoiceService:
@@ -22,8 +18,7 @@ class VoiceService:
     async def generate_irish_voice(self, request: VoiceRequest) -> VoiceResponse:
         """Mock voice generation - local implementation planned."""
         return VoiceResponse(
-            success=False,
-            error="Local voice generation not yet implemented. Research in progress."
+            success=False, error="Local voice generation not yet implemented. Research in progress."
         )
 
     async def list_available_voices(self) -> VoiceListResponse:
@@ -32,7 +27,7 @@ class VoiceService:
             primary_irish_voice="Local TTS (planned)",
             irish_voices=[],
             total_voices=0,
-            note="Local voice synthesis research in progress"
+            note="Local voice synthesis research in progress",
         )
 
 

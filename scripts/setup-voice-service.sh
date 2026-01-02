@@ -99,18 +99,18 @@ if [[ $REPLY =~ ^[Yy]$ ]] || [[ -z $REPLY ]]; then
     VOICE_MODEL="en_US-lessac-medium"
     VOICE_URL="https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/lessac/medium/en_US-lessac-medium.onnx"
     CONFIG_URL="https://huggingface.co/rhasspy/piper-voices/resolve/v1.0.0/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json"
-    
+
     mkdir -p "${VOICE_SERVICE_DIR}/models/voices"
-    
+
     echo -e "${YELLOW}Downloading voice model...${NC}"
     cd "${VOICE_SERVICE_DIR}/models/voices"
-    
+
     if ! curl -L -o "${VOICE_MODEL}.onnx" "${VOICE_URL}"; then
         echo -e "${RED}Warning: Failed to download voice model${NC}"
     else
         echo -e "${GREEN}Voice model downloaded!${NC}"
     fi
-    
+
     if ! curl -L -o "${VOICE_MODEL}.onnx.json" "${CONFIG_URL}"; then
         echo -e "${RED}Warning: Failed to download voice config${NC}"
     else

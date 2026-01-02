@@ -31,4 +31,3 @@ export type SynthesizeSpeechResponse = {
      */
     voice: string;
 };
-

@@ -16,10 +16,9 @@ TEST_PROMPTS = [
 print("🧪 Testing Vetta's responses:\n")
 
 for i, prompt in enumerate(TEST_PROMPTS, 1):
-    inputs = tokenizer(
-        f"### Instruction:\n{prompt}\n\n### Response:\n",
-        return_tensors="pt"
-    ).to("cuda")
+    inputs = tokenizer(f"### Instruction:\n{prompt}\n\n### Response:\n", return_tensors="pt").to(
+        "cuda"
+    )
 
     outputs = model.generate(
         **inputs,

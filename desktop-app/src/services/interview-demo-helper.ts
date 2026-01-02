@@ -43,7 +43,7 @@ export async function runInterviewDemo(config: DemoConfig): Promise<DemoStep[]> 
       model: config.model,
       totalQuestions: config.totalQuestions,
     };
-    
+
     const session = await GatewayClient.interview.start(startReq);
     if (!session) throw new Error('Failed to start interview');
 

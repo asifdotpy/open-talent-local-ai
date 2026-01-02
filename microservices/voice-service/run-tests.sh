@@ -56,7 +56,7 @@ run_unit() {
 # Run integration tests (service interactions)
 run_integration() {
     echo -e "${BLUE}Running Integration Tests (API validation, <5min)${NC}"
-    
+
     # Check if service is running
     if ! curl -f http://localhost:8002/health &>/dev/null; then
         echo -e "${YELLOW}Warning: Voice service not running on port 8002${NC}"
@@ -68,7 +68,7 @@ run_integration() {
             exit 1
         fi
     fi
-    
+
     pytest tests/integration/ \
         -v \
         --tb=short \
@@ -80,32 +80,32 @@ run_integration() {
 # Run business value tests (user journeys)
 run_business() {
     echo -e "${YELLOW}Running Business Value Tests (100% critical paths, <30min)${NC}"
-    
+
     # Check if all services are running
     echo "Checking required services..."
     services_ok=true
-    
+
     if ! curl -f http://localhost:8002/health &>/dev/null; then
         echo -e "${RED}✗ Voice service not running (port 8002)${NC}"
         services_ok=false
     else
         echo -e "${GREEN}✓ Voice service running${NC}"
     fi
-    
+
     if ! curl -f http://localhost:8003/health &>/dev/null; then
         echo -e "${RED}✗ Conversation service not running (port 8003)${NC}"
         services_ok=false
     else
         echo -e "${GREEN}✓ Conversation service running${NC}"
     fi
-    
+
     if ! curl -f http://localhost:8001/health &>/dev/null; then
         echo -e "${RED}✗ Avatar service not running (port 8001)${NC}"
         services_ok=false
     else
         echo -e "${GREEN}✓ Avatar service running${NC}"
     fi
-    
+
     if [ "$services_ok" = false ]; then
         echo ""
         echo "Start all services with: docker-compose up -d"
@@ -115,7 +115,7 @@ run_business() {
             exit 1
         fi
     fi
-    
+
     pytest tests/business/ \
         -v \
         --tb=long \
@@ -128,19 +128,19 @@ run_business() {
 run_all() {
     echo -e "${BLUE}Running Complete Test Suite${NC}"
     echo ""
-    
+
     echo -e "${GREEN}Phase 1: Unit Tests${NC}"
     run_unit
     echo ""
-    
+
     echo -e "${BLUE}Phase 2: Integration Tests${NC}"
     run_integration
     echo ""
-    
+
     echo -e "${YELLOW}Phase 3: Business Value Tests${NC}"
     run_business
     echo ""
-    
+
     echo -e "${GREEN}✓ All tests completed successfully!${NC}"
 }
 
@@ -153,13 +153,13 @@ run_coverage() {
         --cov-report=term-missing \
         --cov-report=xml \
         -v
-    
+
     echo ""
     echo -e "${GREEN}Coverage report generated:${NC}"
     echo "  HTML: file://$(pwd)/htmlcov/index.html"
     echo "  XML:  $(pwd)/coverage.xml"
     echo ""
-    
+
     # Open in browser if available
     if command -v xdg-open &> /dev/null; then
         xdg-open htmlcov/index.html
@@ -174,12 +174,12 @@ run_watch() {
     echo -e "${GREEN}TDD Watch Mode: $test_type tests${NC}"
     echo "Watching for changes... (Ctrl+C to stop)"
     echo ""
-    
+
     if ! command -v pytest-watch &> /dev/null; then
         echo -e "${YELLOW}Installing pytest-watch...${NC}"
         pip install pytest-watch
     fi
-    
+
     case $test_type in
         unit)
             ptw tests/unit/ -- -v --tb=short -m unit

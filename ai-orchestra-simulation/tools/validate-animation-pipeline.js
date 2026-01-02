@@ -2,7 +2,7 @@
 /**
  * Animation Pipeline Validator
  * Tests the complete morph target animation pipeline
- * 
+ *
  * Validates:
  * 1. Model loading and morph target detection
  * 2. PhonemeMapper initialization and mapping
@@ -91,7 +91,7 @@ async function validateModelLoading() {
     const config = appConfig.models.production;
     logInfo(`Loading model: ${config.path}`);
 
-    // Initialize ModelManager  
+    // Initialize ModelManager
     const modelManager = new ModelManager({ face: config }, { mockMode: false });
 
     // Load model

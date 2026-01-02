@@ -84,7 +84,7 @@ class TestPhase1VoiceServicePhonemeExtraction:
             assert "duration" in data
             assert isinstance(data["phonemes"], list)
             assert len(data["phonemes"]) > 0
-            
+
             # Verify duration is at least 2 seconds (mock generates 0.5s per word, min 2s)
             duration = data["duration"]
             assert duration >= 2.0, f"Duration {duration} should be at least 2 seconds"

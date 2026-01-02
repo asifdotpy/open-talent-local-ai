@@ -24,7 +24,7 @@ export function AvatarSelector() {
   return (
     <div className="avatar-selector">
       <h3 className="text-lg font-semibold mb-4">Interview Avatar</h3>
-      
+
       {availableAvatars.length > 0 ? (
         <div className="space-y-4">
           {/* Avatar Dropdown */}

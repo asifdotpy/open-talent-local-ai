@@ -1,6 +1,6 @@
 /**
  * Phase 1 Integration Test - WebGL Avatar with Audio-Video Sync
- * 
+ *
  * Tests the complete Phase 1 pipeline:
  * 1. Voice Service audio synthesis with phonemes
  * 2. Real-time WebGL rendering with morph target animation

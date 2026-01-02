@@ -71,17 +71,17 @@ check_port_open() {
   local port=$1
   local timeout=$2
   local start_time=$(date +%s)
-  
+
   while true; do
     if nc -z localhost "$port" 2>/dev/null; then
       return 0
     fi
-    
+
     local current_time=$(date +%s)
     if (( current_time - start_time > timeout )); then
       return 1
     fi
-    
+
     sleep 1
   done
 }
@@ -90,10 +90,10 @@ check_health_endpoint() {
   local port=$1
   local endpoint=${2:-"/health"}
   local expected_status=${3:-"200"}
-  
+
   local response=$(curl -s -w "\n%{http_code}" -X GET "http://localhost:$port$endpoint" 2>/dev/null || echo "000")
   local status_code=$(echo "$response" | tail -n1)
-  
+
   if [ "$status_code" = "$expected_status" ]; then
     return 0
   else
@@ -148,7 +148,7 @@ separator
 for port in "${!SERVICES[@]}"; do
   service_name="${SERVICES[$port]}"
   log_info "Testing $service_name (port $port)..."
-  
+
   if check_port_open "$port" "$TIMEOUT"; then
     log_success "$service_name is responding on port $port"
   else
@@ -179,9 +179,9 @@ declare -A HEALTH_CHECKS=(
 for port in "${!HEALTH_CHECKS[@]}"; do
   service_name="${SERVICES[$port]}"
   endpoint="${HEALTH_CHECKS[$port]}"
-  
+
   log_info "Checking health: $service_name (GET $endpoint)"
-  
+
   if check_health_endpoint "$port" "$endpoint"; then
     log_success "$service_name health check passed"
   else

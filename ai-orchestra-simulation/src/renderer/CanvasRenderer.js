@@ -1,6 +1,6 @@
 /**
  * CanvasRenderer - 2D Canvas-based avatar renderer
- * 
+ *
  * Fast, lightweight renderer using Node.js Canvas API.
  * Suitable for simple avatar animations with minimal resource usage.
  * Phase 2 MVP implementation - production-ready for basic use cases.

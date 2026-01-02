@@ -1,10 +1,10 @@
 /**
  * Model Validation Script
  * Validates 3D models for lip sync compatibility
- * 
+ *
  * Usage:
  *   node tools/validate-model.js <model-path>
- * 
+ *
  * Example:
  *   node tools/validate-model.js ./assets/models/face.glb
  */
@@ -102,11 +102,11 @@ class ModelValidator {
     // Note: This is a simplified validation
     // Full GLTF validation would require loading in Three.js context
     // For Node.js, we can check file structure and basic properties
-    
+
     console.log('📦 GLTF/GLB file detected');
     console.log('⚠️  Full validation requires browser/Three.js environment');
     console.log('💡 Use tests/test-model-properties.js for detailed validation');
-    
+
     this.addInfo('fileType', 'gltf');
     this.addInfo('validationMethod', 'basic');
     this.addWarning('Full validation requires browser environment');
@@ -114,7 +114,7 @@ class ModelValidator {
 
   validateRequirements() {
     const info = this.results.info;
-    
+
     // Check vertex count
     if (info.vertexCount && info.vertexCount > MAX_VERTICES) {
       this.addError(`Vertex count (${info.vertexCount}) exceeds maximum (${MAX_VERTICES})`);
@@ -164,7 +164,7 @@ class ModelValidator {
   printResults() {
     console.log('\n📊 Validation Results:');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    
+
     if (this.results.errors.length === 0 && this.results.warnings.length === 0) {
       console.log('✅ Model is valid for lip sync');
       this.results.valid = true;
@@ -215,7 +215,7 @@ export function validateModelInBrowser(modelPath, gltf) {
         // Check for morph targets
         if (geometry.morphTargets && geometry.morphTargets.length > 0) {
           meshesWithMorphTargets++;
-          
+
           // Build morph target dictionary
           if (child.morphTargetDictionary) {
             morphTargetDictionary = child.morphTargetDictionary;
@@ -275,7 +275,7 @@ export function validateModelInBrowser(modelPath, gltf) {
 // CLI usage
 if (import.meta.url === `file://${process.argv[1]}`) {
   const modelPath = process.argv[2];
-  
+
   if (!modelPath) {
     console.error('Usage: node tools/validate-model.js <model-path>');
     console.error('Example: node tools/validate-model.js ./assets/models/face.glb');
@@ -289,5 +289,3 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 export default ModelValidator;
-
-

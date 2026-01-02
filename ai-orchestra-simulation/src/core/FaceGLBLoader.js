@@ -1,6 +1,6 @@
 /**
  * Face.glb Model Loader with Named Morph Targets
- * 
+ *
  * Properly loads face.glb with 52 named morph targets (ARKit blendshapes)
  * Uses gltf-transform to handle compressed GLB format
  */
@@ -18,7 +18,7 @@ export class FaceGLBLoader {
       mouthFunnel: 28,
       mouthClose: 36,
       mouthSmile: 38,
-      
+
       // Additional mouth shapes for comprehensive phoneme coverage
       mouthPucker: 29,
       mouthLeft: 30,
@@ -41,15 +41,15 @@ export class FaceGLBLoader {
       mouthPress_R: 48,
       mouthStretch_L: 49,
       mouthStretch_R: 50,
-      
+
       // Jaw movements
       jawForward: 25,
       jawLeft: 26,
       jawRight: 27,
-      
+
       // Tongue
       tongueOut: 51,
-      
+
       // Eye expressions
       eyeLookUp_L: 5,
       eyeLookUp_R: 6,
@@ -65,19 +65,19 @@ export class FaceGLBLoader {
       eyeSquint_R: 16,
       eyeWide_L: 17,
       eyeWide_R: 18,
-      
+
       // Brow expressions
       browInnerUp: 0,
       browDown_L: 1,
       browDown_R: 2,
       browOuterUp_L: 3,
       browOuterUp_R: 4,
-      
+
       // Cheek expressions
       cheekPuff: 19,
       cheekSquint_L: 20,
       cheekSquint_R: 21,
-      
+
       // Nose expressions
       noseSneer_L: 22,
       noseSneer_R: 23
@@ -91,26 +91,26 @@ export class FaceGLBLoader {
    */
   async load(path) {
     console.log('🔄 Loading face.glb with gltf-transform...');
-    
+
     // Initialize meshopt decoder
     await MeshoptDecoder.ready;
-    
+
     // Initialize gltf-transform
     const io = new NodeIO()
       .registerExtensions(ALL_EXTENSIONS)
       .registerDependencies({
         'meshopt.decoder': MeshoptDecoder,
       });
-    
+
     // Read GLTF document
     const document = await io.read(path);
     const root = document.getRoot();
-    
+
     // Find mesh with morph targets
     const meshes = root.listMeshes();
     let morphTargetMesh = null;
     let morphTargetNames = [];
-    
+
     for (const mesh of meshes) {
       const primitives = mesh.listPrimitives();
       for (const primitive of primitives) {
@@ -124,18 +124,18 @@ export class FaceGLBLoader {
       }
       if (morphTargetMesh) break;
     }
-    
+
     if (!morphTargetMesh) {
       throw new Error('No morph targets found in face.glb');
     }
-    
+
     // Convert to Three.js format
     const threeModel = await this.convertToThreeJS(document, morphTargetNames);
-    
+
     console.log('✅ face.glb loaded successfully');
     console.log(`   Vertices: ${this.getVertexCount(threeModel)}`);
     console.log(`   Morph targets: ${morphTargetNames.length}`);
-    
+
     return threeModel;
   }
 
@@ -146,41 +146,41 @@ export class FaceGLBLoader {
   async convertToThreeJS(document, morphTargetNames) {
     // For now, return a simplified model with the morphTargetDictionary set
     // In production, you'd use GLTFLoader or a proper converter
-    
+
     const group = new THREE.Group();
     group.name = 'FaceGLB';
-    
+
     // Create a placeholder geometry with morph targets
     const geometry = new THREE.SphereGeometry(1, 32, 32);
-    
+
     // Set up morph target dictionary with proper names
     geometry.morphTargetDictionary = {};
-    
+
     // Map GLTF morph targets to our named targets
     Object.entries(this.morphTargetMapping).forEach(([name, index]) => {
       if (index < morphTargetNames.length) {
         geometry.morphTargetDictionary[name] = index;
       }
     });
-    
+
     // Also include original names for compatibility
     morphTargetNames.forEach((name, index) => {
       if (!geometry.morphTargetDictionary[name]) {
         geometry.morphTargetDictionary[name] = index;
       }
     });
-    
+
     // Initialize morph target influences
     geometry.morphTargetInfluences = new Array(morphTargetNames.length).fill(0);
-    
+
     const material = new THREE.MeshBasicMaterial({ color: 0xffdbac });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.name = 'FaceHead';
     mesh.morphTargetDictionary = geometry.morphTargetDictionary;
     mesh.morphTargetInfluences = geometry.morphTargetInfluences;
-    
+
     group.add(mesh);
-    
+
     return group;
   }
 

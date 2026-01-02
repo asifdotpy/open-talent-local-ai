@@ -4,9 +4,8 @@ Script to check Trello board for AWS instance sync task and update it
 """
 
 import os
+
 import requests
-import json
-from datetime import datetime
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -22,6 +21,7 @@ if not all([TRELLO_API_KEY, TRELLO_TOKEN, TRELLO_BOARD_ID]):
 
 BASE_URL = "https://api.trello.com/1"
 AUTH_PARAMS = f"?key={TRELLO_API_KEY}&token={TRELLO_TOKEN}"
+
 
 def get_all_cards():
     """Fetches all cards from the Trello board"""
@@ -39,6 +39,7 @@ def get_all_cards():
         print(f"❌ Error searching tasks: {e}")
         return []
 
+
 def get_list_names_map():
     """Fetches all lists on the board and returns a dictionary mapping list IDs to names."""
     lists_url = f"{BASE_URL}/boards/{TRELLO_BOARD_ID}/lists{AUTH_PARAMS}"
@@ -46,27 +47,27 @@ def get_list_names_map():
         response = requests.get(lists_url)
         response.raise_for_status()
         lists = response.json()
-        return {lst['id']: lst['name'] for lst in lists}
+        return {lst["id"]: lst["name"] for lst in lists}
     except requests.exceptions.RequestException as e:
         print(f"❌ Error fetching lists: {e}")
         return {}
+
 
 def update_task_with_completion(card_id, completion_comment):
     """Add completion comment to a task"""
     url = f"{BASE_URL}/cards/{card_id}/actions/comments{AUTH_PARAMS}"
 
-    data = {
-        'text': completion_comment
-    }
+    data = {"text": completion_comment}
 
     try:
         response = requests.post(url, data=data)
         response.raise_for_status()
-        print(f"✅ Added completion comment to task")
+        print("✅ Added completion comment to task")
         return True
     except requests.exceptions.RequestException as e:
         print(f"❌ Error updating task: {e}")
         return False
+
 
 def move_to_done_list(card_id):
     """Move task to Done list"""
@@ -80,14 +81,14 @@ def move_to_done_list(card_id):
 
         done_list = None
         for list_item in lists:
-            if 'done' in list_item['name'].lower() or 'complete' in list_item['name'].lower():
+            if "done" in list_item["name"].lower() or "complete" in list_item["name"].lower():
                 done_list = list_item
                 break
 
         if done_list:
             # Move card to done list
             move_url = f"{BASE_URL}/cards/{card_id}{AUTH_PARAMS}"
-            data = {'idList': done_list['id']}
+            data = {"idList": done_list["id"]}
 
             response = requests.put(move_url, data=data)
             response.raise_for_status()
@@ -100,6 +101,7 @@ def move_to_done_list(card_id):
     except requests.exceptions.RequestException as e:
         print(f"❌ Error moving task: {e}")
         return False
+
 
 def main():
     print("🚀 TRELLO CARD LISTER")
@@ -119,11 +121,12 @@ def main():
     for i, card in enumerate(all_cards, 1):
         print(f"{i}. **{card['name']}**")
         print(f"   URL: {card['shortUrl']}")
-        list_name = list_names_map.get(card.get('idList'), 'Unknown')
+        list_name = list_names_map.get(card.get("idList"), "Unknown")
         print(f"   List: {list_name}")
-        if card.get('desc'):
+        if card.get("desc"):
             print(f"   Description: {card['desc'][:100]}...")
         print()
+
 
 if __name__ == "__main__":
     main()

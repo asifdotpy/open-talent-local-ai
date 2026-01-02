@@ -5,9 +5,11 @@ Convert Vetta Granite merged model to GGUF format for Ollama deployment
 
 import os
 import sys
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from huggingface_hub import HfApi, login
+
 import torch
+from huggingface_hub import HfApi, login
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
 
 def convert_to_gguf():
     """Convert the merged model to GGUF format"""
@@ -33,10 +35,7 @@ def convert_to_gguf():
     print(f"📥 Loading merged model from: {MERGED_REPO}")
     try:
         model = AutoModelForCausalLM.from_pretrained(
-            MERGED_REPO,
-            torch_dtype=torch.float16,
-            device_map="auto",
-            trust_remote_code=True
+            MERGED_REPO, torch_dtype=torch.float16, device_map="auto", trust_remote_code=True
         )
         tokenizer = AutoTokenizer.from_pretrained(MERGED_REPO)
         print("✅ Merged model loaded")
@@ -75,10 +74,15 @@ def convert_to_gguf():
     try:
         # Convert pytorch model to ggml
         convert_cmd = [
-            "python", "-m", "llama_cpp.convert",
-            "--model", temp_dir,
-            "--outtype", "f16",
-            "--outfile", f"{temp_dir}/vetta-granite-f16.gguf"
+            "python",
+            "-m",
+            "llama_cpp.convert",
+            "--model",
+            temp_dir,
+            "--outtype",
+            "f16",
+            "--outfile",
+            f"{temp_dir}/vetta-granite-f16.gguf",
         ]
 
         result = subprocess.run(convert_cmd, capture_output=True, text=True)
@@ -93,7 +97,7 @@ def convert_to_gguf():
             "llama-quantize",
             f"{temp_dir}/vetta-granite-f16.gguf",
             f"{temp_dir}/vetta-granite-q4_k_m.gguf",
-            "q4_k_m"
+            "q4_k_m",
         ]
 
         result = subprocess.run(quantize_cmd, capture_output=True, text=True)
@@ -120,7 +124,7 @@ def convert_to_gguf():
             path_in_repo="vetta-granite-2b-gguf-v3.gguf",
             repo_id=GGUF_REPO,
             repo_type="model",
-            commit_message="Upload GGUF quantized model for Vetta Granite v3 (Q4_K_M)"
+            commit_message="Upload GGUF quantized model for Vetta Granite v3 (Q4_K_M)",
         )
         print("✅ GGUF model uploaded to Hugging Face")
 
@@ -129,7 +133,7 @@ def convert_to_gguf():
         sys.exit(1)
 
     # Create model card
-    model_card = f"""---
+    model_card = """---
 language: en
 tags:
 - granite
@@ -179,17 +183,18 @@ This model is designed to conduct professional AI-powered interviews, providing 
             path_in_repo="README.md",
             repo_id=GGUF_REPO,
             repo_type="model",
-            commit_message="Add model card and usage instructions"
+            commit_message="Add model card and usage instructions",
         )
         print("✅ Model card uploaded")
     except Exception as e:
         print(f"❌ Model card upload failed: {e}")
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🎉 GGUF CONVERSION COMPLETE!")
-    print("="*60)
+    print("=" * 60)
     print(f"GGUF Model: https://huggingface.co/{GGUF_REPO}")
     print("\nReady for Ollama integration!")
+
 
 if __name__ == "__main__":
     convert_to_gguf()

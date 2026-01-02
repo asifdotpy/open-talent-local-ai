@@ -32,7 +32,7 @@ function createWindow() {
 app.whenReady().then(() => {
   // Initialize Ollama service
   ollamaService = new OllamaService();
-  
+
   createWindow();
 
   app.on('activate', () => {

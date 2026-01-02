@@ -11,4 +11,3 @@ export type HealthResponse = {
     services: Record<string, any>;
     summary: Record<string, any>;
 };
-

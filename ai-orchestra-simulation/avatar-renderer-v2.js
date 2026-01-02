@@ -2,14 +2,14 @@
  * Avatar Rendering Server - Production Version 2.0
  *
  * Modular avatar rendering service with pluggable renderers and production features.
- * 
+ *
  * Architecture:
  * - Modular renderer system (Canvas 2D / Three.js 3D)
  * - WebSocket session management with connection pooling
  * - Production logging and monitoring
  * - Environment-based configuration
  * - Health checks and metrics endpoints
- * 
+ *
  * Usage:
  *   node avatar-renderer-v2.js                      # Development (Canvas renderer)
  *   NODE_ENV=production node avatar-renderer-v2.js  # Production (Three.js renderer)
@@ -80,7 +80,7 @@ class AvatarRendererServer {
     try {
       this.logger.info('Starting Avatar Renderer Server...');
       await this.server.start();
-      
+
       this.logger.info('Server started successfully', {
         port: this.port,
         endpoints: {
@@ -118,7 +118,7 @@ class AvatarRendererServer {
 if (import.meta.url === `file://${process.argv[1]}`) {
   const port = process.env.PORT ? parseInt(process.env.PORT) : 3001;
   const server = new AvatarRendererServer(port);
-  
+
   // Graceful shutdown handling
   const shutdown = async () => {
     console.log('\nReceived shutdown signal...');

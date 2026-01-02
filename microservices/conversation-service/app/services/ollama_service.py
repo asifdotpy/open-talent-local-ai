@@ -1,23 +1,23 @@
-"""
-Legacy Ollama Service - Now uses Modular LLM Service
+"""Legacy Ollama Service - Now uses Modular LLM Service
 
 This service maintains backward compatibility while using the new modular LLM service.
 For new implementations, use modular_llm_service directly.
 """
 
 import logging
-from typing import Dict, Any
+from typing import Any
+
 from .modular_llm_service import modular_llm_service
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def generate_questions_from_ollama(
     job_description: str, num_questions: int, difficulty: str
-) -> Dict[str, Any]:
-    """
-    Generates interview questions based on a job description.
+) -> dict[str, Any]:
+    """Generates interview questions based on a job description.
     Now uses the modular LLM service for better provider flexibility.
 
     This function maintains the same interface for backward compatibility.
@@ -58,14 +58,14 @@ Do not include any other text, explanations, or markdown formatting in your resp
                                     "id": {"type": "integer"},
                                     "text": {"type": "string"},
                                     "category": {"type": "string"},
-                                    "expected_duration_seconds": {"type": "integer"}
+                                    "expected_duration_seconds": {"type": "integer"},
                                 },
-                                "required": ["id", "text", "category", "expected_duration_seconds"]
-                            }
+                                "required": ["id", "text", "category", "expected_duration_seconds"],
+                            },
                         }
                     },
-                    "required": ["questions"]
-                }
+                    "required": ["questions"],
+                },
             )
 
             logger.info("Successfully received and parsed questions from modular LLM service.")
@@ -74,7 +74,8 @@ Do not include any other text, explanations, or markdown formatting in your resp
         except Exception as e:
             logger.error(f"Modular LLM service failed: {e}")
             # Fallback to mock responses
-            from .modular_llm_service import LLMProvider, LLMConfig, MockProvider
+            from .modular_llm_service import LLMConfig, LLMProvider, MockProvider
+
             mock_config = LLMConfig(provider=LLMProvider.MOCK, model="mock")
             mock_provider = MockProvider(mock_config)
 
@@ -88,10 +89,11 @@ Do not include any other text, explanations, or markdown formatting in your resp
         logger.error(f"Failed to generate questions: {e}")
         return _generate_mock_questions(job_description, num_questions, difficulty)
 
-def _generate_mock_questions(job_description: str, num_questions: int, difficulty: str) -> Dict[str, Any]:
-    """
-    Generate mock interview questions for development/testing when Ollama is not available.
-    """
+
+def _generate_mock_questions(
+    job_description: str, num_questions: int, difficulty: str
+) -> dict[str, Any]:
+    """Generate mock interview questions for development/testing when Ollama is not available."""
     logger.info(f"Generating {num_questions} mock questions (difficulty: {difficulty})")
 
     # Extract keywords from job description for relevant questions
@@ -119,7 +121,7 @@ def _generate_mock_questions(job_description: str, num_questions: int, difficult
             "Explain the trade-offs in choosing {tech1} over {tech2}.",
             "How would you debug a complex issue in production?",
             "Design an architecture for {requirement} with scalability in mind.",
-        ]
+        ],
     }
 
     templates = question_templates.get(difficulty.lower(), question_templates["medium"])
@@ -128,11 +130,7 @@ def _generate_mock_questions(job_description: str, num_questions: int, difficult
     categories = ["technical", "behavioral", "situational", "problem-solving", "leadership"]
 
     # Duration ranges based on difficulty
-    duration_ranges = {
-        "easy": (30, 60),
-        "medium": (60, 120),
-        "hard": (120, 180)
-    }
+    duration_ranges = {"easy": (30, 60), "medium": (60, 120), "hard": (120, 180)}
     min_duration, max_duration = duration_ranges.get(difficulty.lower(), (60, 120))
 
     questions = []
@@ -166,27 +164,56 @@ def _generate_mock_questions(job_description: str, num_questions: int, difficult
             question_text = question_text.replace("{tech1}", techs[0])
             question_text = question_text.replace("{tech2}", techs[1])
         if "{requirement}" in template:
-            requirement = random.choice(["real-time chat", "video streaming", "e-commerce platform"])
+            requirement = random.choice(
+                ["real-time chat", "video streaming", "e-commerce platform"]
+            )
             question_text = question_text.replace("{requirement}", requirement)
 
-        questions.append({
-            "id": i + 1,
-            "text": question_text,
-            "category": category,
-            "expected_duration_seconds": duration
-        })
+        questions.append(
+            {
+                "id": i + 1,
+                "text": question_text,
+                "category": category,
+                "expected_duration_seconds": duration,
+            }
+        )
 
     logger.info(f"Generated {len(questions)} mock questions")
     return {"questions": questions}
 
+
 def _extract_keywords(job_description: str) -> list:
     """Extract relevant technical keywords from job description."""
     tech_keywords = [
-        "python", "javascript", "react", "node.js", "django", "flask",
-        "postgresql", "mysql", "mongodb", "redis", "docker", "kubernetes",
-        "aws", "azure", "gcp", "linux", "git", "api", "rest", "graphql",
-        "machine learning", "ai", "data science", "frontend", "backend",
-        "devops", "testing", "agile", "scrum"
+        "python",
+        "javascript",
+        "react",
+        "node.js",
+        "django",
+        "flask",
+        "postgresql",
+        "mysql",
+        "mongodb",
+        "redis",
+        "docker",
+        "kubernetes",
+        "aws",
+        "azure",
+        "gcp",
+        "linux",
+        "git",
+        "api",
+        "rest",
+        "graphql",
+        "machine learning",
+        "ai",
+        "data science",
+        "frontend",
+        "backend",
+        "devops",
+        "testing",
+        "agile",
+        "scrum",
     ]
 
     found_keywords = []

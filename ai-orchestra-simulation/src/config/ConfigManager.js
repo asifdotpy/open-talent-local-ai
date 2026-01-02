@@ -1,6 +1,6 @@
 /**
  * ConfigManager - Environment-based configuration management
- * 
+ *
  * Loads and merges configuration based on NODE_ENV
  */
 

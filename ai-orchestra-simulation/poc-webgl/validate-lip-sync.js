@@ -63,7 +63,7 @@ function log(message, color = 'reset') {
 
 async function testVoiceService() {
   log('\n=== Testing Voice Service Connection ===', 'bright');
-  
+
   try {
     const response = await fetch(VOICE_SERVICE_URL, {
       method: 'POST',
@@ -74,7 +74,7 @@ async function testVoiceService() {
         extract_phonemes: true
       })
     });
-    
+
     if (response.ok) {
       log('✅ Voice service is running and accessible', 'green');
       return true;
@@ -100,11 +100,11 @@ async function extractPhonemes(text) {
         extract_phonemes: true
       })
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data.phonemes || [];
   } catch (error) {
@@ -116,7 +116,7 @@ async function extractPhonemes(text) {
 function validatePhonemeMapping(phonemes) {
   const mappedVisemes = new Set();
   const unmappedPhonemes = [];
-  
+
   phonemes.forEach(p => {
     const phoneme = p.phoneme.toUpperCase();
     if (PHONEME_TO_OCULUS_VISEME[phoneme]) {
@@ -126,7 +126,7 @@ function validatePhonemeMapping(phonemes) {
       unmappedPhonemes.push(phoneme);
     }
   });
-  
+
   return {
     mappedVisemes: Array.from(mappedVisemes),
     unmappedPhonemes: [...new Set(unmappedPhonemes)],
@@ -138,7 +138,7 @@ function validatePhonemeMapping(phonemes) {
 function analyzeVisemeCoverage(allMappedVisemes) {
   const coverage = EXPECTED_VISEMES.filter(v => allMappedVisemes.has(v));
   const missing = EXPECTED_VISEMES.filter(v => !allMappedVisemes.has(v));
-  
+
   return {
     coverage: coverage.length,
     total: EXPECTED_VISEMES.length,
@@ -150,82 +150,82 @@ function analyzeVisemeCoverage(allMappedVisemes) {
 
 async function testPhrase(phrase, index) {
   log(`\n${index + 1}. Testing: "${phrase}"`, 'cyan');
-  
+
   const phonemes = await extractPhonemes(phrase);
-  
+
   if (phonemes.length === 0) {
     log('   ⚠️  No phonemes extracted', 'yellow');
     return { mappedVisemes: [], unmappedPhonemes: [], totalPhonemes: 0, uniquePhonemes: 0 };
   }
-  
+
   const validation = validatePhonemeMapping(phonemes);
-  
+
   log(`   ✅ Extracted ${validation.totalPhonemes} phonemes (${validation.uniquePhonemes} unique)`, 'green');
   log(`   🎯 Mapped to ${validation.mappedVisemes.length} visemes: ${validation.mappedVisemes.join(', ')}`, 'blue');
-  
+
   if (validation.unmappedPhonemes.length > 0) {
     log(`   ⚠️  Unmapped phonemes: ${validation.unmappedPhonemes.join(', ')}`, 'yellow');
   }
-  
+
   return validation;
 }
 
 async function runFullValidation() {
   log('\n🎭 === Phoneme-to-Viseme Mapping Validation ===', 'bright');
   log('Testing RPM Avatar Lip Sync System\n', 'bright');
-  
+
   // Test voice service connection
   const serviceAvailable = await testVoiceService();
   if (!serviceAvailable) {
     log('\n❌ Cannot proceed without voice service. Please start it first.', 'red');
     process.exit(1);
   }
-  
+
   // Test all phrases
   log('\n=== Testing Sample Interview Phrases ===', 'bright');
-  
+
   const allVisemes = new Set();
   const allResults = [];
-  
+
   for (let i = 0; i < TEST_PHRASES.length; i++) {
     const result = await testPhrase(TEST_PHRASES[i], i);
     result.mappedVisemes.forEach(v => allVisemes.add(v));
     allResults.push(result);
-    
+
     // Small delay between requests
     await new Promise(resolve => setTimeout(resolve, 100));
   }
-  
+
   // Analyze overall coverage
   log('\n=== Overall Viseme Coverage Analysis ===', 'bright');
-  
+
   const coverage = analyzeVisemeCoverage(allVisemes);
-  
+
   log(`\n📊 Viseme Coverage: ${coverage.coverage}/${coverage.total} (${coverage.percentage}%)`, 'magenta');
   log(`✅ Covered visemes: ${coverage.covered.join(', ')}`, 'green');
-  
+
   if (coverage.missing.length > 0) {
     log(`❌ Missing visemes: ${coverage.missing.join(', ')}`, 'red');
     log(`   Tip: Add phrases with phonemes that map to these visemes`, 'yellow');
   }
-  
+
   // Phoneme statistics
   const totalPhonemes = allResults.reduce((sum, r) => sum + r.totalPhonemes, 0);
   const totalUnique = new Set(allResults.flatMap(r => r.unmappedPhonemes)).size;
-  
+
   log(`\n📈 Phoneme Statistics:`, 'magenta');
   log(`   Total phonemes tested: ${totalPhonemes}`, 'blue');
   log(`   Unique visemes activated: ${allVisemes.size}`, 'blue');
-  
+
   if (totalUnique > 0) {
     const uniqueUnmapped = new Set();
     allResults.forEach(r => r.unmappedPhonemes.forEach(p => uniqueUnmapped.add(p)));
     log(`   ⚠️  Unmapped phonemes found: ${Array.from(uniqueUnmapped).join(', ')}`, 'yellow');
   }
-  
+
   // Final verdict
   log('\n=== Validation Summary ===', 'bright');
-  
+
   if (coverage.percentage >= 90) {
     log('✅ EXCELLENT: Lip sync mapping covers 90%+ of Oculus visemes', 'green');
   } else if (coverage.percentage >= 70) {
@@ -237,13 +237,13 @@ async function runFullValidation() {
     log('❌ POOR: Lip sync mapping covers <50% of Oculus visemes', 'red');
     log('   Review phoneme extraction and mapping logic', 'red');
   }
-  
+
   log('\n💡 Next Steps:', 'cyan');
   log('   1. Test in browser: Open http://localhost:5173', 'cyan');
   log('   2. Enable debug overlay: Press Ctrl+D', 'cyan');
   log('   3. Speak test phrases and observe morph targets', 'cyan');
   log('   4. Validate visual lip sync accuracy', 'cyan');
-  
+
   log('\n✅ Validation complete!\n', 'bright');
 }
 

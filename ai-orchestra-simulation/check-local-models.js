@@ -45,7 +45,7 @@ function parseGLBMorphTargets(buffer) {
     const gltf = JSON.parse(jsonChunk.toString('utf8'));
 
     const morphTargets = new Set();
-    
+
     if (gltf.meshes) {
       for (const mesh of gltf.meshes) {
         if (mesh.primitives) {
@@ -69,21 +69,21 @@ function parseGLBMorphTargets(buffer) {
 
 function checkModel(modelPath) {
   log(colors.cyan, `\n🔍 Checking: ${modelPath}`);
-  
+
   try {
     const fullPath = resolve(modelPath);
     const buffer = readFileSync(fullPath);
-    
+
     log(colors.green, `   ✅ Size: ${(buffer.length / 1024 / 1024).toFixed(2)} MB`);
-    
+
     const morphTargets = parseGLBMorphTargets(buffer);
-    
+
     if (morphTargets.length === 0) {
       log(colors.yellow, `   ⚠️  No morph targets found`);
       return null;
     }
 
-    const oculusVisemes = morphTargets.filter(name => 
+    const oculusVisemes = morphTargets.filter(name =>
       name.toLowerCase().startsWith('viseme_')
     );
 
@@ -92,7 +92,7 @@ function checkModel(modelPath) {
     );
 
     log(colors.yellow, `   📊 Total morph targets: ${morphTargets.length}`);
-    
+
     if (oculusVisemes.length > 0) {
       log(colors.green, `   ✅ Oculus visemes: ${oculusVisemes.length}/15`);
     } else {
@@ -162,7 +162,7 @@ if (fullyCompatible.length > 0) {
   console.log('Use this model in Avatar.jsx for guaranteed lip-sync!\n');
   console.log('Update code:');
   console.log(`  url: '/${fullyCompatible[0].path}'\n`);
-  
+
 } else if (withVisemes.length > 0) {
   log(colors.yellow, '⚠️  MODELS WITH PARTIAL VISEME SUPPORT:\n');
   withVisemes.forEach(r => {

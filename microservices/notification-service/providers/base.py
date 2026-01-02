@@ -1,23 +1,26 @@
-from typing import Optional, Dict, List
+from typing import Optional
+
 
 class NotificationProvider:
-    async def send_email(self, to: str, subject: str, html: str, text: Optional[str] = None) -> Dict:
+    async def send_email(
+        self, to: str, subject: str, html: str, text: Optional[str] = None
+    ) -> dict:
         raise NotImplementedError
 
-    async def send_sms(self, to: str, text: str) -> Dict:
+    async def send_sms(self, to: str, text: str) -> dict:
         raise NotImplementedError
 
-    async def send_push(self, to: str, title: str, body: str, data: Optional[Dict] = None) -> Dict:
+    async def send_push(self, to: str, title: str, body: str, data: Optional[dict] = None) -> dict:
         raise NotImplementedError
 
-    async def get_templates(self) -> List[Dict]:
+    async def get_templates(self) -> list[dict]:
         raise NotImplementedError
 
-    async def render(self, template_id: str, payload: Dict) -> Dict:
+    async def render(self, template_id: str, payload: dict) -> dict:
         raise NotImplementedError
 
-    async def preferences(self, user_id: str) -> Dict:
+    async def preferences(self, user_id: str) -> dict:
         raise NotImplementedError
 
-    async def health(self) -> Dict:
+    async def health(self) -> dict:
         raise NotImplementedError

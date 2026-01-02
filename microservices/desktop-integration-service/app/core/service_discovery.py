@@ -2,8 +2,9 @@
 
 import asyncio
 import logging
-from typing import Dict, Optional
-from datetime import datetime, timedelta
+from datetime import datetime
+from typing import Optional
+
 import httpx
 
 from app.config.settings import settings
@@ -19,7 +20,7 @@ class ServiceHealthCache:
         self.cached_result = None
         self.cache_time = None
 
-    def get(self) -> Optional[Dict]:
+    def get(self) -> Optional[dict]:
         """Get cached health result if not expired."""
         if self.cached_result and self.cache_time:
             elapsed = (datetime.now() - self.cache_time).total_seconds()
@@ -27,7 +28,7 @@ class ServiceHealthCache:
                 return self.cached_result
         return None
 
-    def set(self, result: Dict):
+    def set(self, result: dict):
         """Cache health result."""
         self.cached_result = result
         self.cache_time = datetime.now()
@@ -43,25 +44,20 @@ class ServiceDiscovery:
             "scout-service": settings.scout_url,
             "user-service": settings.user_url,
             "candidate-service": settings.candidate_url,
-            
             # AI & Conversation Services (3)
             "_granite-interview-service": settings.granite_interview_url,  # Hidden from UI
             "conversation-service": settings.conversation_url,
             "interview-service": settings.interview_url,
-            
             # Voice & Avatar Services (2)
             "voice-service": settings.voice_url,
             "avatar-service": settings.avatar_url,
-            
             # Analytics & Monitoring Services (4)
             "analytics-service": settings.analytics_url,
             "security-service": settings.security_url,
             "notification-service": settings.notification_url,
             "ai-auditing-service": settings.ai_auditing_url,
-            
             # Explainability Service (1)
             "explainability-service": settings.explainability_url,
-            
             # AI Model Engine
             "ollama": settings.ollama_url,
         }
@@ -72,11 +68,13 @@ class ServiceDiscovery:
 
         self.services = {**base_services, **optional_services}
         self.health_cache = ServiceHealthCache(ttl_seconds=settings.health_cache_ttl)
-        
-        logger.info(f"Initialized service discovery with {len(self.services)} services: "
-                   f"{', '.join([s for s in self.services.keys() if not s.startswith('_')])}")
 
-    async def check_all_services(self) -> Dict:
+        logger.info(
+            f"Initialized service discovery with {len(self.services)} services: "
+            f"{', '.join([s for s in self.services.keys() if not s.startswith('_')])}"
+        )
+
+    async def check_all_services(self) -> dict:
         """Check health of all services. Returns cached result if not expired."""
         # Try cache first
         cached = self.health_cache.get()
@@ -88,24 +86,18 @@ class ServiceDiscovery:
         self.health_cache.set(result)
         return result
 
-    async def _perform_health_checks(self) -> Dict:
+    async def _perform_health_checks(self) -> dict:
         """Actually perform health checks on all services."""
-        tasks = [
-            self._check_service(name, url)
-            for name, url in self.services.items()
-        ]
+        tasks = [self._check_service(name, url) for name, url in self.services.items()]
         service_statuses = await asyncio.gather(*tasks, return_exceptions=False)
 
-        status_dict = {
-            status["name"]: status
-            for status in service_statuses
-        }
+        status_dict = {status["name"]: status for status in service_statuses}
 
         # Calculate overall status (excluding hidden services)
         visible_statuses = {k: v for k, v in status_dict.items() if not k.startswith("_")}
         online_count = sum(1 for s in visible_statuses.values() if s["status"] == "online")
         total_count = len(visible_statuses)
-        
+
         # Check if critical services are online
         ollama_online = status_dict.get("ollama", {}).get("status") == "online"
 
@@ -128,7 +120,7 @@ class ServiceDiscovery:
             },
         }
 
-    async def _check_service(self, name: str, url: str) -> Dict:
+    async def _check_service(self, name: str, url: str) -> dict:
         """Check health of a single service."""
         start_time = datetime.now()
 
