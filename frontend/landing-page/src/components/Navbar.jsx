@@ -5,19 +5,56 @@ import { CONFIG } from '../config';
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+    const navigateTo = (path, e) => {
+        if (e) e.preventDefault();
+        window.history.pushState({}, '', path);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+        setIsMenuOpen(false);
+    };
+
+    const handleNavClick = (href, e) => {
+        if (href.startsWith('#')) {
+            const id = href.substring(1);
+            if (window.location.pathname !== '/') {
+                navigateTo('/', e);
+                // Wait for navigation to home before scrolling
+                setTimeout(() => {
+                    const element = document.getElementById(id);
+                    if (element) element.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            } else {
+                if (e) e.preventDefault();
+                const element = document.getElementById(id);
+                if (element) element.scrollIntoView({ behavior: 'smooth' });
+                setIsMenuOpen(false);
+            }
+        } else {
+            navigateTo(href, e);
+        }
+    };
+
     return (
         <nav className="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-lg border-b border-slate-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
-                    <div className="flex items-center space-x-2">
+                    <a 
+                        href="/" 
+                        onClick={(e) => navigateTo('/', e)}
+                        className="flex items-center space-x-2 hover:opacity-80 transition cursor-pointer"
+                    >
                         <Icons.Logo className="w-8 h-8" />
                         <span className="text-xl font-bold">{CONFIG.project.name}</span>
-                    </div>
+                    </a>
                     
                     {/* Desktop Menu */}
                     <div className="hidden md:flex items-center space-x-8">
                         {CONFIG.navigation.map((link) => (
-                            <a key={link.name} href={link.href} className="text-slate-300 hover:text-white transition">
+                            <a 
+                                key={link.name} 
+                                href={link.href} 
+                                onClick={(e) => handleNavClick(link.href, e)}
+                                className="text-slate-300 hover:text-white transition cursor-pointer"
+                            >
                                 {link.name}
                             </a>
                         ))}
@@ -48,8 +85,8 @@ const Navbar = () => {
                         <a 
                             key={link.name} 
                             href={link.href} 
-                            onClick={() => setIsMenuOpen(false)}
-                            className="block text-slate-300 hover:text-white transition text-lg"
+                            onClick={(e) => handleNavClick(link.href, e)}
+                            className="block text-slate-300 hover:text-white transition text-lg cursor-pointer"
                         >
                             {link.name}
                         </a>
