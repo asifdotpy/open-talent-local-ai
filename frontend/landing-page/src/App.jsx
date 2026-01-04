@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Blog from './Blog';
+import FAQ from './components/FAQ';
 import LegalPages from './components/LegalPages';
 import { Icons } from './components/Icons';
 import { CONFIG } from './config';
@@ -187,6 +188,9 @@ function App() {
 
             {/* Blog Section */}
             <Blog />
+
+            {/* FAQ Section */}
+            <FAQ />
 
             {/* Download Section */}
             <section id="download" className="py-24 px-4">

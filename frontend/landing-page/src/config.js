@@ -10,6 +10,7 @@ export const CONFIG = {
         { name: 'Features', href: '#features' },
         { name: 'Blog', href: '#blog' },
         { name: 'Pricing', href: '#pricing' },
+        { name: 'FAQ', href: '#faq' },
     ],
     features: [
         {
@@ -43,5 +44,35 @@ export const CONFIG = {
         windows: { name: "Windows", version: "Windows 10+", status: "Coming Soon" },
         macos: { name: "macOS", version: "macOS 11+", status: "Coming Soon" },
         linux: { name: "Linux", version: "Ubuntu/Debian", status: "Coming Soon" },
-    }
+    },
+    faq: [
+        {
+            question: "What is OpenTalent?",
+            answer: "OpenTalent is the world's first desktop-first, open-source AI recruitment platform. It allows recruiters to source, interview, and hire candidates using 100% local AI processing, ensuring complete data privacy and significant cost savings."
+        },
+        {
+            question: "How does OpenTalent ensure data privacy?",
+            answer: "All data processing, including AI interviews and candidate data storage, happens exclusively on your local machine. No candidate data, interview transcripts, or user activity is ever sent to our servers or any third-party cloud services. This is a core architectural principle."
+        },
+        {
+            question: "What does 'Local AI' mean?",
+            answer: "'Local AI' means the platform runs powerful AI models (like Granite 4) directly on your computer using technologies like Ollama. This eliminates cloud dependency, reduces latency, and guarantees that your sensitive hiring data never leaves your device."
+        },
+        {
+            question: "Is OpenTalent truly open source?",
+            answer: "Yes, the core software is licensed under the MIT License. This allows for full transparency, community contributions, and the freedom to use, modify, and distribute the software."
+        },
+        {
+            question: "How much does OpenTalent cost?",
+            answer: "OpenTalent offers a Free tier that is free forever. Paid tiers (Pro and Enterprise) are available for power users and large organizations, offering a 97% cost saving compared to traditional cloud-based recruitment stacks."
+        },
+        {
+            question: "What is the BYOK (Bring Your Own Key) model?",
+            answer: "For features that require external APIs (e.g., sourcing from LinkedIn), OpenTalent uses a BYOK model. You provide your own API keys, establishing a direct connection with the third-party provider. OpenTalent does not act as a data intermediary."
+        },
+        {
+            question: "What are the system requirements?",
+            answer: "OpenTalent is designed to run on modern Windows, macOS, and Linux systems. While it is optimized for local AI, a machine with a dedicated GPU is recommended for the best performance during AI interviews."
+        }
+    ]
 };
