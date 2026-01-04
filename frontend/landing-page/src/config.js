@@ -10,6 +10,7 @@ export const CONFIG = {
         { name: 'Features', href: '#features' },
         { name: 'Blog', href: '#blog' },
         { name: 'Pricing', href: '#pricing' },
+        { name: 'Community', href: '#community' },
         { name: 'FAQ', href: '#faq' },
     ],
     features: [

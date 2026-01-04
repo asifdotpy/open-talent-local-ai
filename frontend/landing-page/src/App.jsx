@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
+import Stats from './components/Stats';
+import Features from './components/Features';
+import Download from './components/Download';
+import Community from './components/Community';
 import Blog from './Blog';
 import FAQ from './components/FAQ';
 import LegalPages from './components/LegalPages';
@@ -52,55 +56,8 @@ function App() {
         <div className="min-h-screen bg-slate-950 text-white">
             <Navbar />
             <Hero />
-
-            {/* Stats Section */}
-            <section className="py-16 bg-slate-900/50 border-y border-slate-800">
-                <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                    <div>
-                        <div className="text-4xl font-bold gradient-text">1.8B+</div>
-                        <div className="text-slate-400 mt-2">Profiles Accessible</div>
-                    </div>
-                    <div>
-                        <div className="text-4xl font-bold gradient-text">97%</div>
-                        <div className="text-slate-400 mt-2">Cost Savings</div>
-                    </div>
-                    <div>
-                        <div className="text-4xl font-bold gradient-text">100%</div>
-                        <div className="text-slate-400 mt-2">Local Privacy</div>
-                    </div>
-                    <div>
-                        <div className="text-4xl font-bold gradient-text">11</div>
-                        <div className="text-slate-400 mt-2">Microservices</div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Features Section */}
-            <section id="features" className="py-24 px-4">
-                <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold mb-4">Everything You Need to Recruit</h2>
-                        <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-                            One platform replaces your entire recruiting stack
-                        </p>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {CONFIG.features.map((feature, i) => (
-                            <div key={i} className="card-gradient border border-slate-800 rounded-2xl p-6 hover:border-primary-500/50 transition">
-                                <div className="w-14 h-14 bg-primary-500/20 rounded-xl flex items-center justify-center text-primary-400 mb-4">
-                                    {i === 0 && <Icons.Search />}
-                                    {i === 1 && <Icons.Bot />}
-                                    {i === 2 && <Icons.Shield />}
-                                    {i === 3 && <Icons.Zap />}
-                                </div>
-                                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                                <p className="text-slate-400">{feature.description}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+            <Stats />
+            <Features />
 
             {/* Pricing Section */}
             <section id="pricing" className="py-24 px-4 bg-slate-900/30">
@@ -186,40 +143,10 @@ function App() {
                 </div>
             </section>
 
-            {/* Blog Section */}
             <Blog />
-
-            {/* FAQ Section */}
             <FAQ />
-
-            {/* Download Section */}
-            <section id="download" className="py-24 px-4">
-                <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="text-4xl font-bold mb-4">Download OpenTalent</h2>
-                    <p className="text-xl text-slate-400 mb-12">
-                        Available for Windows, macOS, and Linux. Free forever on the Free tier.
-                    </p>
-
-                    <div className="grid md:grid-cols-3 gap-6">
-                        {Object.entries(CONFIG.downloads).map(([key, platform]) => (
-                            <div key={key} className="flex flex-col items-center gap-4 border border-slate-800 rounded-2xl p-8 bg-slate-900/50 opacity-75">
-                                {key === 'windows' && <Icons.Windows />}
-                                {key === 'macos' && <Icons.Apple />}
-                                {key === 'linux' && <Icons.Linux />}
-                                <div>
-                                    <div className="font-semibold text-lg">{platform.name}</div>
-                                    <div className="text-slate-400 text-sm">{platform.version}</div>
-                                </div>
-                                <span className="text-slate-500 text-sm font-medium">{platform.status}</span>
-                            </div>
-                        ))}
-                    </div>
-
-                    <p className="mt-8 text-slate-500">
-                        Or build from source: <a href={CONFIG.project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:underline">github.com/asifdotpy/open-talent-local-ai</a>
-                    </p>
-                </div>
-            </section>
+            <Download />
+            <Community />
 
             {/* CTA Section */}
             <section className="py-24 px-4 hero-gradient">
