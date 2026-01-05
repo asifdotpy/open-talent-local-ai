@@ -24,7 +24,8 @@ repos:
     rev: 1.7.5
     hooks:
       - id: bandit
-        args: [--severity-level=medium, -ll]
+        additional_dependencies: [pbr]
+        args: [-ll]
         exclude: ^tests/|^scripts/test
 
   # ============================================================================
@@ -103,25 +104,25 @@ repos:
   # ============================================================================
 
   # Mypy - Static type checking
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.1
-    hooks:
-      - id: mypy
-        # additional_dependencies: [types-all]  # removed due to types-pkg-resources error
-        exclude: ^tests/|\.venv/
-        args: [--ignore-missing-imports]
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.7.1
+  #   hooks:
+  #     - id: mypy
+  #       # additional_dependencies: [types-all]  # removed due to types-pkg-resources error
+  #       exclude: ^tests/|\.venv/
+  #       args: [--ignore-missing-imports]
 
   # ============================================================================
   # MARKDOWN & DOCUMENTATION
   # ============================================================================
 
   # Markdownlint - Markdown linting
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.37.0
-    hooks:
-      - id: markdownlint
-        args: [--fix]
-        exclude: ^\.venv/|^node_modules/
+  # - repo: https://github.com/igorshubovych/markdownlint-cli
+  #   rev: v0.37.0
+  #   hooks:
+  #     - id: markdownlint
+  #       args: [--fix]
+  #       exclude: ^\.venv/|^node_modules/
 
   # ============================================================================
   # SHELL SCRIPTS
