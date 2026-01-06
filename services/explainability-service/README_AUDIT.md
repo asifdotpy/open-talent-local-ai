@@ -4,7 +4,7 @@ This document provides a comprehensive audit of the service, focusing on securit
 
 ## 1. Service Overview
 
-*   **Service Name:** conversation-service
+*   **Service Name:** explainability-service
 *   **Description:** [Briefly describe the service's purpose and functionality.]
 *   **Owner:** [Team or individual responsible for the service.]
 *   **Contact:** [Email or communication channel for the service owner.]
@@ -43,31 +43,23 @@ This document provides a comprehensive audit of the service, focusing on securit
 
 ### 5.1. Active Endpoints
 
-#### main.py
 *   `GET /`
 *   `GET /health`
-*   `GET /doc`
-*   `GET /api-docs`
-
-#### app/api/endpoints/interview.py
-*   `POST /conversation/generate-questions`
-*   `POST /conversation/start`
-*   `POST /conversation/message`
-*   `GET /conversation/status/{session_id}`
-*   `POST /conversation/end/{session_id}`
-*   `POST /api/v1/conversation/generate-adaptive-question`
-*   `POST /api/v1/conversation/generate-followup`
-*   `POST /api/v1/conversation/adapt-interview`
-*   `POST /api/v1/persona/switch`
-*   `GET /api/v1/persona/current`
+*   `POST /api/v1/explain/score`
+*   `POST /api/v1/explain/recommendation`
+*   `POST /api/v1/explain/path`
+*   `GET /api/v1/features/importance`
+*   `GET /api/v1/interviews/{interview_id}/features`
+*   `GET /api/v1/model/metadata`
+*   `GET /api/v1/decisions/log`
 
 ### 5.2. Mock Status
 
-The service calls an external Ollama service for question generation and relies on other internal services (like the `job_description_service`) for data. This indicates that it's designed to work with real, external dependencies rather than mock data.
+The service returns hardcoded, static data for all of its endpoints. This indicates that it's a mock service.
 
 ### 5.3. Gap Analysis
 
-The service has several endpoints related to adaptive questioning and follow-up generation, which could be considered a form of "gap analysis" in the context of an interview. The `/api/v1/conversation/generate-followup` endpoint, in particular, is designed to generate questions based on the quality and sentiment of a candidate's response.
+There is no explicit "gap analysis" logic in this service.
 
 ---
 *This is a placeholder file. Please fill out the details above.*

@@ -4,7 +4,7 @@ This document provides a comprehensive audit of the service, focusing on securit
 
 ## 1. Service Overview
 
-*   **Service Name:** conversation-service
+*   **Service Name:** granite-interview-service
 *   **Description:** [Briefly describe the service's purpose and functionality.]
 *   **Owner:** [Team or individual responsible for the service.]
 *   **Contact:** [Email or communication channel for the service owner.]
@@ -43,31 +43,26 @@ This document provides a comprehensive audit of the service, focusing on securit
 
 ### 5.1. Active Endpoints
 
-#### main.py
 *   `GET /`
 *   `GET /health`
-*   `GET /doc`
-*   `GET /api-docs`
-
-#### app/api/endpoints/interview.py
-*   `POST /conversation/generate-questions`
-*   `POST /conversation/start`
-*   `POST /conversation/message`
-*   `GET /conversation/status/{session_id}`
-*   `POST /conversation/end/{session_id}`
-*   `POST /api/v1/conversation/generate-adaptive-question`
-*   `POST /api/v1/conversation/generate-followup`
-*   `POST /api/v1/conversation/adapt-interview`
-*   `POST /api/v1/persona/switch`
-*   `GET /api/v1/persona/current`
+*   `GET /api/v1/models`
+*   `POST /api/v1/models/load`
+*   `DELETE /api/v1/models/{model_name}`
+*   `GET /api/v1/models/{model_name}/status`
+*   `POST /api/v1/interview/generate-question`
+*   `POST /api/v1/interview/analyze-response`
+*   `POST /api/v1/training/fine-tune`
+*   `GET /api/v1/training/jobs/{job_id}`
+*   `DELETE /api/v1/training/jobs/{job_id}`
+*   `GET /api/v1/system/gpu`
 
 ### 5.2. Mock Status
 
-The service calls an external Ollama service for question generation and relies on other internal services (like the `job_description_service`) for data. This indicates that it's designed to work with real, external dependencies rather than mock data.
+The service is a production-ready, non-mocked service designed to work with real, trained AI models. It features a sophisticated model registry and loading system, and it can interact with GPUs for performance.
 
 ### 5.3. Gap Analysis
 
-The service has several endpoints related to adaptive questioning and follow-up generation, which could be considered a form of "gap analysis" in the context of an interview. The `/api/v1/conversation/generate-followup` endpoint, in particular, is designed to generate questions based on the quality and sentiment of a candidate's response.
+The `/api/v1/interview/analyze-response` endpoint is designed to analyze a candidate's response to an interview question. This is a form of "gap analysis," as it's intended to evaluate the quality and correctness of a candidate's knowledge.
 
 ---
 *This is a placeholder file. Please fill out the details above.*
