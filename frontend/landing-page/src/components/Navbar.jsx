@@ -1,110 +1,85 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Icons } from './Icons';
 import { CONFIG } from '../config';
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    const navigateTo = (path, e) => {
-        if (e) e.preventDefault();
-        window.history.pushState({}, '', path);
-        window.dispatchEvent(new PopStateEvent('popstate'));
-        setIsMenuOpen(false);
-    };
-
-    const handleNavClick = (href, e) => {
-        if (href.startsWith('#')) {
-            const id = href.substring(1);
-            if (window.location.pathname !== '/') {
-                navigateTo('/', e);
-                // Wait for navigation to home before scrolling
-                setTimeout(() => {
-                    const element = document.getElementById(id);
-                    if (element) element.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
-            } else {
-                if (e) e.preventDefault();
-                const element = document.getElementById(id);
-                if (element) element.scrollIntoView({ behavior: 'smooth' });
-                setIsMenuOpen(false);
-            }
-        } else {
-            navigateTo(href, e);
-        }
-    };
-
     return (
-        <nav className="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-lg border-b border-slate-800">
+        <header className="sticky top-0 z-50 w-full bg-slate-950/80 backdrop-blur-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center h-16">
-                    <a 
-                        href="/" 
-                        onClick={(e) => navigateTo('/', e)}
-                        className="flex items-center space-x-2 hover:opacity-80 transition cursor-pointer"
-                    >
-                        <Icons.Logo className="w-8 h-8" />
+                <div className="flex items-center justify-between h-16">
+                    <Link to="/" className="flex items-center gap-2">
+                        <Icons.Logo />
                         <span className="text-xl font-bold">{CONFIG.project.name}</span>
-                    </a>
-                    
-                    {/* Desktop Menu */}
-                    <div className="hidden md:flex items-center space-x-8">
-                        {CONFIG.navigation.map((link) => (
-                            <a 
-                                key={link.name} 
-                                href={link.href} 
-                                onClick={(e) => handleNavClick(link.href, e)}
-                                className="text-slate-300 hover:text-white transition cursor-pointer"
+                    </Link>
+
+                    {/* Desktop Navigation */}
+                    <nav className="hidden md:flex items-center gap-6 text-slate-300">
+                        {CONFIG.navLinks.map((link) => (
+                            <Link
+                                key={link.href}
+                                to={link.href}
+                                className="hover:text-white transition"
                             >
-                                {link.name}
-                            </a>
+                                {link.label}
+                            </Link>
                         ))}
-                        <a href={CONFIG.project.githubUrl} target="_blank" rel="noopener noreferrer" className="text-slate-300 hover:text-white transition flex items-center gap-2">
-                            <Icons.GitHub /> GitHub
+                    </nav>
+
+                    <div className="hidden md:flex items-center gap-4">
+                        <a
+                            href={CONFIG.project.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-slate-400 hover:text-white transition"
+                        >
+                            <Icons.GitHub />
                         </a>
-                        <button className="bg-slate-800 text-slate-400 cursor-not-allowed px-4 py-2 rounded-lg font-medium transition flex items-center gap-2">
+                        <button className="bg-slate-800 text-slate-400 cursor-not-allowed px-4 py-2 rounded-lg font-medium transition">
                             Coming Soon
                         </button>
                     </div>
 
                     {/* Mobile Menu Button */}
-                    <div className="md:hidden flex items-center">
-                        <button 
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="text-slate-300 hover:text-white p-2"
-                        >
-                            {isMenuOpen ? <Icons.Close /> : <Icons.Menu />}
+                    <div className="md:hidden">
+                        <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                            {isMenuOpen ? <Icons.X /> : <Icons.Menu />}
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* Mobile Menu Overlay */}
+            {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="md:hidden bg-slate-900 border-b border-slate-800 py-4 px-4 space-y-4">
-                    {CONFIG.navigation.map((link) => (
-                        <a 
-                            key={link.name} 
-                            href={link.href} 
-                            onClick={(e) => handleNavClick(link.href, e)}
-                            className="block text-slate-300 hover:text-white transition text-lg cursor-pointer"
+                <div className="md:hidden bg-slate-900/90">
+                    <nav className="flex flex-col gap-4 px-4 py-6 text-slate-300">
+                        {CONFIG.navLinks.map((link) => (
+                            <Link
+                                key={link.href}
+                                to={link.href}
+                                className="hover:text-white transition"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
+                        <a
+                            href={CONFIG.project.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-slate-400 hover:text-white transition"
                         >
-                            {link.name}
+                            <Icons.GitHub /> GitHub
                         </a>
-                    ))}
-                    <a 
-                        href={CONFIG.project.githubUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="flex items-center gap-2 text-slate-300 hover:text-white transition text-lg"
-                    >
-                        <Icons.GitHub /> GitHub
-                    </a>
-                    <button className="w-full bg-slate-800 text-slate-400 cursor-not-allowed py-3 rounded-lg font-medium text-center">
-                        Coming Soon
-                    </button>
+                        <button className="bg-slate-800 text-slate-400 cursor-not-allowed px-4 py-2 rounded-lg font-medium transition w-full">
+                            Coming Soon
+                        </button>
+                    </nav>
                 </div>
             )}
-        </nav>
+        </header>
     );
 };
 

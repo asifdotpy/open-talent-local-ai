@@ -1,0 +1,34 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'frontend/landing-page/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'frontend/landing-page/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          cd frontend/landing-page
+          npm install
+
+      - name: Build project
+        run: |
+          cd frontend/landing-page
+          npm run build

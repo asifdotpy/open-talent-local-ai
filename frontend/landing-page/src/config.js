@@ -6,11 +6,13 @@ export const CONFIG = {
         tagline: "Source. Interview. Hire.",
         description: "The only platform that combines 1.8B+ profile sourcing with local AI interviewing. 100% privacy-first. 97% cheaper than LinkedIn + HireVue combined.",
     },
-    navigation: [
-        { name: 'Features', href: '#features' },
-        { name: 'Blog', href: '#blog' },
-        { name: 'Pricing', href: '#pricing' },
-        { name: 'FAQ', href: '#faq' },
+    navLinks: [
+        { label: 'Features', href: '/features' },
+        { label: 'Blog', href: '/blog' },
+        { label: 'Pricing', href: '/pricing' },
+        { label: 'Community', href: '/community' },
+        { label: 'FAQ', href: '/faq' },
+        { label: 'Download', href: '/download' },
     ],
     features: [
         {
