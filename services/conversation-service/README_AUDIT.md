@@ -1,37 +1,43 @@
-# Service Audit Results: conversation-service
+# README_AUDIT.md
 
-**Location**: `/home/asif1/open-talent/services/conversation-service`
-**Type**: FastAPI
+This document provides a comprehensive audit of the service, focusing on security, compliance, and operational readiness. It should be updated regularly to reflect the current state of the service.
 
-## Endpoints
+## 1. Service Overview
 
-### Conversation Management
+*   **Service Name:** conversation-service
+*   **Description:** [Briefly describe the service's purpose and functionality.]
+*   **Owner:** [Team or individual responsible for the service.]
+*   **Contact:** [Email or communication channel for the service owner.]
 
-| Method | Path | Description |
-| :--- | :--- | :--- |
-| `POST` | `/conversation/start` | Start new interview session |
-| `POST` | `/conversation/message` | Send message / Get AI response |
-| `GET` | `/conversation/status/{session_id}` | Get session status |
-| `POST` | `/conversation/end/{session_id}` | End session |
+## 2. Security Audit
 
-### Adaptive Intelligence
+### 2.1. Authentication and Authorization
 
-| Method | Path | Description |
-| :--- | :--- | :--- |
-| `POST` | `/conversation/generate-questions` | Generate questions (Ollama) |
-| `POST` | `/api/v1/conversation/generate-adaptive-question` | Generate next context-aware question |
-| `POST` | `/api/v1/conversation/generate-followup` | Generate follow-up questions |
-| `POST` | `/api/v1/conversation/adapt-interview` | Strategy adaptation |
+*   [Describe the authentication and authorization mechanisms used by the service.]
 
-### Persona Management
+### 2.2. Data Encryption
 
-| Method | Path | Description |
-| :--- | :--- | :--- |
-| `POST` | `/api/v1/persona/switch` | Switch interviewer persona |
-| `GET` | `/api/v1/persona/current` | Get current persona |
+*   [Detail how data is encrypted at rest and in transit.]
 
-## Mock Data / Simulation Findings
+### 2.3. Vulnerability Scanning
 
-1. **Persistence**: Unlike other services, this service uses **REAL** persistence via `DatabaseService`. It defaults to SQLite (`conversations.db`) but supports PostgreSQL.
-2. **LLM Integration**: Uses `OllamaService` and `ModularLLMService` for real AI generation, not hardcoded strings.
-3. **Real Logic**: Implements complex states, adaptive questioning logic, and persona management.
+*   [Describe the process and tools used for vulnerability scanning.]
+*   **Last Scan Date:**
+*   **Summary of Findings:**
+
+## 3. Compliance Audit
+
+*   [Describe how the service complies with relevant regulations (e.g., GDPR, HIPAA).]
+
+## 4. Operational Readiness
+
+### 4.1. Monitoring and Logging
+
+*   [Detail the monitoring and logging solutions in place.]
+
+### 4.2. Disaster Recovery
+
+*   [Outline the disaster recovery plan for the service.]
+
+---
+*This is a placeholder file. Please fill out the details above.*

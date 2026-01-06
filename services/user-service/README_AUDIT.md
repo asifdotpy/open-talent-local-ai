@@ -1,58 +1,43 @@
-# Service Audit Results: user-service
+# README_AUDIT.md
 
-**Location**: `services/user-service`
-**Type**: FastAPI
+This document provides a comprehensive audit of the service, focusing on security, compliance, and operational readiness. It should be updated regularly to reflect the current state of the service.
 
-## Recent Changes
+## 1. Service Overview
 
-```
-commit b43abe82811bb9e7871b3a2f44764ad4a65a4fb5
-Author: Asif - TalentAI <asif@talentai.com>
-Date:   Mon Jan 5 18:20:29 2026 +0600
+*   **Service Name:** user-service
+*   **Description:** [Briefly describe the service's purpose and functionality.]
+*   **Owner:** [Team or individual responsible for the service.]
+*   **Contact:** [Email or communication channel for the service owner.]
 
-    feat: Enhance type safety in create_access_token and resolve pre-commit issues
+## 2. Security Audit
 
-    Refactored create_access_token function for type safety.
-    Resolved bandit, black, isort, and ruff pre-commit hook failures.
-    Temporarily disabled mypy and markdownlint hooks to unblock commit.
-    Follow-up tasks are needed to properly configure mypy and markdownlint.
-```
+### 2.1. Authentication and Authorization
 
-## Endpoints
+*   [Describe the authentication and authorization mechanisms used by the service.]
 
-| Method | Path | Description |
-| :--- | :--- | :--- |
-| `GET` | `/` | Service root |
-| `GET` | `/health` | Health check |
-| `GET` | `/api/v1/users` | List users |
-| `GET` | `/api/v1/users/count` | Count users |
-| `GET` | `/api/v1/users/{user_id}` | Get user by ID |
-| `POST` | `/api/v1/users` | Create user |
-| `PATCH` | `/api/v1/users/{user_id}` | Update user |
-| `PUT` | `/api/v1/users/{user_id}` | Update user |
-| `DELETE` | `/api/v1/users/{user_id}` | Delete user |
-| `GET` | `/api/v1/users/{user_id}/profile` | Get user profile |
-| `POST` | `/api/v1/users/{user_id}/profile` | Create user profile |
-| `PATCH` | `/api/v1/users/{user_id}/profile` | Update user profile |
-| `PUT` | `/api/v1/users/{user_id}/profile` | Update user profile |
-| `GET` | `/api/v1/users/me/profile` | Get current user's profile |
-| `PATCH` | `/api/v1/users/me/profile` | Update current user's profile |
-| `GET` | `/api/v1/users/{user_id}/preferences` | Get user preferences |
-| `POST` | `/api/v1/users/{user_id}/preferences` | Create user preferences |
-| `PATCH` | `/api/v1/users/{user_id}/preferences` | Update user preferences |
-| `PUT` | `/api/v1/users/{user_id}/preferences` | Update user preferences |
-| `GET` | `/api/v1/users/me/preferences` | Get current user's preferences |
-| `PATCH` | `/api/v1/users/me/preferences` | Update current user's preferences |
-| `PUT` | `/api/v1/users/me/preferences` | Update current user's preferences |
-| `GET` | `/api/v1/users/{user_id}/activity` | Get user activity |
-| `POST` | `/api/v1/users/{user_id}/activity` | Log user activity |
-| `GET` | `/api/v1/users/{user_id}/sessions` | Get user sessions |
-| `DELETE` | `/api/v1/users/{user_id}/sessions/{session_id}`| Revoke user session |
-| `POST` | `/api/v1/users/bulk/import` | Bulk import users |
-| `GET` | `/api/v1/users/bulk/export` | Bulk export users |
+### 2.2. Data Encryption
 
-## Mock Data / Simulation Findings
+*   [Detail how data is encrypted at rest and in transit.]
 
-1.  **Database Integration**: The service is fully integrated with a PostgreSQL database using SQLAlchemy for data persistence. All CRUD operations interact with the database.
-2.  **No Mock Data**: No in-memory data structures, hardcoded responses, or mock data patterns were found within the main application logic in `app/routers.py`.
-3.  **Test Data**: Mock data and `example.com` domains are used appropriately within the test suite (`tests/`) to isolate tests and are not present in the production code.
+### 2.3. Vulnerability Scanning
+
+*   [Describe the process and tools used for vulnerability scanning.]
+*   **Last Scan Date:**
+*   **Summary of Findings:**
+
+## 3. Compliance Audit
+
+*   [Describe how the service complies with relevant regulations (e.g., GDPR, HIPAA).]
+
+## 4. Operational Readiness
+
+### 4.1. Monitoring and Logging
+
+*   [Detail the monitoring and logging solutions in place.]
+
+### 4.2. Disaster Recovery
+
+*   [Outline the disaster recovery plan for the service.]
+
+---
+*This is a placeholder file. Please fill out the details above.*

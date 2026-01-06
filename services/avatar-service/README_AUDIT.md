@@ -1,63 +1,43 @@
-# Service Audit Results: avatar-service
+# README_AUDIT.md
 
-**Location**: `/home/asif1/open-talent/services/avatar-service`
-**Type**: FastAPI (with Node.js renderer)
+This document provides a comprehensive audit of the service, focusing on security, compliance, and operational readiness. It should be updated regularly to reflect the current state of the service.
 
-## Endpoints
+## 1. Service Overview
 
-### Base / System
+*   **Service Name:** avatar-service
+*   **Description:** [Briefly describe the service's purpose and functionality.]
+*   **Owner:** [Team or individual responsible for the service.]
+*   **Contact:** [Email or communication channel for the service owner.]
 
-| Method | Path | Description |
-| :--- | :--- | :--- |
-| `GET` | `/` | Service info |
-| `GET` | `/health` | Health check |
-| `GET` | `/ping` | Heartbeat |
-| `GET` | `/doc`, `/api-docs` | Documentation helpers |
-| `POST` | `/render/lipsync` | Direct render call (invokes Node.js) |
+## 2. Security Audit
 
-### Avatar V1 API (`/api/v1/avatars`)
+### 2.1. Authentication and Authorization
 
-*Extensive scaffold API for avatar management*
-| Method | Path | Description |
-| :--- | :--- | :--- |
-| `POST` | `/render`, `/render/sequence` | Render requests |
-| `POST` | `/lipsync`, `/lipsync/preview` | Lipsync operations |
-| `GET/POST` | `/presets` | Preset management |
-| `POST` | `/customize` | Customize avatar traits |
-| `GET/PATCH` | `/{avatar_id}/state` | Avatar state management |
-| `POST` | `/phonemes`, `/phonemes/timing` | Phoneme calculation |
-| `GET/PATCH` | `/{avatar_id}/emotions` | Emotion control |
-| `GET/PUT` | `/config` | Service configuration |
-| `GET` | `/performance` | Performance metrics |
-| `GET/POST` | `/{avatar_id}/snapshot` | Screenshot generation |
-| `GET/POST` | `/assets` | Asset management |
-| `GET/POST` | `/models` | Model selection |
-| `POST/DEL` | `/session` | Session management |
-| `POST/DEL` | `/voice/attach`, `/voice/detach` | Voice integration |
-| `WS` | `/{avatar_id}/stream` | Avatar streaming WebSocket |
+*   [Describe the authentication and authorization mechanisms used by the service.]
 
-### Legacy/Direct Routes (Root)
+### 2.2. Data Encryption
 
-| Method | Path | Description |
-| :--- | :--- | :--- |
-| `GET` | `/src/{path}`, `/assets/{path}` | Serve static assets |
-| `POST` | `/generate` | Generate video from text |
-| `POST` | `/generate-from-audio` | Generate from audio file |
-| `GET/POST` | `/phonemes`, `/set-phonemes` | Session phoneme data |
-| `GET` | `/info` | Avatar service info |
+*   [Detail how data is encrypted at rest and in transit.]
 
-### Voice Routes (`/api/v1`)
+### 2.3. Vulnerability Scanning
 
-| Method | Path | Description |
-| :--- | :--- | :--- |
-| `POST` | `/generate-voice` | Generate voice (US English) |
-| `GET` | `/voices` | List voices |
+*   [Describe the process and tools used for vulnerability scanning.]
+*   **Last Scan Date:**
+*   **Summary of Findings:**
 
-## Mock Data / Simulation Findings
+## 3. Compliance Audit
 
-1. **In-Memory Scaffolding**: `avatar_v1.py` relies entirely on in-memory dictionaries (`avatars`, `presets`, `sessions`) which reset on restart.
-2. **Mock Renderer Mode**: `renderer/render.js` checks `process.env.SKIP_RENDERING` to return mock video metadata without rendering.
-3. **Hardcoded Responses**:
-    - `/performance` returns constant FPS/GPU load.
-    - `/phonemes` returns hardcoded phoneme sequences.
-    - `health_check` reports "healthy" with static component status.
+*   [Describe how the service complies with relevant regulations (e.g., GDPR, HIPAA).]
+
+## 4. Operational Readiness
+
+### 4.1. Monitoring and Logging
+
+*   [Detail the monitoring and logging solutions in place.]
+
+### 4.2. Disaster Recovery
+
+*   [Outline the disaster recovery plan for the service.]
+
+---
+*This is a placeholder file. Please fill out the details above.*
