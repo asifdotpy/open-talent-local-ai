@@ -39,5 +39,23 @@ This document provides a comprehensive audit of the service, focusing on securit
 
 *   [Outline the disaster recovery plan for the service.]
 
+## 5. Service Analysis
+
+### 5.1. Active Endpoints
+
+*   `GET /`
+*   `GET /health`
+*   `GET /jobs`
+*   `GET /jobs/{project_id}`
+*   `POST /jobs`
+
+### 5.2. Mock Status
+
+The service is designed to work with a real database and uses SQLAlchemy for object-relational mapping. It also has a data seeding mechanism to ensure that some data is present on startup. This indicates that it's a production-ready, non-mocked service.
+
+### 5.3. Gap Analysis
+
+There is no explicit "gap analysis" logic in this service.
+
 ---
 *This is a placeholder file. Please fill out the details above.*

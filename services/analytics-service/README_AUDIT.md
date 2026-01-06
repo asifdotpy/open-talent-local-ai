@@ -39,5 +39,34 @@ This document provides a comprehensive audit of the service, focusing on securit
 
 *   [Outline the disaster recovery plan for the service.]
 
+## 5. Service Analysis
+
+### 5.1. Active Endpoints
+
+*   `GET /`
+*   `GET /health`
+*   `POST /api/v1/analyze/sentiment`
+*   `POST /api/v1/analyze/quality`
+*   `POST /api/v1/analyze/bias`
+*   `POST /api/v1/analyze/expertise`
+*   `POST /api/v1/analyze/performance`
+*   `POST /api/v1/analyze/report`
+*   `GET /api/v1/analytics/interviews`
+*   `GET /api/v1/analytics/candidates/{candidate_id}`
+*   `GET /api/v1/analytics/interviews/{interview_id}`
+*   `GET /api/v1/analytics/metrics`
+*   `GET /api/v1/analytics/metrics/timeseries`
+*   `POST /api/v1/analytics/reports`
+*   `GET /api/v1/analytics/reports/{report_id}`
+*   `GET /api/v1/analytics/reports/{report_id}/export`
+
+### 5.2. Mock Status
+
+The service uses TextBlob for sentiment analysis and has hardcoded keywords for expertise assessment. This indicates that the service is using mock data and simulated logic.
+
+### 5.3. Gap Analysis
+
+The service has a "knowledge gaps" analysis in the `/api/v1/analyze/expertise` endpoint. It checks if technical skills were demonstrated in the response.
+
 ---
 *This is a placeholder file. Please fill out the details above.*

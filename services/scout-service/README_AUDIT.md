@@ -39,5 +39,33 @@ This document provides a comprehensive audit of the service, focusing on securit
 
 *   [Outline the disaster recovery plan for the service.]
 
+## 5. Service Analysis
+
+### 5.1. Active Endpoints
+
+*   `GET /`
+*   `GET /health`
+*   `POST /search`
+*   `GET /api/v1/search`
+*   `POST /api/v1/search/advanced`
+*   `POST /api/v1/lists`
+*   `POST /handoff`
+*   `GET /agents/registry`
+*   `GET /agents/health`
+*   `GET /agents/{agent_name}`
+*   `POST /agents/call`
+*   `POST /agents/search-multi`
+*   `POST /agents/capability/{capability}`
+*   `POST /search/multi-agent`
+*   `GET /health/full`
+
+### 5.2. Mock Status
+
+The service is a production-ready, non-mocked service designed to work with real, external APIs, including the GitHub API, an Ollama service, and the ContactOut API.
+
+### 5.3. Gap Analysis
+
+There is no explicit "gap analysis" logic in this service. Its primary purpose is to find and enrich candidate profiles.
+
 ---
 *This is a placeholder file. Please fill out the details above.*

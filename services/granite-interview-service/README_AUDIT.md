@@ -39,5 +39,30 @@ This document provides a comprehensive audit of the service, focusing on securit
 
 *   [Outline the disaster recovery plan for the service.]
 
+## 5. Service Analysis
+
+### 5.1. Active Endpoints
+
+*   `GET /`
+*   `GET /health`
+*   `GET /api/v1/models`
+*   `POST /api/v1/models/load`
+*   `DELETE /api/v1/models/{model_name}`
+*   `GET /api/v1/models/{model_name}/status`
+*   `POST /api/v1/interview/generate-question`
+*   `POST /api/v1/interview/analyze-response`
+*   `POST /api/v1/training/fine-tune`
+*   `GET /api/v1/training/jobs/{job_id}`
+*   `DELETE /api/v1/training/jobs/{job_id}`
+*   `GET /api/v1/system/gpu`
+
+### 5.2. Mock Status
+
+The service is a production-ready, non-mocked service designed to work with real, trained AI models. It features a sophisticated model registry and loading system, and it can interact with GPUs for performance.
+
+### 5.3. Gap Analysis
+
+The `/api/v1/interview/analyze-response` endpoint is designed to analyze a candidate's response to an interview question. This is a form of "gap analysis," as it's intended to evaluate the quality and correctness of a candidate's knowledge.
+
 ---
 *This is a placeholder file. Please fill out the details above.*

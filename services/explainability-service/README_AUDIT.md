@@ -39,5 +39,27 @@ This document provides a comprehensive audit of the service, focusing on securit
 
 *   [Outline the disaster recovery plan for the service.]
 
+## 5. Service Analysis
+
+### 5.1. Active Endpoints
+
+*   `GET /`
+*   `GET /health`
+*   `POST /api/v1/explain/score`
+*   `POST /api/v1/explain/recommendation`
+*   `POST /api/v1/explain/path`
+*   `GET /api/v1/features/importance`
+*   `GET /api/v1/interviews/{interview_id}/features`
+*   `GET /api/v1/model/metadata`
+*   `GET /api/v1/decisions/log`
+
+### 5.2. Mock Status
+
+The service returns hardcoded, static data for all of its endpoints. This indicates that it's a mock service.
+
+### 5.3. Gap Analysis
+
+There is no explicit "gap analysis" logic in this service.
+
 ---
 *This is a placeholder file. Please fill out the details above.*
