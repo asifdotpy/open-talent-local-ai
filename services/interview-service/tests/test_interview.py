@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from app.core.config import settings
 
 
-def test_start_interview(test_client: TestClient) -> None:
+def test_start_interview(client: TestClient) -> None:
     """Test the start_interview endpoint."""
     payload = {
         "searchCriteria": {
@@ -47,10 +47,12 @@ def test_start_interview(test_client: TestClient) -> None:
         },
     }
 
-    response = test_client.post(f"{settings.API_V1_STR}/interview/start", json=payload)
+    response = client.post(f"{settings.API_V1_STR}/interview/start", json=payload)
     assert response.status_code == 201
     data = response.json()
-    assert data["message"] == "Handoff received successfully. Interview process initiated."
+    assert (
+        data["message"] == "Handoff received successfully. Interview process initiated."
+    )
     assert data["candidate"] == "John Doe"
     assert "interview_session_id" in data
     assert "initial_response" in data
