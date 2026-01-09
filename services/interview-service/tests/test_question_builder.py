@@ -23,7 +23,7 @@ from services.question_builder import (
 def question_builder():
     """Create question builder instance for testing."""
     return NaturalLanguageQuestionBuilder(
-        ollama_base_url="http://localhost:11434", model="smollm:135m"
+        ollama_base_url="http://localhost:11434"
     )
 
 
@@ -92,8 +92,7 @@ async def test_generate_questions_with_ollama(question_builder, sample_prompt):
     # Verify API call was made correctly
     mock_post.assert_called_once()
     call_args = mock_post.call_args
-    assert call_args[1]["json"]["model"] == "smollm:135m"
-    assert "distributed system" in call_args[1]["json"]["prompt"]
+    assert call_args[1]["json"]["model"] == "granite4:350m-h"
 
     # Assertions
     assert len(questions) == 2

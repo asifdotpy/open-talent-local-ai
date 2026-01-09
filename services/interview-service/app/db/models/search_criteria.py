@@ -4,6 +4,8 @@ from sqlmodel import Field, SQLModel
 
 
 class SearchCriteria(SQLModel, table=True):
+    __tablename__ = "search_criteria"
+
     id: Optional[int] = Field(default=None, primary_key=True)
     job_title: Optional[str] = None
     required_skills: Optional[str] = None

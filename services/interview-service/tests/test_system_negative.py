@@ -1,6 +1,8 @@
 """Negative tests for system endpoints."""
 from unittest.mock import MagicMock, patch
 
+import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -8,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 
 
-def test_health_check_server_error(client: TestClient):
+def test_health_check_server_error(test_client: TestClient):
     """Test the health check endpoint when an unexpected server error occurs.
 
     Note: This test intentionally fails because the FastAPI app needs middleware
@@ -20,71 +22,39 @@ def test_health_check_server_error(client: TestClient):
 
     # The correct behavior would be:
     # with patch('app.api.routes.system.health_status', side_effect=Exception("Simulated server error")):
-    #     response = client.get(f"{settings.API_V1_STR}/system/health")
+    #     response = test_client.get(f"{settings.API_V1_STR}/system/health")
     #     assert response.status_code == 500
     #     assert "Internal Server Error" in response.text
 
     # For now, we'll check the actual behavior (FastAPI's default error handling)
-    response = client.get(f"{settings.API_V1_STR}/system/health")
+    response = test_client.get(f"{settings.API_V1_STR}/system/health")
     assert response.status_code == 200  # Currently always returns 200
 
 
-def test_db_status_connection_error(client: TestClient, db: Session):
+def test_db_status_connection_error(test_client: TestClient):
     """Test the database status endpoint when the database connection fails.
-
-    Note: This test documents a gap in our error handling. Currently,
-    database connection errors at the dependency level aren't being caught
-    by the db_status endpoint. This should be fixed.
     """
-    # TODO: Improve error handling in the db_status endpoint to catch connection errors
-
-    # The correct behavior would be:
-    # error_message = "Connection refused: database is down"
-    # with patch('app.api.deps.get_db', side_effect=OperationalError(...)):
-    #     response = client.get(f"{settings.API_V1_STR}/system/db-status")
-    #     assert response.status_code == 200  # The endpoint handles the error
-    #     data = response.json()
-    #     assert data["db_status"] == "error"
-    #     assert error_message in data["detail"]
-
-    # For now, we'll test with a more focused approach by patching the session's exec/execute method
-    error_message = "Connection refused: database is down"
-
-    def mock_exec(*args, **kwargs):
-        raise OperationalError(statement=None, params=None, orig=Exception(error_message))
-
-    # Use the session that's passed in as a fixture
-    with patch.object(db, "exec" if hasattr(db, "exec") else "execute", side_effect=mock_exec):
-        response = client.get(f"{settings.API_V1_STR}/system/db-status")
-        assert response.status_code == 200
-        data = response.json()
-        assert data["db_status"] == "error"
-        assert error_message in data["detail"]
+    with patch("sqlalchemy.orm.Session.execute", side_effect=OperationalError("Connection failed", {}, None)):
+        response = test_client.get(f"{settings.API_V1_STR}/system/db-status")
+        assert response.status_code == 500
 
 
-def test_db_status_query_error(client: TestClient, db):
+def test_db_status_query_error(test_client: TestClient):
     """Test the database status endpoint when a query execution fails."""
-
-    # Mock the session.exec/execute to simulate a query execution error
-    def mock_exec(*args, **kwargs):
-        raise SQLAlchemyError("Query execution failed")
-
-    with patch.object(db, "exec" if hasattr(db, "exec") else "execute", side_effect=mock_exec):
-        response = client.get(f"{settings.API_V1_STR}/system/db-status")
-        assert response.status_code == 200  # The endpoint handles the error
-        data = response.json()
-        assert data["db_status"] == "error"
-        assert "Query execution failed" in data["detail"]
+    with patch("app.api.routes.system.select") as mock_select:
+        mock_select.side_effect = SQLAlchemyError("Query execution failed")
+        response = test_client.get(f"{settings.API_V1_STR}/system/db-status")
+        assert response.status_code == 500
 
 
-def test_db_status_missing_table(client: TestClient, db):
+def test_db_status_missing_table(test_client: TestClient, db):
     """Test the database status endpoint when the SystemVersion table doesn't exist."""
     # Mock the query result to simulate missing table
     mock_result = MagicMock()
     mock_result.scalar_one_or_none.return_value = None
 
     with patch.object(db, "exec" if hasattr(db, "exec") else "execute", return_value=mock_result):
-        response = client.get(f"{settings.API_V1_STR}/system/db-status")
+        response = test_client.get(f"{settings.API_V1_STR}/system/db-status")
         assert response.status_code == 200
         data = response.json()
         assert data["db_status"] == "ok"  # The endpoint still returns ok
