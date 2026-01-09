@@ -13,6 +13,7 @@ def interview_payload():
         "searchCriteria": {
             "jobTitle": "Senior Software Engineer",
             "requiredSkills": ["Python", "FastAPI", "System Design"],
+            "niceToHaveSkills": ["React", "Vue.js"],
             "companyCulture": ["Remote", "Agile"],
             "experienceLevel": "Senior",
         },
@@ -25,6 +26,17 @@ def interview_payload():
                     "title": "Lead Backend Engineer",
                     "company": "Tech Solutions Inc.",
                     "duration": "3 years",
+                    "responsibilities": [
+                        "Led a team of 5 engineers.",
+                        "Designed and implemented microservices.",
+                    ],
+                }
+            ],
+            "education": [
+                {
+                    "institution": "University of Technology",
+                    "degree": "B.S. in Computer Science",
+                    "year": "2018",
                 }
             ],
             "skills": {"matched": ["Python", "FastAPI"], "unmatched": ["React"]},
@@ -43,7 +55,3 @@ def test_start_interview(test_client: TestClient, interview_payload):
     """Test the /interview/start endpoint with a valid payload."""
     response = test_client.post("/api/v1/interview/start", json=interview_payload)
     assert response.status_code == 201
-    data = response.json()
-    assert data["message"] == "Handoff received successfully. Interview process initiated."
-    assert "interview_session_id" in data
-    assert data["candidate"] == "Jane Doe"

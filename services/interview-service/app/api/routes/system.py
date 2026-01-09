@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.exc import OperationalError
 from sqlmodel import Session, select
 
@@ -22,9 +22,9 @@ def db_status(session: Session = Depends(get_db)):
             "detail": "No error",
         }
     except OperationalError as e:
-        return {"db_status": "error", "detail": str(e)}
+        raise HTTPException(status_code=500, detail=str(e))
     except Exception as e:
-        return {"db_status": "error", "detail": str(e)}
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # Health check endpoint
