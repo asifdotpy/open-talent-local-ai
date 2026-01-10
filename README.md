@@ -1,72 +1,62 @@
-# OpenTalent: Privacy-First AI Recruitment 🚀
+# Open Talent: The Interviewer that Keeps Secrets.
 
-[![Release](https://img.shields.io/badge/release-v1.1.0-brightgreen.svg)](https://github.com/asifdotpy/open-talent-local-ai/releases/tag/v1.1.0)
+**Tagline:** 100% Local. 100% Private.
+
+[![Release](https://img.shields.io/badge/release-Community%20Edition-brightgreen.svg)](https://github.com/asifdotpy/open-talent-local-ai/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Local AI](https://img.shields.io/badge/AI-100%25%20Local-orange.svg)](#)
-[![Privacy First](https://img.shields.io/badge/Privacy-First-blueviolet.svg)](#)
+[![Local AI](https://img.shields.io/badge/AI-100%25%20Offline-orange.svg)](#)
+[![Privacy First](https://img.shields.io/badge/Data%20Sovereignty-100%25-blueviolet.svg)](#)
 
-OpenTalent is a state-of-the-art, desktop-first recruitment platform that leverages **local AI** to find, evaluate, and track technical talent. Featuring the new **TalentScout Pro** interface, it offers a seamless, privacy-first experience where no data leaves your machine.
+OpenTalent is a desktop-first, offline AI platform designed to conduct technical interviews without data ever leaving your device. Unlike cloud-based competitors, our tool prioritizes data sovereignty, zero latency, and enterprise-grade logic.
 
----
-
-## 🌟 Choose Your Journey
-
-To provide the best experience, we've created specialized guides for different audiences:
-
-| I am a... | Goal | Fast Path |
-| :--- | :--- | :--- |
-| **Investor/Executive** | See the value & potential | [**Investor Demo Guide**](README_DEMO.md) 🎬 |
-| **Recruiter/End User** | Install and start using | [**User Guide (Non-Technical)**](README_USER_GUIDE.md) 👥 |
-| **Developer** | Contribute or build | [**Developer Setup Guide**](SETUP_GUIDE.md) 🛠️ |
-| **QA/Tester** | Verify system health | [**Testing Guide**](README_TESTING.md) 🧪 |
+**Core Philosophy:** "Bring the AI to the data, not the data to the AI."
 
 ---
 
-## 🔥 Key Features
+## 🔥 The "Killer" Value Propositions
 
-- **Local AI Engines**: Powered by Ollama (Granite 4/Mistral) for search and evaluation.
-- **Privacy Core**: 100% offline interview processing and candidate enrichment.
-- **Unified Gateway**: A high-performance microservices architecture managed through a single entry point.
-- **Voice Intelligence**: Local TTS (Piper) and STT for immersive AI-led interviews.
-- **Cross-Platform**: Built with Electron & React for a premium desktop experience.
-
----
-
-## 🚀 Quick Start (Production Environment)
-
-If you have the prerequisites (Node.js 20, Python 3.12, NPM), start the entire platform with a single command:
-
-```bash
-# Clone the repository
-git clone https://github.com/asifdotpy/open-talent-local-ai.git
-cd open-talent
-
-# Bootstrap dependencies
-./manage.sh start
-```
-
-### Management Commands
-
-Our unified management script handles the entire lifecycle:
-
-- `./manage.sh start` - Start all microservices and the desktop app
-- `./manage.sh stop` - Gracefully stop all components
-- `./manage.sh status` - Check the health and PIDs of active services
-- `./manage.sh restart` - Perform a clean stop-start cycle
+| Feature | The Selling Point |
+| :--- | :--- |
+| **100% Offline Architecture** | **Privacy:** GDPR/CCPA compliance is native. No candidate data ever touches a cloud server. |
+| **Zero API Costs** | **Economics:** Companies save thousands monthly on OpenAI/Anthropic token fees. |
+| **Zero Latency Voice** | **Experience:** Using Piper (TTS) ensures instant voice responses, eliminating "awkward cloud lag." |
+| **Enterprise Logic** | **Accuracy:** Built on IBM Granite 4, optimized for coding and business logic, not creative fiction. |
 
 ---
 
-## 🏛️ Architecture at a Glance
+## 🚀 Get Started in 60 Seconds
 
-OpenTalent uses a decoupled microservices architecture coordinated via a **Desktop Integration Gateway**:
+The easiest way to use OpenTalent is with the **desktop application**.
 
-1. **Frontend**: React-based Electron application.
-2. **Gateway**: Unified proxy for all microservices.
-3. **Services**:
-    - `scout-service`: GitHub/LinkedIn talent sourcing.
-    - `voice-service`: Local STT/TTS processing.
-    - `analytics-service`: Interview and quality metrics.
-    - `desktop-integration-service`: Service discovery and orchestration.
+1.  **Navigate to the Desktop App:**
+    ```bash
+    cd desktop-app
+    ```
+
+2.  **Follow the Setup Guide:**
+    Our detailed `README.md` in that directory has everything you need to get up and running.
+
+    ➡️ **[Click here for the Desktop App Guide](desktop-app/README.md)**
+
+---
+
+## 🛠️ The Tech Stack as a Feature
+
+- **Ollama Integration:** Marketed as **"Universal Compatibility,"** allowing users to swap in different local models.
+- **Piper (Text-to-Speech):** Marketed as **"Real-Time Conversation,"** crucial for a seamless voice interview experience.
+- **IBM Granite 4:** Marketed as **"Business Class AI,"** differentiating it from more playful models like Llama.
+- **Electron + React:** Marketed as **"One-Click Deployment,"** requiring no complex setup for end-users.
+
+---
+
+## 🏛️ Secure by Design: A Glimpse into the Architecture
+
+OpenTalent is built as a **desktop-first, secure interview infrastructure**.
+
+- **The Core:** A cross-platform Electron application that runs everything locally.
+- **Local AI:** Ollama serves powerful models like IBM Granite 4 directly on your machine.
+- **Real-Time Voice:** Piper TTS provides instant, offline text-to-speech for natural conversations.
+- **No Cloud Dependencies:** The entire interview process happens in an air-gapped environment. For more technical details, see our [**Architecture Guide**](AGENTS.md).
 
 ---
 
