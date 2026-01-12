@@ -5,9 +5,9 @@ Purpose: Interview management, scheduling, feedback.
 """
 
 from typing import Any
-from fastapi.testclient import TestClient
 
 import pytest
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture

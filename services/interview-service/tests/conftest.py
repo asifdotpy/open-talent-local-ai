@@ -8,10 +8,9 @@ from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from app.core.config import settings
 from fastapi.testclient import TestClient
 from sqlmodel import Session, create_engine
-
-from app.core.config import settings
 
 
 @pytest.fixture(scope="session")

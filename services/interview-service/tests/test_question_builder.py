@@ -7,7 +7,6 @@ from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from services.question_builder import (
     InterviewQuestion,
     NaturalLanguagePrompt,

@@ -3,8 +3,8 @@ Targets the actual implementation in main.py.
 """
 from datetime import datetime
 
-from fastapi.testclient import TestClient
 import pytest
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture
