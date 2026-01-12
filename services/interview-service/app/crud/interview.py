@@ -2,10 +2,9 @@
 
 import uuid
 
-from sqlalchemy.orm import Session
-
 from app.db.models import interview as interview_models
 from app.schemas import interview as interview_schemas
+from sqlalchemy.orm import Session
 
 
 def _create_search_criteria(

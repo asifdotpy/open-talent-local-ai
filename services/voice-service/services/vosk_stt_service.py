@@ -16,7 +16,6 @@ except ImportError:
 
 import numpy as np
 import soundfile as sf
-
 from app.core.constants import DEFAULT_SAMPLE_RATE, DEFAULT_VOSK_MODEL_PATH
 
 

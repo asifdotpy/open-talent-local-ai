@@ -1,8 +1,6 @@
 from datetime import datetime
 
 from fastapi import FastAPI, HTTPException
-from textblob import TextBlob
-
 from schemas import (
     BiasDetection,
     BiasDetectionRequest,
@@ -23,6 +21,7 @@ from schemas import (
     SentimentAnalysis,
     SentimentAnalysisRequest,
 )
+from textblob import TextBlob
 
 # FastAPI app
 app = FastAPI(

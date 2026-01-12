@@ -8,9 +8,8 @@ Updated: December 13, 2025
 import logging
 from typing import Any
 
-from pydantic import BaseModel, Field
-
 from agent_registry import AgentRegistry
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 

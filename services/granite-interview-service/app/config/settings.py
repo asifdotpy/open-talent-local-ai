@@ -7,7 +7,7 @@ for multiple model architectures (Granite, Llama, Mistral, etc.).
 
 import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import yaml
 from app.core.constants import DISK_REQUIREMENT_MAP, MEMORY_REQUIREMENT_MAP
@@ -220,13 +220,13 @@ class Settings:
         with open(config_file, "w") as f:
             yaml.dump(configs, f, default_flow_style=False)
 
-    def get_model_config(self, model_name: str) -> Optional[ModelConfig]:
+    def get_model_config(self, model_name: str) -> ModelConfig | None:
         """Get configuration for a specific model."""
         return self.models.get(model_name)
 
     def get_supported_architectures(self) -> list[str]:
         """Get list of supported model architectures."""
-        return list(set(config.architecture for config in self.models.values()))
+        return list({config.architecture for config in self.models.values()})
 
     def validate_model_compatibility(self, model_name: str) -> dict[str, Any]:
         """Validate if a model can run on current hardware."""

@@ -1,11 +1,10 @@
 """Negative tests for system endpoints."""
 from unittest.mock import MagicMock, patch
 
+from app.core.config import settings
 from fastapi.testclient import TestClient
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
-
-from app.core.config import settings
 
 
 def test_health_check_server_error(client: TestClient):

@@ -7,7 +7,6 @@
 
 import pytest
 from fastapi.testclient import TestClient
-
 from main import DEFAULT_USER_ID, TEST_TOKEN, app
 
 
