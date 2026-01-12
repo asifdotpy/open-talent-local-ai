@@ -69,7 +69,11 @@ class TrainingService:
         if not dataset_path:
             return {"valid": False, "reason": "No dataset specified for training"}
 
-        dataset_file = Path(settings.training_data_dir) / f"{dataset_path}.json"
+        if not dataset_path.endswith(".json"):
+            dataset_file = Path(settings.training_data_dir) / f"{dataset_path}.json"
+        else:
+            dataset_file = Path(settings.training_data_dir) / dataset_path
+
         if not dataset_file.exists():
             return {"valid": False, "reason": f"Dataset file not found: {dataset_file}"}
 
@@ -194,6 +198,9 @@ class TrainingService:
                 "status": "starting",
                 "config": train_config,
                 "start_time": None,
+                "progress": 0.0,
+                "current_epoch": 0,
+                "total_epochs": train_config.get("num_train_epochs", 3),
             }
 
             return {
@@ -326,10 +333,13 @@ class TrainingService:
 
         training = self.active_trainings[training_id]
         status = {
-            "training_id": training_id,
+            "job_id": training_id,
             "model_name": training["model_name"],
             "status": training["status"],
             "config": training["config"],
+            "progress": training.get("progress", 0.0),
+            "current_epoch": training.get("current_epoch", 0),
+            "total_epochs": training.get("total_epochs", 0),
         }
 
         # Add timing information if available

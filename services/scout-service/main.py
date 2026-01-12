@@ -1300,8 +1300,8 @@ if __name__ == "__main__":
     import uvicorn
 
     print("Starting FastAPI server...")
-    print("API will be available at: http://localhost:8000")
-    print("API documentation at: http://localhost:8000/docs")
-    print("Agent endpoints: http://localhost:8000/agents/*")
+    print("API will be available at: http://localhost:8013")
+    print("API documentation at: http://localhost:8013/docs")
+    print("Agent endpoints: http://localhost:8013/agents/*")
     host = os.environ.get("HOST", "127.0.0.1")
-    uvicorn.run(app, host=host, port=8000)
+    uvicorn.run(app, host=host, port=8013)
