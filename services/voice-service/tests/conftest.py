@@ -191,12 +191,6 @@ def invalid_base64() -> str:
 
 
 @pytest.fixture
-def service_url() -> str:
-    """Voice service base URL for integration tests."""
-    return "http://localhost:8002"
-
-
-@pytest.fixture
 def available_voices() -> list:
     """List of available TTS voices for testing."""
     return ["en_US-lessac-medium", "en_US-amy-medium", "en_US-ryan-high", "en_US-hfc_female-medium"]

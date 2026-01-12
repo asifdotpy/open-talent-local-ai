@@ -73,7 +73,7 @@ class AuditConfig(BaseModel):
     max_findings: int = Field(default=1000, ge=1)
 
     @validator("default_ruleset")
-    def validate_default_ruleset(cls, v):
+    def validate_default_ruleset(self, v):
         unknown = [rid for rid in v if rid not in KNOWN_RULE_IDS]
         if unknown:
             raise ValueError(f"Unknown rule IDs in default_ruleset: {unknown}")
