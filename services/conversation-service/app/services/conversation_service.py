@@ -7,7 +7,7 @@ from typing import Any
 
 import httpx
 
-from ..core.constants import (
+from app.core.constants import (
     CONVERSATION_TOPICS,
     INTERVIEW_PHASES,
     INTERVIEWER_SYSTEM_PROMPT,
@@ -16,6 +16,7 @@ from ..core.constants import (
     TECH_KEYWORDS,
     USER_MESSAGE_TEMPLATE,
 )
+
 from .database_service import database_service
 from .modular_sentiment_service import modular_sentiment_service
 

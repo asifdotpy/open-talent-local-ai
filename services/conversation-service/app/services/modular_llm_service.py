@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 # Add PEFT and transformers imports
 try:
     import torch
-    from peft import PeftConfig, PeftModel
+    from peft import PeftModel
     from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
     PEFT_AVAILABLE = True
@@ -651,6 +651,8 @@ class VLLMProvider(BaseLLMProvider):
             logger.error(f"vLLM streaming failed: {e}")
             raise
 
+
+class ModularLLMService:
     """Main service that manages multiple LLM providers with fallback support."""
 
     def __init__(self):
@@ -796,64 +798,6 @@ class VLLMProvider(BaseLLMProvider):
         if ollama_provider and isinstance(ollama_provider, OllamaProvider):
             return ollama_provider.current_model
         return "unknown"
-
-
-# ---------------------------------------------------------------------------
-# Minimal service orchestrator
-# ---------------------------------------------------------------------------
-
-
-class ModularLLMService:
-    """Lightweight orchestrator for LLM providers.
-
-    The full implementation was missing; this minimal version supports the
-    current API surface used by the endpoints (persona switching + basic
-    provider registration) without blocking import-time errors.
-    """
-
-    def __init__(self):
-        self.providers: dict[LLMProvider, BaseLLMProvider] = {}
-        self.primary_provider: LLMProvider | None = None
-        self.fallback_provider: LLMProvider | None = None
-        self._current_persona: str = os.getenv("LLM_MODEL", "granite4:350m-h")
-
-    def configure_provider(self, config: LLMConfig):
-        """Register a provider. Only Ollama is actively constructed to avoid
-        optional dependency explosions during import.
-        """
-        try:
-            if config.provider == LLMProvider.OLLAMA:
-                self.providers[LLMProvider.OLLAMA] = OllamaProvider(config)
-                self.primary_provider = self.primary_provider or LLMProvider.OLLAMA
-                self._current_persona = config.model
-            elif config.provider == LLMProvider.MOCK:
-                self.providers[LLMProvider.MOCK] = MockProvider(config)
-                self.primary_provider = self.primary_provider or LLMProvider.MOCK
-            else:
-                # Register placeholder for other providers without instantiation
-                self.providers[config.provider] = None  # type: ignore[assignment]
-                if not self.primary_provider:
-                    self.primary_provider = config.provider
-        except Exception as exc:  # pragma: no cover - defensive
-            logger.warning(f"Failed to configure provider {config.provider}: {exc}")
-
-    def switch_persona(self, persona_model: str):
-        ollama_provider = self.providers.get(LLMProvider.OLLAMA)
-        if isinstance(ollama_provider, OllamaProvider):
-            ollama_provider.switch_persona(persona_model)
-        self._current_persona = persona_model
-
-    def get_current_persona(self) -> str:
-        return self._current_persona
-
-    async def health_check(self) -> dict[str, bool]:
-        results: dict[str, bool] = {}
-        for provider_type, provider in self.providers.items():
-            if provider is None:
-                results[provider_type.value] = False
-            else:
-                results[provider_type.value] = await provider.health_check()
-        return results
 
 
 # Global instance

@@ -6,7 +6,6 @@ response quality assessment, and expertise evaluation.
 
 
 import pytest
-
 from main import (
     FollowupQuestion,
     analyze_response_quality,

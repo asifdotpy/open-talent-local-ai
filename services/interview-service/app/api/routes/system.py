@@ -1,9 +1,8 @@
+from app.api.deps import get_db
+from app.db.models.system_version import SystemVersion
 from fastapi import APIRouter, Depends
 from sqlalchemy.exc import OperationalError
 from sqlmodel import Session, select
-
-from app.api.deps import get_db
-from app.db.models.system_version import SystemVersion
 
 router = APIRouter()
 
