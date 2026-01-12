@@ -12,8 +12,16 @@ def create_room_data():
     return {
         "interview_session_id": "test-session-123",
         "participants": [
-            {"user_id": "candidate-1", "role": "candidate", "display_name": "Jane Candidate"},
-            {"user_id": "interviewer-1", "role": "interviewer", "display_name": "John Interviewer"},
+            {
+                "user_id": "candidate-1",
+                "role": "candidate",
+                "display_name": "Jane Candidate",
+            },
+            {
+                "user_id": "interviewer-1",
+                "role": "interviewer",
+                "display_name": "John Interviewer",
+            },
         ],
         "duration_minutes": 45,
         "job_description": "Software Engineer with Python/React experience",

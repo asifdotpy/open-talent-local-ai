@@ -3,6 +3,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
+from app.core.config import settings
 from fastapi.testclient import TestClient
 
 @pytest.fixture
@@ -38,11 +39,13 @@ def interview_payload():
     }
 
 
-def test_start_interview(test_client: TestClient, interview_payload):
-    """Test the /interview/start endpoint with a valid payload."""
-    response = test_client.post("/api/v1/interview/start", json=interview_payload)
+def test_start_interview(client: TestClient, interview_payload) -> None:
+    """Test the start_interview endpoint."""
+    response = client.post(f"{settings.API_V1_STR}/interview/start", json=interview_payload)
     assert response.status_code == 201
     data = response.json()
-    assert data["message"] == "Handoff received successfully. Interview process initiated."
+    assert (
+        data["message"] == "Handoff received successfully. Interview process initiated."
+    )
     assert "interview_session_id" in data
     assert data["candidate"] == "Jane Doe"
