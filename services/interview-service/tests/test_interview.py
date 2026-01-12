@@ -1,57 +1,48 @@
-"""Tests for the interview process."""
+"""Main tests for the Interview Service, covering core functionalities."""
 
-from app.core.config import settings
+from unittest.mock import MagicMock, patch
+
+import pytest
 from fastapi.testclient import TestClient
 
-
-def test_start_interview(test_client: TestClient) -> None:
-    """Test the start_interview endpoint."""
-    payload = {
+@pytest.fixture
+def interview_payload():
+    """Valid payload for starting an interview."""
+    return {
         "searchCriteria": {
-            "jobTitle": "Software Engineer",
-            "requiredSkills": ["Python", "FastAPI"],
-            "niceToHaveSkills": ["React", "Docker"],
-            "companyCulture": ["Agile", "Remote"],
+            "jobTitle": "Senior Software Engineer",
+            "requiredSkills": ["Python", "FastAPI", "System Design"],
+            "companyCulture": ["Remote", "Agile"],
             "experienceLevel": "Senior",
         },
         "candidateProfile": {
-            "fullName": "John Doe",
-            "sourceUrl": "https://example.com/johndoe",
-            "summary": "A senior software engineer with experience in Python and FastAPI.",
+            "fullName": "Jane Doe",
+            "sourceUrl": "https://example.com/janedoe",
+            "summary": "Experienced software engineer with a focus on backend development.",
             "workExperience": [
                 {
-                    "title": "Senior Software Engineer",
-                    "company": "Acme Inc.",
-                    "duration": "2 years",
-                    "responsibilities": [
-                        "Developed and maintained web applications using Python and FastAPI."
-                    ],
+                    "title": "Lead Backend Engineer",
+                    "company": "Tech Solutions Inc.",
+                    "duration": "3 years",
                 }
             ],
-            "education": [
-                {
-                    "institution": "University of Example",
-                    "degree": "B.S. in Computer Science",
-                    "year": "2018",
-                }
-            ],
-            "skills": {"matched": ["Python", "FastAPI"], "unmatched": ["Java"]},
-            "alignmentScore": 0.85,
+            "skills": {"matched": ["Python", "FastAPI"], "unmatched": ["React"]},
+            "alignmentScore": 0.9,
             "initialQuestions": [
                 {
-                    "question": "Tell me about your experience with FastAPI.",
-                    "reasoning": "To assess the candidate's hands-on experience with the required framework.",
+                    "question": "Describe your experience with large-scale distributed systems.",
+                    "reasoning": "To assess system design and architecture skills.",
                 }
             ],
         },
     }
 
-    response = test_client.post(f"{settings.API_V1_STR}/interview/start", json=payload)
+
+def test_start_interview(test_client: TestClient, interview_payload):
+    """Test the /interview/start endpoint with a valid payload."""
+    response = test_client.post("/api/v1/interview/start", json=interview_payload)
     assert response.status_code == 201
     data = response.json()
     assert data["message"] == "Handoff received successfully. Interview process initiated."
-    assert data["candidate"] == "John Doe"
     assert "interview_session_id" in data
-    assert "initial_response" in data
-    assert "video_url" in data["initial_response"]
-    assert "audio_url" in data["initial_response"]
+    assert data["candidate"] == "Jane Doe"

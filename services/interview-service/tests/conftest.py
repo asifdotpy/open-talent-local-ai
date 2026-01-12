@@ -9,6 +9,28 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlmodel import Session, create_engine
+
+from app.core.config import settings
+
+
+@pytest.fixture(scope="session")
+def engine():
+    """Create a test database engine."""
+    # The `echo=True` will log all SQL statements, which is useful for debugging
+    return create_engine(str(settings.TEST_DATABASE_URI), echo=False)
+
+
+@pytest.fixture(scope="function")
+def db(engine):
+    """Create a new database session for each test."""
+    connection = engine.connect()
+    transaction = connection.begin()
+    session = Session(bind=connection)
+    yield session
+    session.close()
+    transaction.rollback()
+    connection.close()
 
 
 @pytest.fixture(scope="session")

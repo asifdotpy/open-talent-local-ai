@@ -7,7 +7,7 @@ from enum import Enum
 from typing import Any, Optional
 
 import httpx
-from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
@@ -56,12 +56,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include question builder routes
-# app.include_router(question_router, prefix="/api/v1", tags=["question-builder"])
+# Create a new router to hold all the v1 routes
+api_v1_router = APIRouter(prefix="/api/v1")
 
-# Include Vetta AI routes
-app.include_router(vetta_router)
-app.include_router(interview_router, prefix="/api/v1")
+# Include Vetta AI and interview routes
+api_v1_router.include_router(vetta_router)
+api_v1_router.include_router(interview_router)
+
+# Include the v1 router in the main app
+app.include_router(api_v1_router)
 
 # --- OpenAPI Documentation Routes ---
 
@@ -1658,7 +1661,7 @@ def generate_interview_recommendations(analysis: ResponseAnalysis) -> list[str]:
         recommendations.append("Consider additional technical questions to assess competence")
 
     if analysis.bias_detection.bias_score > 0.5:
-        recommendations.append("Review questions for potential bias and ensure fairness")
+        recommendations.append("Review interview process for bias mitigation")
 
     if analysis.expertise_assessment.level == "expert":
         recommendations.append("Explore leadership and architecture experience")
