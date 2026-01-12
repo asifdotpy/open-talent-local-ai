@@ -347,7 +347,7 @@ Provide:
                         info["model_size"] = model.get("size", "unknown")
                         info["model_modified"] = model.get("modified_at", "unknown")
                         break
-            except:
+            except Exception:
                 pass
 
         return info

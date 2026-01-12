@@ -1,11 +1,10 @@
 """Negative tests for interview endpoints."""
 from unittest.mock import MagicMock, patch
 
+from app.core.config import settings
 from fastapi.testclient import TestClient
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
-
-from app.core.config import settings
 
 
 def test_start_interview_missing_fields(client: TestClient) -> None:

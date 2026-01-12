@@ -8,9 +8,8 @@ Updated: December 13, 2025
 import logging
 from datetime import datetime, timedelta
 
-from pydantic import BaseModel
-
 from agent_registry import AgentMetadata, AgentRegistry, AgentStatus
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 

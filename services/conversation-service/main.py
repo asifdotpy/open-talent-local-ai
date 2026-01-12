@@ -1,7 +1,6 @@
+from app.api.endpoints import interview
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
-
-from app.api.endpoints import interview
 
 app = FastAPI(
     title="OpenTalent - Conversation Service",
