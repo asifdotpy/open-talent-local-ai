@@ -4,13 +4,10 @@ Provides fixtures and setup for testing the standalone FastAPI application.
 """
 
 import asyncio
-import multiprocessing
-import time
 from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
-import uvicorn
 from fastapi.testclient import TestClient
 from sqlmodel import Session, create_engine
 
@@ -35,22 +32,6 @@ def db(engine):
     transaction.rollback()
     connection.close()
 
-from app.main import app
-
-
-@pytest.fixture(scope="session")
-def live_server():
-    """Fixture to run the FastAPI app in a background process."""
-
-    def run_server():
-        uvicorn.run(app, host="0.0.0.0", port=8014)
-
-    server_process = multiprocessing.Process(target=run_server)
-    server_process.start()
-    time.sleep(5)  # Give the server time to start
-    yield
-    server_process.terminate()
-
 
 @pytest.fixture(scope="session")
 def event_loop():
@@ -71,9 +52,7 @@ def mock_voice_service():
             "connection_id": "voice-conn-123",
             "session_id": "voice-session-123",
         }
-        mock_client.return_value.__aenter__.return_value.post.return_value = (
-            mock_response
-        )
+        mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
         yield mock_client
 
 
@@ -89,9 +68,7 @@ def mock_conversation_service():
             "bias_score": 0.1,
             "sentiment_context": "neutral",
         }
-        mock_client.return_value.__aenter__.return_value.post.return_value = (
-            mock_response
-        )
+        mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
         yield mock_client
 
 
@@ -106,9 +83,7 @@ def mock_avatar_service():
             "avatar_id": "avatar-123",
             "session_id": "avatar-session-123",
         }
-        mock_client.return_value.__aenter__.return_value.post.return_value = (
-            mock_response
-        )
+        mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
         yield mock_client
 
 
@@ -237,31 +212,18 @@ def clear_room_storage():
     yield
 
 
-from collections.abc import Generator
+@pytest.fixture
+def test_client():
+    """Create test client for the structured API app."""
+    from app.main import app
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-from app.core.config import settings
-
-
-@pytest.fixture(scope="session")
-def db() -> Generator:
-    """Database session fixture.
-    """
-    engine = create_engine(str(settings.TEST_DATABASE_URI))
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    return TestClient(app)
 
 
 @pytest.fixture
-def client():
-    """Create test client for the interview service."""
-    from app.main import app
+def test_client_rooms():
+    """Create test client for the rooms/WebRTC app."""
+    from main import app
 
     return TestClient(app)
 

@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 
 from services.vetta_ai import get_vetta_ai
 
-router = APIRouter(tags=["vetta-ai"])
+router = APIRouter(prefix="/api/v1/vetta", tags=["vetta-ai"])
 
 
 # Request/Response Models

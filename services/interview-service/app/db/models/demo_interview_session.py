@@ -6,6 +6,8 @@ from sqlmodel import Field, SQLModel
 
 
 class DemoInterviewSession(SQLModel, table=True):
+    __tablename__ = "demo_interview_session"
+
     id: Optional[int] = Field(default=None, primary_key=True)
     session_id: str
     candidate_name: Optional[str] = None
