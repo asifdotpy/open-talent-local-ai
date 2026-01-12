@@ -167,7 +167,7 @@ class UnifiedStreamService:
         for ws in self.active_connections:
             try:
                 await ws.send_json(message)
-            except:
+            except Exception:
                 disconnected.add(ws)
 
         # Clean up disconnected clients

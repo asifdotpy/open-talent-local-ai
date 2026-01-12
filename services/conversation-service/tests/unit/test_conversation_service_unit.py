@@ -14,7 +14,6 @@ from datetime import datetime
 from unittest.mock import patch
 
 import pytest
-
 from app.models.interview_models import (
     ConversationResponse,
     GenerateQuestionsRequest,

@@ -1,8 +1,7 @@
 """Tests for the interview process."""
 
-from fastapi.testclient import TestClient
-
 from app.core.config import settings
+from fastapi.testclient import TestClient
 
 
 def test_start_interview(test_client: TestClient) -> None:

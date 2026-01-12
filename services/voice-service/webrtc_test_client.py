@@ -22,7 +22,6 @@ from aiortc import (
     RTCPeerConnection,
     RTCSessionDescription,
 )
-
 from audio_processing_validator import AudioProcessingValidator, ValidationResult
 
 # Configure logging

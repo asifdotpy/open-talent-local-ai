@@ -70,9 +70,6 @@ class SileroVADService:
 
             self.logger.info(f"Loading Silero VAD model from: {self.model_path}")
 
-            # Load ONNX model
-            import onnxruntime as ort
-
             self.model = ort.InferenceSession(
                 str(self.model_path), providers=["CPUExecutionProvider"]
             )

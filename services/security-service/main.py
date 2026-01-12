@@ -18,16 +18,6 @@ from cryptography.fernet import Fernet
 from fastapi import Body, Depends, FastAPI, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from slowapi import Limiter
-from slowapi.errors import RateLimitExceeded
-from slowapi.middleware import SlowAPIMiddleware
-from slowapi.util import get_remote_address
-
-_this_dir = os.path.dirname(__file__)
-if _this_dir not in _sys.path:
-    _sys.path.append(_this_dir)
-
-# Pydantic schemas
 from schemas import (
     AssignRoleRequest,
     ChangePasswordRequest,
@@ -43,6 +33,15 @@ from schemas import (
     TokenRefreshRequest,
     TokenVerifyRequest,
 )
+from slowapi import Limiter
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.util import get_remote_address
+
+_this_dir = os.path.dirname(__file__)
+if _this_dir not in _sys.path:
+    _sys.path.append(_this_dir)
+
 
 app = FastAPI(title="Security Service", version="1.0.0")
 
@@ -126,11 +125,11 @@ def verify_password(password: str, hash_value: str) -> bool:
     return sha256(password.encode()).hexdigest() == hash_value
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+def create_access_token(email: str, expires_delta: timedelta | None = None) -> str:
     """Generate a signed JWT access token for a user.
 
     Args:
-        data: Key-value pairs to include in the JWT payload (claims).
+        email: User email to include in the JWT payload.
         expires_delta: Optional override for the token expiration period.
 
     Returns:
@@ -204,7 +203,7 @@ def is_valid_email(email: str) -> bool:
 # CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS if ["*"] != ALLOWED_ORIGINS else ["*"],
+    allow_origins=ALLOWED_ORIGINS if ALLOWED_ORIGINS != ["*"] else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -753,4 +752,4 @@ if __name__ == "__main__":
     import uvicorn
 
     port = int(os.environ.get("SECURITY_SERVICE_PORT", "8010"))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app, host="127.0.0.1", port=port)  # nosec
