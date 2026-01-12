@@ -101,9 +101,6 @@ class VettaAI:
         try:
             logger.info(f"Loading Vetta AI v4 model via Unsloth: {self.model_name}")
 
-            import torch
-            from unsloth import FastLanguageModel
-
             # Load model with 4-bit quantization for efficiency
             self.model, self.tokenizer = FastLanguageModel.from_pretrained(
                 model_name=self.model_name,

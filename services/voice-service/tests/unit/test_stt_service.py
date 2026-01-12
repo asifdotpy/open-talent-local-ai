@@ -40,10 +40,6 @@ def mock_whisper_model():
 class TestWhisperSTTServiceInitialization:
     """Test service initialization and configuration."""
 
-
-class TestWhisperSTTServiceInitialization:
-    """Test service initialization and configuration."""
-
     def test_initialization_with_default_model(self):
         """Test that service initializes with base model by default."""
         service = WhisperSTTService()

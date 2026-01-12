@@ -23,6 +23,7 @@ from .models import (
     UserSession,
     UserStatus,
 )
+from .utils import JWTClaims, get_jwt_claims, require_role
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -71,8 +72,6 @@ class SimpleHealthResponse(BaseModel):
     service: str
     status: str
 
-
-from .utils import JWTClaims, get_jwt_claims, require_role
 
 router = APIRouter()
 
@@ -223,14 +222,13 @@ async def get_user(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     # RLS: Check tenant access
-    if claims.role != "admin":
-        if (
-            claims.tenant_id
-            and user.tenant_id != claims.tenant_id
-            or not claims.tenant_id
-            and user.email != claims.email
-        ):
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+    if claims.role != "admin" and (
+        claims.tenant_id
+        and user.tenant_id != claims.tenant_id
+        or not claims.tenant_id
+        and user.email != claims.email
+    ):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     return UserRead.model_validate(user)
 
@@ -295,14 +293,13 @@ async def update_user(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
         # RLS: Check tenant access (only for non-'me' endpoints)
-        if claims.role != "admin":
-            if (
-                claims.tenant_id
-                and user.tenant_id != claims.tenant_id
-                or not claims.tenant_id
-                and user.email != claims.email
-            ):
-                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+        if claims.role != "admin" and (
+            claims.tenant_id
+            and user.tenant_id != claims.tenant_id
+            or not claims.tenant_id
+            and user.email != claims.email
+        ):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
 
     # Check email uniqueness if changed
     if payload.email and payload.email != user.email:

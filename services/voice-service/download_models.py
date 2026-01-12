@@ -78,22 +78,21 @@ class ModelDownloader:
             print(f"\n{desc}: {url}")
             print(f"Saving to: {output_path}")
 
-            async with httpx.AsyncClient(follow_redirects=True, timeout=30.0) as client:
-                async with client.stream("GET", url) as response:
-                    response.raise_for_status()
-                    file_size = int(response.headers.get("Content-Length", 0))
+            async with httpx.AsyncClient(
+                follow_redirects=True, timeout=30.0
+            ) as client, client.stream("GET", url) as response:
+                response.raise_for_status()
+                file_size = int(response.headers.get("Content-Length", 0))
 
-                    with open(output_path, "wb") as f:
-                        if TQDM_AVAILABLE and file_size > 0:
-                            with tqdm(
-                                total=file_size, unit="B", unit_scale=True, desc=desc
-                            ) as pbar:
-                                async for chunk in response.aiter_bytes():
-                                    f.write(chunk)
-                                    pbar.update(len(chunk))
-                        else:
+                with open(output_path, "wb") as f:
+                    if TQDM_AVAILABLE and file_size > 0:
+                        with tqdm(total=file_size, unit="B", unit_scale=True, desc=desc) as pbar:
                             async for chunk in response.aiter_bytes():
                                 f.write(chunk)
+                                pbar.update(len(chunk))
+                    else:
+                        async for chunk in response.aiter_bytes():
+                            f.write(chunk)
 
             print(f"✓ Downloaded: {output_path.name}")
             return True
