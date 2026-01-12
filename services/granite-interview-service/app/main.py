@@ -379,10 +379,6 @@ async def analyze_candidate_response(request: AnalyzeResponseRequest):
 async def start_fine_tuning_endpoint(request: FineTuneRequest, background_tasks: BackgroundTasks):
     """Start fine-tuning a model."""
     try:
-        logger.info(f"DEBUG: training_service instance: {training_service}")
-        logger.info(
-            f"DEBUG: training_service methods: {[m for m in dir(training_service) if not m.startswith('_')]}"
-        )
         result = await cast(Any, training_service).start_training(
             model_name=request.base_model,
             dataset_path=request.training_data,
@@ -414,6 +410,8 @@ async def get_training_status(job_id: str):
     """Get the status of a training job."""
     try:
         status = cast(Any, training_service).get_training_status(job_id)
+        if status is None:
+            raise HTTPException(status_code=404, detail=f"Training job {job_id} not found")
         return status
     except Exception as e:
         logger.error(f"Failed to get training status for {job_id}: {e}")
@@ -426,7 +424,11 @@ async def get_training_status(job_id: str):
 async def cancel_training(job_id: str):
     """Cancel a training job."""
     try:
-        cast(Any, training_service).cancel_training(job_id)
+        success = cast(Any, training_service).cancel_training(job_id)
+        if not success:
+            raise HTTPException(
+                status_code=404, detail=f"Training job {job_id} not found or cannot be cancelled"
+            )
         return {"message": f"Training job {job_id} cancelled"}
     except Exception as e:
         logger.error(f"Failed to cancel training {job_id}: {e}")
@@ -473,5 +475,5 @@ async def get_gpu_status():
 
 if __name__ == "__main__":
     host = os.environ.get("HOST", "127.0.0.1")
-    port = int(os.environ.get("GRANITE_INTERVIEW_PORT", 8005))
+    port = int(os.environ.get("GRANITE_INTERVIEW_PORT", 8008))
     uvicorn.run(app, host=host, port=port)

@@ -51,7 +51,7 @@ class ModelConfig:
 
         base_config = {
             "technique": self.fine_tuning_technique,
-            "rank": self.lora_rank,
+            "r": self.lora_rank,
             "target_modules": self._get_target_modules(),
             "lora_dropout": 0.05,
             "bias": "none",
@@ -131,7 +131,7 @@ class Settings:
     def __init__(self):
         # Service settings
         self.host = os.environ.get("HOST", "127.0.0.1")
-        self.port = int(os.environ.get("PORT", 8005))
+        self.port = int(os.environ.get("PORT", 8008))
         self.workers = int(os.environ.get("WORKERS", 2))
         self.debug = os.environ.get("DEBUG", "false").lower() == "true"
 

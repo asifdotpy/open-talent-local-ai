@@ -45,8 +45,8 @@ app = FastAPI()
 
 # Configuration
 SIGNALING_URL = os.getenv("SIGNALING_URL", "ws://localhost:8005/webrtc/signal")
-CONVERSATION_SERVICE_URL = os.getenv("CONVERSATION_SERVICE_URL", "http://localhost:8003")
-INTERVIEW_SERVICE_URL = os.getenv("INTERVIEW_SERVICE_URL", "http://localhost:8004")
+CONVERSATION_SERVICE_URL = os.getenv("CONVERSATION_SERVICE_URL", "http://localhost:8002")
+INTERVIEW_SERVICE_URL = os.getenv("INTERVIEW_SERVICE_URL", "http://localhost:8005")
 USE_MOCK = os.getenv("USE_MOCK", "false").lower() == "true"
 
 # Audio Pipeline Configuration
@@ -489,7 +489,7 @@ class AudioStreamTrack(MediaStreamTrack):
             # Send TTS request to our own service
             async with httpx.AsyncClient() as client:
                 response = await client.post(
-                    "http://localhost:8002/webrtc/tts",
+                    "http://localhost:8015/webrtc/tts",
                     json={"session_id": self.session_id, "text": text},
                     timeout=5.0,
                 )
@@ -965,4 +965,4 @@ def get_status():
 
 if __name__ == "__main__":
     host = os.environ.get("HOST", "127.0.0.1")
-    uvicorn.run(app, host=host, port=8006)
+    uvicorn.run(app, host=host, port=8017)
