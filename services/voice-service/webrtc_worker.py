@@ -11,6 +11,7 @@ from fractions import Fraction
 import aiohttp
 import httpx
 import numpy as np
+import uvicorn
 from aiortc import (
     MediaStreamTrack,
     RTCConfiguration,
@@ -961,5 +962,7 @@ def get_status():
     """Get status of all active sessions."""
     return {"active_sessions": list(active_connections.keys()), "count": len(active_connections)}
 
+
+if __name__ == "__main__":
     host = os.environ.get("HOST", "127.0.0.1")
     uvicorn.run(app, host=host, port=8006)

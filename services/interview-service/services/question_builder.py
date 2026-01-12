@@ -406,7 +406,7 @@ Output JSON array:"""
                     for obj in json_objects:
                         try:
                             questions_data.append(json.loads(obj))
-                        except:
+                        except Exception:
                             continue
                 else:
                     raise ValueError("Could not extract JSON objects")

@@ -52,7 +52,7 @@ class TestGraniteStrengthened:
             },
         )
         if response.status_code != 200:
-            print(f"Error detail: {response.text}")
+            pass
         assert response.status_code == 200
         data = response.json()
         assert "job_id" in data
