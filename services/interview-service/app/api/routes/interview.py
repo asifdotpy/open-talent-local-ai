@@ -1,8 +1,5 @@
 """API routes for handling the interview process."""
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-
 from app.api import deps
 from app.crud import interview as interview_crud
 from app.crud.demo_interview_session import create_demo_session, get_demo_session_by_id
@@ -14,6 +11,8 @@ from app.schemas.demo_interview_session import (
 )
 from app.schemas.interview import HandoffPayload
 from app.services import audit_service, avatar_service, conversation_service
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 

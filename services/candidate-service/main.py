@@ -14,7 +14,7 @@ import uuid
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Generic, TypeVar
+from typing import Any, TypeVar
 
 from fastapi import Body, Depends, FastAPI, Header, HTTPException, Query
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -326,7 +326,7 @@ class PaginationParams(BaseModel):
     limit: int = Field(default=20, ge=1, le=100, description="Number of items to return (1-100)")
 
 
-class PaginatedResponse(BaseModel, Generic[T]):
+class PaginatedResponse[T](BaseModel):
     """Generic paginated response wrapper."""
 
     total: int = Field(..., description="Total number of items")

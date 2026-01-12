@@ -39,12 +39,6 @@ class TestPiperTTSServiceInitialization:
 
         assert service.model_path == mock_model_path
 
-    def test_initialization_stores_model_path(self, mock_piper_path, mock_model_path):
-        """Test that initialization stores the model file path."""
-        service = PiperTTSService(piper_path=mock_piper_path, model_path=mock_model_path)
-
-        assert service.model_path == mock_model_path
-
     def test_initialization_with_custom_paths(self, tmp_path):
         """Test initialization with custom piper and model paths."""
         custom_piper = str(tmp_path / "custom_piper")
