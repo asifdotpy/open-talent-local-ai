@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Icons } from './Icons';
 import { CONFIG } from '../config';
 
@@ -23,9 +24,9 @@ const Hero = () => {
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start mb-12">
-                        <a href="#download" className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition flex items-center justify-center gap-3">
+                        <Link to="/download" className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition flex items-center justify-center gap-3">
                             Download Now
-                        </a>
+                        </Link>
                         <a href={CONFIG.project.githubUrl} target="_blank" rel="noopener noreferrer" className="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-8 py-4 rounded-xl font-semibold text-lg transition flex items-center justify-center gap-3">
                             <Icons.GitHub /> View on GitHub
                         </a>
