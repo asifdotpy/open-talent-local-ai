@@ -80,7 +80,7 @@ async def main():
         passed = sum(1 for _, r in results if r["status"] == "success")
         total = len(results)
 
-        for name, result in results:
+        for _name, result in results:
             "✅" if result["status"] == "success" else "❌"
 
         if passed == total:

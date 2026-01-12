@@ -10,9 +10,8 @@ sys.path.append(str(Path(__file__).resolve().parents[1]))
 import os
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config, pool
-
 from alembic import context
+from sqlalchemy import engine_from_config, pool
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -42,6 +41,11 @@ if config.config_file_name is not None:
 from app.db.base import Base
 
 # Import all your models here to ensure they are registered with SQLAlchemy
+from app.db.models import demo_interview_session
+from app.db.models import interview
+from app.db.models import search_criteria
+from app.db.models import system_version
+from app.db.models import user
 
 target_metadata = Base.metadata
 

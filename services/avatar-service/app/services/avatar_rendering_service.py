@@ -180,7 +180,7 @@ class AvatarRenderingService:
             renderer_status = (
                 "connected" if response.status_code == 200 else f"error_{response.status_code}"
             )
-        except:
+        except Exception:
             renderer_status = "disconnected"
 
         return {

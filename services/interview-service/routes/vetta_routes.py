@@ -6,7 +6,6 @@ from datetime import datetime
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-
 from services.vetta_ai import get_vetta_ai
 
 router = APIRouter(prefix="/api/v1/vetta", tags=["vetta-ai"])

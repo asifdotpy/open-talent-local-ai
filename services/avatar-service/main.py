@@ -14,6 +14,7 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
+import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
@@ -72,9 +73,6 @@ if str(_service_dir) not in sys.path:
     sys.path.insert(0, str(_service_dir))
 
 try:
-    from app.models.voice import VoiceListResponse, VoiceRequest, VoiceResponse
-    from app.services.voice_service import voice_service
-
     VOICE_MODULES_AVAILABLE = True
     logger.info("Voice modules imported successfully")
 except ImportError as e:

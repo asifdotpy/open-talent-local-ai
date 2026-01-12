@@ -7,15 +7,14 @@ from datetime import datetime
 from typing import Any
 
 import aiohttp
-from dotenv import load_dotenv
-from fastapi import APIRouter, Depends, FastAPI, HTTPException
-
 from core.constants import (
     COMPANY_KEYWORDS,
     CRITICAL_AGENTS,
     GITHUB_API_TIMEOUT,
     LANGUAGE_MAPPING,
 )
+from dotenv import load_dotenv
+from fastapi import APIRouter, Depends, FastAPI, HTTPException
 from schemas import (
     CandidateProfile,
     CandidateResponse,

@@ -3,7 +3,6 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import numpy as np
 import pytest
-
 from services.audio_processing_service import RNNoiseTrack
 
 

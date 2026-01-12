@@ -11,10 +11,10 @@ from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconn
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
-
-from config import ALLOWED_ORIGINS, logger, setup_logging
 from routes.interview_routes import router as interview_router
 from routes.vetta_routes import router as vetta_router
+
+from config import ALLOWED_ORIGINS, logger, setup_logging
 
 # Configure logging
 setup_logging()
@@ -2115,10 +2115,7 @@ async def get_interview_intelligence_report(room_id: str):
 
 
 if __name__ == "__main__":
-    import os
-
     import uvicorn
 
-    port = int(os.environ.get("PORT", 8004))
     port = int(os.environ.get("PORT", 8014))
     uvicorn.run(app, host="0.0.0.0", port=port)

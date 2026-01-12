@@ -1,12 +1,15 @@
 import json
-from fastapi import FastAPI, Depends, HTTPException
+
+from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
-from . import models, database
+
+from . import database, models
 
 # Initialize database
 models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI()
+
 
 # Seeding logic: ensure some real data exists on startup
 def seed_data():
@@ -22,9 +25,9 @@ def seed_data():
                     "key_responsibilities": [
                         "Architect multi-agent orchestration layers",
                         "Evaluate and select foundation models",
-                        "Lead a team of 5 AI engineers"
+                        "Lead a team of 5 AI engineers",
                     ],
-                    "required_skills": ["Python", "PyTorch", "Kubernetes", "LLMs"]
+                    "required_skills": ["Python", "PyTorch", "Kubernetes", "LLMs"],
                 },
                 {
                     "id": "project-002",
@@ -33,10 +36,10 @@ def seed_data():
                     "key_responsibilities": [
                         "Maintain the OpenTalent core UI kit",
                         "Optimize dashboard rendering performance",
-                        "Drive accessibility compliance (WCAG)"
+                        "Drive accessibility compliance (WCAG)",
                     ],
-                    "required_skills": ["React", "TypeScript", "Vite", "TailwindCSS"]
-                }
+                    "required_skills": ["React", "TypeScript", "Vite", "TailwindCSS"],
+                },
             ]
             for job_data in initial_jobs:
                 job = models.Project(
@@ -44,23 +47,27 @@ def seed_data():
                     title=job_data["title"],
                     description=job_data["description"],
                     key_responsibilities_json=json.dumps(job_data["key_responsibilities"]),
-                    required_skills_json=json.dumps(job_data["required_skills"])
+                    required_skills_json=json.dumps(job_data["required_skills"]),
                 )
                 db.add(job)
             db.commit()
     finally:
         db.close()
 
+
 # Run seed on startup
 seed_data()
+
 
 @app.get("/")
 async def root():
     return {"message": "Project Service (Production Mode) is running!"}
 
+
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "database": "connected"}
+
 
 @app.get("/jobs", response_model=list[models.JobDetails])
 async def list_jobs(db: Session = Depends(database.get_db)):
@@ -72,9 +79,11 @@ async def list_jobs(db: Session = Depends(database.get_db)):
             title=p.title,
             description=p.description,
             key_responsibilities=p.key_responsibilities,
-            required_skills=p.required_skills
-        ) for p in projects
+            required_skills=p.required_skills,
+        )
+        for p in projects
     ]
+
 
 @app.get("/jobs/{project_id}", response_model=models.JobDetails)
 async def get_job_details(project_id: str, db: Session = Depends(database.get_db)):
@@ -87,8 +96,9 @@ async def get_job_details(project_id: str, db: Session = Depends(database.get_db
         title=project.title,
         description=project.description,
         key_responsibilities=project.key_responsibilities,
-        required_skills=project.required_skills
+        required_skills=project.required_skills,
     )
+
 
 @app.post("/jobs", response_model=models.JobDetails)
 async def create_job(job_in: models.JobDetails, db: Session = Depends(database.get_db)):
@@ -101,7 +111,7 @@ async def create_job(job_in: models.JobDetails, db: Session = Depends(database.g
         title=job_in.title,
         description=job_in.description,
         key_responsibilities_json=json.dumps(job_in.key_responsibilities),
-        required_skills_json=json.dumps(job_in.required_skills)
+        required_skills_json=json.dumps(job_in.required_skills),
     )
     db.add(db_job)
     db.commit()
@@ -111,12 +121,15 @@ async def create_job(job_in: models.JobDetails, db: Session = Depends(database.g
         title=db_job.title,
         description=db_job.description,
         key_responsibilities=db_job.key_responsibilities,
-        required_skills=db_job.required_skills
+        required_skills=db_job.required_skills,
     )
+
 
 if __name__ == "__main__":
     import os
+
     import uvicorn
+
     host = os.environ.get("HOST", "0.0.0.0")
     port = int(os.environ.get("PORT", 8015))
     uvicorn.run(app, host=host, port=port)

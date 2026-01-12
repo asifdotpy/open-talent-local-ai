@@ -14,7 +14,6 @@ import subprocess
 from unittest.mock import Mock, patch
 
 import pytest
-
 from services.tts_service import PiperTTSService
 
 
@@ -32,12 +31,6 @@ class TestPiperTTSServiceInitialization:
         service = PiperTTSService(piper_path=mock_piper_path, model_path=mock_model_path)
 
         assert service.piper_path == mock_piper_path
-
-    def test_initialization_stores_model_path(self, mock_piper_path, mock_model_path):
-        """Test that initialization stores the model file path."""
-        service = PiperTTSService(piper_path=mock_piper_path, model_path=mock_model_path)
-
-        assert service.model_path == mock_model_path
 
     def test_initialization_stores_model_path(self, mock_piper_path, mock_model_path):
         """Test that initialization stores the model file path."""
