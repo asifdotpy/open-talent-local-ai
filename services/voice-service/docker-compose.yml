@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
 
     ports:
-      - "8015:8015"
+      - "8002:8002"
 
     environment:
       # Service configuration
@@ -43,7 +43,7 @@ services:
       - open-talent-network
 
     healthcheck:
-      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8015/health').raise_for_status()"]
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8002/health').raise_for_status()"]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -46,6 +46,14 @@ print_error() {
     exit 1
 }
 
+# Stage 0: Environment Check
+print_stage 0 "Checking Environment Configuration"
+if [ -f ".env.shared" ]; then
+    print_success ".env.shared exists"
+else
+    print_error ".env.shared NOT found. Please run setup."
+fi
+
 # Stage 1: Desktop App Compilation
 print_stage 1 "Checking Desktop App TypeScript Compilation"
 

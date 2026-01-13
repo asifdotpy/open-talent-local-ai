@@ -38,8 +38,8 @@ class AgentConfig(BaseSettings):
         default="http://localhost:8003", env="CONVERSATION_SERVICE_URL"
     )
     voice_service_url: str = Field(default="http://localhost:8002", env="VOICE_SERVICE_URL")
-    avatar_service_url: str = Field(default="http://localhost:8001", env="AVATAR_SERVICE_URL")
-    interview_service_url: str = Field(default="http://localhost:8004", env="INTERVIEW_SERVICE_URL")
+    avatar_service_url: str = Field(default="http://localhost:8004", env="AVATAR_SERVICE_URL")
+    interview_service_url: str = Field(default="http://localhost:8014", env="INTERVIEW_SERVICE_URL")
     genkit_service_url: str = Field(default="http://localhost:3400", env="GENKIT_SERVICE_URL")
 
     # Agent URLs

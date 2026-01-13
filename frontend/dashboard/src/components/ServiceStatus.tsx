@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Activity, AlertCircle, CheckCircle, Server } from 'lucide-react';
-import integrationGatewayAPI from '../services/integrationGatewayAPI';
+import { fetchIntegrationHealth } from '../services/integration-service-client';
 
 interface ServiceStatusData {
   status: 'online' | 'degraded' | 'offline';
@@ -18,21 +18,23 @@ export const ServiceStatus = () => {
   const fetchStatus = async () => {
     try {
       setIsLoading(true);
-      const response = await integrationGatewayAPI.health.getSystemStatus();
-      
-      // Parse the response to get service counts
-      const services = response.services || {};
-      const onlineCount = Object.values(services).filter(s => s === true).length;
-      const totalCount = Object.keys(services).length;
-      
-      const status = onlineCount >= 6 ? 'online' : onlineCount >= 3 ? 'degraded' : 'offline';
-      
+      const health = await fetchIntegrationHealth();
+
+      if (!health) throw new Error('Health check failed');
+
+      const services = health.services || [];
+      const onlineCount = services.filter(s => s.status === 'online').length;
+      const totalCount = services.length;
+
+      // Default to degraded if we have services but < all online
+      const status = health.status;
+
       setStatusData({
         status,
         onlineCount,
         totalCount,
-        timestamp: response.timestamp,
-        services
+        timestamp: new Date().toISOString(),
+        services: services.reduce((acc, s) => ({ ...acc, [s.name]: s.status === 'online' }), {})
       });
       setLastChecked(new Date());
     } catch (error) {

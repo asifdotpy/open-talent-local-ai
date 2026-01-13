@@ -13,6 +13,9 @@
 
 set -e
 
+# Export Local Redis URL
+export REDIS_URL="redis://localhost:6379"
+
 # Directory setup
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
@@ -43,25 +46,36 @@ readonly BOLD='\033[1m'
 readonly NC='\033[0m' # No Color
 
 # Service definitions
+# Load Unified Port Registry
+if [ -f ".env.shared" ]; then
+    set -a
+    source .env.shared
+    set +a
+else
+    echo "Error: .env.shared not found. Run setup first."
+    exit 1
+fi
+
+# Service definitions
 declare -A SERVICES=(
-    ["scout-service"]="8000"
-    ["user-service"]="8001"
-    ["conversation-service"]="8002"
-    ["voice-service"]="8003"
-    ["avatar-service"]="8004"
-    ["granite-interview-service"]="8005"
-    ["candidate-service"]="8006"
-    ["analytics-service"]="8007"
-    ["desktop-integration-service"]="8009"
-    ["security-service"]="8010"
-    ["notification-service"]="8011"
-    ["ai-auditing-service"]="8012"
-    ["explainability-service"]="8013"
-    ["interview-service"]="8014"
-    ["project-service"]="8015"
+    ["scout-service"]="$SCOUT_SERVICE_PORT"
+    ["user-service"]="$USER_SERVICE_PORT"
+    ["conversation-service"]="$CONVERSATION_SERVICE_PORT"
+    ["voice-service"]="$VOICE_SERVICE_PORT"
+    ["avatar-service"]="$AVATAR_SERVICE_PORT"
+    ["granite-interview-service"]="$GRANITE_SERVICE_PORT"
+    ["candidate-service"]="$CANDIDATE_SERVICE_PORT"
+    ["analytics-service"]="$ANALYTICS_SERVICE_PORT"
+    ["desktop-integration-service"]="$GATEWAY_PORT"
+    ["security-service"]="$SECURITY_SERVICE_PORT"
+    ["notification-service"]="$NOTIFICATION_SERVICE_PORT"
+    ["ai-auditing-service"]="$AI_AUDITING_SERVICE_PORT"
+    ["explainability-service"]="$EXPLAINABILITY_SERVICE_PORT"
+    ["interview-service"]="$INTERVIEW_SERVICE_PORT"
+    ["project-service"]="$PROJECT_SERVICE_PORT"
 )
 
-DESKTOP_PORT="3000"
+DESKTOP_PORT="$DESKTOP_APP_PORT"
 
 ################################################################################
 # Logging Functions

@@ -11,9 +11,7 @@ class VoiceRequest(BaseModel):
 
     text: str
     voice_id: Optional[str] = None
-    model_id: str = "piper_en_us"
-
-    model_config = {"protected_namespaces": ()}
+    model_id: str = "eleven_multilingual_v2"
 
 
 class VoiceResponse(BaseModel):
@@ -44,6 +42,6 @@ class VoiceInfo(BaseModel):
 class VoiceListResponse(BaseModel):
     """Response model for voice listing."""
 
-    primary_us_voice: str
-    us_voices: list[VoiceInfo]
+    primary_irish_voice: str
+    irish_voices: list[VoiceInfo]
     total_voices: int

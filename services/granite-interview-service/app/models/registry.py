@@ -68,13 +68,7 @@ class GraniteModelHandler(BaseModelHandler):
     def load_model(self) -> bool:
         """Load Granite model with appropriate quantization."""
         try:
-            logger.info(f"Loading Granite model {self.model_name} from {settings.model_cache_dir}")
             model_path = settings.model_cache_dir / self.model_name
-            logger.info(f"Full model path: {model_path}")
-
-            if model_path is None:
-                logger.error("model_path is None!")
-                return False
 
             # Quantization config for Granite
             if self.config.quantization == "4bit":
@@ -87,14 +81,12 @@ class GraniteModelHandler(BaseModelHandler):
             else:
                 bnb_config = None
 
-            logger.info(f"Loading tokenizer from {model_path}")
             # Load tokenizer
-            self.tokenizer = AutoTokenizer.from_pretrained(str(model_path), trust_remote_code=True)
+            self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
 
-            logger.info(f"Loading model from {model_path}")
             # Load model
             self.model = AutoModelForCausalLM.from_pretrained(
-                str(model_path),
+                model_path,
                 quantization_config=bnb_config,
                 device_map="auto",
                 trust_remote_code=True,
@@ -348,11 +340,6 @@ class ModelRegistry:
             "mistral": MistralModelHandler,
         }
         self.loaded_models: dict[str, BaseModelHandler] = {}
-
-    @property
-    def models(self) -> dict[str, Any]:
-        """Proxy to settings.models for backward compatibility with main.py."""
-        return settings.models
 
     def get_handler_class(self, architecture: str) -> Optional[type[BaseModelHandler]]:
         """Get handler class for architecture."""

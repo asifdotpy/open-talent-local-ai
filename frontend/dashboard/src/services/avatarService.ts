@@ -1,4 +1,5 @@
 // Avatar service for managing avatar data and API calls
+import * as client from './integration-service-client';
 export interface Avatar {
   id: string;
   name: string;
@@ -41,27 +42,12 @@ export const avatarService = {
     phonemes: Array<{ phoneme: string; timestamp: number; intensity: number }>;
   }> => {
     try {
-      // Call voice service for TTS
-      const response = await fetch('http://localhost:8002/tts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          text,
-          voice: 'alloy',
-          avatar_id: avatarId
-        }),
-      });
+      const result = await client.generateLipSync(text, avatarId);
+      if (!result) throw new Error('Failed to generate lip-sync');
 
-      if (!response.ok) {
-        throw new Error(`Voice service error: ${response.status}`);
-      }
-
-      const data = await response.json();
       return {
-        audioUrl: data.audio_url,
-        phonemes: data.phonemes || []
+        audioUrl: result.audioUrl,
+        phonemes: result.phonemes || []
       };
     } catch (error) {
       console.error('Failed to generate lip-sync:', error);

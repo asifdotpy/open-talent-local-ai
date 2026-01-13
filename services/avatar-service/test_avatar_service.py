@@ -4,7 +4,6 @@ Tests the refactored service to ensure all functionality works correctly.
 """
 
 import asyncio
-import sys
 
 import httpx
 import pytest
@@ -66,9 +65,9 @@ class TestAvatarService:
 
             assert response.status_code == 200
             data = response.json()
-            assert "primary_us_voice" in data
-            assert "Local TTS" in data["primary_us_voice"]
-            assert isinstance(data["us_voices"], list)
+            assert "primary_irish_voice" in data
+            assert "Local TTS" in data["primary_irish_voice"]
+            assert isinstance(data["irish_voices"], list)
             assert data["total_voices"] == 0  # No voices available yet
             print("✅ Voice listing endpoint passed")
 
@@ -90,7 +89,7 @@ class TestAvatarService:
             assert response.status_code == 200
             data = response.json()
             assert "success" in data
-            assert not data["success"]
+            assert data["success"] == False
             assert "error" in data
             print("✅ Voice generation request validation passed")
 
@@ -124,7 +123,7 @@ class TestAvatarService:
             assert response.status_code == 200
             data = response.json()
             assert "success" in data
-            assert not data["success"]
+            assert data["success"] == False
             print("✅ Empty text handling passed")
 
     @pytest.mark.asyncio
@@ -142,7 +141,7 @@ class TestAvatarService:
             assert response.status_code == 200
             data = response.json()
             assert "success" in data
-            assert not data["success"]  # Mock implementation
+            assert data["success"] == False  # Mock implementation
             print("✅ Default voice handling passed")
 
     @pytest.mark.asyncio
@@ -165,7 +164,7 @@ class TestAvatarService:
             )
 
             # CORS preflight should be handled
-            assert "access-control-allow-origin" in [h.lower() for h in response.headers]
+            assert "access-control-allow-origin" in [h.lower() for h in response.headers.keys()]
             print("✅ CORS headers test passed")
 
     def test_service_imports(self):
@@ -249,7 +248,7 @@ if __name__ == "__main__":
     try:
         result = asyncio.run(run_all_tests())
         print(f"\n🎉 Avatar Service Test Suite: {'PASSED' if result else 'FAILED'}")
-        sys.exit(0 if result else 1)
+        exit(0 if result else 1)
     except Exception as e:
         print(f"\n❌ Test suite failed with error: {e}")
-        sys.exit(1)
+        exit(1)
