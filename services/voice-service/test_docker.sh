@@ -4,7 +4,7 @@ set -e
 
 IMAGE_NAME="voice-service-local:latest"
 CONTAINER_NAME="voice-service-test"
-VOICE_PORT=8015
+VOICE_PORT=8002
 WEBRTC_PORT=8005
 
 echo "--- Building Docker image with Docker ---"

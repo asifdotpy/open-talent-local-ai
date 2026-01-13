@@ -1,23 +1,26 @@
 """Voice Service - Local Speech Processing
-Powered by Vosk (STT), Piper (TTS), and Silero (VAD).
+Powered by Vosk (STT), Piper (TTS), and Silero (VAD)
 """
 
 import asyncio
-import base64
 import logging
 import os
 import tempfile
-from datetime import datetime
+from typing import Optional
 
-import uvicorn
-from fastapi import Body, FastAPI, File, HTTPException, UploadFile, WebSocket
+from fastapi import (
+    Body,
+    FastAPI,
+    File,
+    HTTPException,
+    UploadFile,
+    WebSocket,
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from pydub import AudioSegment
-from pydub.silence import split_on_silence
+from pydantic import BaseModel
 
 from services.modular_tts_service import MockModularTTSService, ModularTTSService
-from services.phoneme_extractor import PhonemeExtractor
 from services.silero_vad_service import MockSileroVADService, SileroVADService
 from services.stream_service import UnifiedStreamService
 from services.vosk_stt_service import MockVoskSTTService, VoskSTTService
@@ -49,24 +52,55 @@ except ImportError:
     start_webrtc_worker = None
     logger.warning("WebRTC worker not available. Install aiortc for WebRTC support.")
 
-from app.core.constants import (
-    DEFAULT_OPENAI_TTS_MODEL,
-    DEFAULT_OPENAI_TTS_VOICE,
-    SERVICE_DESCRIPTION,
-    SERVICE_NAME,
-    SERVICE_VERSION,
-)
-
 app = FastAPI(
-    title=f"{SERVICE_NAME} API",
-    description=SERVICE_DESCRIPTION,
-    version=SERVICE_VERSION,
+    title="Voice Service API",
+    description="""
+    Local Speech Processing Service for OpenTalent Platform
+
+    **Capabilities:**
+    - **Speech-to-Text (STT)**: Real-time transcription using Vosk
+    - **Text-to-Speech (TTS)**: High-quality synthesis using Piper (local) or OpenAI API
+    - **Voice Activity Detection (VAD)**: Silence filtering using Silero
+    - **WebRTC Integration**: Real-time audio streaming for interviews
+    - **WebSocket Streaming**: Bidirectional audio streaming
+
+    **API Documentation:**
+    - Interactive Swagger UI: `/docs`
+    - Alternative docs URL: `/doc`
+    - ReDoc documentation: `/redoc`
+    - OpenAPI schema: `/openapi.json`
+    - API endpoints summary: `/api-docs`
+
+    **Service Stack:** Vosk + Modular TTS (Piper/OpenAI) + Silero + WebRTC + FastAPI
+
+    **Quick Start with Docker:**
+    ```bash
+    # Build image
+    docker build -t voice-service:latest .
+
+    # Run container
+    docker run -d -p 8002:8002 \
+      -e OPENAI_API_KEY=your_key_here \
+      --name voice-service \
+      voice-service:latest
+
+    # Or use docker-compose
+    docker-compose up -d
+    ```
+
+    **Environment Variables:**
+    - `USE_MOCK_SERVICES`: Use mock services for testing (default: false)
+    - `OPENAI_API_KEY`: OpenAI API key for TTS (required for production)
+    - `OPENAI_TTS_MODEL`: TTS model (default: gpt-4o-mini-tts)
+    - `OPENAI_TTS_VOICE`: Default voice (default: alloy)
+    """,
+    version="2.1.0",
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
     contact={
         "name": "OpenTalent Platform Team",
-        "url": "https://github.com/asifdotpy/open-talent",
+        "url": "https://github.com/asifdotpy/open-talent-platform",
         "email": "support@OpenTalent.platform",
     },
     license_info={"name": "MIT License", "url": "https://opensource.org/licenses/MIT"},
@@ -98,55 +132,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Add security headers middleware
-from app.security import (
-    RateLimitMiddleware,
-    RequestSizeLimitMiddleware,
-    SecurityHeadersMiddleware,
-)
-
-app.add_middleware(SecurityHeadersMiddleware)
-# Configure request size limit via env var (bytes), default 10MB
-try:
-    MAX_REQUEST_SIZE = int(os.getenv("MAX_REQUEST_SIZE", str(10 * 1024 * 1024)))
-except ValueError:
-    MAX_REQUEST_SIZE = 10 * 1024 * 1024
-app.add_middleware(RequestSizeLimitMiddleware, max_bytes=MAX_REQUEST_SIZE)
-
-# Configure rate limiting (token bucket) via env
-try:
-    RATE_LIMIT_BURST = int(os.getenv("RATE_LIMIT_BURST", "10"))
-except ValueError:
-    RATE_LIMIT_BURST = 10
-
-try:
-    RATE_LIMIT_RATE = int(os.getenv("RATE_LIMIT_RATE", "5"))  # tokens per second
-except ValueError:
-    RATE_LIMIT_RATE = 5
-
-ALLOWLIST_PATHS = (
-    "/",
-    "/health",
-    "/info",
-    "/docs",
-    "/doc",
-    "/openapi.json",
-    "/api-docs",
-    "/redoc",
-)
-
-app.add_middleware(
-    RateLimitMiddleware,
-    burst=RATE_LIMIT_BURST,
-    rate_per_sec=RATE_LIMIT_RATE,
-    allowlist=ALLOWLIST_PATHS,
-)
-
-try:
-    MAX_AUDIO_DURATION_MS = int(os.getenv("MAX_AUDIO_DURATION_MS", str(5 * 60 * 1000)))  # 5 minutes
-except ValueError:
-    MAX_AUDIO_DURATION_MS = 5 * 60 * 1000
-
 # --- Service Initialization ---
 
 if USE_MOCK:
@@ -168,8 +153,8 @@ else:
         tts_service = ModularTTSService(
             provider="openai",
             openai_api_key=os.getenv("OPENAI_API_KEY"),
-            openai_model=os.getenv("OPENAI_TTS_MODEL", DEFAULT_OPENAI_TTS_MODEL),
-            openai_voice=os.getenv("OPENAI_TTS_VOICE", DEFAULT_OPENAI_TTS_VOICE),
+            openai_model=os.getenv("OPENAI_TTS_MODEL", "gpt-4o-mini-tts"),
+            openai_voice=os.getenv("OPENAI_TTS_VOICE", "alloy"),
         )
     else:
         logger.info("Using local Piper TTS for production")
@@ -181,7 +166,7 @@ else:
             ),
             piper_binary=os.getenv(
                 "PIPER_BINARY",
-                os.path.join(os.path.dirname(os.path.abspath(__file__)), "piper", "piper"),
+                "/home/asif1/open-talent-platform/microservices/voice-service/piper/piper",
             ),
         )
 
@@ -196,20 +181,18 @@ stream_service = UnifiedStreamService(
     stt_service=stt_service, tts_service=tts_service, vad_service=vad_service
 )
 
-# Phoneme extractor
-phoneme_extractor = PhonemeExtractor(logger=logger)
-
 # Initialize WebRTC worker if available and enabled
 webrtc_task = None
 
 if WEBRTC_AVAILABLE and ENABLE_WEBRTC and not USE_MOCK:
     logger.info("WebRTC support enabled - will start worker on app startup")
-elif not WEBRTC_AVAILABLE:
-    logger.warning("WebRTC support disabled - aiortc not installed")
-elif USE_MOCK:
-    logger.info("WebRTC support disabled in mock mode")
 else:
-    logger.info("WebRTC support disabled via ENABLE_WEBRTC=false")
+    if not WEBRTC_AVAILABLE:
+        logger.warning("WebRTC support disabled - aiortc not installed")
+    elif USE_MOCK:
+        logger.info("WebRTC support disabled in mock mode")
+    else:
+        logger.info("WebRTC support disabled via ENABLE_WEBRTC=false")
 
 
 @app.on_event("startup")
@@ -247,25 +230,37 @@ async def startup_event():
             webrtc_task = None
 
 
-# Keep legacy imports from app/schemas for backward compatibility
-
 # --- Request and Response Models ---
-# Import from root schemas.py (comprehensive schema definitions)
-from schemas import (  # TTS Schemas; STT Schemas; VAD Schemas (using base models from app/schemas for backward compatibility); Audio Processing; WebRTC; Phonemes; Voice Analytics; Voice Info; Batch Processing; Service Info
-    HealthCheckResponse,
-    STTResponse,
-    TTSRequest,
-)
+class TTSRequest(BaseModel):
+    text: str
+    voice: Optional[str] = None  # Will default to provider-specific voice
+    speed: Optional[float] = 1.0
+    extract_phonemes: Optional[bool] = True
+
+
+class STTResponse(BaseModel):
+    text: str
+    words: list[dict]
+    duration: float
+    confidence: float
+
+
+class TTSResponse(BaseModel):
+    audio_file: str
+    duration: float
+    sample_rate: int
+    phonemes: list[dict]
+    words: list[dict]
+
+
+class VADRequest(BaseModel):
+    remove_silence: Optional[bool] = False
 
 
 # --- API Endpoints ---
 @app.get("/", tags=["health"], summary="Service root endpoint")
 async def root():
-    """Service identification endpoint for the Voice Service.
-
-    Returns:
-        A dictionary confirming the service name, version, and documentation links.
-    """
+    """Root endpoint for the Voice Service."""
     return {
         "service": "Voice Service",
         "version": "2.1.0",
@@ -285,39 +280,10 @@ async def root():
     }
 
 
-def _audiosegment_from_upload(upload_file: UploadFile) -> AudioSegment:
-    """Load UploadFile into a pydub AudioSegment with validation."""
-    if upload_file.content_type and not upload_file.content_type.startswith("audio/"):
-        raise HTTPException(status_code=400, detail="Invalid audio file type")
-    suffix = os.path.splitext(upload_file.filename or "audio.wav")[-1] or ".wav"
-    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-        content = upload_file.file.read()
-        tmp.write(content)
-        tmp_path = tmp.name
-    try:
-        seg = AudioSegment.from_file(tmp_path)
-    finally:
-        if os.path.exists(tmp_path):
-            os.unlink(tmp_path)
-    if len(seg) > MAX_AUDIO_DURATION_MS:
-        raise HTTPException(status_code=413, detail="Audio too long")
-    return seg
-
-
-def _export_audiosegment(seg: AudioSegment, format_: str = "wav") -> str:
-    """Export AudioSegment to temp file and return path."""
-    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{format_}") as tmp_out:
-        out_path = tmp_out.name
-    seg.export(out_path, format=format_)
-    return out_path
-
-
 @app.get("/docs", include_in_schema=False)
 async def docs_redirect():
-    """Redirect to the principal Swagger UI documentation.
-
-    Returns:
-        A RedirectResponse to the /docs endpoint.
+    """Redirect to FastAPI interactive API documentation.
+    This endpoint provides Swagger UI documentation for all API routes.
     """
     from fastapi.responses import RedirectResponse
 
@@ -326,10 +292,8 @@ async def docs_redirect():
 
 @app.get("/doc", include_in_schema=False)
 async def doc_redirect():
-    """Alternative redirect path for principal Swagger UI documentation.
-
-    Returns:
-        A RedirectResponse to the /docs endpoint.
+    """Alternative redirect to API documentation.
+    Same as /docs but shorter URL for convenience.
     """
     from fastapi.responses import RedirectResponse
 
@@ -373,23 +337,7 @@ async def api_docs_info():
         "routes": routes_info,
         "categories": {
             "health": ["GET /", "GET /health", "GET /info"],
-            "voice_processing": [
-                "POST /voice/stt",
-                "POST /voice/tts",
-                "POST /voice/vad",
-                "POST /voice/normalize",
-                "POST /voice/format",
-                "POST /voice/split",
-                "POST /voice/join",
-                "GET /voices",
-                "POST /voice/phonemes",
-                "POST /voice/trim",
-                "POST /voice/resample",
-                "POST /voice/metadata",
-                "POST /voice/channels",
-                "POST /voice/latency-test",
-                "POST /voice/batch-tts",
-            ],
+            "voice_processing": ["POST /voice/stt", "POST /voice/tts", "POST /voice/vad"],
             "streaming": ["WebSocket /voice/ws/stt", "WebSocket /voice/ws/tts"],
             "webrtc": [
                 "POST /webrtc/start",
@@ -401,43 +349,34 @@ async def api_docs_info():
             else [],
             "documentation": ["GET /docs", "GET /doc", "GET /api-docs", "GET /openapi.json"],
         },
-        "counts": {
-            "health": 3,
-            "voice_processing": 16,
-            "streaming": 2,
-            "webrtc": 4 if WEBRTC_AVAILABLE else 0,
-            "documentation": 4,
-        },
     }
 
 
-@app.get(
-    "/health", tags=["health"], summary="Health check endpoint", response_model=HealthCheckResponse
-)
-async def health_check() -> HealthCheckResponse:
-    """Comprehensive health check endpoint for the Voice Service.
-
-    Verifies the operational status of STT, TTS, and VAD components.
-
-    Returns:
-        A HealthCheckResponse containing granular status and availability flags.
-    """
+@app.get("/health", tags=["health"], summary="Health check endpoint")
+async def health_check():
+    """Health check endpoint with service status."""
     stt_health = stt_service.health_check()
     tts_health = tts_service.health_check()
-    vad_service.health_check()
+    vad_health = vad_service.health_check()
 
     # Core services (STT/TTS) must be healthy, VAD is optional
     core_healthy = stt_health and tts_health
+    all_healthy = core_healthy and vad_health
 
-    return HealthCheckResponse(
-        status="healthy" if core_healthy else "unhealthy",
-        timestamp=datetime.utcnow(),
-        tts_available=tts_health,
-        stt_available=stt_health,
-        webrtc_available=WEBRTC_AVAILABLE and ENABLE_WEBRTC,
-        audio_processing_available=True,
-        uptime_seconds=0.0,  # TODO: Track actual uptime
-    )
+    return {
+        "status": "healthy" if core_healthy else "unhealthy",
+        "services": {
+            "stt": "ready" if stt_health else "not_ready",
+            "tts": "ready" if tts_health else "not_ready",
+            "vad": "ready" if vad_health else "degraded",
+            "streaming": "ready",
+        },
+        "active_connections": stream_service.get_connection_count(),
+        "mode": "mock" if USE_MOCK else "local",
+        "note": "VAD degradation doesn't affect core functionality"
+        if core_healthy and not vad_health
+        else None,
+    }
 
 
 @app.get("/voices", tags=["voice-processing"], summary="Get available TTS voices")
@@ -553,7 +492,7 @@ async def text_to_speech(request: TTSRequest):
     Returns:
         Audio file (WAV) with word timing and phoneme data, or JSON with phonemes if return_json=True
     """
-    logger.info(f"TTS request: '{request.text[:50]}...' (voice: {request.voice_id})")
+    logger.info(f"TTS request: '{request.text[:50]}...' (voice: {request.voice})")
 
     if not request.text or len(request.text.strip()) == 0:
         raise HTTPException(status_code=400, detail="Text cannot be empty")
@@ -567,8 +506,8 @@ async def text_to_speech(request: TTSRequest):
         synthesis_result = tts_service.synthesize_speech(
             text=request.text,
             output_path=output_path,
-            voice=request.voice_id,
-            speed=request.speaking_rate,
+            voice=request.voice,
+            speed=request.speed,
             extract_phonemes=request.extract_phonemes,
         )
 
@@ -662,165 +601,6 @@ async def voice_activity_detection(
             os.unlink(tmp_audio_file_path)
 
 
-# --- Audio Processing Helpers (stubs) ---
-
-
-# TODO: Implement with services/audio_processing_service.py normalize pipeline
-@app.post("/voice/normalize", tags=["voice-processing"], summary="Normalize audio levels")
-async def normalize_audio(audio_file: UploadFile = File(...), target_dbfs: float = -20.0):
-    seg = _audiosegment_from_upload(audio_file)
-    change = target_dbfs - seg.dBFS
-    normalized = seg.apply_gain(change)
-    out_path = _export_audiosegment(normalized)
-    return FileResponse(out_path, media_type="audio/wav", filename="normalized.wav")
-
-
-# TODO: Implement with services/audio_processing_service.py format conversion
-@app.post("/voice/format", tags=["voice-processing"], summary="Convert audio format")
-async def convert_audio_format(audio_file: UploadFile = File(...), target_format: str = "wav"):
-    seg = _audiosegment_from_upload(audio_file)
-    out_path = _export_audiosegment(seg, format_=target_format)
-    return FileResponse(
-        out_path, media_type=f"audio/{target_format}", filename=f"converted.{target_format}"
-    )
-
-
-# TODO: Implement with services/audio_processing_service.py silence-based splitting
-@app.post("/voice/split", tags=["voice-processing"], summary="Split audio by silence")
-async def split_audio(
-    audio_file: UploadFile = File(...),
-    min_silence_len: int = 500,
-    silence_thresh_delta: int = 16,
-    keep_silence: int = 200,
-):
-    seg = _audiosegment_from_upload(audio_file)
-    silence_thresh = seg.dBFS - silence_thresh_delta
-    chunks = split_on_silence(
-        seg,
-        min_silence_len=min_silence_len,
-        silence_thresh=silence_thresh,
-        keep_silence=keep_silence,
-    )
-    metadata = []
-    for idx, chunk in enumerate(chunks):
-        metadata.append({"index": idx, "duration_ms": len(chunk)})
-    return {"status": "ok", "segments": metadata, "count": len(chunks)}
-
-
-# TODO: Implement with services/audio_processing_service.py join pipeline
-@app.post("/voice/join", tags=["voice-processing"], summary="Join audio segments")
-async def join_audio(files: list[UploadFile] = File(...)):
-    combined = None
-    for f in files:
-        seg = _audiosegment_from_upload(f)
-        combined = seg if combined is None else combined + seg
-    if combined is None:
-        raise HTTPException(status_code=400, detail="No files provided")
-    if len(combined) > MAX_AUDIO_DURATION_MS:
-        raise HTTPException(status_code=413, detail="Audio too long")
-    out_path = _export_audiosegment(combined)
-    return FileResponse(out_path, media_type="audio/wav", filename="joined.wav")
-
-
-# TODO: Implement with services/phoneme_extractor.py using TTS backend
-@app.post("/voice/phonemes", tags=["voice-processing"], summary="Extract phonemes from text")
-async def extract_phonemes_api(text: str = Body(..., embed=True), duration: float = 0.0):
-    result = phoneme_extractor.extract_phonemes(text, duration=duration)
-    return result
-
-
-@app.post("/voice/trim", tags=["voice-processing"], summary="Trim audio by start/end")
-async def trim_audio(
-    audio_file: UploadFile = File(...), start_ms: int = 0, end_ms: int | None = None
-):
-    seg = _audiosegment_from_upload(audio_file)
-    if end_ms is None or end_ms <= 0 or end_ms > len(seg):
-        end_ms = len(seg)
-    trimmed = seg[start_ms:end_ms]
-    out_path = _export_audiosegment(trimmed)
-    return FileResponse(out_path, media_type="audio/wav", filename="trimmed.wav")
-
-
-@app.post("/voice/resample", tags=["voice-processing"], summary="Resample audio sample rate")
-async def resample_audio(audio_file: UploadFile = File(...), target_sample_rate: int = 16000):
-    seg = _audiosegment_from_upload(audio_file)
-    resampled = seg.set_frame_rate(target_sample_rate)
-    out_path = _export_audiosegment(resampled)
-    return FileResponse(out_path, media_type="audio/wav", filename="resampled.wav")
-
-
-@app.post("/voice/metadata", tags=["voice-processing"], summary="Extract audio metadata")
-async def audio_metadata(audio_file: UploadFile = File(...)):
-    seg = _audiosegment_from_upload(audio_file)
-    return {
-        "status": "ok",
-        "metadata": {
-            "duration_ms": len(seg),
-            "frame_rate": seg.frame_rate,
-            "channels": seg.channels,
-            "sample_width": seg.sample_width,
-            "dBFS": seg.dBFS,
-        },
-    }
-
-
-@app.post("/voice/channels", tags=["voice-processing"], summary="Convert channels (mono/stereo)")
-async def audio_channels(audio_file: UploadFile = File(...), target_channels: int = 1):
-    seg = _audiosegment_from_upload(audio_file)
-    converted = seg.set_channels(target_channels)
-    out_path = _export_audiosegment(converted)
-    return FileResponse(out_path, media_type="audio/wav", filename="channels.wav")
-
-
-@app.post("/voice/latency-test", tags=["voice-processing"], summary="Latency test for pipeline")
-async def latency_test(text: str = Body("ping", embed=True)):
-    import time
-
-    t0 = time.time()
-    # Minimal pipeline: phoneme extraction as proxy
-    _ = phoneme_extractor.extract_phonemes(text, duration=0.0)
-    t1 = time.time()
-    return {
-        "status": "ok",
-        "input": text,
-        "start": t0,
-        "end": t1,
-        "latency_ms": int((t1 - t0) * 1000),
-    }
-
-
-@app.post("/voice/batch-tts", tags=["voice-processing"], summary="Batch TTS for multiple texts")
-async def batch_tts(requests: list[TTSRequest]):
-    results = []
-    for req in requests:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_audio_file:
-            output_path = tmp_audio_file.name
-        try:
-            synthesis_result = tts_service.synthesize_speech(
-                text=req.text,
-                output_path=output_path,
-                voice=req.voice_id,
-                speed=req.speaking_rate,
-                extract_phonemes=req.extract_phonemes,
-            )
-            with open(output_path, "rb") as f:
-                audio_b64 = base64.b64encode(f.read()).decode("utf-8")
-            results.append(
-                {
-                    "text": req.text,
-                    "audio_data": audio_b64,
-                    "duration": synthesis_result.get("duration"),
-                    "sample_rate": synthesis_result.get("sample_rate"),
-                    "phonemes": synthesis_result.get("phonemes"),
-                    "words": synthesis_result.get("words"),
-                }
-            )
-        finally:
-            if os.path.exists(output_path):
-                os.unlink(output_path)
-    return {"status": "ok", "count": len(results), "results": results}
-
-
 @app.websocket("/voice/ws/stt")
 async def websocket_stt_stream(websocket: WebSocket, use_vad: bool = True):
     """Real-time STT streaming via WebSocket.
@@ -828,18 +608,6 @@ async def websocket_stt_stream(websocket: WebSocket, use_vad: bool = True):
     Client sends audio chunks as bytes, server responds with transcription results.
     """
     await stream_service.handle_stt_stream(websocket, use_vad)
-
-
-@app.websocket("/ws/audio")
-async def websocket_endpoint(websocket: WebSocket):
-    """Bidirectional WebSocket endpoint for real-time audio streaming.
-
-    Handles audio chunks (PCM16), performs real-time transcription using Vosk,
-    and returns text responses or status updates.
-
-    Args:
-        websocket: The active WebSocket connection.
-    """
 
 
 @app.websocket("/voice/ws/tts")
@@ -860,7 +628,7 @@ if WEBRTC_AVAILABLE:
         Called by interview-service when a new interview begins.
         """
         session_id = payload.get("session_id")
-        payload.get("job_description", "General software engineering position")
+        job_description = payload.get("job_description", "General software engineering position")
 
         if not session_id:
             return {"error": "Missing session_id"}, 400
@@ -879,7 +647,7 @@ if WEBRTC_AVAILABLE:
 
     @app.post("/webrtc/stop", tags=["webrtc"], summary="Stop WebRTC session")
     async def stop_webrtc_session(payload: dict = Body(...)):
-        """Stop an active WebRTC session."""
+        """Stop an active WebRTC session"""
         session_id = payload.get("session_id")
 
         if not session_id:
@@ -891,7 +659,7 @@ if WEBRTC_AVAILABLE:
 
     @app.post("/webrtc/tts", tags=["webrtc"], summary="Send TTS to WebRTC session")
     async def send_webrtc_tts(payload: dict = Body(...)):
-        """Generate and send TTS audio to active WebRTC session.
+        """Generate and send TTS audio to active WebRTC session
 
         Args:
             session_id: Active session ID
@@ -909,7 +677,7 @@ if WEBRTC_AVAILABLE:
 
     @app.get("/webrtc/status", tags=["webrtc"], summary="Get WebRTC status")
     async def get_webrtc_status():
-        """Get status of WebRTC functionality."""
+        """Get status of WebRTC functionality"""
         return {
             "webrtc_enabled": ENABLE_WEBRTC,
             "webrtc_available": WEBRTC_AVAILABLE,
@@ -918,6 +686,6 @@ if WEBRTC_AVAILABLE:
 
 
 if __name__ == "__main__":
-    host = os.getenv("HOST", "127.0.0.1")
-    port = int(os.getenv("PORT", 8015))
-    uvicorn.run(app, host=host, port=port)
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8002)

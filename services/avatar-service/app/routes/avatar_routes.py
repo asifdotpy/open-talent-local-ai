@@ -6,10 +6,11 @@ Endpoints for avatar video generation and management.
 import io
 import logging
 from pathlib import Path
+from typing import Optional
 
 import httpx
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from pydantic import BaseModel
 
 from app.services.avatar_rendering_service import AvatarRenderingService
@@ -25,8 +26,8 @@ class AvatarRequest(BaseModel):
     """Request model for avatar generation."""
 
     text: str
-    voice: str | None = "en_US-lessac-medium"
-    avatar_id: str | None = "default"
+    voice: Optional[str] = "en_US-lessac-medium"
+    avatar_id: Optional[str] = "default"
 
 
 class PhonemeData(BaseModel):
@@ -41,14 +42,27 @@ class PhonemeData(BaseModel):
 current_session = {"audio_url": None, "phonemes": None}
 
 
+@router.get("/")
+async def get_avatar_page():
+    """Serve the avatar HTML page from shared ai-orchestra-simulation library."""
+    try:
+        # Use shared avatar.html from ai-orchestra-simulation
+        html_path = (
+            Path(__file__).parent.parent.parent.parent.parent
+            / "ai-orchestra-simulation"
+            / "avatar.html"
+        )
+        with open(html_path) as f:
+            html_content = f.read()
+        return HTMLResponse(content=html_content, status_code=200)
+    except Exception as e:
+        logger.error(f"Failed to serve avatar page: {e}")
+        raise HTTPException(status_code=500, detail="Avatar page not available")
+
+
 @router.get("/src/{path:path}")
 async def serve_src_files(path: str):
     """Serve JavaScript source files from shared ai-orchestra-simulation library."""
-    # Security: Check for null bytes and path traversal attempts
-    if "\x00" in path or ".." in path or path.startswith("/"):
-        logger.warning(f"Blocked malicious src request: {path}")
-        raise HTTPException(status_code=404, detail="File not found")
-
     try:
         # Use shared library from ai-orchestra-simulation
         orchestra_path = (
@@ -57,36 +71,18 @@ async def serve_src_files(path: str):
             / "src"
             / path
         )
-
-        # Verify the resolved path is still within the src directory
-        base_src = (
-            Path(__file__).parent.parent.parent.parent.parent / "ai-orchestra-simulation" / "src"
-        )
-        try:
-            orchestra_path.resolve().relative_to(base_src.resolve())
-        except ValueError:
-            logger.warning(f"Path traversal attempt detected in /src: {path}")
-            raise HTTPException(status_code=404, detail="File not found")
-
         if orchestra_path.exists() and orchestra_path.is_file():
             return FileResponse(orchestra_path)
         else:
             raise HTTPException(status_code=404, detail=f"File not found: {path}")
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error(f"Failed to serve file {path}: {e}")
-        raise HTTPException(status_code=404, detail="File not found")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/assets/{path:path}")
 async def serve_asset_files(path: str):
     """Serve asset files (models, audio, textures) from shared ai-orchestra-simulation library."""
-    # Security: Check for null bytes and path traversal attempts
-    if "\x00" in path or ".." in path or path.startswith("/"):
-        logger.warning(f"Blocked malicious asset request: {path}")
-        raise HTTPException(status_code=404, detail="Asset not found")
-
     try:
         # Use shared assets from ai-orchestra-simulation
         orchestra_assets = (
@@ -95,26 +91,13 @@ async def serve_asset_files(path: str):
             / "assets"
             / path
         )
-
-        # Verify the resolved path is still within the assets directory
-        base_assets = (
-            Path(__file__).parent.parent.parent.parent.parent / "ai-orchestra-simulation" / "assets"
-        )
-        try:
-            orchestra_assets.resolve().relative_to(base_assets.resolve())
-        except ValueError:
-            logger.warning(f"Path traversal attempt detected: {path}")
-            raise HTTPException(status_code=404, detail="Asset not found")
-
         if orchestra_assets.exists() and orchestra_assets.is_file():
             return FileResponse(orchestra_assets)
         else:
-            raise HTTPException(status_code=404, detail="Asset not found")
-    except HTTPException:
-        raise
+            raise HTTPException(status_code=404, detail=f"Asset not found: {path}")
     except Exception as e:
         logger.error(f"Failed to serve asset {path}: {e}")
-        raise HTTPException(status_code=404, detail="Asset not found")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/generate")
@@ -142,7 +125,7 @@ async def generate_avatar_video(request: AvatarRequest):
             audio_data = voice_data.get("audio_data")
             duration = voice_data.get("duration", 5.0)
             phonemes = voice_data.get("phonemes", [])
-            voice_data.get("words", [])
+            words = voice_data.get("words", [])
 
         if not audio_data:
             raise HTTPException(status_code=500, detail="No audio data from voice service")
@@ -219,7 +202,7 @@ async def get_phonemes():
 @router.post("/generate-from-audio")
 async def generate_avatar_from_audio(
     audio_file: UploadFile = File(...),
-    phonemes: str | None = Form(None),  # JSON string of phonemes
+    phonemes: Optional[str] = Form(None),  # JSON string of phonemes
 ):
     """Generate avatar video from uploaded audio file.
 
@@ -265,3 +248,13 @@ async def get_avatar_info():
     except Exception as e:
         logger.error(f"Failed to get avatar info: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/health")
+async def avatar_health():
+    """Avatar rendering service health check."""
+    try:
+        info = await avatar_service.get_avatar_info()
+        return {"status": "healthy", "component": "avatar_rendering", "details": info}
+    except Exception as e:
+        return {"status": "unhealthy", "component": "avatar_rendering", "error": str(e)}
