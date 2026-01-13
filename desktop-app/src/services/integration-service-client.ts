@@ -52,6 +52,27 @@ export interface InterviewSession {
   isComplete: boolean;
 }
 
+export interface TrustReport {
+  fairness_score: number;
+  is_audit_verified: boolean;
+  bias_findings: any[];
+  decision_logic: {
+    factors: string[];
+    confidence: number;
+    logic: string;
+    model: string;
+  };
+  export_timestamp: string;
+}
+
+export interface TrustReportRequest {
+  interview_id: string;
+  candidate_id: string;
+  role: string;
+  score: number;
+  room_id: string;
+}
+
 export interface StartInterviewRequest {
   role: string;
   model: string;
@@ -172,6 +193,27 @@ export async function getDashboard(): Promise<any> {
     return await DefaultService.getDashboardApiV1DashboardGet();
   } catch (error) {
     console.error('[IntegrationClient] Failed to get dashboard:', error);
+    return null;
+  }
+}
+
+/**
+ * Fetch Enterprise Trust Report (Aggregation of Explainability + Auditing + Bias)
+ */
+export async function fetchTrustReport(
+  request: TrustReportRequest
+): Promise<TrustReport | null> {
+  try {
+    const response = await fetch(`${INTEGRATION_BASE_URL}/api/v1/analytics/trust-report`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch trust report');
+    return await response.json();
+  } catch (error) {
+    console.error('[IntegrationClient] Failed to fetch trust report:', error);
     return null;
   }
 }
