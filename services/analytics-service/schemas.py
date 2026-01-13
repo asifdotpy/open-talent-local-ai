@@ -144,3 +144,19 @@ class HealthResponse(BaseModel):
     status: str
     service: str
     timestamp: datetime
+
+
+class TrustReportRequest(BaseModel):
+    interview_id: str
+    candidate_id: str
+    role: str
+    score: float
+    room_id: str
+
+
+class TrustReport(BaseModel):
+    fairness_score: float
+    is_audit_verified: bool
+    bias_findings: list[dict[str, Any]]
+    decision_logic: dict[str, Any]
+    export_timestamp: str

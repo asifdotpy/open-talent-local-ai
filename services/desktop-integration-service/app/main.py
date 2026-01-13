@@ -563,6 +563,27 @@ async def analyze_sentiment(payload: dict) -> dict:
         raise HTTPException(status_code=502, detail="Sentiment analysis failed")
 
 
+@app.post("/api/v1/analytics/trust-report")
+async def get_trust_report(payload: dict) -> dict:
+    """Proxy trust report generation to analytics-service."""
+    if not settings.enable_analytics:
+        raise HTTPException(status_code=503, detail="Analytics service disabled")
+
+    if not service_discovery or not http_client:
+        raise HTTPException(status_code=503, detail="Service discovery not initialized")
+
+    url = await service_discovery.get_service_url("analytics-service")
+    if not url:
+        raise HTTPException(status_code=503, detail="Analytics service unavailable")
+
+    try:
+        response = await http_client.post(f"{url}/api/v1/analyze/trust-report", json=payload)
+        return response.json()
+    except Exception as e:
+        logger.warning(f"Trust report generation failed: {e}")
+        raise HTTPException(status_code=502, detail="Trust report generation failed")
+
+
 # =========================================================================
 # Agents Endpoints (optional)
 # =========================================================================
