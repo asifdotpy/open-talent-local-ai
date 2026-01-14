@@ -9,15 +9,20 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from app.core.config import settings
+from app.db import models  # noqa: F401
+from app.db.base import Base
 from fastapi.testclient import TestClient
-from sqlmodel import Session, create_engine
+from sqlmodel import Session, SQLModel, create_engine
 
 
 @pytest.fixture(scope="session")
 def engine():
     """Create a test database engine."""
     # The `echo=True` will log all SQL statements, which is useful for debugging
-    return create_engine(str(settings.TEST_DATABASE_URI), echo=False)
+    engine = create_engine(str(settings.TEST_DATABASE_URI), echo=False)
+    SQLModel.metadata.create_all(engine)
+    Base.metadata.create_all(engine)
+    return engine
 
 
 @pytest.fixture(scope="function")
@@ -51,7 +56,9 @@ def mock_voice_service():
             "connection_id": "voice-conn-123",
             "session_id": "voice-session-123",
         }
-        mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
+        mock_client.return_value.__aenter__.return_value.post.return_value = (
+            mock_response
+        )
         yield mock_client
 
 
@@ -67,7 +74,9 @@ def mock_conversation_service():
             "bias_score": 0.1,
             "sentiment_context": "neutral",
         }
-        mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
+        mock_client.return_value.__aenter__.return_value.post.return_value = (
+            mock_response
+        )
         yield mock_client
 
 
@@ -82,7 +91,9 @@ def mock_avatar_service():
             "avatar_id": "avatar-123",
             "session_id": "avatar-session-123",
         }
-        mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
+        mock_client.return_value.__aenter__.return_value.post.return_value = (
+            mock_response
+        )
         yield mock_client
 
 
@@ -212,16 +223,19 @@ def clear_room_storage():
 
 
 @pytest.fixture
-def test_client():
-    """Create test client for the structured API app."""
+def test_client(db):
+    """Create test client for the structured interview service API (app/main.py)."""
+    from app.api.deps import get_db
     from app.main import app
 
-    return TestClient(app)
+    app.dependency_overrides[get_db] = lambda: db
+    yield TestClient(app)
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture
 def test_client_rooms():
-    """Create test client for the rooms/WebRTC app."""
+    """Create test client for the rooms/WebRTC service (main.py)."""
     from main import app
 
     return TestClient(app)
