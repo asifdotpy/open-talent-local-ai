@@ -193,7 +193,22 @@ start_microservice() {
         export PORT="$port"
         export HOST="0.0.0.0"
 
-        "$VENV_PATH/bin/python" -m uvicorn "$uvicorn_app" \
+    # Service-Specific Overrides
+    local timeout=10 # Default timeout
+
+    if [ "$service_name" == "granite-interview-service" ]; then
+        # Override Docker paths with local directory structure
+        export MODEL_CACHE_DIR="$SCRIPT_DIR/models/cache"
+        export TRAINING_DATA_DIR="$SCRIPT_DIR/data/training"
+        export OUTPUT_DIR="$SCRIPT_DIR/models/output"
+        mkdir -p "$MODEL_CACHE_DIR" "$TRAINING_DATA_DIR" "$OUTPUT_DIR"
+
+        timeout=120 # Heavy load time for Granite
+    elif [ "$service_name" == "candidate-service" ]; then
+        timeout=120 # Heavy load time for embeddings
+    fi
+
+    "$VENV_PATH/bin/python" -m uvicorn "$uvicorn_app" \
             --host 0.0.0.0 \
             --port "$port" \
             --log-level warning \
@@ -204,7 +219,7 @@ start_microservice() {
     echo "$service_name:$pid:$port" >> "$PID_FILE"
 
     # Wait for application-layer healthiness instead of just process presence
-    if check_service_health "$service_name" "$port" 10; then
+    if check_service_health "$service_name" "$port" "$timeout"; then
         log_success "$service_name started and healthy (PID: $pid, Port: $port)"
         return 0
     else
@@ -250,10 +265,24 @@ cmd_start() {
     check_prerequisites
 
     # Check if already running
+    # Smart Check: Check if services are *actually* running
     if [ -f "$PID_FILE" ]; then
-        log_warning "Services may already be running. Run './manage.sh stop' first."
-        log_info "Or remove $PID_FILE if stale"
-        exit 1
+        local active_pids=0
+        while IFS=':' read -r _ idx_pid _; do
+             # Check if PID is valid and process is running
+             if [ -n "$idx_pid" ] && kill -0 "$idx_pid" 2>/dev/null; then
+                 active_pids=$((active_pids + 1))
+             fi
+        done < "$PID_FILE"
+
+        if [ $active_pids -gt 0 ]; then
+             log_warning "Services are currently running ($active_pids active)."
+             log_info "Run './manage.sh stop' to stop them, or './manage.sh restart'."
+             exit 1
+        else
+             log_warning "Found stale PID file (no active processes). Cleaning up..."
+             rm "$PID_FILE"
+        fi
     fi
 
     # Create new PID file
