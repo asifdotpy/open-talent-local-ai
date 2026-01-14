@@ -87,6 +87,7 @@ class TestInterviewManagement:
 
 
 @pytest.mark.skip(reason="Endpoints do not exist in app.main")
+@pytest.mark.skip(reason="Endpoints do not exist in app.main")
 class TestInterviewFeedback:
     def test_submit_feedback(
         self, test_client: TestClient, feedback_data: dict, auth_headers: dict
@@ -113,6 +114,7 @@ class TestInterviewFeedback:
         assert response.status_code in [200, 201, 404]
 
 
+@pytest.mark.skip(reason="Endpoints do not exist in app.main")
 @pytest.mark.skip(reason="Endpoints do not exist in app.main")
 class TestInterviewScheduling:
     def test_get_available_slots(self, test_client: TestClient, auth_headers: dict):
