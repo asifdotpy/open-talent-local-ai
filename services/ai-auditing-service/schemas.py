@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Any, ClassVar
 
-from pydantic import BaseModel, Field, constr, validator
+from pydantic import BaseModel, Field, constr, field_validator
 
 try:
     from rules import RULES  # when loaded as a module without package context
@@ -72,8 +72,9 @@ class AuditConfig(BaseModel):
     fail_on_severity: Severity = Field(default=Severity.HIGH)
     max_findings: int = Field(default=1000, ge=1)
 
-    @validator("default_ruleset")
-    def validate_default_ruleset(self, v):
+    @field_validator("default_ruleset")
+    @classmethod
+    def validate_default_ruleset(cls, v):
         unknown = [rid for rid in v if rid not in KNOWN_RULE_IDS]
         if unknown:
             raise ValueError(f"Unknown rule IDs in default_ruleset: {unknown}")

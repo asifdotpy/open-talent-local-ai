@@ -125,19 +125,22 @@ def create_app() -> FastAPI:
     return app
 
 
-from fastapi.staticfiles import StaticFiles
-
 # ... existing imports ...
 
 # Create app instance
 app = create_app()
 
-# Mount static files
-app.mount("/models", StaticFiles(directory="public/models"), name="models")
+# Mount static files (conditionally)
+_models_dir = os.path.join(os.path.dirname(__file__), "public", "models")
+if not os.path.exists(_models_dir):
+    os.makedirs(_models_dir, exist_ok=True)
+app.mount("/models", StaticFiles(directory=_models_dir), name="models")
 
 
 # Pydantic models for request/response
 class RenderRequest(BaseModel):
+    """Request model for rendering avatar video."""
+
     text: str
     phonemes: list  # From voice service
     duration: float
@@ -226,13 +229,14 @@ async def health_check():
                 "error": str(e),
                 "timestamp": datetime.now().isoformat(),
             },
-        )
+        ) from e
 
 
 @app.post("/render/lipsync")
 async def render_lipsync(request: RenderRequest):
-    """Render avatar video with lip-sync
-    Uses face.glb in production, allows model override in dev
+    """Render avatar video with lip-sync.
+
+    Uses face.glb in production, allows model override in dev.
     """
     # Call Node.js renderer
     renderer_script = os.path.join(os.path.dirname(__file__), "renderer", "render.js")
@@ -264,7 +268,7 @@ async def render_lipsync(request: RenderRequest):
         )
     except subprocess.TimeoutExpired:
         logger.error("Renderer subprocess timed out after 120s")
-        raise HTTPException(status_code=500, detail="Rendering timed out")
+        raise HTTPException(status_code=500, detail="Rendering timed out") from None
     except Exception as e:
         logger.error(f"Renderer subprocess error: {type(e).__name__}: {e}")
         raise
@@ -296,4 +300,4 @@ async def render_lipsync(request: RenderRequest):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host="0.0.0.0", port=8001)  # nosec B104
