@@ -56,9 +56,7 @@ def mock_voice_service():
             "connection_id": "voice-conn-123",
             "session_id": "voice-session-123",
         }
-        mock_client.return_value.__aenter__.return_value.post.return_value = (
-            mock_response
-        )
+        mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
         yield mock_client
 
 
@@ -74,9 +72,7 @@ def mock_conversation_service():
             "bias_score": 0.1,
             "sentiment_context": "neutral",
         }
-        mock_client.return_value.__aenter__.return_value.post.return_value = (
-            mock_response
-        )
+        mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
         yield mock_client
 
 
@@ -91,9 +87,7 @@ def mock_avatar_service():
             "avatar_id": "avatar-123",
             "session_id": "avatar-session-123",
         }
-        mock_client.return_value.__aenter__.return_value.post.return_value = (
-            mock_response
-        )
+        mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
         yield mock_client
 
 

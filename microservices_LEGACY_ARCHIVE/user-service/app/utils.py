@@ -1,9 +1,9 @@
-from fastapi import Header, HTTPException, status, Depends
-from typing import Optional, Dict, Any
-from pydantic import BaseModel
-import jwt
+from typing import Any
+
 import httpx
-from datetime import datetime
+import jwt
+from fastapi import Depends, Header, HTTPException, status
+from pydantic import BaseModel
 
 from .config import settings
 
@@ -12,14 +12,14 @@ class JWTClaims(BaseModel):
     """JWT claims extracted from verified token."""
 
     email: str
-    user_id: Optional[str] = None
-    role: Optional[str] = None
-    tenant_id: Optional[str] = None
-    exp: Optional[int] = None
-    iat: Optional[int] = None
+    user_id: str | None = None
+    role: str | None = None
+    tenant_id: str | None = None
+    exp: int | None = None
+    iat: int | None = None
 
 
-async def verify_jwt_with_security_service(token: str) -> Dict[str, Any]:
+async def verify_jwt_with_security_service(token: str) -> dict[str, Any]:
     """Verify JWT token with Security Service via HTTP."""
     try:
         async with httpx.AsyncClient(timeout=settings.security_service_timeout) as client:
@@ -37,7 +37,7 @@ async def verify_jwt_with_security_service(token: str) -> Dict[str, Any]:
         return {"valid": False, "error": "Security Service unavailable"}
 
 
-def verify_jwt_locally(token: str) -> Optional[Dict[str, Any]]:
+def verify_jwt_locally(token: str) -> dict[str, Any] | None:
     """Fallback: Verify JWT token locally using shared secret."""
     try:
         payload = jwt.decode(
@@ -58,7 +58,7 @@ def verify_jwt_locally(token: str) -> Optional[Dict[str, Any]]:
         )
 
 
-async def get_jwt_claims(authorization: Optional[str] = Header(None)) -> JWTClaims:
+async def get_jwt_claims(authorization: str | None = Header(None)) -> JWTClaims:
     """Extract and verify JWT token, return claims."""
     if not authorization:
         raise HTTPException(
@@ -114,7 +114,7 @@ async def get_jwt_claims(authorization: Optional[str] = Header(None)) -> JWTClai
     return claims
 
 
-async def get_current_user(authorization: Optional[str] = Header(None)) -> str:
+async def get_current_user(authorization: str | None = Header(None)) -> str:
     """Backward compatibility: Extract email from JWT."""
     claims = await get_jwt_claims(authorization)
     return claims.email

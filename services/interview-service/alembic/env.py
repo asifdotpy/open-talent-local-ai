@@ -41,11 +41,6 @@ if config.config_file_name is not None:
 from app.db.base import Base
 
 # Import all your models here to ensure they are registered with SQLAlchemy
-from app.db.models import demo_interview_session
-from app.db.models import interview
-from app.db.models import search_criteria
-from app.db.models import system_version
-from app.db.models import user
 
 target_metadata = Base.metadata
 

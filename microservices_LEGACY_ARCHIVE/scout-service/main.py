@@ -1,15 +1,15 @@
-import asyncio
-import aiohttp
 import json
 import os
 import re
-from dataclasses import dataclass, asdict
-from datetime import datetime
-from typing import List, Optional, Dict, Any
-from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Depends
-from pydantic import BaseModel, Field
 from contextlib import asynccontextmanager
+from dataclasses import asdict, dataclass
+from datetime import datetime
+from typing import Any
+
+import aiohttp
+from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, HTTPException
+from pydantic import BaseModel, Field
 
 load_dotenv()
 
@@ -27,28 +27,28 @@ class CandidateResponse(BaseModel):
     location: str
     profile_url: str
     platform: str
-    bio: Optional[str] = None
-    email: Optional[str] = None
-    linkedin_url: Optional[str] = None
-    twitter_url: Optional[str] = None
-    website_url: Optional[str] = None
-    company: Optional[str] = None
-    confidence_score: Optional[float] = None
-    linkedin_enriched: Optional[Dict[str, Any]] = None
-    work_emails: Optional[List[str]] = None
-    personal_emails: Optional[List[str]] = None
-    phone_numbers: Optional[List[str]] = None
-    linkedin_headline: Optional[str] = None
-    linkedin_industry: Optional[str] = None
-    linkedin_summary: Optional[str] = None
-    linkedin_experience: Optional[List[Dict]] = None
-    linkedin_education: Optional[List[Dict]] = None
-    linkedin_skills: Optional[List[str]] = None
-    linkedin_followers: Optional[int] = None
+    bio: str | None = None
+    email: str | None = None
+    linkedin_url: str | None = None
+    twitter_url: str | None = None
+    website_url: str | None = None
+    company: str | None = None
+    confidence_score: float | None = None
+    linkedin_enriched: dict[str, Any] | None = None
+    work_emails: list[str] | None = None
+    personal_emails: list[str] | None = None
+    phone_numbers: list[str] | None = None
+    linkedin_headline: str | None = None
+    linkedin_industry: str | None = None
+    linkedin_summary: str | None = None
+    linkedin_experience: list[dict] | None = None
+    linkedin_education: list[dict] | None = None
+    linkedin_skills: list[str] | None = None
+    linkedin_followers: int | None = None
 
 
 class SearchResponse(BaseModel):
-    candidates: List[CandidateResponse]
+    candidates: list[CandidateResponse]
     total_found: int
     search_query: str
     location: str
@@ -57,21 +57,17 @@ class SearchResponse(BaseModel):
 # Interview Process Models (Agent-to-Interview Handoff Contract)
 class SearchCriteria(BaseModel):
     jobTitle: str = Field(..., description="The target job title.")
-    requiredSkills: List[str] = Field(..., description="A list of mandatory skills for the role.")
-    niceToHaveSkills: List[str] = Field(
-        ..., description="A list of desired but not essential skills."
-    )
-    companyCulture: List[str] = Field(..., description="Keywords describing the company culture.")
-    experienceLevel: str = Field(
-        ..., description="The target seniority for the role (e.g., 'Senior')."
-    )
+    requiredSkills: list[str] = Field(..., description="A list of mandatory skills for the role.")
+    niceToHaveSkills: list[str] = Field(..., description="A list of desired but not essential skills.")
+    companyCulture: list[str] = Field(..., description="Keywords describing the company culture.")
+    experienceLevel: str = Field(..., description="The target seniority for the role (e.g., 'Senior').")
 
 
 class WorkExperience(BaseModel):
     title: str
     company: str
     duration: str
-    responsibilities: List[str]
+    responsibilities: list[str]
 
 
 class Education(BaseModel):
@@ -81,8 +77,8 @@ class Education(BaseModel):
 
 
 class Skills(BaseModel):
-    matched: List[str]
-    unmatched: List[str]
+    matched: list[str]
+    unmatched: list[str]
 
 
 class InitialQuestion(BaseModel):
@@ -92,17 +88,13 @@ class InitialQuestion(BaseModel):
 
 class CandidateProfile(BaseModel):
     fullName: str = Field(..., description="The candidate's full name.")
-    sourceUrl: str = Field(
-        ..., description="The primary URL where the candidate's profile was found."
-    )
+    sourceUrl: str = Field(..., description="The primary URL where the candidate's profile was found.")
     summary: str = Field(..., description="AI-generated summary of the candidate's profile.")
-    workExperience: List[WorkExperience]
-    education: List[Education]
+    workExperience: list[WorkExperience]
+    education: list[Education]
     skills: Skills
-    alignmentScore: float = Field(
-        ..., description="Score indicating alignment with the search criteria."
-    )
-    initialQuestions: List[InitialQuestion]
+    alignmentScore: float = Field(..., description="Score indicating alignment with the search criteria.")
+    initialQuestions: list[InitialQuestion]
 
 
 class HandoffPayload(BaseModel):
@@ -117,60 +109,56 @@ class Candidate:
     location: str
     profile_url: str
     platform: str
-    bio: Optional[str] = None
-    email: Optional[str] = None
-    linkedin_url: Optional[str] = None
-    twitter_url: Optional[str] = None
-    website_url: Optional[str] = None
-    company: Optional[str] = None
-    confidence_score: Optional[float] = None
+    bio: str | None = None
+    email: str | None = None
+    linkedin_url: str | None = None
+    twitter_url: str | None = None
+    website_url: str | None = None
+    company: str | None = None
+    confidence_score: float | None = None
     # ContactOut enriched data
-    linkedin_enriched: Optional[Dict[str, Any]] = None
-    work_emails: Optional[List[str]] = None
-    personal_emails: Optional[List[str]] = None
-    phone_numbers: Optional[List[str]] = None
-    linkedin_headline: Optional[str] = None
-    linkedin_industry: Optional[str] = None
-    linkedin_summary: Optional[str] = None
-    linkedin_experience: Optional[List[Dict]] = None
-    linkedin_education: Optional[List[Dict]] = None
-    linkedin_skills: Optional[List[str]] = None
-    linkedin_followers: Optional[int] = None
+    linkedin_enriched: dict[str, Any] | None = None
+    work_emails: list[str] | None = None
+    personal_emails: list[str] | None = None
+    phone_numbers: list[str] | None = None
+    linkedin_headline: str | None = None
+    linkedin_industry: str | None = None
+    linkedin_summary: str | None = None
+    linkedin_experience: list[dict] | None = None
+    linkedin_education: list[dict] | None = None
+    linkedin_skills: list[str] | None = None
+    linkedin_followers: int | None = None
 
 
 class GitHubTalentScout:
-    """
-    Find GitHub developers with AI-powered query formatting
-    """
+    """Find GitHub developers with AI-powered query formatting."""
 
     def __init__(self):
         self.github_token = os.getenv("GITHUB_TOKEN", "")
         self.contactout_token = os.getenv("CONTACTOUT_API_TOKEN", "")
         self.ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
         self.ollama_model = os.getenv("OLLAMA_MODEL", "granite4:350m-h")
-        self.session: Optional[aiohttp.ClientSession] = None
+        self.session: aiohttp.ClientSession | None = None
 
     async def init_session(self):
-        """Initialize HTTP session"""
+        """Initialize HTTP session."""
         if self.session is None:
             self.session = aiohttp.ClientSession(
                 timeout=aiohttp.ClientTimeout(total=30), headers={"User-Agent": "TalentScout/1.0"}
             )
 
     async def close_session(self):
-        """Close HTTP session"""
+        """Close HTTP session."""
         if self.session:
             await self.session.close()
             self.session = None
 
     async def format_query_with_ollama(self, user_query: str, location: str = "Ireland") -> str:
-        """
-        Use Ollama Llama 3.1 to convert natural language to GitHub search query format
+        """Use Ollama Llama 3.1 to convert natural language to GitHub search query format.
 
         CRITICAL: GitHub searches profile text (name, bio, email), not a resume database!
         Strategy: Use ONLY qualifiers (language, repos), avoid text keywords unless essential
         """
-
         prompt = f"""Convert this job search query into a GitHub API search query.
 
     USER QUERY: "{user_query}"
@@ -227,7 +215,7 @@ class GitHubTalentScout:
                 "options": {"temperature": 0.1, "top_p": 0.9, "num_predict": 50},
             }
 
-            print(f"[AI] Formatting query with Ollama Llama 3.1...")
+            print("[AI] Formatting query with Ollama Llama 3.1...")
             print(f"[AI] User input: '{user_query}'")
 
             async with self.session.post(url, json=payload) as response:
@@ -242,9 +230,7 @@ class GitHubTalentScout:
                     actual_query = None
 
                     for line in reversed(lines):
-                        if any(
-                            q in line for q in ["location:", "language:", "repos:", "type:user"]
-                        ):
+                        if any(q in line for q in ["location:", "language:", "repos:", "type:user"]):
                             actual_query = line
                             break
 
@@ -279,11 +265,9 @@ class GitHubTalentScout:
                     if (
                         not actual_query
                         or len(actual_query) < 5
-                        or actual_query.lower().startswith(
-                            ("here", "the", "this", "i ", "converted")
-                        )
+                        or actual_query.lower().startswith(("here", "the", "this", "i ", "converted"))
                     ):
-                        print(f"[WARNING] AI response looks invalid, using fallback")
+                        print("[WARNING] AI response looks invalid, using fallback")
                         return self.basic_query_format(user_query, location)
 
                     print(f"[AI] Formatted query: '{actual_query}'")
@@ -294,11 +278,11 @@ class GitHubTalentScout:
 
         except Exception as e:
             print(f"[ERROR] Error calling Ollama: {e}")
-            print(f"[INFO] Using basic query formatting as fallback")
+            print("[INFO] Using basic query formatting as fallback")
             return self.basic_query_format(user_query, location)
 
     def basic_query_format(self, user_query: str, location: str) -> str:
-        """Fallback basic query formatting - QUALIFIER-FOCUSED"""
+        """Fallback basic query formatting - QUALIFIER-FOCUSED."""
         query = user_query.lower()
 
         # Build query with ONLY qualifiers, NO text keywords
@@ -390,10 +374,8 @@ class GitHubTalentScout:
         location: str = "Ireland",
         max_results: int = 20,
         use_ai_formatting: bool = True,
-    ) -> List[Candidate]:
-        """
-        Search GitHub for developers with AI-formatted queries
-        """
+    ) -> list[Candidate]:
+        """Search GitHub for developers with AI-formatted queries."""
         candidates = []
 
         if not self.github_token:
@@ -414,8 +396,8 @@ class GitHubTalentScout:
             params = {"q": search_query, "per_page": 50, "sort": "repositories", "order": "desc"}
 
             print(f"\n[SEARCH] GitHub API Query: '{search_query}'")
-            print(f"[INFO] Searching for users with these keywords in their profile/bio")
-            print(f"[SEARCH] Searching GitHub...")
+            print("[INFO] Searching for users with these keywords in their profile/bio")
+            print("[SEARCH] Searching GitHub...")
 
             async with self.session.get(url, params=params, headers=headers) as response:
                 if response.status == 200:
@@ -463,30 +445,20 @@ class GitHubTalentScout:
 
                             # Enrich LinkedIn profile if available
                             if candidate.linkedin_url and self.contactout_token:
-                                enriched_data = await self.enrich_linkedin_profile(
-                                    candidate.linkedin_url
-                                )
+                                enriched_data = await self.enrich_linkedin_profile(candidate.linkedin_url)
                                 if enriched_data:
                                     candidate.linkedin_enriched = enriched_data
                                     candidate.work_emails = enriched_data.get("work_email", [])
-                                    candidate.personal_emails = enriched_data.get(
-                                        "personal_email", []
-                                    )
+                                    candidate.personal_emails = enriched_data.get("personal_email", [])
                                     candidate.phone_numbers = enriched_data.get("phone", [])
                                     candidate.linkedin_headline = enriched_data.get("headline")
                                     candidate.linkedin_industry = enriched_data.get("industry")
                                     candidate.linkedin_summary = enriched_data.get("summary")
-                                    candidate.linkedin_experience = enriched_data.get(
-                                        "experience", []
-                                    )
-                                    candidate.linkedin_education = enriched_data.get(
-                                        "education", []
-                                    )
+                                    candidate.linkedin_experience = enriched_data.get("experience", [])
+                                    candidate.linkedin_education = enriched_data.get("education", [])
                                     candidate.linkedin_skills = enriched_data.get("skills", [])
                                     candidate.linkedin_followers = enriched_data.get("followers")
-                                    candidate.confidence_score = min(
-                                        1.0, (candidate.confidence_score or 0) + 0.3
-                                    )
+                                    candidate.confidence_score = min(1.0, (candidate.confidence_score or 0) + 0.3)
 
                             candidates.append(candidate)
 
@@ -524,8 +496,8 @@ class GitHubTalentScout:
 
         return candidates
 
-    async def get_github_user_details(self, username: str) -> Optional[Dict]:
-        """Get detailed GitHub user information"""
+    async def get_github_user_details(self, username: str) -> dict | None:
+        """Get detailed GitHub user information."""
         try:
             url = f"https://api.github.com/users/{username}"
             headers = {"Authorization": f"token {self.github_token}"}
@@ -539,8 +511,8 @@ class GitHubTalentScout:
 
         return None
 
-    def extract_social_links(self, user_details: Dict) -> Dict[str, Optional[str]]:
-        """Extract LinkedIn, Twitter/X, and website links"""
+    def extract_social_links(self, user_details: dict) -> dict[str, str | None]:
+        """Extract LinkedIn, Twitter/X, and website links."""
         links = {"linkedin": None, "twitter": None, "website": None}
 
         fields_to_check = [
@@ -602,8 +574,8 @@ class GitHubTalentScout:
 
         return links
 
-    async def enrich_linkedin_profile(self, linkedin_url: str) -> Optional[Dict[str, Any]]:
-        """Enrich LinkedIn profile using ContactOut API"""
+    async def enrich_linkedin_profile(self, linkedin_url: str) -> dict[str, Any] | None:
+        """Enrich LinkedIn profile using ContactOut API."""
         if not self.contactout_token or not linkedin_url:
             return None
 
@@ -628,9 +600,7 @@ class GitHubTalentScout:
                     data = await response.json()
                     if data.get("status_code") == 200 and data.get("profile"):
                         profile_data = data["profile"]
-                        if profile_data and not (
-                            isinstance(profile_data, list) and len(profile_data) == 0
-                        ):
+                        if profile_data and not (isinstance(profile_data, list) and len(profile_data) == 0):
                             return profile_data
                 elif response.status == 401:
                     print("[ERROR] ContactOut API: Invalid token")
@@ -642,15 +612,15 @@ class GitHubTalentScout:
 
         return None
 
-    def display_results(self, candidates: List[Candidate]):
-        """Display candidates"""
+    def display_results(self, candidates: list[Candidate]):
+        """Display candidates."""
         if not candidates:
             print("\n[ERROR] No candidates with emails found")
             return
 
-        print(f"\n{'='*70}")
-        print(f"GITHUB CANDIDATES WITH EMAILS")
-        print(f"{'='*70}")
+        print(f"\n{'=' * 70}")
+        print("GITHUB CANDIDATES WITH EMAILS")
+        print(f"{'=' * 70}")
         print(f"Total candidates: {len(candidates)}\n")
 
         for i, candidate in enumerate(candidates[:15], 1):
@@ -681,8 +651,8 @@ class GitHubTalentScout:
                 print(f"   Bio: {bio}")
             print()
 
-    def export_results(self, candidates: List[Candidate], filename: str = None) -> str:
-        """Export results to JSON"""
+    def export_results(self, candidates: list[Candidate], filename: str = None) -> str:
+        """Export results to JSON."""
         if not filename:
             import time
 
@@ -728,8 +698,8 @@ async def lifespan(app: FastAPI):
     print("AGENT SYSTEM INITIALIZED")
     print("=" * 70)
     print(f"✓ Discovered {len(registry.get_all_agents())} agents")
-    print(f"✓ Health monitoring started")
-    print(f"✓ Agent API endpoints available at /agents/*")
+    print("✓ Health monitoring started")
+    print("✓ Agent API endpoints available at /agents/*")
     print("=" * 70 + "\n")
 
     yield
@@ -757,17 +727,13 @@ async def get_finder() -> GitHubTalentScout:
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
+    """Health check endpoint."""
     return {"status": "healthy", "service": "Talent Scout Service"}
 
 
 @app.post("/search", response_model=SearchResponse)
-async def search_candidates(
-    request: SearchRequest, finder: GitHubTalentScout = Depends(get_finder)
-):
-    """
-    Search for GitHub candidates based on natural language query
-    """
+async def search_candidates(request: SearchRequest, finder: GitHubTalentScout = Depends(get_finder)):
+    """Search for GitHub candidates based on natural language query."""
     try:
         # Search for candidates
         candidates = await finder.search_github_candidates(
@@ -794,12 +760,8 @@ async def search_candidates(
 
 
 @app.post("/handoff", response_model=HandoffPayload)
-async def create_handoff(
-    search_criteria: SearchCriteria, finder: GitHubTalentScout = Depends(get_finder)
-):
-    """
-    Create interview handoff payload for Agent-to-Interview process
-    """
+async def create_handoff(search_criteria: SearchCriteria, finder: GitHubTalentScout = Depends(get_finder)):
+    """Create interview handoff payload for Agent-to-Interview process."""
     try:
         # Convert search criteria to GitHub search query
         query_parts = [search_criteria.jobTitle]
@@ -830,11 +792,8 @@ async def create_handoff(
         raise HTTPException(status_code=500, detail=f"Handoff creation failed: {str(e)}")
 
 
-async def transform_to_candidate_profile(
-    candidate: Candidate, search_criteria: SearchCriteria
-) -> CandidateProfile:
-    """Transform GitHub candidate data to CandidateProfile format"""
-
+async def transform_to_candidate_profile(candidate: Candidate, search_criteria: SearchCriteria) -> CandidateProfile:
+    """Transform GitHub candidate data to CandidateProfile format."""
     # Extract work experience from LinkedIn data if available
     work_experience = []
     if candidate.linkedin_experience:
@@ -879,7 +838,7 @@ async def transform_to_candidate_profile(
         text_sources.append(candidate.linkedin_summary.lower())
 
     def skill_matches(skill_name: str) -> bool:
-        """Check if a skill matches in candidate data"""
+        """Check if a skill matches in candidate data."""
         skill_lower = skill_name.lower()
 
         # Direct match in skills
@@ -892,11 +851,7 @@ async def transform_to_candidate_profile(
                 return True
 
         # Check in text sources
-        for text in text_sources:
-            if skill_lower in text:
-                return True
-
-        return False
+        return any(skill_lower in text for text in text_sources)
 
     # Check required skills
     for skill in search_criteria.requiredSkills:
@@ -920,9 +875,7 @@ async def transform_to_candidate_profile(
         summary += f"\n\n{candidate.linkedin_summary}"
 
     # Calculate alignment score based on matched skills
-    total_criteria_skills = len(search_criteria.requiredSkills) + len(
-        search_criteria.niceToHaveSkills
-    )
+    total_criteria_skills = len(search_criteria.requiredSkills) + len(search_criteria.niceToHaveSkills)
     if total_criteria_skills > 0:
         alignment_score = len(matched_skills) / total_criteria_skills
     else:
@@ -948,7 +901,7 @@ async def transform_to_candidate_profile(
 
 # Keep the CLI version for backward compatibility
 async def main():
-    """Main function with user input"""
+    """Main function with user input."""
     print("=" * 70)
     print("GITHUB CANDIDATE FINDER - AI-Powered Query Formatting")
     print("Using Ollama Llama 3.1 for intelligent query conversion")
@@ -977,12 +930,12 @@ async def main():
     use_ai = input("\nUse AI query formatting? (Y/n): ").strip().lower()
     use_ai_formatting = use_ai != "n"
 
-    print(f"\n{'='*70}")
-    print(f"Search Configuration:")
+    print(f"\n{'=' * 70}")
+    print("Search Configuration:")
     print(f"  Query: {user_query}")
     print(f"  Location: {location}")
     print(f"  AI Formatting: {'Enabled' if use_ai_formatting else 'Disabled'}")
-    print(f"{'='*70}\n")
+    print(f"{'=' * 70}\n")
 
     # Initialize finder
     finder = GitHubCandidateFinder()
@@ -1003,15 +956,15 @@ async def main():
         if candidates:
             finder.export_results(candidates)
 
-            print(f"\n{'='*70}")
+            print(f"\n{'=' * 70}")
             print("SEARCH SUMMARY")
-            print(f"{'='*70}")
+            print(f"{'=' * 70}")
             print(f"Total candidates found: {len(candidates)}")
             print(f"With LinkedIn: {sum(1 for c in candidates if c.linkedin_url)}")
             print(
                 f"With social links: {sum(1 for c in candidates if c.linkedin_url or c.twitter_url or c.website_url)}"
             )
-            print(f"{'='*70}\n")
+            print(f"{'=' * 70}\n")
     except Exception as e:
         print(f"[ERROR] Search failed: {str(e)}")
         import traceback
@@ -1025,10 +978,9 @@ async def main():
 # Agent Integration (New - December 13, 2025)
 # ============================
 
-from agent_registry import AgentRegistry, AgentStatus, get_agent_registry
 from agent_health import HealthMonitor, HealthReport
-from agent_routes import AgentRouter, AgentRequest, AgentResponse, MultiAgentResponse
-import os
+from agent_registry import AgentStatus, get_agent_registry
+from agent_routes import AgentRequest, AgentResponse, AgentRouter, MultiAgentResponse
 
 # ============================
 # Agent API Endpoints
@@ -1036,9 +988,8 @@ import os
 
 
 @app.get("/agents/registry")
-async def get_agents_registry(capability: Optional[str] = None, status: Optional[str] = None):
-    """
-    Get agent registry with optional filtering
+async def get_agents_registry(capability: str | None = None, status: str | None = None):
+    """Get agent registry with optional filtering.
 
     Query Parameters:
     - capability: Filter agents by capability (e.g., 'search', 'enrichment')
@@ -1071,8 +1022,7 @@ async def get_agents_registry(capability: Optional[str] = None, status: Optional
 
 @app.get("/agents/health")
 async def get_agents_health() -> HealthReport:
-    """
-    Get comprehensive health report for all agents
+    """Get comprehensive health report for all agents.
 
     Returns overall system health and individual agent statuses
     """
@@ -1087,7 +1037,7 @@ async def get_agents_health() -> HealthReport:
 
 @app.get("/agents/{agent_name}")
 async def get_agent_info(agent_name: str):
-    """Get detailed information about a specific agent"""
+    """Get detailed information about a specific agent."""
     try:
         registry = app.state.agent_registry
         agent = registry.get_agent(agent_name)
@@ -1105,8 +1055,7 @@ async def get_agent_info(agent_name: str):
 
 @app.post("/agents/call")
 async def call_agent_endpoint(request: AgentRequest) -> AgentResponse:
-    """
-    Call an agent endpoint directly
+    """Call an agent endpoint directly.
 
     Request body:
     - agent_name: Name of the target agent
@@ -1138,9 +1087,8 @@ async def call_agent_endpoint(request: AgentRequest) -> AgentResponse:
 
 
 @app.post("/agents/search-multi")
-async def search_across_agents(request: SearchRequest) -> Dict[str, Any]:
-    """
-    Execute search across all search-capable agents
+async def search_across_agents(request: SearchRequest) -> dict[str, Any]:
+    """Execute search across all search-capable agents.
 
     Queries multiple agents in parallel and aggregates results
     """
@@ -1159,10 +1107,9 @@ async def search_across_agents(request: SearchRequest) -> Dict[str, Any]:
 
 @app.post("/agents/capability/{capability}")
 async def route_by_capability(
-    capability: str, endpoint: str, method: str = "POST", payload: Optional[Dict] = None
+    capability: str, endpoint: str, method: str = "POST", payload: dict | None = None
 ) -> MultiAgentResponse:
-    """
-    Route request to all agents with specific capability
+    """Route request to all agents with specific capability.
 
     Path Parameters:
     - capability: Required capability (e.g., 'search', 'enrichment')
@@ -1195,11 +1142,8 @@ async def route_by_capability(
 
 
 @app.post("/search/multi-agent")
-async def search_multi_agent(
-    request: SearchRequest, finder: GitHubTalentScout = Depends(get_finder)
-) -> Dict[str, Any]:
-    """
-    Enhanced search using multiple agents
+async def search_multi_agent(request: SearchRequest, finder: GitHubTalentScout = Depends(get_finder)) -> dict[str, Any]:
+    """Enhanced search using multiple agents.
 
     This endpoint:
     1. Performs GitHub search directly (scout-service)
@@ -1242,8 +1186,7 @@ async def search_multi_agent(
 
         return SearchResponse(
             candidates=[
-                CandidateResponse(**c) if isinstance(c, dict) else c
-                for c in combined_candidates[: request.max_results]
+                CandidateResponse(**c) if isinstance(c, dict) else c for c in combined_candidates[: request.max_results]
             ],
             total_found=len(combined_candidates),
             search_query=request.query,
@@ -1261,9 +1204,7 @@ async def search_multi_agent(
 
 @app.get("/health/full")
 async def full_system_health():
-    """
-    Get comprehensive system health including all agents
-    """
+    """Get comprehensive system health including all agents."""
     try:
         monitor = app.state.health_monitor
         registry = app.state.agent_registry
@@ -1296,9 +1237,7 @@ async def full_system_health():
                     "status": agent.status,
                     "port": agent.port,
                     "capabilities": agent.capabilities,
-                    "last_check": agent.last_health_check.isoformat()
-                    if agent.last_health_check
-                    else None,
+                    "last_check": agent.last_health_check.isoformat() if agent.last_health_check else None,
                 }
                 for agent in health_report.agents
             ],

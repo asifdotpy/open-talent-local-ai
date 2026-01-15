@@ -1,15 +1,13 @@
-"""
-Database service for persistent conversation storage.
+"""Database service for persistent conversation storage.
 Supports SQLite (development) and PostgreSQL (production).
 """
 
 import json
-import os
 import logging
-from typing import Dict, Any, Optional, List
+import os
 from datetime import datetime
 from pathlib import Path
-import asyncio
+from typing import Any
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -36,7 +34,6 @@ class DatabaseService:
 
     def _initialize_database(self):
         """Initialize database connection and create tables."""
-
         if self.db_type == "sqlite":
             self._initialize_sqlite()
         elif self.db_type == "postgresql":
@@ -76,7 +73,6 @@ class DatabaseService:
 
     def _create_tables_sqlite(self):
         """Create SQLite tables for conversation storage."""
-
         cursor = self.connection.cursor()
 
         # Conversations table
@@ -129,7 +125,6 @@ class DatabaseService:
 
     def _create_tables_postgresql(self):
         """Create PostgreSQL tables for conversation storage."""
-
         cursor = self.connection.cursor()
 
         # Conversations table
@@ -180,9 +175,8 @@ class DatabaseService:
         self.connection.commit()
         logger.info("PostgreSQL tables created successfully")
 
-    def save_conversation(self, conversation: Dict[str, Any]) -> bool:
+    def save_conversation(self, conversation: dict[str, Any]) -> bool:
         """Save or update a conversation record."""
-
         if not self.use_database:
             return False
 
@@ -274,12 +268,11 @@ class DatabaseService:
         message_type: str,
         content: str,
         speaker: str = "ai",
-        confidence: Optional[float] = None,
-        metadata: Optional[Dict[str, Any]] = None,
-        timestamp: Optional[datetime] = None,
+        confidence: float | None = None,
+        metadata: dict[str, Any] | None = None,
+        timestamp: datetime | None = None,
     ) -> bool:
         """Save a message to the database."""
-
         if not self.use_database:
             return False
 
@@ -333,9 +326,8 @@ class DatabaseService:
             self.connection.rollback()
             return False
 
-    def get_conversation(self, conversation_id: str) -> Optional[Dict[str, Any]]:
+    def get_conversation(self, conversation_id: str) -> dict[str, Any] | None:
         """Retrieve a conversation by ID."""
-
         if not self.use_database:
             return None
 
@@ -343,13 +335,9 @@ class DatabaseService:
             cursor = self.connection.cursor()
 
             if self.db_type == "sqlite":
-                cursor.execute(
-                    "SELECT * FROM conversations WHERE conversation_id = ?", (conversation_id,)
-                )
+                cursor.execute("SELECT * FROM conversations WHERE conversation_id = ?", (conversation_id,))
             else:
-                cursor.execute(
-                    "SELECT * FROM conversations WHERE conversation_id = %s", (conversation_id,)
-                )
+                cursor.execute("SELECT * FROM conversations WHERE conversation_id = %s", (conversation_id,))
 
             row = cursor.fetchone()
             if row:
@@ -360,9 +348,8 @@ class DatabaseService:
             logger.error(f"Error retrieving conversation: {e}")
             return None
 
-    def get_messages(self, conversation_id: str, limit: int = 100) -> List[Dict[str, Any]]:
+    def get_messages(self, conversation_id: str, limit: int = 100) -> list[dict[str, Any]]:
         """Retrieve messages for a conversation."""
-
         if not self.use_database:
             return []
 
@@ -397,9 +384,8 @@ class DatabaseService:
             logger.error(f"Error retrieving messages: {e}")
             return []
 
-    def get_conversation_by_session(self, session_id: str) -> Optional[Dict[str, Any]]:
+    def get_conversation_by_session(self, session_id: str) -> dict[str, Any] | None:
         """Retrieve a conversation by session ID."""
-
         if not self.use_database:
             return None
 

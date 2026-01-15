@@ -1,5 +1,5 @@
 """Piper Text-to-Speech Service
-High-quality, local TTS with phoneme extraction for lip-sync
+High-quality, local TTS with phoneme extraction for lip-sync.
 """
 
 import json
@@ -14,7 +14,7 @@ from .phoneme_extractor import PhonemeExtractor
 
 
 class PiperTTSService:
-    """Local Text-to-Speech service using Piper (VITS-based)
+    """Local Text-to-Speech service using Piper (VITS-based).
 
     Features:
     - MOS 4.1-4.3 quality (human-like speech)
@@ -90,8 +90,7 @@ class PiperTTSService:
                 self.logger.warning("Piper binary not responding correctly")
         except FileNotFoundError:
             self.logger.error(
-                f"Piper binary not found: {self.piper_binary}\n"
-                "Install Piper from: https://github.com/rhasspy/piper"
+                f"Piper binary not found: {self.piper_binary}\nInstall Piper from: https://github.com/rhasspy/piper"
             )
         except Exception as e:
             self.logger.error(f"Error checking Piper availability: {e}")
@@ -211,8 +210,7 @@ class PiperTTSService:
             }
 
             self.logger.info(
-                f"Synthesized {duration:.2f}s audio: '{text[:50]}...' "
-                f"({len(phonemes)} phonemes, {len(words)} words)"
+                f"Synthesized {duration:.2f}s audio: '{text[:50]}...' ({len(phonemes)} phonemes, {len(words)} words)"
             )
 
             return synthesis_result
@@ -221,9 +219,7 @@ class PiperTTSService:
             self.logger.error(f"Speech synthesis failed: {e}")
             raise
 
-    def synthesize_streaming(
-        self, text: str, chunk_size: int = 4096, voice: str = "lessac"
-    ) -> list[bytes]:
+    def synthesize_streaming(self, text: str, chunk_size: int = 4096, voice: str = "lessac") -> list[bytes]:
         """Synthesize speech in chunks for streaming.
 
         Args:
@@ -247,9 +243,7 @@ class PiperTTSService:
                 audio_bytes = audio_int16.tobytes()
 
                 # Split into chunks
-                chunks = [
-                    audio_bytes[i : i + chunk_size] for i in range(0, len(audio_bytes), chunk_size)
-                ]
+                chunks = [audio_bytes[i : i + chunk_size] for i in range(0, len(audio_bytes), chunk_size)]
 
                 self.logger.info(f"Generated {len(chunks)} audio chunks")
                 return chunks

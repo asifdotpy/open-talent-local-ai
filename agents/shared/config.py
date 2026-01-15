@@ -3,8 +3,6 @@ Shared configuration for OpenTalent agents.
 Manages environment variables and service URLs.
 """
 
-from typing import Optional
-
 from pydantic import Field
 from pydantic_settings import BaseSettings
 
@@ -30,7 +28,7 @@ class AgentConfig(BaseSettings):
     # Neo4j Vector Database Configuration
     neo4j_uri: str = Field(default="neo4j+s://4b63e239.databases.neo4j.io", env="NEO4J_URI")
     neo4j_username: str = Field(default="neo4j", env="NEO4J_USERNAME")
-    neo4j_password: Optional[str] = Field(default=None, env="NEO4J_PASSWORD")
+    neo4j_password: str | None = Field(default=None, env="NEO4J_PASSWORD")
     neo4j_database: str = Field(default="neo4j", env="NEO4J_DATABASE")
 
     # Microservice URLs
@@ -51,10 +49,10 @@ class AgentConfig(BaseSettings):
     scout_port: int = Field(default=8090, env="SCOUT_PORT")
 
     # API Keys
-    google_genai_api_key: Optional[str] = Field(default=None, env="GOOGLE_GENAI_API_KEY")
-    contactout_api_key: Optional[str] = Field(default=None, env="CONTACTOUT_API_KEY")
-    salesql_api_key: Optional[str] = Field(default=None, env="SALESQL_API_KEY")
-    github_token: Optional[str] = Field(default=None, env="GITHUB_TOKEN")
+    google_genai_api_key: str | None = Field(default=None, env="GOOGLE_GENAI_API_KEY")
+    contactout_api_key: str | None = Field(default=None, env="CONTACTOUT_API_KEY")
+    salesql_api_key: str | None = Field(default=None, env="SALESQL_API_KEY")
+    github_token: str | None = Field(default=None, env="GITHUB_TOKEN")
 
     # Service Timeouts (seconds)
     default_timeout: float = 30.0

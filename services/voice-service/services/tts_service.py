@@ -5,11 +5,10 @@ from loguru import logger
 
 
 class PiperTTSService:
-    """Piper TTS Service - Local, Fast, High-Quality Text-to-Speech
-    """
+    """Piper TTS Service - Local, Fast, High-Quality Text-to-Speech."""
 
     def __init__(self, piper_path: str, model_path: str):
-        """Initialize Piper TTS
+        """Initialize Piper TTS.
 
         Args:
             piper_path: Path to piper executable
@@ -23,7 +22,7 @@ class PiperTTSService:
         logger.info(f"  Model path: {self.model_path}")
 
     def check_installation(self) -> bool:
-        """Check if Piper is installed and model is available"""
+        """Check if Piper is installed and model is available."""
         try:
             # Check if piper executable exists
             result = subprocess.run(
@@ -58,7 +57,7 @@ class PiperTTSService:
             return False
 
     def synthesize(self, text: str, output_file: str = "tts_output.wav") -> str | None:
-        """Synthesize speech from text
+        """Synthesize speech from text.
 
         Args:
             text: Text to synthesize

@@ -9,7 +9,7 @@ import os
 import sys
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -31,8 +31,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-message_bus: Optional[MessageBus] = None
-service_clients: Optional[ServiceClients] = None
+message_bus: MessageBus | None = None
+service_clients: ServiceClients | None = None
 config = get_config()
 
 
@@ -204,8 +204,8 @@ async def detect_bias(candidate_data: dict[str, Any]) -> list[str]:
     bias_flags = []
 
     # Check for common bias indicators
-    name = candidate_data.get("name", "")
-    location = candidate_data.get("location", "")
+    candidate_data.get("name", "")
+    candidate_data.get("location", "")
 
     # Gender bias check (simplified)
     # In production, use sophisticated NLP models
@@ -218,7 +218,7 @@ async def detect_bias(candidate_data: dict[str, Any]) -> list[str]:
 
     # University bias check
     if "education" in candidate_data:
-        education = candidate_data["education"]
+        candidate_data["education"]
         # Check if only considering elite universities
 
     return bias_flags

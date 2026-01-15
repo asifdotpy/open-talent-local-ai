@@ -9,12 +9,11 @@ Tests verify:
 - Error handling
 """
 
-import pytest
-from httpx import AsyncClient
-from unittest.mock import patch, AsyncMock
+from unittest.mock import patch
 from uuid import uuid4
 
-from app.utils import JWTClaims
+import pytest
+from httpx import AsyncClient
 
 
 @pytest.mark.integration

@@ -1,6 +1,7 @@
 # tests/shared/test_utils.py
 import time
-from typing import Dict, Any, Optional
+from typing import Any
+
 import pytest
 
 
@@ -8,7 +9,7 @@ class TestHelper:
     """Simple test helper for the platform"""
 
     def __init__(self):
-        self.test_data: Dict[str, Any] = {}
+        self.test_data: dict[str, Any] = {}
 
     def set_test_data(self, key: str, value: Any) -> None:
         """Store test data"""
@@ -28,16 +29,14 @@ class TestHelper:
 
 def assert_response_status(response, expected_status: int) -> None:
     """Assert HTTP response status"""
-    assert response.status_code == expected_status, f"Expected {expected_status}, got {response.status_code}"
+    assert response.status_code == expected_status, (
+        f"Expected {expected_status}, got {response.status_code}"
+    )
 
 
-def create_mock_service_response(data: Dict[str, Any]) -> Dict[str, Any]:
+def create_mock_service_response(data: dict[str, Any]) -> dict[str, Any]:
     """Create a mock service response"""
-    return {
-        "status": "success",
-        "data": data,
-        "timestamp": time.time()
-    }
+    return {"status": "success", "data": data, "timestamp": time.time()}
 
 
 # Test fixtures
@@ -47,8 +46,9 @@ def sample_user():
         "id": "user-123",
         "email": "test@example.com",
         "role": "recruiter",
-        "permissions": ["read", "write"]
+        "permissions": ["read", "write"],
     }
+
 
 @pytest.fixture
 def mock_candidate_profile():
@@ -56,8 +56,9 @@ def mock_candidate_profile():
         "id": "candidate-456",
         "name": "John Doe",
         "skills": ["Python", "React", "AWS"],
-        "experience_years": 5
+        "experience_years": 5,
     }
+
 
 @pytest.fixture
 def mock_job_requirement():
@@ -65,7 +66,7 @@ def mock_job_requirement():
         "id": "job-789",
         "title": "Senior Software Engineer",
         "required_skills": ["Python", "React", "AWS"],
-        "experience_level": "Senior"
+        "experience_level": "Senior",
     }
 
 

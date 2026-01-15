@@ -1,5 +1,3 @@
-
-
 class TestVoiceStrengthened:
     def test_service_info_extended(self, client):
         response = client.get("/info")

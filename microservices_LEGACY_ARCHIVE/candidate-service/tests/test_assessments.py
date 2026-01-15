@@ -1,4 +1,5 @@
 import uuid
+
 from fastapi.testclient import TestClient
 
 from main import app
@@ -45,17 +46,13 @@ def test_assessment_crud_happy_path():
 
     # Update assessment with score and status
     upd = {"status": "completed", "score": 85.5}
-    r5 = client.put(
-        f"/api/v1/candidates/{candidate_id}/assessments/{assessment_id}", json=upd, headers=AUTH
-    )
+    r5 = client.put(f"/api/v1/candidates/{candidate_id}/assessments/{assessment_id}", json=upd, headers=AUTH)
     assert r5.status_code == 200
     assert r5.json()["status"] == "completed"
     assert r5.json()["score"] == 85.5
 
     # Delete assessment
-    r6 = client.delete(
-        f"/api/v1/candidates/{candidate_id}/assessments/{assessment_id}", headers=AUTH
-    )
+    r6 = client.delete(f"/api/v1/candidates/{candidate_id}/assessments/{assessment_id}", headers=AUTH)
     assert r6.status_code == 204
 
 
@@ -73,9 +70,7 @@ def test_assessment_unauthorized_and_not_found():
 
     # Get assessment with unknown ID
     unknown_assessment = str(uuid.uuid4())
-    r3 = client.get(
-        f"/api/v1/candidates/{candidate_id}/assessments/{unknown_assessment}", headers=AUTH
-    )
+    r3 = client.get(f"/api/v1/candidates/{candidate_id}/assessments/{unknown_assessment}", headers=AUTH)
     assert r3.status_code == 404
 
     # List for unknown candidate

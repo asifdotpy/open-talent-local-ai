@@ -21,31 +21,31 @@ Requirements:
 Created: November 11, 2025
 """
 
+import argparse
 import subprocess
 import sys
-import argparse
-import os
-from pathlib import Path
 import time
+from pathlib import Path
 
 
 class Colors:
     """ANSI color codes for terminal output."""
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
+
+    HEADER = "\033[95m"
+    OKBLUE = "\033[94m"
+    OKCYAN = "\033[96m"
+    OKGREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[91m"
+    ENDC = "\033[0m"
+    BOLD = "\033[1m"
 
 
 def print_header(text):
     """Print formatted header."""
-    print(f"\n{Colors.HEADER}{Colors.BOLD}{'='*80}{Colors.ENDC}")
+    print(f"\n{Colors.HEADER}{Colors.BOLD}{'=' * 80}{Colors.ENDC}")
     print(f"{Colors.HEADER}{Colors.BOLD}{text:^80}{Colors.ENDC}")
-    print(f"{Colors.HEADER}{Colors.BOLD}{'='*80}{Colors.ENDC}\n")
+    print(f"{Colors.HEADER}{Colors.BOLD}{'=' * 80}{Colors.ENDC}\n")
 
 
 def print_success(text):
@@ -75,7 +75,7 @@ def check_services():
     services = {
         "Voice Service": "http://localhost:8002/health",
         "Avatar Service": "http://localhost:8001/health",
-        "Avatar Renderer": "http://localhost:3001/health"
+        "Avatar Renderer": "http://localhost:3001/health",
     }
 
     all_running = True
@@ -97,11 +97,15 @@ def check_services():
     if not all_running:
         print_warning("\nSome services are not running. Some tests may fail.")
         print_info("Start services with:")
-        print_info("  Voice service: cd microservices/voice-service && source .venv/bin/activate && python main.py")
-        print_info("  Avatar service: cd microservices/avatar-service && source venv/bin/activate && python main.py")
+        print_info(
+            "  Voice service: cd microservices/voice-service && source .venv/bin/activate && python main.py"
+        )
+        print_info(
+            "  Avatar service: cd microservices/avatar-service && source venv/bin/activate && python main.py"
+        )
         print_info("  Avatar renderer: cd ai-orchestra-simulation && node avatar-renderer-v2.js")
         response = input("\nContinue anyway? [y/N]: ")
-        if response.lower() != 'y':
+        if response.lower() != "y":
             sys.exit(1)
 
     return all_running
@@ -130,11 +134,7 @@ def run_tests(test_type, verbose=False, markers=None):
     else:
         cmd.append("-q")
 
-    cmd.extend([
-        "--tb=short",
-        "--color=yes",
-        f"--rootdir={project_root}"
-    ])
+    cmd.extend(["--tb=short", "--color=yes", f"--rootdir={project_root}"])
 
     # Add markers if specified
     if markers:
@@ -142,12 +142,14 @@ def run_tests(test_type, verbose=False, markers=None):
 
     # Add coverage if running all tests
     if test_type == "all":
-        cmd.extend([
-            "--cov=microservices/voice-service",
-            "--cov=microservices/avatar-service",
-            "--cov-report=term-missing",
-            "--cov-report=html"
-        ])
+        cmd.extend(
+            [
+                "--cov=microservices/voice-service",
+                "--cov=microservices/avatar-service",
+                "--cov-report=term-missing",
+                "--cov-report=html",
+            ]
+        )
 
     print_info(f"Running: {' '.join(cmd)}\n")
 
@@ -174,45 +176,24 @@ Examples:
   python run_avatar_tests.py --quick            # Quick tests only
   python run_avatar_tests.py --verbose          # Verbose output
   python run_avatar_tests.py --no-service-check # Skip service check
-        """
+        """,
     )
 
-    parser.add_argument(
-        "--unit",
-        action="store_true",
-        help="Run only unit tests"
-    )
+    parser.add_argument("--unit", action="store_true", help="Run only unit tests")
+
+    parser.add_argument("--integration", action="store_true", help="Run only integration tests")
 
     parser.add_argument(
-        "--integration",
-        action="store_true",
-        help="Run only integration tests"
+        "--quick", action="store_true", help="Run only quick tests (exclude slow tests)"
     )
 
-    parser.add_argument(
-        "--quick",
-        action="store_true",
-        help="Run only quick tests (exclude slow tests)"
-    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
 
     parser.add_argument(
-        "--verbose",
-        "-v",
-        action="store_true",
-        help="Verbose output"
+        "--no-service-check", action="store_true", help="Skip service availability check"
     )
 
-    parser.add_argument(
-        "--no-service-check",
-        action="store_true",
-        help="Skip service availability check"
-    )
-
-    parser.add_argument(
-        "--path",
-        type=str,
-        help="Run tests from specific path"
-    )
+    parser.add_argument("--path", type=str, help="Run tests from specific path")
 
     args = parser.parse_args()
 

@@ -1,11 +1,10 @@
-"""
-Voice Activity Detection (VAD) service for optimized STT processing.
+"""Voice Activity Detection (VAD) service for optimized STT processing.
 Reduces unnecessary transcription during silence using webrtcvad.
 """
 
 import logging
 import os
-from typing import Optional
+
 import numpy as np
 
 # Configure logging
@@ -57,8 +56,7 @@ class VoiceActivityDetector:
             self.use_vad = False
 
     def is_speech(self, audio_chunk: bytes) -> bool:
-        """
-        Detect if audio chunk contains speech.
+        """Detect if audio chunk contains speech.
 
         Args:
             audio_chunk: Raw PCM audio bytes (16-bit signed integers)
@@ -101,8 +99,7 @@ class VoiceActivityDetector:
             return True
 
     def is_speech_numpy(self, audio_array: np.ndarray) -> bool:
-        """
-        Detect speech from numpy array.
+        """Detect speech from numpy array.
 
         Args:
             audio_array: Numpy array of audio samples (float32 or int16)
@@ -115,7 +112,7 @@ class VoiceActivityDetector:
 
         try:
             # Convert to 16-bit PCM bytes
-            if audio_array.dtype == np.float32 or audio_array.dtype == np.float64:
+            if audio_array.dtype in (np.float32, np.float64):
                 # Convert float to int16
                 audio_array = (audio_array * 32767).astype(np.int16)
             elif audio_array.dtype != np.int16:
@@ -157,8 +154,7 @@ class VoiceActivityDetector:
         }
 
     def set_aggressiveness(self, level: int):
-        """
-        Adjust VAD aggressiveness level.
+        """Adjust VAD aggressiveness level.
 
         Args:
             level: 0-3 (0 = least aggressive, 3 = most aggressive)

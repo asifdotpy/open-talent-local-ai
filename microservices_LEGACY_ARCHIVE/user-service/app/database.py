@@ -1,7 +1,6 @@
-from typing import Optional
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
-from sqlalchemy import text
 
 from .config import settings
 
@@ -16,9 +15,9 @@ async def get_session() -> AsyncSession:
 
 
 async def get_session_with_rls(
-    user_email: Optional[str] = None,
-    user_role: Optional[str] = None,
-    tenant_id: Optional[str] = None,
+    user_email: str | None = None,
+    user_role: str | None = None,
+    tenant_id: str | None = None,
 ) -> AsyncSession:
     """
     Get database session with RLS (Row-Level Security) context.

@@ -4,35 +4,31 @@
 import asyncio
 import json
 import logging
-import tempfile
-import wave
-import struct
-from typing import Optional, Dict
-from pathlib import Path
-from fractions import Fraction
-from aiortc import (
-    RTCPeerConnection,
-    MediaStreamTrack,
-    RTCSessionDescription,
-    RTCIceCandidate,
-    RTCConfiguration,
-    RTCIceServer,
-)
-from aiortc.contrib.media import MediaBlackhole, MediaPlayer, MediaRecorder, MediaStreamError
-from aiortc.codecs.opus import OpusEncoder
-from av import AudioFrame
-from fastapi import FastAPI, Body
-import aiohttp
 import os
-import numpy as np
+import tempfile
+from fractions import Fraction
+
+import aiohttp
 import httpx
+import numpy as np
+from aiortc import (
+    MediaStreamTrack,
+    RTCConfiguration,
+    RTCIceCandidate,
+    RTCPeerConnection,
+    RTCSessionDescription,
+)
+from aiortc.codecs.opus import OpusEncoder
+from aiortc.contrib.media import MediaBlackhole, MediaStreamError
+from av import AudioFrame
+from fastapi import Body, FastAPI
 
 # Import voice services
 try:
-    from services.vosk_stt_service import VoskSTTService
+    from services.audio_processing_service import RNNoiseTrack
     from services.piper_tts_service import PiperTTSService
     from services.silero_vad_service import SileroVADService
-    from services.audio_processing_service import RNNoiseTrack
+    from services.vosk_stt_service import VoskSTTService
 
     STT_TTS_AVAILABLE = True
 except ImportError:
@@ -90,21 +86,19 @@ else:
     logger.warning("Running in mock mode or services not available")
 
 # Active peer connections by session_id
-active_connections: Dict[str, RTCPeerConnection] = {}
-active_workers: Dict[str, "VoiceServiceWorker"] = {}
+active_connections: dict[str, RTCPeerConnection] = {}
+active_workers: dict[str, "VoiceServiceWorker"] = {}
 
 
 class ConversationClient:
-    """Client for communicating with the conversation service"""
+    """Client for communicating with the conversation service."""
 
     def __init__(self, base_url: str = CONVERSATION_SERVICE_URL):
         self.base_url = base_url
         self.client = httpx.AsyncClient(timeout=10.0)
 
-    async def send_transcript(
-        self, session_id: str, transcript: str, metadata: Optional[Dict] = None
-    ) -> Optional[Dict]:
-        """Send a transcript to the conversation service for processing"""
+    async def send_transcript(self, session_id: str, transcript: str, metadata: dict | None = None) -> dict | None:
+        """Send a transcript to the conversation service for processing."""
         try:
             response = await self.client.post(
                 f"{self.base_url}/conversation/message",
@@ -119,9 +113,7 @@ class ConversationClient:
             if response.status_code == 200:
                 return response.json()
             else:
-                logger.error(
-                    f"Conversation service error: {response.status_code} - {response.text}"
-                )
+                logger.error(f"Conversation service error: {response.status_code} - {response.text}")
                 return None
 
         except Exception as e:
@@ -129,7 +121,7 @@ class ConversationClient:
             return None
 
     async def start_conversation(self, session_id: str, job_description: str) -> bool:
-        """Start a conversation session"""
+        """Start a conversation session."""
         try:
             response = await self.client.post(
                 f"{self.base_url}/conversation/start",
@@ -148,12 +140,12 @@ class ConversationClient:
             return False
 
     async def close(self):
-        """Close the HTTP client"""
+        """Close the HTTP client."""
         await self.client.aclose()
 
 
 class InterviewServiceClient:
-    """Client for communicating with the interview service for live transcription"""
+    """Client for communicating with the interview service for live transcription."""
 
     def __init__(self, base_url: str = INTERVIEW_SERVICE_URL):
         self.base_url = base_url
@@ -169,9 +161,9 @@ class InterviewServiceClient:
         end_time: float,
         confidence: float,
         is_final: bool = False,
-        words: Optional[list] = None,
+        words: list | None = None,
     ) -> bool:
-        """Send transcription segment to interview service for live display"""
+        """Send transcription segment to interview service for live display."""
         try:
             segment_data = {
                 "text": text,
@@ -205,7 +197,7 @@ class InterviewServiceClient:
             return False
 
     async def close(self):
-        """Close the HTTP client"""
+        """Close the HTTP client."""
         await self.client.aclose()
 
 
@@ -215,9 +207,8 @@ interview_client = InterviewServiceClient()
 
 
 class EnhancedAudioPipeline(MediaStreamTrack):
-    """
-    Enhanced audio processing pipeline: RNNoise → Opus Encoder → AEC (future)
-    Provides optimized audio quality for WebRTC voice processing
+    """Enhanced audio processing pipeline: RNNoise → Opus Encoder → AEC (future)
+    Provides optimized audio quality for WebRTC voice processing.
     """
 
     kind = "audio"
@@ -237,9 +228,7 @@ class EnhancedAudioPipeline(MediaStreamTrack):
             self.opus_encoder.channels = self.channels
             self.opus_encoder.bitrate = OPUS_BITRATE
             self.opus_encoder.complexity = OPUS_COMPLEXITY
-            logger.info(
-                f"Opus encoder initialized: {OPUS_BITRATE}bps, complexity {OPUS_COMPLEXITY}"
-            )
+            logger.info(f"Opus encoder initialized: {OPUS_BITRATE}bps, complexity {OPUS_COMPLEXITY}")
         except Exception as e:
             logger.error(f"Failed to initialize Opus encoder: {e}")
             self.opus_encoder = None
@@ -253,7 +242,7 @@ class EnhancedAudioPipeline(MediaStreamTrack):
             logger.warning("RNNoise not available, using raw audio")
 
     async def recv(self):
-        """Process audio through enhanced pipeline: RNNoise → Opus → AEC"""
+        """Process audio through enhanced pipeline: RNNoise → Opus → AEC."""
         import time
 
         start_time = time.time()
@@ -305,9 +294,7 @@ class EnhancedAudioPipeline(MediaStreamTrack):
                     # Fallback to original audio
 
             # Create new frame with processed audio
-            new_frame = AudioFrame.from_ndarray(
-                audio_data.reshape(1, -1), format="flt", layout="mono"
-            )
+            new_frame = AudioFrame.from_ndarray(audio_data.reshape(1, -1), format="flt", layout="mono")
             new_frame.sample_rate = self.sample_rate
             new_frame.pts = self.pts_counter
             new_frame.time_base = Fraction(1, self.sample_rate)
@@ -329,7 +316,7 @@ class EnhancedAudioPipeline(MediaStreamTrack):
 
 
 class AudioStreamTrack(MediaStreamTrack):
-    """Audio track that processes incoming audio chunks for STT"""
+    """Audio track that processes incoming audio chunks for STT."""
 
     kind = "audio"
 
@@ -362,7 +349,7 @@ class AudioStreamTrack(MediaStreamTrack):
             stt_service.reset_recognizer()
 
     async def recv(self):
-        """Receive and process audio frame"""
+        """Receive and process audio frame."""
         try:
             frame = await self.track.recv()
 
@@ -394,7 +381,7 @@ class AudioStreamTrack(MediaStreamTrack):
             raise
 
     async def _process_stt_chunk(self, audio_chunk: bytes):
-        """Process audio chunk through STT and send results via DataChannel and to interview service"""
+        """Process audio chunk through STT and send results via DataChannel and to interview service."""
         if not stt_service or not self.datachannel:
             return
 
@@ -441,7 +428,7 @@ class AudioStreamTrack(MediaStreamTrack):
             logger.error(f"STT processing error: {e}")
 
     async def _send_to_conversation_service(self, stt_result: dict, current_time: float):
-        """Send final transcript to conversation service for adaptive response and to interview service for display"""
+        """Send final transcript to conversation service for adaptive response and to interview service for display."""
         try:
             # Send final transcription to interview service
             await self.interview_client.send_transcription_segment(
@@ -488,12 +475,12 @@ class AudioStreamTrack(MediaStreamTrack):
             logger.error(f"Failed to send transcript to services: {e}")
 
     async def _generate_tts_response(self, text: str):
-        """Generate TTS response for conversation service output"""
+        """Generate TTS response for conversation service output."""
         try:
             # Send TTS request to our own service
             async with httpx.AsyncClient() as client:
                 response = await client.post(
-                    f"http://localhost:8002/webrtc/tts",
+                    "http://localhost:8002/webrtc/tts",
                     json={"session_id": self.session_id, "text": text},
                     timeout=5.0,
                 )
@@ -508,7 +495,7 @@ class AudioStreamTrack(MediaStreamTrack):
 
 
 class TTSAudioTrack(MediaStreamTrack):
-    """Generate audio track from TTS synthesis"""
+    """Generate audio track from TTS synthesis."""
 
     kind = "audio"
 
@@ -524,7 +511,7 @@ class TTSAudioTrack(MediaStreamTrack):
         asyncio.create_task(self._generate_audio(text))
 
     async def _generate_audio(self, text: str):
-        """Generate audio using Piper TTS"""
+        """Generate audio using Piper TTS."""
         if not tts_service:
             logger.warning("TTS service not available")
             return
@@ -537,7 +524,7 @@ class TTSAudioTrack(MediaStreamTrack):
                 output_path = tmp.name
 
             # Synthesize speech
-            result = tts_service.synthesize_speech(
+            tts_service.synthesize_speech(
                 text=text,
                 output_path=output_path,
                 extract_phonemes=False,  # Skip phonemes for speed
@@ -566,7 +553,7 @@ class TTSAudioTrack(MediaStreamTrack):
             self.generating = False
 
     async def recv(self):
-        """Send next audio frame"""
+        """Send next audio frame."""
         # Wait for generation to start
         while self.generating and len(self.audio_frames) == 0:
             await asyncio.sleep(0.01)
@@ -592,7 +579,7 @@ class TTSAudioTrack(MediaStreamTrack):
 
 
 class VoiceServiceWorker:
-    """WebRTC worker that connects to signaling server and handles voice processing"""
+    """WebRTC worker that connects to signaling server and handles voice processing."""
 
     def __init__(
         self,
@@ -605,13 +592,13 @@ class VoiceServiceWorker:
         self.room_id = room_id or session_id  # Use session_id as fallback
         self.participant_id = participant_id or "candidate"  # Default participant
         self.signaling_url = signaling_url
-        self.pc: Optional[RTCPeerConnection] = None
-        self.ws: Optional[aiohttp.ClientWebSocketResponse] = None
+        self.pc: RTCPeerConnection | None = None
+        self.ws: aiohttp.ClientWebSocketResponse | None = None
         self.datachannel = None
         self.recorder = MediaBlackhole()
 
     async def start(self):
-        """Connect to signaling server and initialize peer connection"""
+        """Connect to signaling server and initialize peer connection."""
         try:
             session = aiohttp.ClientSession()
             self.ws = await session.ws_connect(self.signaling_url)
@@ -650,7 +637,7 @@ class VoiceServiceWorker:
             await self.stop()
 
     def _setup_pc_handlers(self):
-        """Setup RTCPeerConnection event handlers"""
+        """Setup RTCPeerConnection event handlers."""
 
         @self.pc.on("track")
         async def on_track(track: MediaStreamTrack):
@@ -689,7 +676,7 @@ class VoiceServiceWorker:
                 )
 
     async def _signaling_loop(self):
-        """Handle incoming signaling messages"""
+        """Handle incoming signaling messages."""
         async for msg in self.ws:
             if msg.type == aiohttp.WSMsgType.TEXT:
                 data = json.loads(msg.data)
@@ -699,7 +686,7 @@ class VoiceServiceWorker:
                 break
 
     async def _handle_signaling_message(self, message: dict):
-        """Process signaling messages from interview-service"""
+        """Process signaling messages from interview-service."""
         msg_type = message.get("type")
 
         if msg_type == "offer":
@@ -726,7 +713,7 @@ class VoiceServiceWorker:
             await self.pc.addIceCandidate(candidate)
 
     async def send_tts_response(self, text: str):
-        """Generate TTS audio and add as outbound track"""
+        """Generate TTS audio and add as outbound track."""
         if not self.pc:
             logger.warning("Cannot send TTS: peer connection not active")
             return
@@ -744,7 +731,7 @@ class VoiceServiceWorker:
             logger.error(f"Failed to add TTS track: {e}")
 
     async def stop(self):
-        """Clean up resources"""
+        """Clean up resources."""
         if self.pc:
             await self.pc.close()
             active_connections.pop(self.session_id, None)
@@ -756,8 +743,7 @@ class VoiceServiceWorker:
 
 @app.post("/webrtc/start")
 async def start_session(payload: dict = Body(...)):
-    """
-    Start a new WebRTC session for voice processing.
+    """Start a new WebRTC session for voice processing.
     Called by interview-service when a new interview begins.
     """
     session_id = payload.get("session_id")
@@ -788,7 +774,7 @@ async def start_session(payload: dict = Body(...)):
 
 @app.post("/webrtc/stop")
 async def stop_session(payload: dict = Body(...)):
-    """Stop an active WebRTC session"""
+    """Stop an active WebRTC session."""
     session_id = payload.get("session_id")
 
     if session_id in active_connections:
@@ -802,8 +788,7 @@ async def stop_session(payload: dict = Body(...)):
 
 @app.post("/webrtc/tts")
 async def send_tts_audio(payload: dict = Body(...)):
-    """
-    Generate and send TTS audio to active session
+    """Generate and send TTS audio to active session.
 
     Args:
         session_id: Active session ID
@@ -818,7 +803,7 @@ async def send_tts_audio(payload: dict = Body(...)):
 
 @app.get("/webrtc/audio/stats")
 async def get_audio_pipeline_stats():
-    """Get audio pipeline performance statistics"""
+    """Get audio pipeline performance statistics."""
     return {
         "pipeline_stats": audio_pipeline_stats,
         "configuration": {
@@ -835,8 +820,7 @@ async def get_audio_pipeline_stats():
 
 @app.post("/webrtc/audio/benchmark")
 async def run_audio_benchmark(payload: dict = Body(...)):
-    """
-    Run audio pipeline benchmark test
+    """Run audio pipeline benchmark test.
 
     Args:
         duration_seconds: Test duration (default: 5)
@@ -887,9 +871,7 @@ async def run_audio_benchmark(payload: dict = Body(...)):
                     # Create AudioFrame
                     from av import AudioFrame
 
-                    frame = AudioFrame.from_ndarray(
-                        chunk.reshape(1, -1), format="flt", layout="mono"
-                    )
+                    frame = AudioFrame.from_ndarray(chunk.reshape(1, -1), format="flt", layout="mono")
                     frame.sample_rate = sample_rate
                     frame.pts = start_idx
                     frame.time_base = Fraction(1, sample_rate)
@@ -913,9 +895,7 @@ async def run_audio_benchmark(payload: dict = Body(...)):
 
                 # Calculate output SNR
                 output_signal_power = np.mean(rnnoise_output**2)
-                output_noise_power = np.mean(
-                    (rnnoise_output - clean_signal[: len(rnnoise_output)]) ** 2
-                )
+                output_noise_power = np.mean((rnnoise_output - clean_signal[: len(rnnoise_output)]) ** 2)
                 rnnoise_snr = 10 * np.log10(output_signal_power / output_noise_power)
 
         processing_time = time.time() - start_time
@@ -949,7 +929,7 @@ async def run_audio_benchmark(payload: dict = Body(...)):
 
 
 async def start_webrtc_worker():
-    """Start the WebRTC worker service"""
+    """Start the WebRTC worker service."""
     logger.info("Starting WebRTC worker service on port 8006")
     # The worker runs as a separate FastAPI app
     # This function is called from main.py to start the worker in background
@@ -958,7 +938,7 @@ async def start_webrtc_worker():
 
 @app.get("/webrtc/status")
 def get_status():
-    """Get status of all active sessions"""
+    """Get status of all active sessions."""
     return {"active_sessions": list(active_connections.keys()), "count": len(active_connections)}
 
 

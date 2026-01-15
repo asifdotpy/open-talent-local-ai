@@ -8,7 +8,7 @@ Purpose: Authentication, Authorization, Permissions, MFA, Encryption
 import importlib
 import os
 import time
-from typing import Dict, Any
+from typing import Any
 
 import httpx
 import pytest
@@ -53,19 +53,19 @@ async def async_client():
 
 
 @pytest.fixture
-def valid_credentials() -> Dict[str, Any]:
+def valid_credentials() -> dict[str, Any]:
     """Valid login credentials"""
     return {"email": "user@example.com", "password": "SecurePassword123!"}
 
 
 @pytest.fixture
-def invalid_credentials() -> Dict[str, Any]:
+def invalid_credentials() -> dict[str, Any]:
     """Invalid login credentials"""
     return {"email": "user@example.com", "password": "wrongpassword"}
 
 
 @pytest.fixture
-def new_user_data() -> Dict[str, Any]:
+def new_user_data() -> dict[str, Any]:
     """New user registration data with unique email"""
     timestamp = int(time.time() * 1000)
     return {

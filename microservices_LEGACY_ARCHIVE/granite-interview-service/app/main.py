@@ -9,7 +9,7 @@ import logging
 import os
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 import uvicorn
 from app.config.settings import Settings
@@ -94,8 +94,8 @@ class ModelInfo(BaseModel):
     size: str
     quantization: str
     status: str
-    loaded_at: Optional[datetime] = None
-    memory_usage: Optional[str] = None
+    loaded_at: datetime | None = None
+    memory_usage: str | None = None
 
 
 class LoadModelRequest(BaseModel):
@@ -159,7 +159,7 @@ class TrainingStatus(BaseModel):
     job_id: str
     status: str
     progress: float
-    eta: Optional[str] = None
+    eta: str | None = None
     current_epoch: int = 0
     total_epochs: int = 0
 

@@ -54,9 +54,7 @@ class TestInterviewManagement:
     def test_create_interview(
         self, test_client: TestClient, interview_data: dict, auth_headers: dict
     ):
-        response = test_client.post(
-            "/api/v1/interviews", json=interview_data, headers=auth_headers
-        )
+        response = test_client.post("/api/v1/interviews", json=interview_data, headers=auth_headers)
         # Loosened assertion to account for validation errors until tests are improved
         assert response.status_code in [200, 201, 422]
 
@@ -100,9 +98,7 @@ class TestInterviewFeedback:
         assert response.status_code in [200, 201, 404]
 
     def test_get_feedback(self, test_client: TestClient, auth_headers: dict):
-        response = test_client.get(
-            "/api/v1/interviews/123/feedback", headers=auth_headers
-        )
+        response = test_client.get("/api/v1/interviews/123/feedback", headers=auth_headers)
         assert response.status_code in [200, 404]
 
     def test_update_feedback(self, test_client: TestClient, auth_headers: dict):
@@ -118,9 +114,7 @@ class TestInterviewFeedback:
 @pytest.mark.skip(reason="Endpoints do not exist in app.main")
 class TestInterviewScheduling:
     def test_get_available_slots(self, test_client: TestClient, auth_headers: dict):
-        response = test_client.get(
-            "/api/v1/interviews/available-slots", headers=auth_headers
-        )
+        response = test_client.get("/api/v1/interviews/available-slots", headers=auth_headers)
         assert response.status_code in [200, 403]
 
     def test_schedule_interview(

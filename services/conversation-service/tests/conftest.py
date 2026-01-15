@@ -3,6 +3,7 @@
 Sets env flags to force mock LLM and disable DB writes, then exposes a
 FastAPI TestClient bound to the app for in-process testing.
 """
+
 import os
 
 import pytest

@@ -1,8 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.routes import users, system, interview, question_routes
-from app.core.config import settings
-
+from app.api.routes import interview, question_routes, system, users
 
 api_router = APIRouter()
 api_router.include_router(users.router, prefix="/users", tags=["Users"])

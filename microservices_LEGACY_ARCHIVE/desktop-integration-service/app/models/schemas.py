@@ -1,7 +1,7 @@
 """Pydantic models for request/response validation."""
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -43,9 +43,9 @@ class StartInterviewRequest(BaseModel):
 class InterviewResponseRequest(BaseModel):
     """Request to respond to interview question."""
 
-    sessionId: Optional[str] = Field(None, description="Session ID (optional)")
+    sessionId: str | None = Field(None, description="Session ID (optional)")
     message: str = Field(..., description="User's response message")
-    session: Optional[InterviewSession] = Field(
+    session: InterviewSession | None = Field(
         None, description="Full session (client can send entire session)"
     )
 
@@ -55,8 +55,8 @@ class ServiceHealth(BaseModel):
 
     name: str
     status: str  # "online" | "degraded" | "offline"
-    latencyMs: Optional[float] = None
-    error: Optional[str] = None
+    latencyMs: float | None = None
+    error: str | None = None
     lastChecked: datetime
 
 
@@ -78,8 +78,8 @@ class ModelInfo(BaseModel):
     ramRequired: str = Field(..., description="RAM required")
     downloadSize: str = Field(..., description="Download size")
     description: str = Field(..., description="Model description")
-    dataset: Optional[str] = Field(None, description="Training dataset")
-    source: Optional[str] = Field(None, description="Model source")
+    dataset: str | None = Field(None, description="Training dataset")
+    source: str | None = Field(None, description="Model source")
 
 
 class ModelsResponse(BaseModel):
@@ -93,7 +93,7 @@ class ErrorResponse(BaseModel):
 
     error: str = Field(..., description="Error message")
     timestamp: datetime
-    details: Optional[dict[str, Any]] = None
+    details: dict[str, Any] | None = None
 
 
 class SynthesizeSpeechRequest(BaseModel):
@@ -110,9 +110,9 @@ class SynthesizeSpeechRequest(BaseModel):
 class SynthesizeSpeechResponse(BaseModel):
     """Response with synthesized audio."""
 
-    audioUrl: Optional[str] = Field(None, description="URL to audio file")
-    audioBase64: Optional[str] = Field(None, description="Base64-encoded audio")
-    duration: Optional[float] = Field(None, description="Audio duration in seconds")
+    audioUrl: str | None = Field(None, description="URL to audio file")
+    audioBase64: str | None = Field(None, description="Base64-encoded audio")
+    duration: float | None = Field(None, description="Audio duration in seconds")
     format: str = Field("mp3", description="Audio format (mp3, wav, ogg)")
     text: str = Field(..., description="Text that was synthesized")
     voice: str = Field(..., description="Voice used")
@@ -122,7 +122,7 @@ class AnalyzeSentimentRequest(BaseModel):
     """Request to analyze sentiment of text."""
 
     text: str = Field(..., min_length=1, max_length=5000, description="Text to analyze")
-    context: Optional[str] = Field(
+    context: str | None = Field(
         None, description="Context for analysis (e.g., 'interview_response', 'general')"
     )
 
@@ -140,5 +140,5 @@ class AnalyzeSentimentResponse(BaseModel):
 
     sentiment: SentimentScore = Field(..., description="Sentiment analysis")
     text: str = Field(..., description="Text that was analyzed")
-    context: Optional[str] = Field(None, description="Analysis context")
-    sentences: Optional[list[dict[str, Any]]] = Field(None, description="Per-sentence analysis")
+    context: str | None = Field(None, description="Analysis context")
+    sentences: list[dict[str, Any]] | None = Field(None, description="Per-sentence analysis")

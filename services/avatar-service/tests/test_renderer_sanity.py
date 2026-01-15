@@ -15,9 +15,7 @@ def test_node_binary_available():
     if not node_path:
         pytest.skip("node not available in PATH; renderer tests skipped")
     # Smoke check: node --version must succeed quickly
-    proc = subprocess.run(
-        [node_path, "--version"], check=False, capture_output=True, text=True, timeout=5
-    )
+    proc = subprocess.run([node_path, "--version"], check=False, capture_output=True, text=True, timeout=5)
     assert proc.returncode == 0, "node --version failed"
     assert proc.stdout.strip(), "node --version produced no output"
 

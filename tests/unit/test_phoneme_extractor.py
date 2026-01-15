@@ -7,9 +7,10 @@ Part of Phase 1: Voice Service Phoneme Extraction
 Created: November 11, 2025
 """
 
-import pytest
 import sys
 from pathlib import Path
+
+import pytest
 
 # Add voice-service to path
 voice_service_path = Path(__file__).parent.parent.parent / "microservices" / "voice-service"
@@ -35,7 +36,7 @@ class TestPhonemeExtractorInitialization:
     def test_backend_initialization(self, extractor):
         """Test that espeak backend is initialized."""
         # Should not raise exception
-        assert hasattr(extractor, 'backend')
+        assert hasattr(extractor, "backend")
 
 
 class TestBasicPhonemeExtraction:
@@ -199,7 +200,7 @@ class TestPhonemeAccuracy:
         test_words = {
             "hello": ["HH", "EH", "L", "OW"],
             "world": ["W", "ER", "L", "D"],
-            "test": ["T", "EH", "S", "T"]
+            "test": ["T", "EH", "S", "T"],
         }
 
         for word, expected in test_words.items():
@@ -212,7 +213,23 @@ class TestPhonemeAccuracy:
 
     def test_vowel_detection(self, extractor):
         """Test that vowels are detected."""
-        vowel_phonemes = ["AA", "AE", "AH", "AO", "AW", "AY", "EH", "ER", "EY", "IH", "IY", "OW", "OY", "UH", "UW"]
+        vowel_phonemes = [
+            "AA",
+            "AE",
+            "AH",
+            "AO",
+            "AW",
+            "AY",
+            "EH",
+            "ER",
+            "EY",
+            "IH",
+            "IY",
+            "OW",
+            "OY",
+            "UH",
+            "UW",
+        ]
 
         result = extractor.extract_phonemes("hello world")
         extracted = [p["phoneme"] for p in result["phonemes"]]

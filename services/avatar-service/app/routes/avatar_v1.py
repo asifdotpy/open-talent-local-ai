@@ -173,10 +173,7 @@ async def phonemes(payload: PhonemeRequest):
 
 @router.post("/phonemes/timing")
 async def phoneme_timing(payload: PhonemeTimingRequest):
-    aligned = [
-        {"phoneme": p, "start": i * 0.05, "end": i * 0.05 + 0.04}
-        for i, p in enumerate(payload.phonemes)
-    ]
+    aligned = [{"phoneme": p, "start": i * 0.05, "end": i * 0.05 + 0.04} for i, p in enumerate(payload.phonemes)]
     return {"duration": payload.audio_duration, "alignment": aligned}
 
 

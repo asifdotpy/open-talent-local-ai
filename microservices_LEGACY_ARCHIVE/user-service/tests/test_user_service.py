@@ -5,10 +5,11 @@ Port: 8007
 Purpose: User management, profiles, preferences
 """
 
-import pytest
-import httpx
-from typing import Dict, Any
 import time
+from typing import Any
+
+import httpx
+import pytest
 
 
 @pytest.fixture
@@ -36,7 +37,7 @@ def auth_headers(auth_token):
 
 
 @pytest.fixture
-def user_data() -> Dict[str, Any]:
+def user_data() -> dict[str, Any]:
     """Sample user data"""
     timestamp = int(time.time() * 1000)
     return {
@@ -49,13 +50,13 @@ def user_data() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def user_update_data() -> Dict[str, Any]:
+def user_update_data() -> dict[str, Any]:
     """Sample user update data"""
     return {"first_name": "Jane", "last_name": "Smith", "phone": "+0987654321"}
 
 
 @pytest.fixture
-def user_preferences() -> Dict[str, Any]:
+def user_preferences() -> dict[str, Any]:
     """Sample user preferences"""
     return {
         "language": "en",

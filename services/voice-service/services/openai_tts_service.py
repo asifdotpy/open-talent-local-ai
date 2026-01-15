@@ -1,5 +1,5 @@
 """OpenAI Text-to-Speech Service
-Production TTS using OpenAI's gpt-4o-mini-tts model
+Production TTS using OpenAI's gpt-4o-mini-tts model.
 """
 
 import logging
@@ -13,7 +13,7 @@ from .phoneme_extractor import PhonemeExtractor
 
 
 class OpenAITTSService:
-    """OpenAI Text-to-Speech service using gpt-4o-mini-tts model
+    """OpenAI Text-to-Speech service using gpt-4o-mini-tts model.
 
     Features:
     - Cost-effective: $0.015 per minute
@@ -105,17 +105,13 @@ class OpenAITTSService:
         try:
             # Validate voice
             if voice not in self.voices:
-                self.logger.warning(
-                    f"Unknown voice '{voice}', using default '{self.default_voice}'"
-                )
+                self.logger.warning(f"Unknown voice '{voice}', using default '{self.default_voice}'")
                 voice = self.default_voice
 
             # Validate speed
             speed = max(0.25, min(4.0, speed))
 
-            self.logger.info(
-                f"Synthesizing with OpenAI TTS: '{text[:50]}...' (voice: {voice}, speed: {speed})"
-            )
+            self.logger.info(f"Synthesizing with OpenAI TTS: '{text[:50]}...' (voice: {voice}, speed: {speed})")
 
             # Call OpenAI TTS API
             response = self.client.audio.speech.create(
@@ -176,9 +172,7 @@ class OpenAITTSService:
             self.logger.error(f"OpenAI TTS failed after {processing_time:.2f}s: {e}")
             raise
 
-    def synthesize_streaming(
-        self, text: str, chunk_size: int = 4096, voice: str = "alloy"
-    ) -> list[bytes]:
+    def synthesize_streaming(self, text: str, chunk_size: int = 4096, voice: str = "alloy") -> list[bytes]:
         """Synthesize speech in chunks for streaming.
 
         Args:
@@ -202,9 +196,7 @@ class OpenAITTSService:
                 audio_bytes = audio_int16.tobytes()
 
                 # Split into chunks
-                chunks = [
-                    audio_bytes[i : i + chunk_size] for i in range(0, len(audio_bytes), chunk_size)
-                ]
+                chunks = [audio_bytes[i : i + chunk_size] for i in range(0, len(audio_bytes), chunk_size)]
 
                 self.logger.info(f"Generated {len(chunks)} audio chunks")
                 return chunks

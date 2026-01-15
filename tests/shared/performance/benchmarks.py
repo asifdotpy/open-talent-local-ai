@@ -4,8 +4,7 @@ Performance benchmarks and thresholds for the OpenTalent Platform.
 All submodules should meet or exceed these performance standards.
 """
 
-from typing import Dict, Any
-
+from typing import Any
 
 # API Performance Benchmarks
 API_BENCHMARKS = {
@@ -28,7 +27,7 @@ API_BENCHMARKS = {
     "availability": {
         "target_uptime": 0.999,  # 99.9%
         "critical_uptime": 0.9999,  # 99.99%
-    }
+    },
 }
 
 # UI Performance Benchmarks
@@ -110,7 +109,7 @@ LOAD_TEST_SCENARIOS = {
         "concurrent_users": 500,
         "duration": 300,  # seconds
         "ramp_up": 30,  # seconds
-    }
+    },
 }
 
 # Performance Test Configuration
@@ -123,7 +122,7 @@ PERFORMANCE_TEST_CONFIG = {
 }
 
 
-def get_benchmarks_for_service(service_name: str) -> Dict[str, Any]:
+def get_benchmarks_for_service(service_name: str) -> dict[str, Any]:
     """Get performance benchmarks for a specific service"""
     benchmark_map = {
         "api": API_BENCHMARKS,
@@ -141,7 +140,7 @@ def validate_performance_metric(metric_name: str, actual_value: float, service_n
     benchmarks = get_benchmarks_for_service(service_name)
 
     # Navigate nested benchmark structure
-    keys = metric_name.split('.')
+    keys = metric_name.split(".")
     expected_value = benchmarks
     for key in keys:
         if isinstance(expected_value, dict) and key in expected_value:
@@ -160,7 +159,7 @@ def validate_performance_metric(metric_name: str, actual_value: float, service_n
     return min_acceptable <= actual_value <= max_acceptable
 
 
-def generate_performance_report(results: Dict[str, Any], service_name: str) -> Dict[str, Any]:
+def generate_performance_report(results: dict[str, Any], service_name: str) -> dict[str, Any]:
     """Generate a performance test report"""
     report = {
         "service": service_name,
@@ -168,15 +167,12 @@ def generate_performance_report(results: Dict[str, Any], service_name: str) -> D
         "benchmarks": get_benchmarks_for_service(service_name),
         "results": {},
         "passed": True,
-        "failed_metrics": []
+        "failed_metrics": [],
     }
 
     for metric_name, actual_value in results.items():
         passed = validate_performance_metric(metric_name, actual_value, service_name)
-        report["results"][metric_name] = {
-            "actual": actual_value,
-            "passed": passed
-        }
+        report["results"][metric_name] = {"actual": actual_value, "passed": passed}
 
         if not passed:
             report["passed"] = False

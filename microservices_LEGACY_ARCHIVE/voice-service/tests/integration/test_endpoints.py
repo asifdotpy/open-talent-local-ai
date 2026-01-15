@@ -1,5 +1,5 @@
-import pytest
 from fastapi.testclient import TestClient
+
 from main import app
 
 client = TestClient(app)
@@ -21,9 +21,7 @@ def test_health_check():
 
 # Test the STT endpoint with invalid file type
 def test_stt_invalid_file():
-    response = client.post(
-        "/voice/stt", files={"audio_file": ("test.txt", b"dummy content", "text/plain")}
-    )
+    response = client.post("/voice/stt", files={"audio_file": ("test.txt", b"dummy content", "text/plain")})
     assert response.status_code == 400
     assert response.json()["detail"] == "Invalid audio file type."
 

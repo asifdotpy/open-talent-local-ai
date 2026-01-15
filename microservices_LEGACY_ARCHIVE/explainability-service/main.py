@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
@@ -12,7 +12,7 @@ class InterviewExplanationRequest(BaseModel):
     candidate_id: str
     decision: str  # "pass", "fail", "review"
     scores: dict[str, float]
-    feedback: Optional[str] = None
+    feedback: str | None = None
 
 
 class ScoringExplanationRequest(BaseModel):
@@ -25,7 +25,7 @@ class ScoringExplanationRequest(BaseModel):
 class BiasCheckRequest(BaseModel):
     data: dict[str, Any]
     model_type: str
-    threshold: Optional[float] = 0.1
+    threshold: float | None = 0.1
 
 
 class ExplanationResponse(BaseModel):
@@ -194,26 +194,20 @@ async def explain_candidate_scoring(request: ScoringExplanationRequest):
     overall_score = sum(request.scores.values()) / len(request.scores) if request.scores else 0
 
     if overall_score >= 0.8:
-        summary = (
-            "Candidate shows excellent fit for the position with high scores across all criteria."
-        )
+        summary = "Candidate shows excellent fit for the position with high scores across all criteria."
         confidence = 0.95
     elif overall_score >= 0.6:
         summary = "Candidate shows good potential with solid performance in key areas."
         confidence = 0.82
     else:
-        summary = (
-            "Candidate may not be the best fit; consider additional training or different roles."
-        )
+        summary = "Candidate may not be the best fit; consider additional training or different roles."
         confidence = 0.78
 
     details = {
         "job_requirements": request.criteria,
         "score_breakdown": request.scores,
         "overall_score": overall_score,
-        "top_performing_criteria": sorted(request.scores.items(), key=lambda x: x[1], reverse=True)[
-            :3
-        ],
+        "top_performing_criteria": sorted(request.scores.items(), key=lambda x: x[1], reverse=True)[:3],
         "scoring_model": "talent_ai_scoring_v1.3",
         "benchmark_comparison": "Above average compared to similar candidates",
     }
@@ -366,7 +360,7 @@ async def check_bias(request: BiasCheckRequest):
 
 
 @app.get("/bias/report", response_model=BiasReportResponse)
-async def get_bias_report(report_id: Optional[str] = None):
+async def get_bias_report(report_id: str | None = None):
     """Get the latest bias analysis report or a specific report by ID.
 
     Returns comprehensive bias analysis results with detailed metrics

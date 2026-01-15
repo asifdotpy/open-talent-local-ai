@@ -1,5 +1,5 @@
 """Silero Voice Activity Detection Service
-Efficient voice detection for audio preprocessing
+Efficient voice detection for audio preprocessing.
 """
 
 import logging
@@ -18,7 +18,7 @@ except ImportError:
 
 
 class SileroVADService:
-    """Voice Activity Detection using Silero VAD
+    """Voice Activity Detection using Silero VAD.
 
     Features:
     - 60-70% computational savings by filtering silence
@@ -73,9 +73,7 @@ class SileroVADService:
             # Load ONNX model
             import onnxruntime as ort
 
-            self.model = ort.InferenceSession(
-                str(self.model_path), providers=["CPUExecutionProvider"]
-            )
+            self.model = ort.InferenceSession(str(self.model_path), providers=["CPUExecutionProvider"])
 
             self.logger.info("Silero VAD model loaded successfully")
 
@@ -120,20 +118,14 @@ class SileroVADService:
             speech_ratio = speech_duration / total_duration if total_duration > 0 else 0
 
             result = {
-                "voice_segments": [
-                    (start / self.sample_rate, end / self.sample_rate)
-                    for start, end in voice_segments
-                ],
+                "voice_segments": [(start / self.sample_rate, end / self.sample_rate) for start, end in voice_segments],
                 "total_speech_duration": speech_duration,
                 "total_silence_duration": silence_duration,
                 "speech_ratio": speech_ratio,
                 "num_segments": len(voice_segments),
             }
 
-            self.logger.info(
-                f"VAD detected {len(voice_segments)} speech segments, "
-                f"speech ratio: {speech_ratio:.2%}"
-            )
+            self.logger.info(f"VAD detected {len(voice_segments)} speech segments, speech ratio: {speech_ratio:.2%}")
 
             return result
 
@@ -171,10 +163,7 @@ class SileroVADService:
             for start, end in voice_segments:
                 filtered_audio.append(audio_data[start:end])
 
-            if filtered_audio:
-                filtered_audio = np.concatenate(filtered_audio)
-            else:
-                filtered_audio = np.array([])
+            filtered_audio = np.concatenate(filtered_audio) if filtered_audio else np.array([])
 
             # Save filtered audio
             sf.write(output_path, filtered_audio, self.sample_rate)
@@ -192,8 +181,7 @@ class SileroVADService:
             }
 
             self.logger.info(
-                f"Filtered {original_duration:.2f}s → {filtered_duration:.2f}s "
-                f"({reduction:.1%} reduction)"
+                f"Filtered {original_duration:.2f}s → {filtered_duration:.2f}s ({reduction:.1%} reduction)"
             )
 
             return result

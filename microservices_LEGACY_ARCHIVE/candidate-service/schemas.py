@@ -1,13 +1,14 @@
-from pydantic import BaseModel, HttpUrl
-from typing import List, Optional, Literal
 from datetime import date
+from typing import Literal
+
+from pydantic import BaseModel, HttpUrl
 
 
 class ProfileSource(BaseModel):
     """Records the origin of the candidate data."""
 
     source_name: Literal["ContactOut", "SalesQL", "LinkedIn", "Manual"]
-    source_id: Optional[str] = None  # The record ID from the external system
+    source_id: str | None = None  # The record ID from the external system
     retrieved_at: date
 
 
@@ -17,8 +18,8 @@ class WorkExperience(BaseModel):
     position: str
     company: str
     start_date: date
-    end_date: Optional[date] = None
-    description: Optional[str] = None
+    end_date: date | None = None
+    description: str | None = None
 
 
 class Education(BaseModel):
@@ -28,7 +29,7 @@ class Education(BaseModel):
     degree: str
     field_of_study: str
     start_date: date
-    end_date: Optional[date] = None
+    end_date: date | None = None
 
 
 class SocialProfile(BaseModel):
@@ -39,17 +40,16 @@ class SocialProfile(BaseModel):
 
 
 class EnrichedProfile(BaseModel):
-    """
-    A universal data model to accommodate data from ContactOut and other
+    """A universal data model to accommodate data from ContactOut and other
     sourcing tools, designed to be compatible with the Agent-Interview bridge.
     """
 
     source: ProfileSource
-    work_history: List[WorkExperience] = []
-    education_history: List[Education] = []
-    social_profiles: List[SocialProfile] = []
-    contact_email: Optional[str] = None
-    contact_phone: Optional[str] = None
+    work_history: list[WorkExperience] = []
+    education_history: list[Education] = []
+    social_profiles: list[SocialProfile] = []
+    contact_email: str | None = None
+    contact_phone: str | None = None
 
 
 # This would be linked to the main Candidate model, likely via a JSONB field

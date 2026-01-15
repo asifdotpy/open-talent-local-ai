@@ -2,8 +2,8 @@
 # ║  CELL 3: Load Model with Unsloth                                          ║
 # ╚═══════════════════════════════════════════════════════════════════════════╝
 
-from unsloth import FastLanguageModel
 import torch
+from unsloth import FastLanguageModel
 
 print(f"🏔️ Loading {config.model_name}...")
 
@@ -28,5 +28,5 @@ model = FastLanguageModel.get_peft_model(
     random_state=3407,
 )
 
-print(f"✅ LoRA adapters added")
+print("✅ LoRA adapters added")
 model.print_trainable_parameters()

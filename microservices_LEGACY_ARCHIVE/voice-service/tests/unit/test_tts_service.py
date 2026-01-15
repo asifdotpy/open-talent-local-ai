@@ -1,5 +1,4 @@
-"""
-Unit Tests for Piper TTS Service
+"""Unit Tests for Piper TTS Service.
 
 Following TDD principles:
 - Test behavior, not implementation
@@ -11,11 +10,11 @@ Following TDD principles:
 Created: November 13, 2025
 """
 
-import pytest
-import os
 import subprocess
-from unittest.mock import Mock, patch, MagicMock, call
-from pathlib import Path
+from unittest.mock import Mock, patch
+
+import pytest
+
 from services.tts_service import PiperTTSService
 
 
@@ -117,9 +116,7 @@ class TestPiperInstallationCheck:
         assert result is False
 
     @patch("subprocess.run")
-    def test_check_installation_fails_when_model_config_missing(
-        self, mock_run, mock_piper_path, tmp_path
-    ):
+    def test_check_installation_fails_when_model_config_missing(self, mock_run, mock_piper_path, tmp_path):
         """Test that installation check fails when model .json config is missing."""
         # Arrange
         mock_run.return_value = Mock(returncode=0, stdout="0.0.2", stderr="")
@@ -154,9 +151,7 @@ class TestSpeechSynthesis:
 
     @patch("subprocess.Popen")
     @patch("os.path.exists")
-    def test_synthesize_creates_audio_file(
-        self, mock_exists, mock_popen, tts_service, short_text, test_audio_dir
-    ):
+    def test_synthesize_creates_audio_file(self, mock_exists, mock_popen, tts_service, short_text, test_audio_dir):
         """Test that synthesize creates an audio file from text."""
         # Arrange
         output_file = str(test_audio_dir / "output.wav")
@@ -179,9 +174,7 @@ class TestSpeechSynthesis:
         assert output_file in args
 
     @patch("subprocess.Popen")
-    def test_synthesize_sends_text_to_piper_stdin(
-        self, mock_popen, tts_service, sample_text, test_audio_dir
-    ):
+    def test_synthesize_sends_text_to_piper_stdin(self, mock_popen, tts_service, sample_text, test_audio_dir):
         """Test that text is sent to Piper via stdin."""
         # Arrange
         output_file = str(test_audio_dir / "output.wav")
@@ -198,9 +191,7 @@ class TestSpeechSynthesis:
         mock_process.communicate.assert_called_once_with(input=sample_text, timeout=30)
 
     @patch("subprocess.Popen")
-    def test_synthesize_fails_when_piper_returns_error(
-        self, mock_popen, tts_service, short_text, test_audio_dir
-    ):
+    def test_synthesize_fails_when_piper_returns_error(self, mock_popen, tts_service, short_text, test_audio_dir):
         """Test that synthesize returns None when Piper process fails."""
         # Arrange
         output_file = str(test_audio_dir / "output.wav")
@@ -216,9 +207,7 @@ class TestSpeechSynthesis:
         assert result is None
 
     @patch("subprocess.Popen")
-    def test_synthesize_fails_when_output_file_not_created(
-        self, mock_popen, tts_service, short_text, test_audio_dir
-    ):
+    def test_synthesize_fails_when_output_file_not_created(self, mock_popen, tts_service, short_text, test_audio_dir):
         """Test that synthesize returns None when output file is not created."""
         # Arrange
         output_file = str(test_audio_dir / "output.wav")
@@ -250,9 +239,7 @@ class TestSpeechSynthesis:
         assert result is None
 
     @patch("subprocess.Popen")
-    def test_synthesize_handles_empty_text(
-        self, mock_popen, tts_service, empty_text, test_audio_dir
-    ):
+    def test_synthesize_handles_empty_text(self, mock_popen, tts_service, empty_text, test_audio_dir):
         """Test that synthesize handles empty text input."""
         # Arrange
         output_file = str(test_audio_dir / "output.wav")
@@ -263,7 +250,7 @@ class TestSpeechSynthesis:
 
         # Act
         with patch("os.path.exists", return_value=True):
-            result = tts_service.synthesize(empty_text, output_file)
+            tts_service.synthesize(empty_text, output_file)
 
         # Assert - should still attempt synthesis, Piper will handle it
         assert mock_popen.called
@@ -282,7 +269,7 @@ class TestSpeechSynthesis:
 
         # Act
         with patch("os.path.exists", return_value=True):
-            result = tts_service.synthesize(special_characters_text, output_file)
+            tts_service.synthesize(special_characters_text, output_file)
 
         # Assert
         mock_process.communicate.assert_called_once()
@@ -291,9 +278,7 @@ class TestSpeechSynthesis:
 
     @patch("subprocess.Popen")
     @patch("os.path.exists")
-    def test_synthesize_with_long_text(
-        self, mock_exists, mock_popen, tts_service, long_text, test_audio_dir
-    ):
+    def test_synthesize_with_long_text(self, mock_exists, mock_popen, tts_service, long_text, test_audio_dir):
         """Test that synthesize can handle long text input."""
         # Arrange
         output_file = str(test_audio_dir / "output.wav")
@@ -310,9 +295,7 @@ class TestSpeechSynthesis:
         assert result == output_file
 
     @patch("subprocess.Popen")
-    def test_synthesize_handles_process_exception(
-        self, mock_popen, tts_service, short_text, test_audio_dir
-    ):
+    def test_synthesize_handles_process_exception(self, mock_popen, tts_service, short_text, test_audio_dir):
         """Test that synthesize handles unexpected exceptions gracefully."""
         # Arrange
         output_file = str(test_audio_dir / "output.wav")
@@ -342,7 +325,7 @@ class TestEdgeCasesAndErrorHandling:
             mock_popen.return_value = mock_process
 
             with patch("os.path.exists", return_value=True):
-                result = tts_service.synthesize(unicode_text, output_file)
+                tts_service.synthesize(unicode_text, output_file)
 
             # Should attempt to process (actual handling depends on Piper)
             assert mock_popen.called
@@ -361,9 +344,7 @@ class TestEdgeCasesAndErrorHandling:
         assert result is None
 
     @patch("subprocess.Popen")
-    def test_synthesize_with_nonexistent_output_directory(
-        self, mock_popen, tts_service, short_text
-    ):
+    def test_synthesize_with_nonexistent_output_directory(self, mock_popen, tts_service, short_text):
         """Test that synthesize handles nonexistent output directory."""
         # Arrange
         output_file = "/nonexistent/directory/output.wav"

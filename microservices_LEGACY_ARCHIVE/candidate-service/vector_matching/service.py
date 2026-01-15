@@ -1,23 +1,21 @@
-"""
-Vector matching service using Neo4j for semantic search.
+"""Vector matching service using Neo4j for semantic search.
 Handles candidate-job matching using vector similarity.
 """
 
 import logging
 import os
-from typing import List, Optional, Dict, Any
-from neo4j import GraphDatabase, Driver
 import time
 
-from .models import CandidateEmbedding, JobEmbedding, MatchResult, MatchRequest, MatchResponse
+from neo4j import Driver, GraphDatabase
+
 from .embeddings import EmbeddingGenerator
+from .models import CandidateEmbedding, JobEmbedding, MatchRequest, MatchResponse, MatchResult
 
 logger = logging.getLogger(__name__)
 
 
 class VectorMatchingService:
-    """
-    Service for matching candidates to jobs using vector similarity.
+    """Service for matching candidates to jobs using vector similarity.
     Uses Neo4j vector index for fast semantic search.
     """
 
@@ -28,8 +26,7 @@ class VectorMatchingService:
         neo4j_password: str = None,
         neo4j_database: str = "neo4j",
     ):
-        """
-        Initialize the vector matching service.
+        """Initialize the vector matching service.
 
         Args:
             neo4j_uri: Neo4j connection URI
@@ -42,7 +39,7 @@ class VectorMatchingService:
         self.password = neo4j_password or os.getenv("NEO4J_PASSWORD")
         self.database = neo4j_database
 
-        self.driver: Optional[Driver] = None
+        self.driver: Driver | None = None
         self.embedding_gen = EmbeddingGenerator()
 
         logger.info(f"Initializing Neo4j connection to {self.uri}")
@@ -97,8 +94,7 @@ class VectorMatchingService:
                 logger.warning(f"Error creating vector indexes (may already exist): {e}")
 
     def store_candidate_embedding(self, candidate: CandidateEmbedding) -> bool:
-        """
-        Store candidate embedding in Neo4j.
+        """Store candidate embedding in Neo4j.
 
         Args:
             candidate: CandidateEmbedding object with embedding vector
@@ -141,8 +137,7 @@ class VectorMatchingService:
                 return False
 
     def store_job_embedding(self, job: JobEmbedding) -> bool:
-        """
-        Store job embedding in Neo4j.
+        """Store job embedding in Neo4j.
 
         Args:
             job: JobEmbedding object with embedding vector
@@ -183,8 +178,7 @@ class VectorMatchingService:
                 return False
 
     def find_matching_candidates(self, request: MatchRequest) -> MatchResponse:
-        """
-        Find candidates that match a job description using vector similarity.
+        """Find candidates that match a job description using vector similarity.
 
         Args:
             request: MatchRequest with job_id and search parameters
@@ -198,9 +192,7 @@ class VectorMatchingService:
         job = self._get_job_embedding(request.job_id)
         if not job or not job.embedding:
             logger.error(f"Job {request.job_id} not found or has no embedding")
-            return MatchResponse(
-                job_id=request.job_id, total_candidates_searched=0, matches=[], search_time_ms=0
-            )
+            return MatchResponse(job_id=request.job_id, total_candidates_searched=0, matches=[], search_time_ms=0)
 
         # Perform vector search
         with self.driver.session(database=self.database) as session:
@@ -231,9 +223,7 @@ class VectorMatchingService:
                 matched_skills = list(candidate_skills & required_skills)
                 missing_skills = list(required_skills - candidate_skills)
 
-                skill_match_score = (
-                    len(matched_skills) / len(required_skills) if required_skills else 1.0
-                )
+                skill_match_score = len(matched_skills) / len(required_skills) if required_skills else 1.0
 
                 # Check experience requirement
                 experience_match = True
@@ -273,7 +263,7 @@ class VectorMatchingService:
             search_time_ms=round(search_time, 2),
         )
 
-    def _get_job_embedding(self, job_id: str) -> Optional[JobEmbedding]:
+    def _get_job_embedding(self, job_id: str) -> JobEmbedding | None:
         """Retrieve job embedding from Neo4j."""
         with self.driver.session(database=self.database) as session:
             result = session.run(

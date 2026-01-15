@@ -8,20 +8,20 @@ Tests:
 - RBAC role enforcement
 """
 
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
-from fastapi import HTTPException
-import jwt
 from datetime import datetime, timedelta
+from unittest.mock import AsyncMock, MagicMock, patch
 
+import jwt
+import pytest
+from app.config import settings
 from app.utils import (
     JWTClaims,
-    verify_jwt_with_security_service,
-    verify_jwt_locally,
     get_jwt_claims,
     require_role,
+    verify_jwt_locally,
+    verify_jwt_with_security_service,
 )
-from app.config import settings
+from fastapi import HTTPException
 
 
 class TestJWTClaims:

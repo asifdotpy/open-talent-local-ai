@@ -97,7 +97,7 @@ class TestSessionWebSocketStreaming:
                 ws.receive_json()  # connect
                 ws.receive_json()  # heartbeat
                 # Stub implementation closes after heartbeat
-                with pytest.raises(Exception):
+                with pytest.raises(RuntimeError):
                     ws.receive_json(timeout=1.0)
         except RuntimeError:
             # TestClient may raise on closed connection
@@ -112,8 +112,8 @@ class TestSessionWebSocketStreaming:
         sid2 = res2.json()["session_id"]
 
         # Open two streams simultaneously
-        with client.websocket_connect(f"/api/v1/avatars/session/{sid1}/stream") as ws1:
-            with client.websocket_connect(f"/api/v1/avatars/session/{sid2}/stream") as ws2:
+        with client.websocket_connect(f"/api/v1/avatars/session/{sid1}/stream") as ws1, \
+             client.websocket_connect(f"/api/v1/avatars/session/{sid2}/stream") as ws2:
                 # Each should have correct session_id in messages
                 msg1 = ws1.receive_json()
                 msg2 = ws2.receive_json()

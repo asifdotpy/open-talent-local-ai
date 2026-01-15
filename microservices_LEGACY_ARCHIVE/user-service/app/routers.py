@@ -1,38 +1,38 @@
-from datetime import datetime
-from typing import List, Optional
-from uuid import UUID
 import csv
 import io
-from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, status
+from datetime import datetime
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from fastapi.responses import StreamingResponse
-from sqlalchemy import select, or_, and_, func
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import get_session
 from .models import (
     User,
-    UserProfile,
-    UserPreferences,
     UserActivity,
-    UserSession,
+    UserPreferences,
+    UserProfile,
     UserRole,
+    UserSession,
     UserStatus,
 )
 from .schemas import (
     HealthResponse,
     RootResponse,
-    UserCreate,
-    UserRead,
-    UserProfileCreate,
-    UserProfileUpdate,
-    UserProfileRead,
-    UserPreferencesCreate,
-    UserPreferencesUpdate,
-    UserPreferencesRead,
     UserActivityRead,
+    UserCreate,
+    UserPreferencesCreate,
+    UserPreferencesRead,
+    UserPreferencesUpdate,
+    UserProfileCreate,
+    UserProfileRead,
+    UserProfileUpdate,
+    UserRead,
     UserSessionRead,
 )
-from .utils import get_current_user, get_jwt_claims, require_role, JWTClaims
+from .utils import JWTClaims, get_jwt_claims, require_role
 
 router = APIRouter()
 
@@ -52,18 +52,18 @@ async def health() -> HealthResponse:
 # ============================================================================
 
 
-@router.get("/api/v1/users", response_model=List[UserRead])
+@router.get("/api/v1/users", response_model=list[UserRead])
 async def list_users(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
-    email: Optional[str] = Query(None, description="Filter by email (partial match)"),
-    role: Optional[UserRole] = Query(None, description="Filter by role"),
-    status: Optional[UserStatus] = Query(None, description="Filter by status"),
-    search: Optional[str] = Query(None, description="Search by name, email, or location"),
-    tenant_id: Optional[str] = Query(None, description="Filter by tenant (admin only)"),
+    email: str | None = Query(None, description="Filter by email (partial match)"),
+    role: UserRole | None = Query(None, description="Filter by role"),
+    status: UserStatus | None = Query(None, description="Filter by status"),
+    search: str | None = Query(None, description="Search by name, email, or location"),
+    tenant_id: str | None = Query(None, description="Filter by tenant (admin only)"),
     session: AsyncSession = Depends(get_session),
     claims: JWTClaims = Depends(get_jwt_claims),
-) -> List[UserRead]:
+) -> list[UserRead]:
     """List users with pagination and filtering. Enforces RLS by tenant_id."""
     query = select(User)
 
@@ -108,9 +108,9 @@ async def list_users(
 
 @router.get("/api/v1/users/count", response_model=dict)
 async def count_users(
-    role: Optional[UserRole] = Query(None),
-    status: Optional[UserStatus] = Query(None),
-    tenant_id: Optional[str] = Query(None, description="Filter by tenant (admin only)"),
+    role: UserRole | None = Query(None),
+    status: UserStatus | None = Query(None),
+    tenant_id: str | None = Query(None, description="Filter by tenant (admin only)"),
     session: AsyncSession = Depends(get_session),
     claims: JWTClaims = Depends(get_jwt_claims),
 ) -> dict:
@@ -425,15 +425,15 @@ async def update_user_preferences(
 # ============================================================================
 
 
-@router.get("/api/v1/users/{user_id}/activity", response_model=List[UserActivityRead])
+@router.get("/api/v1/users/{user_id}/activity", response_model=list[UserActivityRead])
 async def get_user_activity(
     user_id: UUID,
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
-    action: Optional[str] = Query(None, description="Filter by action"),
+    action: str | None = Query(None, description="Filter by action"),
     session: AsyncSession = Depends(get_session),
     claims: JWTClaims = Depends(get_jwt_claims),
-) -> List[UserActivityRead]:
+) -> list[UserActivityRead]:
     """Get user activity log."""
     query = select(UserActivity).where(UserActivity.user_id == user_id)
 
@@ -455,9 +455,9 @@ async def get_user_activity(
 async def log_user_activity(
     user_id: UUID,
     action: str,
-    resource: Optional[str] = None,
-    details: Optional[dict] = None,
-    tenant_id: Optional[str] = None,
+    resource: str | None = None,
+    details: dict | None = None,
+    tenant_id: str | None = None,
     session: AsyncSession = Depends(get_session),
     claims: JWTClaims = Depends(get_jwt_claims),
 ) -> UserActivityRead:
@@ -485,18 +485,18 @@ async def log_user_activity(
 # ============================================================================
 
 
-@router.get("/api/v1/users/{user_id}/sessions", response_model=List[UserSessionRead])
+@router.get("/api/v1/users/{user_id}/sessions", response_model=list[UserSessionRead])
 async def get_user_sessions(
     user_id: UUID,
     active_only: bool = Query(False, description="Show only active sessions"),
     session: AsyncSession = Depends(get_session),
     claims: JWTClaims = Depends(get_jwt_claims),
-) -> List[UserSessionRead]:
+) -> list[UserSessionRead]:
     """Get user sessions."""
     query = select(UserSession).where(UserSession.user_id == user_id)
 
     if active_only:
-        query = query.where(UserSession.revoked == False)
+        query = query.where(not UserSession.revoked)
 
     query = query.order_by(UserSession.last_seen.desc())
     result = await session.execute(query)
@@ -599,9 +599,9 @@ async def bulk_import_users(
 
 @router.get("/api/v1/users/bulk/export")
 async def bulk_export_users(
-    role: Optional[UserRole] = Query(None),
-    status: Optional[UserStatus] = Query(None),
-    tenant_id: Optional[str] = Query(None, description="Filter by tenant (admin only)"),
+    role: UserRole | None = Query(None),
+    status: UserStatus | None = Query(None),
+    tenant_id: str | None = Query(None, description="Filter by tenant (admin only)"),
     session: AsyncSession = Depends(get_session),
     claims: JWTClaims = Depends(get_jwt_claims),
 ) -> StreamingResponse:

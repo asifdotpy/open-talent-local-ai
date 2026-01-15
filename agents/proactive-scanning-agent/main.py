@@ -17,7 +17,6 @@ import sys
 from contextlib import asynccontextmanager
 from datetime import datetime
 from enum import Enum
-from typing import Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -73,7 +72,7 @@ class ConsentType(str, Enum):
     PUBLIC_POSTING = "public_posting"  # Candidate posted job availability publicly
 
 
-message_bus: Optional[MessageBus] = None
+message_bus: MessageBus | None = None
 config = get_config()
 
 
@@ -148,7 +147,7 @@ class ComplianceRecord(BaseModel):
     sourcing_method: SourcingMethod
     consent_type: ConsentType
     consent_date: datetime
-    opt_in_url: Optional[str] = None
+    opt_in_url: str | None = None
     terms_accepted: bool = True
     data_retention_days: int = 730  # 2 years default
 

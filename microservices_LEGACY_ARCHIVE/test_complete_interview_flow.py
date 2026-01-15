@@ -213,9 +213,9 @@ async def test_interview_completion(client: httpx.AsyncClient, room_id: str) -> 
 
 async def run_complete_flow():
     """Run the complete interview flow test."""
-    print(f"\n{BLUE}{'='*60}{RESET}")
+    print(f"\n{BLUE}{'=' * 60}{RESET}")
     print(f"{BLUE}OpenTalent Complete Interview Flow Test{RESET}")
-    print(f"{BLUE}{'='*60}{RESET}")
+    print(f"{BLUE}{'=' * 60}{RESET}")
 
     start_time = time.time()
 
@@ -234,9 +234,9 @@ async def run_complete_flow():
             return False
 
         # Run complete flow
-        print(f"\n{BLUE}{'='*60}{RESET}")
+        print(f"\n{BLUE}{'=' * 60}{RESET}")
         print(f"{BLUE}Running Complete Interview Flow{RESET}")
-        print(f"{BLUE}{'='*60}{RESET}")
+        print(f"{BLUE}{'=' * 60}{RESET}")
 
         # Step 1: Create interview session
         session_data = await test_interview_session_creation(client)
@@ -269,13 +269,13 @@ async def run_complete_flow():
             return False
 
         # Step 7: Complete interview
-        completion_success = await test_interview_completion(client, room_id)
+        await test_interview_completion(client, room_id)
 
         # Summary
         elapsed = time.time() - start_time
-        print(f"\n{BLUE}{'='*60}{RESET}")
+        print(f"\n{BLUE}{'=' * 60}{RESET}")
         print(f"{BLUE}Test Summary{RESET}")
-        print(f"{BLUE}{'='*60}{RESET}")
+        print(f"{BLUE}{'=' * 60}{RESET}")
         print(f"{GREEN}✓{RESET} Complete interview flow executed successfully")
         print(f"  Total time: {elapsed:.2f}s")
         print("  Services tested: 4/4")

@@ -1,7 +1,4 @@
-"""Voice models for the Avatar Service.
-"""
-
-from typing import Optional
+"""Voice models for the Avatar Service."""
 
 from pydantic import BaseModel
 
@@ -10,7 +7,7 @@ class VoiceRequest(BaseModel):
     """Request model for voice generation."""
 
     text: str
-    voice_id: Optional[str] = None
+    voice_id: str | None = None
     model_id: str = "eleven_multilingual_v2"
 
 
@@ -18,8 +15,8 @@ class VoiceResponse(BaseModel):
     """Response model for voice generation."""
 
     success: bool
-    audio_url: Optional[str] = None
-    error: Optional[str] = None
+    audio_url: str | None = None
+    error: str | None = None
 
 
 class HealthResponse(BaseModel):

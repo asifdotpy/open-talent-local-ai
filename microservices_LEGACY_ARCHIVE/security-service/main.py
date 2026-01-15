@@ -3,23 +3,22 @@ Security Service - Authentication, Authorization, Permissions, MFA, Encryption
 Port: 8010
 """
 
-from fastapi import FastAPI, Depends, Body, HTTPException, status, Header, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from typing import Dict, Any, Optional
-import json
-import jwt
+import os
 import secrets
 from datetime import datetime, timedelta
 from hashlib import sha256
-import os
+from typing import Any
+
 import bcrypt
-import base64
+import jwt
 from cryptography.fernet import Fernet
+from fastapi import Body, Depends, FastAPI, Header, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from slowapi import Limiter
-from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
+from slowapi.util import get_remote_address
 
 app = FastAPI(title="Security Service", version="1.0.0")
 
@@ -44,11 +43,11 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 PASSWORD_MIN_LENGTH = 8
 
 # In-memory storage (replace with database in production)
-users_db: Dict[str, Dict[str, Any]] = {
+users_db: dict[str, dict[str, Any]] = {
     "user@example.com": {
         "email": "user@example.com",
         # Legacy SHA256 hash for default user; will be migrated to bcrypt on first successful login
-        "password_hash": sha256("SecurePassword123!".encode()).hexdigest(),
+        "password_hash": sha256(b"SecurePassword123!").hexdigest(),
         "first_name": "Test",
         "last_name": "User",
         "roles": ["user"],
@@ -59,7 +58,7 @@ users_db: Dict[str, Dict[str, Any]] = {
 }
 
 tokens_db: set = set()  # Blacklisted tokens
-sessions_db: Dict[str, Dict[str, Any]] = {}  # Active sessions
+sessions_db: dict[str, dict[str, Any]] = {}  # Active sessions
 
 # ============================================================================
 # HELPER FUNCTIONS
@@ -92,7 +91,7 @@ def verify_password(password: str, hash_value: str) -> bool:
     return sha256(password.encode()).hexdigest() == hash_value
 
 
-def create_access_token(email: str, expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(email: str, expires_delta: timedelta | None = None) -> str:
     """Create JWT access token"""
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -105,7 +104,7 @@ def create_access_token(email: str, expires_delta: Optional[timedelta] = None) -
     return token
 
 
-def verify_token(token: str) -> Optional[str]:
+def verify_token(token: str) -> str | None:
     """Verify JWT token and return email"""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -122,7 +121,7 @@ def verify_token(token: str) -> Optional[str]:
         return None
 
 
-def get_current_user(authorization: Optional[str] = Header(None)) -> Optional[str]:
+def get_current_user(authorization: str | None = Header(None)) -> str | None:
     """Extract and verify token from Authorization header"""
     if not authorization:
         return None
@@ -201,7 +200,7 @@ async def health():
 
 
 @app.post("/api/v1/auth/register")
-@ limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
+@limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
 async def register(request: Request, payload: dict = Body(...)):
     """Register a new user"""
     email = payload.get("email", "").strip()
@@ -248,7 +247,7 @@ async def register(request: Request, payload: dict = Body(...)):
 
 
 @app.post("/api/v1/auth/login")
-@ limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
+@limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
 async def login(request: Request, payload: dict = Body(...)):
     """Login and get access token"""
     email = payload.get("email", "").strip()
@@ -296,7 +295,7 @@ async def login(request: Request, payload: dict = Body(...)):
 
 
 @app.post("/api/v1/auth/logout")
-async def logout(current_user: Optional[str] = Depends(get_current_user)):
+async def logout(current_user: str | None = Depends(get_current_user)):
     """Logout and invalidate token"""
     return JSONResponse(status_code=204, content={"message": "Logged out successfully"})
 
@@ -344,7 +343,7 @@ async def refresh(payload: dict = Body(...)):
 
 
 @app.get("/api/v1/auth/profile")
-async def get_profile(current_user: Optional[str] = Depends(get_current_user)):
+async def get_profile(current_user: str | None = Depends(get_current_user)):
     """Get current user profile"""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
@@ -378,7 +377,7 @@ async def get_profile(current_user: Optional[str] = Depends(get_current_user)):
 
 
 @app.post("/api/v1/auth/mfa/setup")
-async def setup_mfa(current_user: Optional[str] = Depends(get_current_user)):
+async def setup_mfa(current_user: str | None = Depends(get_current_user)):
     """Setup MFA for user"""
     email = current_user
 
@@ -405,7 +404,7 @@ async def setup_mfa(current_user: Optional[str] = Depends(get_current_user)):
 
 @app.post("/api/v1/auth/mfa/verify")
 async def verify_mfa(
-    payload: dict = Body(...), current_user: Optional[str] = Depends(get_current_user)
+    payload: dict = Body(...), current_user: str | None = Depends(get_current_user)
 ):
     """Verify MFA code"""
     email = current_user
@@ -434,7 +433,7 @@ async def verify_mfa(
 
 
 @app.delete("/api/v1/auth/mfa")
-async def disable_mfa(current_user: Optional[str] = Depends(get_current_user)):
+async def disable_mfa(current_user: str | None = Depends(get_current_user)):
     """Disable MFA for user"""
     email = current_user
 
@@ -457,7 +456,7 @@ async def disable_mfa(current_user: Optional[str] = Depends(get_current_user)):
 
 
 @app.get("/api/v1/auth/permissions")
-async def get_permissions(current_user: Optional[str] = Depends(get_current_user)):
+async def get_permissions(current_user: str | None = Depends(get_current_user)):
     """Get user permissions"""
     email = current_user
 
@@ -473,7 +472,7 @@ async def get_permissions(current_user: Optional[str] = Depends(get_current_user
 
 @app.post("/api/v1/auth/permissions/check")
 async def check_permission(
-    payload: dict = Body(...), current_user: Optional[str] = Depends(get_current_user)
+    payload: dict = Body(...), current_user: str | None = Depends(get_current_user)
 ):
     """Check if user has specific permission"""
     email = current_user
@@ -537,7 +536,7 @@ async def decrypt_data(payload: dict = Body(...)):
         return JSONResponse(
             status_code=200, content={"data": decrypted.decode(), "plaintext": decrypted.decode()}
         )
-    except Exception as e:
+    except Exception:
         return JSONResponse(status_code=400, content={"error": "Failed to decrypt data"})
 
 
@@ -547,11 +546,11 @@ async def decrypt_data(payload: dict = Body(...)):
 
 
 @app.post("/api/v1/auth/password/change")
-@ limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
+@limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
 async def change_password(
     request: Request,
     payload: dict = Body(...),
-    current_user: Optional[str] = Depends(get_current_user),
+    current_user: str | None = Depends(get_current_user),
 ):
     """Change user password"""
     email = current_user
@@ -585,7 +584,7 @@ async def change_password(
 
 
 @app.post("/api/v1/auth/password/reset-request")
-@ limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
+@limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
 async def request_password_reset(request: Request, payload: dict = Body(...)):
     """Request password reset"""
     email = payload.get("email", "").strip()
@@ -600,7 +599,7 @@ async def request_password_reset(request: Request, payload: dict = Body(...)):
 
 
 @app.post("/api/v1/auth/password/reset")
-@ limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
+@limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
 async def reset_password(request: Request, payload: dict = Body(...)):
     """Reset password with token"""
     token = payload.get("token")
@@ -624,7 +623,7 @@ async def reset_password(request: Request, payload: dict = Body(...)):
 
 
 @app.get("/api/v1/roles")
-async def get_roles(current_user: Optional[str] = Depends(get_current_user)):
+async def get_roles(current_user: str | None = Depends(get_current_user)):
     """Get user roles"""
     email = current_user
 
@@ -640,7 +639,7 @@ async def get_roles(current_user: Optional[str] = Depends(get_current_user)):
 
 @app.post("/api/v1/roles/assign")
 async def assign_role(
-    payload: dict = Body(...), current_user: Optional[str] = Depends(get_current_user)
+    payload: dict = Body(...), current_user: str | None = Depends(get_current_user)
 ):
     """Assign role to user"""
     email = current_user
@@ -674,7 +673,7 @@ async def assign_role(
 
 @app.delete("/api/v1/roles/revoke")
 async def revoke_role(
-    payload: dict = Body(...), current_user: Optional[str] = Depends(get_current_user)
+    payload: dict = Body(...), current_user: str | None = Depends(get_current_user)
 ):
     """Revoke role from user"""
     email = current_user

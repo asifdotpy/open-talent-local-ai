@@ -126,8 +126,7 @@ class TestLocalJWTVerification:
         """Test expired JWT token rejection."""
         payload = {
             "email": "user@example.com",
-            "exp": datetime.now(UTC).replace(tzinfo=None)
-            - timedelta(minutes=1),  # Expired
+            "exp": datetime.now(UTC).replace(tzinfo=None) - timedelta(minutes=1),  # Expired
         }
         token = jwt.encode(payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
 

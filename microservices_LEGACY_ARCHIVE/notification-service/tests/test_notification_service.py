@@ -3,11 +3,10 @@ Tests for Notification Service
 Following TDD principles - tests written before implementation
 """
 
-import pytest
-import httpx
-from typing import Dict, Any
-import json
+from typing import Any
 
+import httpx
+import pytest
 
 # ============================================================================
 # FIXTURES
@@ -27,7 +26,7 @@ def async_client():
 
 
 @pytest.fixture
-def sample_email_data() -> Dict[str, Any]:
+def sample_email_data() -> dict[str, Any]:
     """Sample email data for testing"""
     return {
         "to": "user@example.com",
@@ -38,13 +37,13 @@ def sample_email_data() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def sample_sms_data() -> Dict[str, Any]:
+def sample_sms_data() -> dict[str, Any]:
     """Sample SMS data for testing"""
     return {"to": "+1234567890", "text": "Your interview is scheduled for tomorrow"}
 
 
 @pytest.fixture
-def sample_push_data() -> Dict[str, Any]:
+def sample_push_data() -> dict[str, Any]:
     """Sample push notification data"""
     return {
         "to": "device_token_123",

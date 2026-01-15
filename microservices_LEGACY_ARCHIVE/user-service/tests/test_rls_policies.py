@@ -8,12 +8,12 @@ Tests verify that RLS policies correctly enforce:
 - Cross-tenant isolation is maintained
 """
 
-import pytest
-from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import uuid4
 
-from app.models import User, UserProfile, UserPreferences, UserActivity, UserSession
+import pytest
+from app.models import User, UserActivity, UserPreferences, UserProfile, UserSession
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 @pytest.mark.integration

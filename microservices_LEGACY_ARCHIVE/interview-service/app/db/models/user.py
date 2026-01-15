@@ -1,5 +1,4 @@
-"""User database model.
-"""
+"""User database model."""
 
 from sqlalchemy import Boolean, Column, Integer, String
 

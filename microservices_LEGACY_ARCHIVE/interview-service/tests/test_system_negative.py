@@ -1,17 +1,16 @@
-"""
-Negative tests for system endpoints.
-"""
-import pytest
+"""Negative tests for system endpoints."""
+
+from unittest.mock import MagicMock, patch
+
 from fastapi.testclient import TestClient
-from unittest.mock import patch, MagicMock
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
+
 from app.core.config import settings
 
 
 def test_health_check_server_error(client: TestClient):
-    """
-    Test the health check endpoint when an unexpected server error occurs.
+    """Test the health check endpoint when an unexpected server error occurs.
 
     Note: This test intentionally fails because the FastAPI app needs middleware
     to handle unexpected exceptions. This test serves as documentation that we should
@@ -32,8 +31,7 @@ def test_health_check_server_error(client: TestClient):
 
 
 def test_db_status_connection_error(client: TestClient, db: Session):
-    """
-    Test the database status endpoint when the database connection fails.
+    """Test the database status endpoint when the database connection fails.
 
     Note: This test documents a gap in our error handling. Currently,
     database connection errors at the dependency level aren't being caught
@@ -66,9 +64,7 @@ def test_db_status_connection_error(client: TestClient, db: Session):
 
 
 def test_db_status_query_error(client: TestClient, db):
-    """
-    Test the database status endpoint when a query execution fails.
-    """
+    """Test the database status endpoint when a query execution fails."""
 
     # Mock the session.exec/execute to simulate a query execution error
     def mock_exec(*args, **kwargs):
@@ -83,9 +79,7 @@ def test_db_status_query_error(client: TestClient, db):
 
 
 def test_db_status_missing_table(client: TestClient, db):
-    """
-    Test the database status endpoint when the SystemVersion table doesn't exist.
-    """
+    """Test the database status endpoint when the SystemVersion table doesn't exist."""
     # Mock the query result to simulate missing table
     mock_result = MagicMock()
     mock_result.scalar_one_or_none.return_value = None

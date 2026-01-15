@@ -1,6 +1,5 @@
 """Configuration management for Desktop Integration Service."""
 
-
 from pydantic_settings import BaseSettings
 
 

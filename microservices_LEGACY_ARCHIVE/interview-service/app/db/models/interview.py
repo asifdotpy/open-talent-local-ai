@@ -1,5 +1,4 @@
-"""Database models for the interview process.
-"""
+"""Database models for the interview process."""
 
 from sqlalchemy import Column, Float, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import relationship
@@ -50,9 +49,7 @@ class CandidateProfile(Base):
 
     work_experience = relationship("WorkExperience", back_populates="candidate")
     education = relationship("Education", back_populates="candidate")
-    skills = relationship(
-        "Skill", secondary=candidate_skill_association, back_populates="candidates"
-    )
+    skills = relationship("Skill", secondary=candidate_skill_association, back_populates="candidates")
     initial_questions = relationship("InitialQuestion", back_populates="candidate")
     interview = relationship("Interview", back_populates="candidate_profile")
 
@@ -89,9 +86,7 @@ class Skill(Base):
     name = Column(String, unique=True, index=True)
     type = Column(String)  # "matched" or "unmatched"
 
-    candidates = relationship(
-        "CandidateProfile", secondary=candidate_skill_association, back_populates="skills"
-    )
+    candidates = relationship("CandidateProfile", secondary=candidate_skill_association, back_populates="skills")
 
 
 class InitialQuestion(Base):

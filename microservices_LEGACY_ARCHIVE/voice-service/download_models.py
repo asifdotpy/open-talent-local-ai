@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
-"""
-Model Download Script for Voice Service
-Downloads Vosk, Piper, and Silero models with progress tracking
+"""Model Download Script for Voice Service
+Downloads Vosk, Piper, and Silero models with progress tracking.
 """
 
-import os
-import sys
 import hashlib
-import zipfile
+import sys
 import tarfile
-from pathlib import Path
-from typing import Optional
 import urllib.request
-import shutil
+import zipfile
+from pathlib import Path
 
 # Progress bar support
 try:
@@ -67,8 +63,7 @@ class ModelDownloader:
         self.models_dir.mkdir(parents=True, exist_ok=True)
 
     def download_file(self, url: str, output_path: Path, desc: str = "Downloading") -> bool:
-        """
-        Download file with progress bar.
+        """Download file with progress bar.
 
         Args:
             url: Download URL
@@ -119,10 +114,10 @@ class ModelDownloader:
         actual_checksum = md5_hash.hexdigest()
 
         if actual_checksum == expected_checksum:
-            print(f"✓ Checksum verified")
+            print("✓ Checksum verified")
             return True
         else:
-            print(f"✗ Checksum mismatch!")
+            print("✗ Checksum mismatch!")
             print(f"  Expected: {expected_checksum}")
             print(f"  Actual:   {actual_checksum}")
             return False
@@ -154,10 +149,10 @@ class ModelDownloader:
         model_info = self.MODELS["vosk"]
         model_name = model_info["name"]
 
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"Downloading Vosk STT Model: {model_name}")
         print(f"Size: {model_info['size']}")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
 
         # Check if already exists
         model_dir = self.models_dir / model_name
@@ -167,16 +162,13 @@ class ModelDownloader:
 
         # Download archive
         archive_path = self.models_dir / f"{model_name}.zip"
-        if not self.download_file(
-            model_info["url"], archive_path, f"Vosk Model ({model_info['size']})"
-        ):
+        if not self.download_file(model_info["url"], archive_path, f"Vosk Model ({model_info['size']})"):
             return False
 
         # Verify checksum if available
-        if model_info["checksum"]:
-            if not self.verify_checksum(archive_path, model_info["checksum"]):
-                archive_path.unlink()
-                return False
+        if model_info["checksum"] and not self.verify_checksum(archive_path, model_info["checksum"]):
+            archive_path.unlink()
+            return False
 
         # Extract archive
         if not self.extract_archive(archive_path, self.models_dir):
@@ -193,28 +185,24 @@ class ModelDownloader:
         model_info = self.MODELS[voice_key]
         model_name = model_info["name"]
 
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"Downloading Piper TTS Voice: {model_name}")
         print(f"Size: {model_info['size']}")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
 
         # Download ONNX model
         model_path = self.models_dir / f"{model_name}.onnx"
         if model_path.exists():
             print(f"✓ Model already exists: {model_path}")
-        else:
-            if not self.download_file(
-                model_info["url"], model_path, f"Piper Voice ({model_info['size']})"
-            ):
-                return False
+        elif not self.download_file(model_info["url"], model_path, f"Piper Voice ({model_info['size']})"):
+            return False
 
         # Download config JSON
         config_path = self.models_dir / f"{model_name}.onnx.json"
         if config_path.exists():
             print(f"✓ Config already exists: {config_path}")
-        else:
-            if not self.download_file(model_info["config_url"], config_path, "Piper Config"):
-                return False
+        elif not self.download_file(model_info["config_url"], config_path, "Piper Config"):
+            return False
 
         print(f"✓ Piper voice ready: {model_name}")
         return True
@@ -223,10 +211,10 @@ class ModelDownloader:
         """Download Silero VAD model."""
         model_info = self.MODELS["silero_vad"]
 
-        print(f"\n{'='*60}")
-        print(f"Downloading Silero VAD Model")
+        print(f"\n{'=' * 60}")
+        print("Downloading Silero VAD Model")
         print(f"Size: {model_info['size']}")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
 
         # Download ONNX model
         model_path = self.models_dir / "silero_vad.onnx"
@@ -234,9 +222,7 @@ class ModelDownloader:
             print(f"✓ Model already exists: {model_path}")
             return True
 
-        if not self.download_file(
-            model_info["url"], model_path, f"Silero VAD ({model_info['size']})"
-        ):
+        if not self.download_file(model_info["url"], model_path, f"Silero VAD ({model_info['size']})"):
             return False
 
         print(f"✓ Silero VAD ready: {model_path}")
@@ -252,7 +238,7 @@ class ModelDownloader:
         print("  1. Vosk STT model (40 MB - small model)")
         print("  2. Piper TTS voices (45 MB each)")
         print("  3. Silero VAD model (2 MB)")
-        print(f"\nTotal download: ~135 MB")
+        print("\nTotal download: ~135 MB")
         print("=" * 60)
 
         # Confirm download
@@ -293,18 +279,14 @@ def main():
     """Main entry point."""
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Download speech processing models for Voice Service"
-    )
+    parser = argparse.ArgumentParser(description="Download speech processing models for Voice Service")
     parser.add_argument(
         "--models-dir",
         type=str,
         default="models",
         help="Directory to store models (default: models)",
     )
-    parser.add_argument(
-        "--vosk-only", action="store_true", help="Download only Vosk STT model (40MB small model)"
-    )
+    parser.add_argument("--vosk-only", action="store_true", help="Download only Vosk STT model (40MB small model)")
     parser.add_argument("--piper-only", action="store_true", help="Download only Piper TTS voices")
     parser.add_argument("--vad-only", action="store_true", help="Download only Silero VAD model")
 
@@ -315,9 +297,7 @@ def main():
     if args.vosk_only:
         success = downloader.download_vosk_model()
     elif args.piper_only:
-        success = downloader.download_piper_voice(
-            "piper_lessac"
-        ) and downloader.download_piper_voice("piper_amy")
+        success = downloader.download_piper_voice("piper_lessac") and downloader.download_piper_voice("piper_amy")
     elif args.vad_only:
         success = downloader.download_silero_vad()
     else:

@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Depends, Body
+from fastapi import Body, Depends, FastAPI
 from fastapi.responses import JSONResponse
+
 from .providers import get_provider
 
 app = FastAPI(title="Notification Service", version="1.0.0")

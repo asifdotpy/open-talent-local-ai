@@ -271,9 +271,10 @@ class TestOllamaService:
             coro.close()
             return expected
 
-        with patch("app.services.ollama_service.USE_MOCK", False), patch(
-            "app.services.ollama_service.asyncio.run", side_effect=fake_run
-        ) as mock_run:
+        with (
+            patch("app.services.ollama_service.USE_MOCK", False),
+            patch("app.services.ollama_service.asyncio.run", side_effect=fake_run) as mock_run,
+        ):
             result = generate_questions_from_ollama(
                 job_description="Software Engineer", num_questions=1, difficulty="easy"
             )
@@ -288,8 +289,9 @@ class TestOllamaService:
             coro.close()
             raise Exception("Ollama connection failed")
 
-        with patch("app.services.ollama_service.USE_MOCK", False), patch(
-            "app.services.ollama_service.asyncio.run", side_effect=fake_run_error
+        with (
+            patch("app.services.ollama_service.USE_MOCK", False),
+            patch("app.services.ollama_service.asyncio.run", side_effect=fake_run_error),
         ):
             result = generate_questions_from_ollama(
                 job_description="Test job", num_questions=1, difficulty="easy"

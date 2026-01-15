@@ -1,6 +1,5 @@
 """CRUD operations for demo interview sessions."""
 
-
 from app.db.models.demo_interview_session import DemoInterviewSession
 from app.schemas.demo_interview_session import DemoInterviewSessionCreate
 from sqlalchemy.orm import Session

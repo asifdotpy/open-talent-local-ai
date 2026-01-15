@@ -1,4 +1,4 @@
-"""Unit Tests for PhonemeExtractor
+"""Unit Tests for PhonemeExtractor.
 
 Tests phoneme extraction, timing accuracy, syllable counting, and basic phoneme mapping.
 """
@@ -452,9 +452,7 @@ class TestPhonemeSymbols:
     def test_common_phoneme_symbols_present(self):
         """Test that common English phonemes appear."""
         # Test with text containing various sounds
-        result = self.extractor.extract_phonemes(
-            "the quick brown fox jumps over the lazy dog", duration=5.0
-        )
+        result = self.extractor.extract_phonemes("the quick brown fox jumps over the lazy dog", duration=5.0)
 
         phoneme_set = {p["phoneme"] for p in result["phonemes"]}
 

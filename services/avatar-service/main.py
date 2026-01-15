@@ -251,9 +251,7 @@ async def render_lipsync(request: RenderRequest):
     )
 
     renderer_dir = os.path.dirname(renderer_script)
-    logger.info(
-        f"Rendering request: text={request.text}, duration={request.duration}s, model={request.model}"
-    )
+    logger.info(f"Rendering request: text={request.text}, duration={request.duration}s, model={request.model}")
 
     try:
         process = subprocess.run(

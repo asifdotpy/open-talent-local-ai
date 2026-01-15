@@ -1,12 +1,11 @@
 """Voice Service - Local Speech Processing
-Powered by Vosk (STT), Piper (TTS), and Silero (VAD)
+Powered by Vosk (STT), Piper (TTS), and Silero (VAD).
 """
 
 import asyncio
 import logging
 import os
 import tempfile
-from typing import Optional
 
 from fastapi import (
     Body,
@@ -26,9 +25,7 @@ from services.stream_service import UnifiedStreamService
 from services.vosk_stt_service import MockVoskSTTService, VoskSTTService
 
 # Configure logging BEFORE importing WebRTC (which uses logger)
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # --- Service Initialization ---
@@ -161,9 +158,7 @@ else:
         tts_service = ModularTTSService(
             provider="local",
             piper_model_path=os.getenv("PIPER_MODEL_PATH", "models/en_US-lessac-medium.onnx"),
-            piper_config_path=os.getenv(
-                "PIPER_CONFIG_PATH", "models/en_US-lessac-medium.onnx.json"
-            ),
+            piper_config_path=os.getenv("PIPER_CONFIG_PATH", "models/en_US-lessac-medium.onnx.json"),
             piper_binary=os.getenv(
                 "PIPER_BINARY",
                 "/home/asif1/open-talent-platform/microservices/voice-service/piper/piper",
@@ -177,22 +172,19 @@ else:
     )
 
 # Initialize unified streaming service
-stream_service = UnifiedStreamService(
-    stt_service=stt_service, tts_service=tts_service, vad_service=vad_service
-)
+stream_service = UnifiedStreamService(stt_service=stt_service, tts_service=tts_service, vad_service=vad_service)
 
 # Initialize WebRTC worker if available and enabled
 webrtc_task = None
 
 if WEBRTC_AVAILABLE and ENABLE_WEBRTC and not USE_MOCK:
     logger.info("WebRTC support enabled - will start worker on app startup")
+elif not WEBRTC_AVAILABLE:
+    logger.warning("WebRTC support disabled - aiortc not installed")
+elif USE_MOCK:
+    logger.info("WebRTC support disabled in mock mode")
 else:
-    if not WEBRTC_AVAILABLE:
-        logger.warning("WebRTC support disabled - aiortc not installed")
-    elif USE_MOCK:
-        logger.info("WebRTC support disabled in mock mode")
-    else:
-        logger.info("WebRTC support disabled via ENABLE_WEBRTC=false")
+    logger.info("WebRTC support disabled via ENABLE_WEBRTC=false")
 
 
 @app.on_event("startup")
@@ -210,13 +202,9 @@ async def startup_event():
     logger.info("Streaming Service: ✓ (initialized)")
 
     if not USE_MOCK and not all([stt_health, tts_health]):
-        logger.warning(
-            "Core services (STT/TTS) not ready. Run download_models.py to fetch required models."
-        )
+        logger.warning("Core services (STT/TTS) not ready. Run download_models.py to fetch required models.")
         if not vad_health:
-            logger.warning(
-                "VAD service degraded - this is non-critical and won't prevent service startup"
-            )
+            logger.warning("VAD service degraded - this is non-critical and won't prevent service startup")
 
     # Start WebRTC worker if enabled
     global webrtc_task
@@ -233,9 +221,9 @@ async def startup_event():
 # --- Request and Response Models ---
 class TTSRequest(BaseModel):
     text: str
-    voice: Optional[str] = None  # Will default to provider-specific voice
-    speed: Optional[float] = 1.0
-    extract_phonemes: Optional[bool] = True
+    voice: str | None = None  # Will default to provider-specific voice
+    speed: float | None = 1.0
+    extract_phonemes: bool | None = True
 
 
 class STTResponse(BaseModel):
@@ -254,7 +242,7 @@ class TTSResponse(BaseModel):
 
 
 class VADRequest(BaseModel):
-    remove_silence: Optional[bool] = False
+    remove_silence: bool | None = False
 
 
 # --- API Endpoints ---
@@ -361,7 +349,6 @@ async def health_check():
 
     # Core services (STT/TTS) must be healthy, VAD is optional
     core_healthy = stt_health and tts_health
-    all_healthy = core_healthy and vad_health
 
     return {
         "status": "healthy" if core_healthy else "unhealthy",
@@ -373,9 +360,7 @@ async def health_check():
         },
         "active_connections": stream_service.get_connection_count(),
         "mode": "mock" if USE_MOCK else "local",
-        "note": "VAD degradation doesn't affect core functionality"
-        if core_healthy and not vad_health
-        else None,
+        "note": "VAD degradation doesn't affect core functionality" if core_healthy and not vad_health else None,
     }
 
 
@@ -628,7 +613,7 @@ if WEBRTC_AVAILABLE:
         Called by interview-service when a new interview begins.
         """
         session_id = payload.get("session_id")
-        job_description = payload.get("job_description", "General software engineering position")
+        payload.get("job_description", "General software engineering position")
 
         if not session_id:
             return {"error": "Missing session_id"}, 400
@@ -647,7 +632,7 @@ if WEBRTC_AVAILABLE:
 
     @app.post("/webrtc/stop", tags=["webrtc"], summary="Stop WebRTC session")
     async def stop_webrtc_session(payload: dict = Body(...)):
-        """Stop an active WebRTC session"""
+        """Stop an active WebRTC session."""
         session_id = payload.get("session_id")
 
         if not session_id:
@@ -659,7 +644,7 @@ if WEBRTC_AVAILABLE:
 
     @app.post("/webrtc/tts", tags=["webrtc"], summary="Send TTS to WebRTC session")
     async def send_webrtc_tts(payload: dict = Body(...)):
-        """Generate and send TTS audio to active WebRTC session
+        """Generate and send TTS audio to active WebRTC session.
 
         Args:
             session_id: Active session ID
@@ -677,7 +662,7 @@ if WEBRTC_AVAILABLE:
 
     @app.get("/webrtc/status", tags=["webrtc"], summary="Get WebRTC status")
     async def get_webrtc_status():
-        """Get status of WebRTC functionality"""
+        """Get status of WebRTC functionality."""
         return {
             "webrtc_enabled": ENABLE_WEBRTC,
             "webrtc_available": WEBRTC_AVAILABLE,

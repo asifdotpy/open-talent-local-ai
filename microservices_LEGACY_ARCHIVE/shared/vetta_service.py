@@ -4,10 +4,9 @@ Vetta AI Service Integration
 Simple wrapper for integrating Vetta AI v4 into microservices
 """
 
-import os
-import torch
-from typing import Optional
 from enum import Enum
+
+import torch
 
 
 class RecruitingTask(Enum):
@@ -39,7 +38,7 @@ class VettaService:
         FastLanguageModel.for_inference(self.model)
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    def _format_prompt(self, instruction: str, context: Optional[str] = None) -> str:
+    def _format_prompt(self, instruction: str, context: str | None = None) -> str:
         """Format prompt in Alpaca style"""
         prompt = f"### Instruction:\n{instruction}"
         if context:
@@ -50,7 +49,7 @@ class VettaService:
     def generate(
         self,
         instruction: str,
-        context: Optional[str] = None,
+        context: str | None = None,
         max_tokens: int = 512,
         temperature: float = 0.7,
     ) -> str:

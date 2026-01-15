@@ -8,28 +8,32 @@ Tests for:
 - Main FastAPI app structure
 """
 
-import pytest
 import asyncio
-from unittest.mock import Mock, AsyncMock, patch
-from fastapi.testclient import TestClient
-from datetime import datetime
 
 # Add path for imports
 import sys
-sys.path.insert(0, '/home/asif1/open-talent/microservices/desktop-integration-service')
+from datetime import datetime
+
+import pytest
+from fastapi.testclient import TestClient
+
+sys.path.insert(0, "/home/asif1/open-talent/microservices/desktop-integration-service")
 
 from app.config.settings import settings
 from app.core.service_discovery import ServiceDiscovery, ServiceHealthCache
 from app.models.schemas import (
-    Message, InterviewConfig, InterviewSession,
-    StartInterviewRequest, InterviewResponseRequest,
-    ModelInfo, HealthResponse
+    HealthResponse,
+    InterviewConfig,
+    InterviewSession,
+    Message,
+    ModelInfo,
+    StartInterviewRequest,
 )
-
 
 # ============================================================================
 # Settings Tests
 # ============================================================================
+
 
 def test_settings_loaded():
     """Test that settings load correctly from environment."""
@@ -55,6 +59,7 @@ def test_settings_service_urls():
 # ============================================================================
 # Service Discovery Tests
 # ============================================================================
+
 
 def test_service_health_cache():
     """Test service health caching mechanism."""
@@ -87,6 +92,7 @@ async def test_service_discovery_initialization():
 # Pydantic Model Tests
 # ============================================================================
 
+
 def test_message_model():
     """Test Message pydantic model."""
     msg = Message(role="user", content="Hello")
@@ -101,11 +107,7 @@ def test_message_model():
 
 def test_interview_config_model():
     """Test InterviewConfig model."""
-    config = InterviewConfig(
-        role="Software Engineer",
-        model="granite-2b",
-        totalQuestions=5
-    )
+    config = InterviewConfig(role="Software Engineer", model="granite-2b", totalQuestions=5)
     assert config.role == "Software Engineer"
     assert config.totalQuestions == 5
     print("✅ InterviewConfig model valid")
@@ -113,29 +115,22 @@ def test_interview_config_model():
 
 def test_interview_session_model():
     """Test InterviewSession model - CRITICAL for desktop app contract."""
-    config = InterviewConfig(
-        role="Software Engineer",
-        model="granite-2b",
-        totalQuestions=5
-    )
+    config = InterviewConfig(role="Software Engineer", model="granite-2b", totalQuestions=5)
 
     messages = [
         Message(role="system", content="You are an interviewer"),
-        Message(role="assistant", content="Hello, let's begin!")
+        Message(role="assistant", content="Hello, let's begin!"),
     ]
 
     session = InterviewSession(
-        config=config,
-        messages=messages,
-        currentQuestion=1,
-        isComplete=False
+        config=config, messages=messages, currentQuestion=1, isComplete=False
     )
 
     # Verify contract matches desktop app expectations
     assert session.config.role == "Software Engineer"
     assert len(session.messages) == 2
     assert session.currentQuestion == 1
-    assert session.isComplete == False
+    assert not session.isComplete
 
     # Test serialization
     session_dict = session.dict()
@@ -147,11 +142,7 @@ def test_interview_session_model():
 
 def test_start_interview_request_model():
     """Test StartInterviewRequest model."""
-    request = StartInterviewRequest(
-        role="Software Engineer",
-        model="granite-2b",
-        totalQuestions=5
-    )
+    request = StartInterviewRequest(role="Software Engineer", model="granite-2b", totalQuestions=5)
     assert request.role == "Software Engineer"
     print("✅ StartInterviewRequest model valid")
 
@@ -166,7 +157,7 @@ def test_model_info_model():
         downloadSize="1.2GB",
         description="Trained model",
         dataset="interviews",
-        source="granite-interview-service"
+        source="granite-interview-service",
     )
     assert model.id == "granite-2b"
     assert model.paramCount == "2B"
@@ -179,7 +170,7 @@ def test_health_response_model():
         status="online",
         timestamp=datetime.now(),
         services={},
-        summary={"online": 7, "total": 7, "percentage": 100}
+        summary={"online": 7, "total": 7, "percentage": 100},
     )
     assert health.status == "online"
     assert health.summary["total"] == 7
@@ -190,10 +181,12 @@ def test_health_response_model():
 # Main App Structure Tests
 # ============================================================================
 
+
 def test_app_imports():
     """Test that main app can be imported without errors."""
     try:
         from app.main import app
+
         assert app is not None
         print("✅ Main app imported successfully")
     except Exception as e:
@@ -224,7 +217,7 @@ def test_app_cors_configured():
     from app.main import app
 
     # Check for CORS middleware
-    cors_middleware = [m for m in app.user_middleware if 'CORSMiddleware' in str(m)]
+    cors_middleware = [m for m in app.user_middleware if "CORSMiddleware" in str(m)]
     assert len(cors_middleware) > 0, "CORS middleware not configured"
     print("✅ CORS middleware configured")
 
@@ -232,6 +225,7 @@ def test_app_cors_configured():
 # ============================================================================
 # Integration Tests
 # ============================================================================
+
 
 def test_client_can_connect():
     """Test that TestClient can connect to app."""
@@ -266,9 +260,9 @@ def test_root_endpoint():
 # ============================================================================
 
 if __name__ == "__main__":
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("PHASE 0A INTEGRATION SERVICE TESTS")
-    print("="*70 + "\n")
+    print("=" * 70 + "\n")
 
     try:
         # Settings Tests
@@ -301,9 +295,9 @@ if __name__ == "__main__":
         test_client_can_connect()
         test_root_endpoint()
 
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print("✅ ALL PHASE 0A TESTS PASSED!")
-        print("="*70)
+        print("=" * 70)
         print("\nPhase 0A (Project Setup): COMPLETE ✅")
         print("Files created:")
         print("  ✅ app/config/settings.py (60 lines)")
@@ -311,10 +305,11 @@ if __name__ == "__main__":
         print("  ✅ app/models/schemas.py (120 lines)")
         print("  ✅ app/main.py (600 lines - 6 endpoint groups)")
         print("\nNext: Phase 0B (Health & Models Endpoints Testing)")
-        print("="*70 + "\n")
+        print("=" * 70 + "\n")
 
     except Exception as e:
         print(f"\n❌ Test failed: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

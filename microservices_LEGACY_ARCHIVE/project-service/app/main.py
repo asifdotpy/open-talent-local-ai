@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+
 from .models import JobDetails
 
 app = FastAPI()
@@ -18,8 +19,7 @@ async def health_check():
 
 @app.get("/jobs/{project_id}", response_model=JobDetails)
 async def get_job_details(project_id: str):
-    """
-    Returns the details for a specific job (project).
+    """Returns the details for a specific job (project).
     NOTE: This currently returns mocked data.
     """
     return {

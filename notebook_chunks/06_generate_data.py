@@ -19,27 +19,30 @@ Usage:
     python enhanced_vetta_data.py  # Generates and validates dataset
 """
 
-from collections import Counter, defaultdict
-from typing import List, Dict, Any, Tuple
 import json
-import random
-from dataclasses import dataclass
-from datasets import load_dataset, DatasetDict
-from huggingface_hub import HfApi
 import os
+import random
+from collections import Counter, defaultdict
+from dataclasses import dataclass
+from typing import Any
+
+from datasets import load_dataset
 
 
 @dataclass
 class ExampleMetadata:
     """Metadata for training examples."""
-    category: str  # opening, technical_question, feedback, behavioral, closing, edge_case, multi_turn
+
+    category: (
+        str  # opening, technical_question, feedback, behavioral, closing, edge_case, multi_turn
+    )
     difficulty: str  # beginner, intermediate, advanced
     domain: str  # backend_python, frontend, ml_ai, system_design, behavioral, general
     expected_length: str  # short, medium, long
     has_context: bool = False  # Whether this is part of a multi-turn conversation
 
 
-def validate_dataset(examples: List[Dict[str, Any]]) -> Dict[str, Any]:
+def validate_dataset(examples: list[dict[str, Any]]) -> dict[str, Any]:
     """
     Validate dataset quality and provide statistics.
 
@@ -49,11 +52,11 @@ def validate_dataset(examples: List[Dict[str, Any]]) -> Dict[str, Any]:
         "total_examples": len(examples),
         "warnings": [],
         "errors": [],
-        "statistics": {}
+        "statistics": {},
     }
 
     # Category distribution
-    categories = Counter(ex.get('category', 'unknown') for ex in examples)
+    categories = Counter(ex.get("category", "unknown") for ex in examples)
     validation_report["statistics"]["categories"] = dict(categories)
 
     # Check category balance
@@ -67,7 +70,7 @@ def validate_dataset(examples: List[Dict[str, Any]]) -> Dict[str, Any]:
     # Response length analysis
     response_lengths = []
     for ex in examples:
-        response = ex.get('response', '')
+        response = ex.get("response", "")
         word_count = len(response.split())
         response_lengths.append(word_count)
 
@@ -77,7 +80,7 @@ def validate_dataset(examples: List[Dict[str, Any]]) -> Dict[str, Any]:
         validation_report["statistics"]["response_lengths"] = {
             "min": min_len,
             "max": max_len,
-            "avg": round(avg_len, 1)
+            "avg": round(avg_len, 1),
         }
 
         # Check for length variety
@@ -97,15 +100,15 @@ def validate_dataset(examples: List[Dict[str, Any]]) -> Dict[str, Any]:
         )
 
     # Difficulty distribution
-    difficulties = Counter(ex.get('difficulty', 'unknown') for ex in examples)
+    difficulties = Counter(ex.get("difficulty", "unknown") for ex in examples)
     validation_report["statistics"]["difficulties"] = dict(difficulties)
 
     # Domain distribution
-    domains = Counter(ex.get('domain', 'unknown') for ex in examples)
+    domains = Counter(ex.get("domain", "unknown") for ex in examples)
     validation_report["statistics"]["domains"] = dict(domains)
 
     # Multi-turn examples
-    multi_turn_count = sum(1 for ex in examples if ex.get('has_context', False))
+    multi_turn_count = sum(1 for ex in examples if ex.get("has_context", False))
     validation_report["statistics"]["multi_turn_examples"] = multi_turn_count
 
     if multi_turn_count < total * 0.1:
@@ -116,7 +119,7 @@ def validate_dataset(examples: List[Dict[str, Any]]) -> Dict[str, Any]:
     return validation_report
 
 
-def create_enhanced_vetta_examples() -> List[Dict[str, Any]]:
+def create_enhanced_vetta_examples() -> list[dict[str, Any]]:
     """
     Create an enhanced dataset using Hugging Face datasets.
     Loads pre-existing data from user's Hugging Face account and adapts it for Vetta interview training.
@@ -124,16 +127,16 @@ def create_enhanced_vetta_examples() -> List[Dict[str, Any]]:
     """
 
     # Set Hugging Face token for authentication
-    hf_token = os.environ.get('HF_TOKEN')
+    hf_token = os.environ.get("HF_TOKEN")
     if hf_token:
-        os.environ['HF_TOKEN'] = hf_token
+        os.environ["HF_TOKEN"] = hf_token
     else:
         print("⚠️  HF_TOKEN not set. Please set it or run huggingface-cli login")
 
     # Load the specific dataset from user's Hugging Face account
     dataset_name = "asifdotpy/vetta-multi-persona-dataset"
     print(f"📥 Loading dataset from your Hugging Face account: {dataset_name}")
-    
+
     dataset = load_dataset(dataset_name, split="train")
 
     examples = []
@@ -152,14 +155,14 @@ def create_enhanced_vetta_examples() -> List[Dict[str, Any]]:
         "candidate_profiling": "general",
         "execution_monitoring": "general",
         "data_driven_insights": "general",
-        "edge_case": "edge_case"
+        "edge_case": "edge_case",
     }
 
     # Process and categorize examples
     for item in dataset:
-        instruction = item.get('instruction', '')
-        response = item.get('response', '')
-        category = item.get('category', '')
+        instruction = item.get("instruction", "")
+        response = item.get("response", "")
+        category = item.get("category", "")
 
         # Map to interview categories
         vetta_category = interview_categories.get(category, "general")
@@ -184,15 +187,17 @@ def create_enhanced_vetta_examples() -> List[Dict[str, Any]]:
         # Check for multi-turn context
         has_context = "follow up" in instruction.lower() or "previous" in instruction.lower()
 
-        examples.append({
-            "instruction": instruction,
-            "response": response,
-            "category": vetta_category,
-            "difficulty": difficulty,
-            "domain": domain,
-            "expected_length": expected_length,
-            "has_context": has_context
-        })
+        examples.append(
+            {
+                "instruction": instruction,
+                "response": response,
+                "category": vetta_category,
+                "difficulty": difficulty,
+                "domain": domain,
+                "expected_length": expected_length,
+                "has_context": has_context,
+            }
+        )
 
         # Limit to ~400 examples to leave room for expanded persona examples
         if len(examples) >= 400:
@@ -202,19 +207,19 @@ def create_enhanced_vetta_examples() -> List[Dict[str, Any]]:
     print("🎭 Adding expanded persona-specific training examples...")
     persona_examples = create_persona_examples()
     examples.extend(persona_examples)
-    
+
     print(f"📊 Total examples after persona expansion: {len(examples)}")
-    
+
     return examples
 
 
-def create_persona_examples() -> List[Dict[str, Any]]:
+def create_persona_examples() -> list[dict[str, Any]]:
     """
     Create expanded persona-specific training examples for HR, interviewer, and sourcer roles.
     Based on the actual persona definitions found in the agents directory.
     """
     persona_examples = []
-    
+
     # Technical Interviewer Examples (from Modelfile.technical)
     technical_examples = [
         {
@@ -224,7 +229,7 @@ def create_persona_examples() -> List[Dict[str, Any]]:
             "difficulty": "intermediate",
             "domain": "backend_python",
             "expected_length": "medium",
-            "has_context": False
+            "has_context": False,
         },
         {
             "instruction": "Evaluate this technical problem-solving approach: 'I would use a dictionary for O(1) lookups'",
@@ -233,7 +238,7 @@ def create_persona_examples() -> List[Dict[str, Any]]:
             "difficulty": "advanced",
             "domain": "system_design",
             "expected_length": "medium",
-            "has_context": True
+            "has_context": True,
         },
         {
             "instruction": "Ask about system design considerations for a high-traffic web application.",
@@ -242,10 +247,10 @@ def create_persona_examples() -> List[Dict[str, Any]]:
             "difficulty": "advanced",
             "domain": "system_design",
             "expected_length": "medium",
-            "has_context": False
-        }
+            "has_context": False,
+        },
     ]
-    
+
     # Behavioral Interviewer Examples (from Modelfile.behavioral)
     behavioral_examples = [
         {
@@ -255,7 +260,7 @@ def create_persona_examples() -> List[Dict[str, Any]]:
             "difficulty": "intermediate",
             "domain": "behavioral",
             "expected_length": "medium",
-            "has_context": False
+            "has_context": False,
         },
         {
             "instruction": "Evaluate communication skills in this response about project collaboration.",
@@ -264,7 +269,7 @@ def create_persona_examples() -> List[Dict[str, Any]]:
             "difficulty": "intermediate",
             "domain": "behavioral",
             "expected_length": "medium",
-            "has_context": True
+            "has_context": True,
         },
         {
             "instruction": "Ask about adaptability when facing changing project requirements.",
@@ -273,10 +278,10 @@ def create_persona_examples() -> List[Dict[str, Any]]:
             "difficulty": "intermediate",
             "domain": "behavioral",
             "expected_length": "medium",
-            "has_context": False
-        }
+            "has_context": False,
+        },
     ]
-    
+
     # HR Interviewer Examples (from Modelfile.hr)
     hr_examples = [
         {
@@ -286,7 +291,7 @@ def create_persona_examples() -> List[Dict[str, Any]]:
             "difficulty": "intermediate",
             "domain": "general",
             "expected_length": "medium",
-            "has_context": False
+            "has_context": False,
         },
         {
             "instruction": "Discuss company culture fit and values alignment.",
@@ -295,7 +300,7 @@ def create_persona_examples() -> List[Dict[str, Any]]:
             "difficulty": "intermediate",
             "domain": "general",
             "expected_length": "medium",
-            "has_context": False
+            "has_context": False,
         },
         {
             "instruction": "Ask about motivation for joining the company.",
@@ -304,10 +309,10 @@ def create_persona_examples() -> List[Dict[str, Any]]:
             "difficulty": "intermediate",
             "domain": "general",
             "expected_length": "medium",
-            "has_context": False
-        }
+            "has_context": False,
+        },
     ]
-    
+
     # Sourcer/Coordinator Examples (from scout-coordinator-agent)
     sourcer_examples = [
         {
@@ -317,7 +322,7 @@ def create_persona_examples() -> List[Dict[str, Any]]:
             "difficulty": "intermediate",
             "domain": "general",
             "expected_length": "medium",
-            "has_context": False
+            "has_context": False,
         },
         {
             "instruction": "Coordinate between scanning agents and quality assessment for found candidates.",
@@ -326,7 +331,7 @@ def create_persona_examples() -> List[Dict[str, Any]]:
             "difficulty": "intermediate",
             "domain": "general",
             "expected_length": "medium",
-            "has_context": True
+            "has_context": True,
         },
         {
             "instruction": "Monitor sourcing pipeline progress and provide status update.",
@@ -335,28 +340,28 @@ def create_persona_examples() -> List[Dict[str, Any]]:
             "difficulty": "intermediate",
             "domain": "general",
             "expected_length": "medium",
-            "has_context": False
-        }
+            "has_context": False,
+        },
     ]
-    
+
     # Add all persona examples
     persona_examples.extend(technical_examples)
     persona_examples.extend(behavioral_examples)
     persona_examples.extend(hr_examples)
     persona_examples.extend(sourcer_examples)
-    
+
     print(f"✅ Added {len(persona_examples)} persona-specific examples:")
     print(f"   - Technical: {len(technical_examples)}")
     print(f"   - Behavioral: {len(behavioral_examples)}")
     print(f"   - HR: {len(hr_examples)}")
     print(f"   - Sourcer: {len(sourcer_examples)}")
-    
+
     return persona_examples
 
 
-def create_train_validation_split(examples: List[Dict[str, Any]],
-                                train_ratio: float = 0.8,
-                                stratify_by: str = "category") -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+def create_train_validation_split(
+    examples: list[dict[str, Any]], train_ratio: float = 0.8, stratify_by: str = "category"
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """
     Create stratified train/validation split.
 
@@ -371,7 +376,7 @@ def create_train_validation_split(examples: List[Dict[str, Any]],
     # Group by stratification field
     groups = defaultdict(list)
     for ex in examples:
-        key = ex.get(stratify_by, 'unknown')
+        key = ex.get(stratify_by, "unknown")
         groups[key].append(ex)
 
     train_examples = []
@@ -390,9 +395,9 @@ def create_train_validation_split(examples: List[Dict[str, Any]],
     return train_examples, val_examples
 
 
-def save_dataset(examples: List[Dict[str, Any]], filename: str):
+def save_dataset(examples: list[dict[str, Any]], filename: str):
     """Save dataset to JSON file."""
-    with open(filename, 'w', encoding='utf-8') as f:
+    with open(filename, "w", encoding="utf-8") as f:
         json.dump(examples, f, indent=2, ensure_ascii=False)
     print(f"✅ Saved {len(examples)} examples to {filename}")
 
@@ -415,14 +420,14 @@ def main():
     print(f"Response lengths: {validation['statistics']['response_lengths']}")
     print(f"Multi-turn examples: {validation['statistics']['multi_turn_examples']}")
 
-    if validation['warnings']:
+    if validation["warnings"]:
         print("\n⚠️ Warnings:")
-        for warning in validation['warnings']:
+        for warning in validation["warnings"]:
             print(f"  - {warning}")
 
-    if validation['errors']:
+    if validation["errors"]:
         print("\n❌ Errors:")
-        for error in validation['errors']:
+        for error in validation["errors"]:
             print(f"  - {error}")
 
     # Create train/validation split

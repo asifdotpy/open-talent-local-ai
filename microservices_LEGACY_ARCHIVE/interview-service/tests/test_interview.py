@@ -1,6 +1,4 @@
-"""
-Tests for the interview process.
-"""
+"""Tests for the interview process."""
 
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
@@ -9,9 +7,7 @@ from app.core.config import settings
 
 
 def test_start_interview(client: TestClient, db: Session) -> None:
-    """
-    Test the start_interview endpoint.
-    """
+    """Test the start_interview endpoint."""
     payload = {
         "searchCriteria": {
             "jobTitle": "Software Engineer",
@@ -29,9 +25,7 @@ def test_start_interview(client: TestClient, db: Session) -> None:
                     "title": "Senior Software Engineer",
                     "company": "Acme Inc.",
                     "duration": "2 years",
-                    "responsibilities": [
-                        "Developed and maintained web applications using Python and FastAPI."
-                    ],
+                    "responsibilities": ["Developed and maintained web applications using Python and FastAPI."],
                 }
             ],
             "education": [

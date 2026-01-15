@@ -1,4 +1,4 @@
-"""Tests for the current Interview Service implementation (main.py)
+"""Tests for the current Interview Service implementation (main.py).
 
 Tests room management, WebRTC streaming, transcription, and AI intelligence features.
 """
@@ -113,9 +113,7 @@ class TestRoomManagement:
 
     def test_join_nonexistent_room(self, client):
         """Test joining a room that doesn't exist."""
-        join_data = {
-            "participant": {"user_id": "test", "display_name": "Test User", "role": "candidate"}
-        }
+        join_data = {"participant": {"user_id": "test", "display_name": "Test User", "role": "candidate"}}
         response = client.post("/api/v1/rooms/nonexistent-room/join", json=join_data)
         assert response.status_code == 404
 
@@ -178,9 +176,7 @@ class TestWebRTCAudioStreaming:
         mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
 
         # Start WebRTC streaming
-        response = client.post(
-            f"/api/v1/rooms/{room_id}/webrtc/start", params={"participant_id": "candidate-1"}
-        )
+        response = client.post(f"/api/v1/rooms/{room_id}/webrtc/start", params={"participant_id": "candidate-1"})
         assert response.status_code == 200
         data = response.json()
         assert data["connection_id"].startswith("webrtc-")
@@ -188,9 +184,7 @@ class TestWebRTCAudioStreaming:
 
     def test_start_webrtc_nonexistent_room(self, client):
         """Test starting WebRTC in nonexistent room."""
-        response = client.post(
-            "/api/v1/rooms/nonexistent/webrtc/start", params={"participant_id": "test"}
-        )
+        response = client.post("/api/v1/rooms/nonexistent/webrtc/start", params={"participant_id": "test"})
         assert response.status_code == 404
 
     def test_get_webrtc_status(self, client, sample_room_data):
@@ -381,9 +375,7 @@ class TestInterviewStart:
     def test_start_interview_voice_service_failure(self, mock_client, client, sample_room_data):
         """Test interview start when voice service fails (should still work)."""
         # Mock voice service failure
-        mock_client.return_value.__aenter__.return_value.post.side_effect = Exception(
-            "Voice service down"
-        )
+        mock_client.return_value.__aenter__.return_value.post.side_effect = Exception("Voice service down")
 
         response = client.post("/api/v1/interviews/start", json=sample_room_data)
         assert response.status_code == 200  # Should still succeed
@@ -407,9 +399,7 @@ class TestErrorHandling:
         client.delete(f"/api/v1/rooms/{room_id}/end")
 
         # Try to join ended room
-        join_data = {
-            "participant": {"user_id": "test", "display_name": "Test User", "role": "candidate"}
-        }
+        join_data = {"participant": {"user_id": "test", "display_name": "Test User", "role": "candidate"}}
         response = client.post(f"/api/v1/rooms/{room_id}/join", json=join_data)
         assert response.status_code == 410  # Gone
 

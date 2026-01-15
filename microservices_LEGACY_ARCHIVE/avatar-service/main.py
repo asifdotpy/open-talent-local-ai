@@ -125,8 +125,6 @@ def create_app() -> FastAPI:
     return app
 
 
-from fastapi.staticfiles import StaticFiles
-
 # ... existing imports ...
 
 # Create app instance
@@ -232,7 +230,7 @@ async def health_check():
 @app.post("/render/lipsync")
 async def render_lipsync(request: RenderRequest):
     """Render avatar video with lip-sync
-    Uses face.glb in production, allows model override in dev
+    Uses face.glb in production, allows model override in dev.
     """
     # Call Node.js renderer
     renderer_script = os.path.join(os.path.dirname(__file__), "renderer", "render.js")
@@ -247,9 +245,7 @@ async def render_lipsync(request: RenderRequest):
     )
 
     renderer_dir = os.path.dirname(renderer_script)
-    logger.info(
-        f"Rendering request: text={request.text}, duration={request.duration}s, model={request.model}"
-    )
+    logger.info(f"Rendering request: text={request.text}, duration={request.duration}s, model={request.model}")
 
     try:
         process = subprocess.run(

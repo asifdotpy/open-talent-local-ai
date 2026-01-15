@@ -1,6 +1,7 @@
 """Aligned Tests for Interview Service
 Targets the actual implementation in main.py.
 """
+
 from datetime import datetime
 
 import pytest
@@ -33,9 +34,7 @@ class TestInterviewAligned:
 
     def test_create_and_get_room(self, test_client_rooms: TestClient, create_room_data: dict):
         # Create Room
-        response = test_client_rooms.post(
-            "/api/v1/rooms/create", json=create_room_data
-        )
+        response = test_client_rooms.post("/api/v1/rooms/create", json=create_room_data)
         assert response.status_code == 200
         room = response.json()
         assert room["interview_session_id"] == "test-session-123"
@@ -56,9 +55,7 @@ class TestInterviewAligned:
         # This endpoint also creates a room but triggers voice service
         data = create_room_data.copy()
         data["interview_session_id"] = f"session-start-{datetime.now().timestamp()}"
-        response = test_client_rooms.post(
-            "/api/v1/interviews/start", json=data
-        )
+        response = test_client_rooms.post("/api/v1/interviews/start", json=data)
         assert response.status_code in [200, 201]
 
     def test_vetta_info(self, test_client_rooms: TestClient):

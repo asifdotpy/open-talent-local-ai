@@ -4,7 +4,6 @@ FastAPI endpoints for question generation service.
 Inspired by PeopleGPT's conversational search paradigm
 """
 
-
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from services.question_builder import (

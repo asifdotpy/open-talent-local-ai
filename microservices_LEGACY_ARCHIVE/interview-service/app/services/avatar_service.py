@@ -1,11 +1,8 @@
-"""
-Placeholder for the Avatar Service.
-"""
+"""Placeholder for the Avatar Service."""
 
 
 def get_avatar_response(dialogue: str) -> dict:
-    """
-    Gets the avatar response from the Avatar Service.
+    """Gets the avatar response from the Avatar Service.
     In a real implementation, this would call the Avatar Service with local rendering.
     """
     print("--- AVATAR SERVICE ---")

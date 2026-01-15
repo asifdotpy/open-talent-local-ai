@@ -1,24 +1,17 @@
-"""
-Unit tests for AI Interview Intelligence functions.
+"""Unit tests for AI Interview Intelligence functions.
 
 Tests the core AI analysis functions: sentiment analysis, bias detection,
 response quality assessment, and expertise evaluation.
 """
 
 import pytest
-from textblob import TextBlob
-from unittest.mock import patch, MagicMock
+
 from main import (
-    SentimentAnalysis,
-    ResponseQuality,
-    BiasDetection,
-    ExpertiseAssessment,
     FollowupQuestion,
-    ResponseAnalysis,
-    analyze_response_sentiment,
-    detect_response_bias,
     analyze_response_quality,
+    analyze_response_sentiment,
     assess_response_expertise,
+    detect_response_bias,
     generate_followup_questions,
 )
 
@@ -29,9 +22,7 @@ class TestSentimentAnalysis:
     @pytest.mark.asyncio
     async def test_positive_sentiment(self):
         """Test analysis of positive sentiment text."""
-        text = (
-            "I'm very excited about this opportunity and I think I'd be a great fit for the team."
-        )
+        text = "I'm very excited about this opportunity and I think I'd be a great fit for the team."
         sentiment = await analyze_response_sentiment(text)
 
         assert sentiment.polarity > 0.5
@@ -83,9 +74,7 @@ class TestBiasDetection:
     @pytest.mark.asyncio
     async def test_gender_bias_detection(self):
         """Test detection of gender-related bias."""
-        text = (
-            "She would be perfect for this role because women are naturally more detail-oriented."
-        )
+        text = "She would be perfect for this role because women are naturally more detail-oriented."
         participants = []  # Mock participants
         bias = await detect_response_bias(text, participants)
 
@@ -119,9 +108,7 @@ class TestBiasDetection:
     @pytest.mark.asyncio
     async def test_multiple_bias_types(self):
         """Test detection of multiple bias types."""
-        text = (
-            "As a young woman, she brings fresh perspectives but might lack the experience needed."
-        )
+        text = "As a young woman, she brings fresh perspectives but might lack the experience needed."
         participants = []
         bias = await detect_response_bias(text, participants)
 
@@ -285,7 +272,9 @@ class TestIntegrationAnalysis:
         assert sentiment.emotion == "neutral"
 
         # Technical jargon heavy response
-        tech_text = "I implemented microservices using Kubernetes, Docker, and implemented CI/CD with Jenkins and GitLab CI."
+        tech_text = (
+            "I implemented microservices using Kubernetes, Docker, and implemented CI/CD with Jenkins and GitLab CI."
+        )
         expertise = await assess_response_expertise(tech_text, "Describe your DevOps experience.")
         assert expertise.level in ["intermediate", "advanced", "expert"]
 
@@ -303,9 +292,7 @@ class TestIntegrationAnalysis:
         sentiment = await analyze_response_sentiment(response_text)
         quality = await analyze_response_quality(response_text, question_context)
 
-        followup_questions = await generate_followup_questions(
-            response_text, question_context, sentiment, quality
-        )
+        followup_questions = await generate_followup_questions(response_text, question_context, sentiment, quality)
 
         assert isinstance(followup_questions, list)
         assert len(followup_questions) > 0

@@ -38,9 +38,7 @@ class PiperTTSService:
     def _verify_piper_available(self) -> None:
         """Verify piper CLI is installed and accessible."""
         try:
-            result = subprocess.run(
-                ["piper", "--version"], check=False, capture_output=True, timeout=5
-            )
+            result = subprocess.run(["piper", "--version"], check=False, capture_output=True, timeout=5)
             if result.returncode != 0:
                 raise RuntimeError("Piper CLI not found")
         except (FileNotFoundError, subprocess.TimeoutExpired) as e:
@@ -80,9 +78,7 @@ class PiperTTSService:
             if self.use_gpu:
                 cmd.append("--cuda")
 
-            result = subprocess.run(
-                cmd, check=False, input=text.encode("utf-8"), capture_output=True, timeout=30
-            )
+            result = subprocess.run(cmd, check=False, input=text.encode("utf-8"), capture_output=True, timeout=30)
 
             if result.returncode != 0:
                 raise RuntimeError(f"Piper failed: {result.stderr.decode()}")

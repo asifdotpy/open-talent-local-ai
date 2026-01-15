@@ -9,7 +9,6 @@ import os
 import sys
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -34,7 +33,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-message_bus: Optional[MessageBus] = None
+message_bus: MessageBus | None = None
 config = get_config()
 
 

@@ -1,5 +1,4 @@
-"""
-Candidate Service Integration Tests
+"""Candidate Service Integration Tests.
 
 Comprehensive testing of the candidate service endpoints with honest validation
 of actual service behavior. Tests vector search functionality and profile management.
@@ -15,12 +14,8 @@ Test Coverage:
 Total: 24 tests
 """
 
-import pytest
-import httpx
-import asyncio
 import time
-import uuid
-from typing import Dict, Any
+
 from fastapi.testclient import TestClient
 
 from main import app
@@ -375,7 +370,8 @@ class TestCandidateServiceIntegration:
         candidate_data = {"full_name": "Test User"}
 
         response = self.client.post(
-            "/api/v1/candidate-profiles", content=str(candidate_data)  # Not JSON
+            "/api/v1/candidate-profiles",
+            content=str(candidate_data),  # Not JSON
         )
 
         # Should handle gracefully or return error
@@ -409,9 +405,7 @@ class TestCandidateServiceIntegration:
                     "responsibilities": ["Writing code", "Testing software"],
                 }
             ],
-            "education": [
-                {"institution": "Test University", "degree": "BS Computer Science", "year": "2019"}
-            ],
+            "education": [{"institution": "Test University", "degree": "BS Computer Science", "year": "2019"}],
             "skills": {"matched": ["Python", "Testing"], "unmatched": ["Design"]},
             "alignment_score": 0.8,
             "initial_questions": [

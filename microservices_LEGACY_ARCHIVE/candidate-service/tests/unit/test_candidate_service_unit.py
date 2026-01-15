@@ -1,5 +1,4 @@
-"""
-Candidate Service Unit Tests
+"""Candidate Service Unit Tests.
 
 Unit tests for individual components of the candidate service.
 Focus on vector search, profile management, and data validation without external dependencies.
@@ -14,22 +13,22 @@ Test Coverage:
 Total: 28 tests
 """
 
-import pytest
-import numpy as np
-from unittest.mock import Mock, patch, MagicMock
 import json
-import uuid
+from unittest.mock import Mock, patch
+
+import numpy as np
+import pytest
 
 # Import service components
 from main import (
-    create_candidate_embedding,
-    store_candidate_profile,
-    search_similar_candidates,
     CandidateProfile,
-    WorkExperience,
     Education,
-    Skills,
     InitialQuestion,
+    Skills,
+    WorkExperience,
+    create_candidate_embedding,
+    search_similar_candidates,
+    store_candidate_profile,
 )
 
 
@@ -79,9 +78,7 @@ class TestVectorSearch:
     @patch("main.vector_db")
     @patch("main.create_candidate_embedding")
     @patch("main.uuid.uuid4")
-    def test_store_candidate_profile_success(
-        self, mock_uuid, mock_create_embedding, mock_vector_db
-    ):
+    def test_store_candidate_profile_success(self, mock_uuid, mock_create_embedding, mock_vector_db):
         """Test successful candidate profile storage."""
         # Mock UUID to return a mock object that converts to string as expected
         mock_uuid_obj = Mock()
@@ -176,8 +173,7 @@ class TestVectorSearch:
 
         mock_table = Mock()
         mock_results = [
-            {"id": f"cand-{i}", "full_name": f"User {i}", "_distance": 0.1 * i, "metadata": "{}"}
-            for i in range(10)
+            {"id": f"cand-{i}", "full_name": f"User {i}", "_distance": 0.1 * i, "metadata": "{}"} for i in range(10)
         ]
         mock_table.search.return_value.limit.return_value.to_list.return_value = mock_results
         mock_vector_db.open_table.return_value = mock_table
@@ -205,9 +201,7 @@ class TestDataModels:
                     responsibilities=["Led development team", "Architected microservices"],
                 )
             ],
-            education=[
-                Education(institution="State University", degree="MS Computer Science", year="2016")
-            ],
+            education=[Education(institution="State University", degree="MS Computer Science", year="2016")],
             skills=Skills(matched=["Python", "JavaScript", "AWS"], unmatched=["C++", "Rust"]),
             alignment_score=0.92,
             initial_questions=[
@@ -268,9 +262,7 @@ class TestDataModels:
 
     def test_skills_model(self):
         """Test Skills model."""
-        skills = Skills(
-            matched=["Python", "Machine Learning", "TensorFlow"], unmatched=["Ruby", "Rails"]
-        )
+        skills = Skills(matched=["Python", "Machine Learning", "TensorFlow"], unmatched=["Ruby", "Rails"])
 
         assert len(skills.matched) == 3
         assert len(skills.unmatched) == 2
@@ -314,7 +306,7 @@ class TestEmbeddingGeneration:
             initial_questions=[],
         )
 
-        embedding = create_candidate_embedding(profile)
+        create_candidate_embedding(profile)
 
         # Verify embed was called
         mock_embedding_model.embed.assert_called_once()

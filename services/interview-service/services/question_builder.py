@@ -342,8 +342,8 @@ Requirements:
 - skill_assessed as array of strings
 
 Context:
-Job Title: {prompt.job_title or 'Software Engineer'}
-Skills: {', '.join(prompt.required_skills) if prompt.required_skills else 'General technical skills'}
+Job Title: {prompt.job_title or "Software Engineer"}
+Skills: {", ".join(prompt.required_skills) if prompt.required_skills else "General technical skills"}
 Difficulty: {prompt.difficulty.value}
 Duration: {prompt.interview_duration} minutes
 
@@ -374,8 +374,8 @@ Requirements:
 - skill_assessed as array of strings
 
 Context:
-Job Title: {prompt.job_title or 'Software Engineer'}
-Skills: {', '.join(prompt.required_skills) if prompt.required_skills else 'General technical skills'}
+Job Title: {prompt.job_title or "Software Engineer"}
+Skills: {", ".join(prompt.required_skills) if prompt.required_skills else "General technical skills"}
 Difficulty: {prompt.difficulty.value}
 Duration: {prompt.interview_duration} minutes
 

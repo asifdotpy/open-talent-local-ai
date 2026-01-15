@@ -5,65 +5,75 @@ Provides high-level APIs for question generation, response analysis,
 candidate assessment, and interview flow management.
 """
 
-import logging
 import json
-from typing import Dict, Any, List, Optional
+import logging
 from dataclasses import dataclass
 from enum import Enum
 
-from ..models import model_registry
 from ..config import settings
+from ..models import model_registry
 
 logger = logging.getLogger(__name__)
 
+
 class InterviewPhase(Enum):
     """Phases of an interview."""
+
     INTRODUCTION = "introduction"
     TECHNICAL = "technical"
     BEHAVIORAL = "behavioral"
     CULTURE_FIT = "culture_fit"
     CLOSING = "closing"
 
+
 class QuestionType(Enum):
     """Types of interview questions."""
+
     TECHNICAL = "technical"
     BEHAVIORAL = "behavioral"
     SITUATIONAL = "situational"
     CULTURE_FIT = "culture_fit"
     FOLLOW_UP = "follow_up"
 
+
 @dataclass
 class InterviewQuestion:
     """Represents an interview question."""
+
     question: str
     type: QuestionType
     phase: InterviewPhase
     difficulty: str  # easy, medium, hard
-    skills_assessed: List[str]
-    follow_up_questions: List[str] = None
+    skills_assessed: list[str]
+    follow_up_questions: list[str] = None
+
 
 @dataclass
 class CandidateResponse:
     """Represents a candidate's response analysis."""
+
     response_text: str
     sentiment_score: float  # -1 to 1
     confidence_score: float  # 0 to 1
-    key_points: List[str]
-    strengths: List[str]
-    weaknesses: List[str]
+    key_points: list[str]
+    strengths: list[str]
+    weaknesses: list[str]
     technical_accuracy: float  # 0 to 1
     communication_score: float  # 0 to 1
+
 
 @dataclass
 class InterviewAssessment:
     """Overall interview assessment."""
+
     overall_score: float  # 0 to 100
     technical_score: float
     communication_score: float
     culture_fit_score: float
-    recommendations: List[str]
+    recommendations: list[str]
     hire_recommendation: str  # "Strong Hire", "Hire", "Maybe", "No Hire"
     feedback_summary: str
+
 
 class InferenceEngine:
     """Engine for AI-powered interview intelligence."""
@@ -77,8 +87,8 @@ class InferenceEngine:
         candidate_experience: str,
         num_questions: int = 5,
         phase: InterviewPhase = InterviewPhase.TECHNICAL,
-        model_name: Optional[str] = None
-    ) -> List[InterviewQuestion]:
+        model_name: str | None = None,
+    ) -> list[InterviewQuestion]:
         """Generate interview questions based on job requirements."""
 
         model = model_name or self.default_model
@@ -100,8 +110,8 @@ class InferenceEngine:
         self,
         question: str,
         response: str,
-        expected_skills: List[str],
-        model_name: Optional[str] = None
+        expected_skills: list[str],
+        model_name: str | None = None,
     ) -> CandidateResponse:
         """Analyze a candidate's response to a question."""
 
@@ -124,7 +134,7 @@ class InferenceEngine:
                 strengths=[],
                 weaknesses=[],
                 technical_accuracy=0.0,
-                communication_score=0.0
+                communication_score=0.0,
             )
 
     def generate_follow_up_questions(
@@ -132,8 +142,8 @@ class InferenceEngine:
         original_question: str,
         candidate_response: str,
         num_questions: int = 2,
-        model_name: Optional[str] = None
-    ) -> List[str]:
+        model_name: str | None = None,
+    ) -> list[str]:
         """Generate follow-up questions based on candidate response."""
 
         model = model_name or self.default_model
@@ -151,9 +161,9 @@ class InferenceEngine:
 
     def assess_interview_overall(
         self,
-        questions_and_responses: List[Dict[str, str]],
+        questions_and_responses: list[dict[str, str]],
         job_requirements: str,
-        model_name: Optional[str] = None
+        model_name: str | None = None,
     ) -> InterviewAssessment:
         """Provide overall interview assessment."""
 
@@ -175,7 +185,7 @@ class InferenceEngine:
                 culture_fit_score=0.0,
                 recommendations=[],
                 hire_recommendation="Unable to assess",
-                feedback_summary="Assessment failed due to technical error"
+                feedback_summary="Assessment failed due to technical error",
             )
 
     def _build_question_generation_prompt(
@@ -183,7 +193,7 @@ class InferenceEngine:
         job_description: str,
         candidate_experience: str,
         num_questions: int,
-        phase: InterviewPhase
+        phase: InterviewPhase,
     ) -> str:
         """Build prompt for question generation."""
 
@@ -215,10 +225,7 @@ Format your response as a JSON array of objects with this structure:
 Generate exactly {num_questions} questions."""
 
     def _build_response_analysis_prompt(
-        self,
-        question: str,
-        response: str,
-        expected_skills: List[str]
+        self, question: str, response: str, expected_skills: list[str]
     ) -> str:
         """Build prompt for response analysis."""
 
@@ -228,7 +235,7 @@ Question: {question}
 
 Candidate Response: {response}
 
-Expected Skills: {', '.join(expected_skills)}
+Expected Skills: {", ".join(expected_skills)}
 
 Provide a detailed analysis in the following JSON format:
 {{
@@ -244,10 +251,7 @@ Provide a detailed analysis in the following JSON format:
 Be objective and provide specific feedback."""
 
     def _build_follow_up_prompt(
-        self,
-        original_question: str,
-        candidate_response: str,
-        num_questions: int
+        self, original_question: str, candidate_response: str, num_questions: int
     ) -> str:
         """Build prompt for follow-up questions."""
 
@@ -267,16 +271,13 @@ Format as a JSON array of strings:
 ["Follow-up question 1", "Follow-up question 2"]"""
 
     def _build_assessment_prompt(
-        self,
-        questions_and_responses: List[Dict[str, str]],
-        job_requirements: str
+        self, questions_and_responses: list[dict[str, str]], job_requirements: str
     ) -> str:
         """Build prompt for overall interview assessment."""
 
-        qa_pairs = "\n\n".join([
-            f"Q: {qa['question']}\nA: {qa['response']}"
-            for qa in questions_and_responses
-        ])
+        qa_pairs = "\n\n".join(
+            [f"Q: {qa['question']}\nA: {qa['response']}" for qa in questions_and_responses]
+        )
 
         return f"""Provide an overall assessment of this candidate's interview performance.
 
@@ -299,7 +300,9 @@ Provide assessment in this JSON format:
 
 Be thorough and objective in your assessment."""
 
-    def _parse_question_response(self, response: str, phase: InterviewPhase) -> List[InterviewQuestion]:
+    def _parse_question_response(
+        self, response: str, phase: InterviewPhase
+    ) -> list[InterviewQuestion]:
         """Parse question generation response."""
         try:
             questions_data = json.loads(response)
@@ -307,12 +310,12 @@ Be thorough and objective in your assessment."""
 
             for q_data in questions_data:
                 question = InterviewQuestion(
-                    question=q_data['question'],
-                    type=QuestionType(q_data['type']),
+                    question=q_data["question"],
+                    type=QuestionType(q_data["type"]),
                     phase=phase,
-                    difficulty=q_data['difficulty'],
-                    skills_assessed=q_data['skills_assessed'],
-                    follow_up_questions=q_data.get('follow_up_questions', [])
+                    difficulty=q_data["difficulty"],
+                    skills_assessed=q_data["skills_assessed"],
+                    follow_up_questions=q_data.get("follow_up_questions", []),
                 )
                 questions.append(question)
 
@@ -327,13 +330,13 @@ Be thorough and objective in your assessment."""
             analysis = json.loads(response)
             return CandidateResponse(
                 response_text=original_response,
-                sentiment_score=float(analysis['sentiment_score']),
-                confidence_score=float(analysis['confidence_score']),
-                key_points=analysis['key_points'],
-                strengths=analysis['strengths'],
-                weaknesses=analysis['weaknesses'],
-                technical_accuracy=float(analysis['technical_accuracy']),
-                communication_score=float(analysis['communication_score'])
+                sentiment_score=float(analysis["sentiment_score"]),
+                confidence_score=float(analysis["confidence_score"]),
+                key_points=analysis["key_points"],
+                strengths=analysis["strengths"],
+                weaknesses=analysis["weaknesses"],
+                technical_accuracy=float(analysis["technical_accuracy"]),
+                communication_score=float(analysis["communication_score"]),
             )
         except (json.JSONDecodeError, KeyError) as e:
             logger.error(f"Error parsing response analysis: {e}")
@@ -345,10 +348,10 @@ Be thorough and objective in your assessment."""
                 strengths=[],
                 weaknesses=[],
                 technical_accuracy=0.0,
-                communication_score=0.0
+                communication_score=0.0,
             )
 
-    def _parse_follow_up_response(self, response: str) -> List[str]:
+    def _parse_follow_up_response(self, response: str) -> list[str]:
         """Parse follow-up questions response."""
         try:
             questions = json.loads(response)
@@ -362,13 +365,13 @@ Be thorough and objective in your assessment."""
         try:
             assessment = json.loads(response)
             return InterviewAssessment(
-                overall_score=float(assessment['overall_score']),
-                technical_score=float(assessment['technical_score']),
-                communication_score=float(assessment['communication_score']),
-                culture_fit_score=float(assessment['culture_fit_score']),
-                recommendations=assessment['recommendations'],
-                hire_recommendation=assessment['hire_recommendation'],
-                feedback_summary=assessment['feedback_summary']
+                overall_score=float(assessment["overall_score"]),
+                technical_score=float(assessment["technical_score"]),
+                communication_score=float(assessment["communication_score"]),
+                culture_fit_score=float(assessment["culture_fit_score"]),
+                recommendations=assessment["recommendations"],
+                hire_recommendation=assessment["hire_recommendation"],
+                feedback_summary=assessment["feedback_summary"],
             )
         except (json.JSONDecodeError, KeyError) as e:
             logger.error(f"Error parsing assessment response: {e}")
@@ -379,8 +382,9 @@ Be thorough and objective in your assessment."""
                 culture_fit_score=0.0,
                 recommendations=[],
                 hire_recommendation="Unable to assess",
-                feedback_summary="Assessment parsing failed"
+                feedback_summary="Assessment parsing failed",
             )
+
 
 # Global inference engine instance
 inference_engine = InferenceEngine()

@@ -44,9 +44,9 @@ def test_bcrypt_with_pepper_changes_hash_and_verification():
     h2 = mod_peppered.hash_password(pw)
     assert h1 != h2, "Pepper should change resulting hash"
     assert mod_peppered.verify_password(pw, h2) is True
-    assert (
-        mod_peppered.verify_password(pw, h1) is False
-    ), "Hash generated without pepper should not verify with pepper"
+    assert mod_peppered.verify_password(pw, h1) is False, (
+        "Hash generated without pepper should not verify with pepper"
+    )
 
 
 def test_legacy_sha256_verification_still_supported():

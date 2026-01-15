@@ -1,4 +1,4 @@
-"""Modular Sentiment Analysis Service for OpenTalent Platform
+"""Modular Sentiment Analysis Service for OpenTalent Platform.
 
 This service provides sentiment analysis capabilities using various models:
 - BERT (via transformers library)
@@ -18,7 +18,6 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Optional
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -89,7 +88,7 @@ class BaseSentimentAnalyzer(ABC):
         """Generate hash for text caching."""
         return hashlib.md5(text.encode()).hexdigest()
 
-    def _get_cached_result(self, text_hash: str) -> Optional[SentimentResult]:
+    def _get_cached_result(self, text_hash: str) -> SentimentResult | None:
         """Get cached result if available and not expired."""
         if not self.config.cache_enabled:
             return None
@@ -138,9 +137,7 @@ class BERTSentimentAnalyzer(BaseSentimentAnalyzer):
             self.id2label = self.model.config.id2label
             self.label2id = {v: k for k, v in self.id2label.items()}
 
-            logger.info(
-                f"Successfully loaded {self.config.model_name} with labels: {list(self.id2label.values())}"
-            )
+            logger.info(f"Successfully loaded {self.config.model_name} with labels: {list(self.id2label.values())}")
 
         except ImportError as e:
             logger.error(f"Failed to import required libraries: {e}")
@@ -221,9 +218,7 @@ class BERTSentimentAnalyzer(BaseSentimentAnalyzer):
         results = []
         for i in range(0, len(texts), self.config.batch_size):
             batch_texts = texts[i : i + self.config.batch_size]
-            batch_results = await asyncio.gather(
-                *[self.analyze_sentiment(text) for text in batch_texts]
-            )
+            batch_results = await asyncio.gather(*[self.analyze_sentiment(text) for text in batch_texts])
             results.extend(batch_results)
         return results
 
@@ -232,19 +227,9 @@ class BERTSentimentAnalyzer(BaseSentimentAnalyzer):
         label_lower = label.lower()
 
         # Common mappings for different BERT models
-        if (
-            "positive" in label_lower
-            or "pos" in label_lower
-            or "4" in label_lower
-            or "5" in label_lower
-        ):
+        if "positive" in label_lower or "pos" in label_lower or "4" in label_lower or "5" in label_lower:
             return "positive"
-        elif (
-            "negative" in label_lower
-            or "neg" in label_lower
-            or "1" in label_lower
-            or "2" in label_lower
-        ):
+        elif "negative" in label_lower or "neg" in label_lower or "1" in label_lower or "2" in label_lower:
             return "negative"
         elif "neutral" in label_lower or "neu" in label_lower or "3" in label_lower:
             return "neutral"
@@ -325,8 +310,8 @@ class ModularSentimentService:
 
     def __init__(self):
         self.analyzers: dict[SentimentModel, BaseSentimentAnalyzer] = {}
-        self.primary_analyzer: Optional[SentimentModel] = None
-        self.fallback_analyzer: Optional[SentimentModel] = None
+        self.primary_analyzer: SentimentModel | None = None
+        self.fallback_analyzer: SentimentModel | None = None
 
     def configure_analyzer(self, config: SentimentConfig):
         """Configure a specific sentiment analyzer."""
@@ -370,14 +355,10 @@ class ModularSentimentService:
                     fallback = self.analyzers[self.fallback_analyzer]
                     method = getattr(fallback, method_name)
                     result = await method(*args, **kwargs)
-                    logger.info(
-                        f"Successfully used fallback {self.fallback_analyzer.value} for {method_name}"
-                    )
+                    logger.info(f"Successfully used fallback {self.fallback_analyzer.value} for {method_name}")
                     return result
                 except Exception as fallback_e:
-                    logger.error(
-                        f"Fallback analyzer {self.fallback_analyzer.value} also failed: {fallback_e}"
-                    )
+                    logger.error(f"Fallback analyzer {self.fallback_analyzer.value} also failed: {fallback_e}")
 
             raise e
 
@@ -403,15 +384,11 @@ def configure_sentiment_service():
     """Configure the sentiment service based on environment variables."""
     # Primary analyzer configuration
     primary_model_str = os.getenv("SENTIMENT_MODEL", "mock").lower()
-    primary_model_name = os.getenv(
-        "SENTIMENT_MODEL_NAME", "cardiffnlp/twitter-roberta-base-sentiment-latest"
-    )
+    primary_model_name = os.getenv("SENTIMENT_MODEL_NAME", "cardiffnlp/twitter-roberta-base-sentiment-latest")
 
     # Fallback analyzer configuration
     fallback_model_str = os.getenv("SENTIMENT_FALLBACK_MODEL", "mock").lower()
-    fallback_model_name = os.getenv(
-        "SENTIMENT_FALLBACK_MODEL_NAME", "cardiffnlp/twitter-roberta-base-sentiment-latest"
-    )
+    fallback_model_name = os.getenv("SENTIMENT_FALLBACK_MODEL_NAME", "cardiffnlp/twitter-roberta-base-sentiment-latest")
 
     # Map string to enum
     try:
@@ -454,9 +431,7 @@ def configure_sentiment_service():
         modular_sentiment_service.configure_analyzer(fallback_config)
         # Note: We don't set fallback in config since it's handled at service level
 
-    logger.info(
-        f"Configured sentiment service with primary: {primary_model.value}, fallback: {fallback_model.value}"
-    )
+    logger.info(f"Configured sentiment service with primary: {primary_model.value}, fallback: {fallback_model.value}")
 
 
 # Initialize on import

@@ -592,9 +592,9 @@ class GitHubTalentScout:
             print("\n[ERROR] No candidates with emails found")
             return
 
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print("GITHUB CANDIDATES WITH EMAILS")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
         print(f"Total candidates: {len(candidates)}\n")
 
         for i, candidate in enumerate(candidates[:15], 1):
@@ -958,12 +958,12 @@ async def main():
     use_ai = input("\nUse AI query formatting? (Y/n): ").strip().lower()
     use_ai_formatting = use_ai != "n"
 
-    print(f"\n{'='*70}")
+    print(f"\n{'=' * 70}")
     print("Search Configuration:")
     print(f"  Query: {user_query}")
     print(f"  Location: {location}")
     print(f"  AI Formatting: {'Enabled' if use_ai_formatting else 'Disabled'}")
-    print(f"{'='*70}\n")
+    print(f"{'=' * 70}\n")
 
     # Initialize finder
     finder = GitHubCandidateFinder()
@@ -984,15 +984,15 @@ async def main():
         if candidates:
             finder.export_results(candidates)
 
-            print(f"\n{'='*70}")
+            print(f"\n{'=' * 70}")
             print("SEARCH SUMMARY")
-            print(f"{'='*70}")
+            print(f"{'=' * 70}")
             print(f"Total candidates found: {len(candidates)}")
             print(f"With LinkedIn: {sum(1 for c in candidates if c.linkedin_url)}")
             print(
                 f"With social links: {sum(1 for c in candidates if c.linkedin_url or c.twitter_url or c.website_url)}"
             )
-            print(f"{'='*70}\n")
+            print(f"{'=' * 70}\n")
     except Exception as e:
         print(f"[ERROR] Search failed: {str(e)}")
         import traceback

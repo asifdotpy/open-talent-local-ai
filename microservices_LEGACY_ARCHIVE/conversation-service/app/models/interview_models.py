@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -17,7 +17,7 @@ class GenerateQuestionsRequest(BaseModel):
     """Data model for the request body of the /conversation/generate-questions endpoint."""
 
     job_description: str
-    job_title: Optional[str] = None
+    job_title: str | None = None
     num_questions: int = Field(default=10, gt=0, le=20)  # Greater than 0, less than or equal to 20
     difficulty: str = Field(default="medium")
 
@@ -33,7 +33,7 @@ class StartConversationRequest(BaseModel):
 
     session_id: str
     job_description: str
-    candidate_profile: Optional[dict[str, Any]] = None
+    candidate_profile: dict[str, Any] | None = None
     interview_type: str = "technical"
     tone: str = "professional"
 
@@ -53,7 +53,7 @@ class SendMessageRequest(BaseModel):
     session_id: str
     message: str
     message_type: str = "transcript"  # transcript, user_input, system
-    metadata: Optional[dict[str, Any]] = None
+    metadata: dict[str, Any] | None = None
 
 
 class ConversationResponse(BaseModel):
@@ -64,7 +64,7 @@ class ConversationResponse(BaseModel):
     response_text: str
     response_type: str  # question, feedback, instruction, conclusion
     should_speak: bool = True
-    metadata: Optional[dict[str, Any]] = None
+    metadata: dict[str, Any] | None = None
     timestamp: datetime = Field(default_factory=datetime.now)
 
 
@@ -76,7 +76,7 @@ class ConversationStatus(BaseModel):
     status: str  # active, paused, completed
     message_count: int
     last_activity: datetime
-    current_topic: Optional[str] = None
+    current_topic: str | None = None
 
 
 # --- New Models for Adaptive Question Generation ---

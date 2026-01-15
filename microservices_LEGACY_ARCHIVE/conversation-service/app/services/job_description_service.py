@@ -1,11 +1,11 @@
-"""
-Job Description service for dynamic loading from project/candidate data.
+"""Job Description service for dynamic loading from project/candidate data.
 Integrates with project-service and candidate-service.
 """
 
 import logging
 import os
-from typing import Dict, Any, Optional
+from typing import Any
+
 import httpx
 
 # Configure logging
@@ -27,11 +27,8 @@ class JobDescriptionService:
         self.use_mock = USE_MOCK_JOB_DESC
         self.client = httpx.AsyncClient(timeout=10.0)
 
-    async def get_job_description(
-        self, project_id: Optional[str] = None, job_id: Optional[str] = None
-    ) -> Dict[str, Any]:
-        """
-        Fetch job description from project service.
+    async def get_job_description(self, project_id: str | None = None, job_id: str | None = None) -> dict[str, Any]:
+        """Fetch job description from project service.
 
         Args:
             project_id: Project ID to fetch job for
@@ -59,9 +56,8 @@ class JobDescriptionService:
             logger.error(f"Error fetching job description: {e}")
             return self._get_mock_job_description(project_id or job_id)
 
-    async def get_candidate_profile(self, candidate_id: str) -> Optional[Dict[str, Any]]:
-        """
-        Fetch candidate profile from candidate service.
+    async def get_candidate_profile(self, candidate_id: str) -> dict[str, Any] | None:
+        """Fetch candidate profile from candidate service.
 
         Args:
             candidate_id: Candidate ID to fetch
@@ -86,7 +82,7 @@ class JobDescriptionService:
             logger.error(f"Error fetching candidate profile: {e}")
             return self._get_mock_candidate_profile(candidate_id)
 
-    def _format_job_description(self, job_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _format_job_description(self, job_data: dict[str, Any]) -> dict[str, Any]:
         """Format job data from project service into standard structure."""
         return {
             "job_id": job_data.get("id"),
@@ -100,9 +96,8 @@ class JobDescriptionService:
             "employment_type": job_data.get("employment_type", "Full-time"),
         }
 
-    def _get_mock_job_description(self, job_id: Optional[str] = None) -> Dict[str, Any]:
+    def _get_mock_job_description(self, job_id: str | None = None) -> dict[str, Any]:
         """Generate mock job description for development/testing."""
-
         mock_jobs = {
             "python-backend": {
                 "job_id": "python-backend",
@@ -179,7 +174,7 @@ class JobDescriptionService:
 
         return mock_jobs["python-backend"]
 
-    def _get_mock_candidate_profile(self, candidate_id: str) -> Dict[str, Any]:
+    def _get_mock_candidate_profile(self, candidate_id: str) -> dict[str, Any]:
         """Generate mock candidate profile for development/testing."""
         return {
             "candidate_id": candidate_id,
@@ -196,9 +191,8 @@ class JobDescriptionService:
             "availability": "2 weeks notice",
         }
 
-    def build_job_description_text(self, job_data: Dict[str, Any]) -> str:
-        """
-        Build a comprehensive job description text for LLM context.
+    def build_job_description_text(self, job_data: dict[str, Any]) -> str:
+        """Build a comprehensive job description text for LLM context.
 
         Args:
             job_data: Job description dictionary
@@ -206,17 +200,17 @@ class JobDescriptionService:
         Returns:
             Formatted text description
         """
-        text = f"""Position: {job_data.get('title', 'Software Engineer')}
-Department: {job_data.get('department', 'Engineering')}
-Location: {job_data.get('location', 'Remote')}
-Employment Type: {job_data.get('employment_type', 'Full-time')}
-Experience Level: {job_data.get('experience_level', 'mid')}
+        text = f"""Position: {job_data.get("title", "Software Engineer")}
+Department: {job_data.get("department", "Engineering")}
+Location: {job_data.get("location", "Remote")}
+Employment Type: {job_data.get("employment_type", "Full-time")}
+Experience Level: {job_data.get("experience_level", "mid")}
 
 Description:
-{job_data.get('description', 'No description available')}
+{job_data.get("description", "No description available")}
 
 Required Skills:
-{', '.join(job_data.get('required_skills', []))}
+{", ".join(job_data.get("required_skills", []))}
 
 Key Responsibilities:
 """

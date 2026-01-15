@@ -15,9 +15,10 @@ class NovuProvider(NotificationProvider):
         }
 
     async def _post(self, path: str, json: dict) -> dict:
-        async with aiohttp.ClientSession() as session, session.post(
-            f"{self.api_url}{path}", headers=self.headers, json=json
-        ) as resp:
+        async with (
+            aiohttp.ClientSession() as session,
+            session.post(f"{self.api_url}{path}", headers=self.headers, json=json) as resp,
+        ):
             return {"status": resp.status, "data": await resp.json()}
 
     async def send_email(self, to: str, subject: str, html: str, text: str | None = None) -> dict:
@@ -33,9 +34,10 @@ class NovuProvider(NotificationProvider):
         return await self._post("/v1/events/trigger", {"name": "push", "payload": payload})
 
     async def get_templates(self) -> list[dict]:
-        async with aiohttp.ClientSession() as session, session.get(
-            f"{self.api_url}/v1/notification-templates", headers=self.headers
-        ) as resp:
+        async with (
+            aiohttp.ClientSession() as session,
+            session.get(f"{self.api_url}/v1/notification-templates", headers=self.headers) as resp,
+        ):
             data = await resp.json()
             return data.get("data", [])
 

@@ -1,23 +1,20 @@
-"""
-Shared pytest fixtures for voice service tests.
+"""Shared pytest fixtures for voice service tests.
 
 This module provides reusable test fixtures for all voice service tests,
 following TDD best practices and DRY principles.
 """
 
-import asyncio
 import base64
 import os
 import struct
 import tempfile
 import wave
+from collections.abc import AsyncGenerator, Generator
 from pathlib import Path
-from typing import AsyncGenerator, Generator
 
 import httpx
 import pytest
 import pytest_asyncio
-
 
 # ============================================================================
 # Service Configuration Fixtures
@@ -93,8 +90,7 @@ def create_test_wav_file(
     sample_rate: int = 16000,
     channels: int = 1,
 ) -> str:
-    """
-    Create a test WAV file with sine wave audio.
+    """Create a test WAV file with sine wave audio.
 
     Args:
         filepath: Path to output WAV file
@@ -290,15 +286,9 @@ def audio_factory() -> AudioFileFactory:
 # Markers for test categorization
 def pytest_configure(config):
     """Register custom markers."""
-    config.addinivalue_line(
-        "markers", "unit: Unit tests for individual components (fast, isolated, 90%+ coverage)"
-    )
-    config.addinivalue_line(
-        "markers", "integration: Integration tests requiring running services (80%+ coverage)"
-    )
-    config.addinivalue_line(
-        "markers", "business: Business value tests validating user outcomes (100% critical paths)"
-    )
+    config.addinivalue_line("markers", "unit: Unit tests for individual components (fast, isolated, 90%+ coverage)")
+    config.addinivalue_line("markers", "integration: Integration tests requiring running services (80%+ coverage)")
+    config.addinivalue_line("markers", "business: Business value tests validating user outcomes (100% critical paths)")
     config.addinivalue_line("markers", "slow: Tests that take longer to run (>5 seconds)")
     config.addinivalue_line("markers", "requires_models: Tests requiring downloaded models")
     config.addinivalue_line("markers", "webrtc: WebRTC-specific tests")

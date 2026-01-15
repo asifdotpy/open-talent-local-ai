@@ -1,6 +1,8 @@
-"""Test pagination for list endpoints"""
+"""Test pagination for list endpoints."""
+
 import pytest
 from fastapi.testclient import TestClient
+
 from main import app
 
 client = TestClient(app)
@@ -9,7 +11,7 @@ AUTH = {"Authorization": "Bearer test-token"}
 
 @pytest.fixture(autouse=True)
 def setup_test_data():
-    """Create test data for pagination tests"""
+    """Create test data for pagination tests."""
     # Create 15 test candidates
     candidates = []
     for i in range(15):
@@ -41,7 +43,7 @@ def setup_test_data():
 
 
 def test_list_candidates_pagination_first_page():
-    """Test first page of candidates pagination"""
+    """Test first page of candidates pagination."""
     r = client.get("/api/v1/candidates?offset=0&limit=5", headers=AUTH)
     assert r.status_code == 200
     data = r.json()
@@ -56,7 +58,7 @@ def test_list_candidates_pagination_first_page():
 
 
 def test_list_candidates_pagination_middle_page():
-    """Test middle page of candidates pagination"""
+    """Test middle page of candidates pagination."""
     r = client.get("/api/v1/candidates?offset=5&limit=5", headers=AUTH)
     assert r.status_code == 200
     data = r.json()
@@ -66,7 +68,7 @@ def test_list_candidates_pagination_middle_page():
 
 
 def test_list_candidates_pagination_default():
-    """Test default pagination parameters"""
+    """Test default pagination parameters."""
     r = client.get("/api/v1/candidates", headers=AUTH)
     assert r.status_code == 200
     data = r.json()
@@ -76,7 +78,7 @@ def test_list_candidates_pagination_default():
 
 
 def test_list_candidates_pagination_has_next():
-    """Test has_next flag"""
+    """Test has_next flag."""
     # Get first 5 items when there are more than 5 total
     r = client.get("/api/v1/candidates?offset=0&limit=5", headers=AUTH)
     data = r.json()
@@ -87,7 +89,7 @@ def test_list_candidates_pagination_has_next():
 
 
 def test_list_candidates_pagination_has_previous():
-    """Test has_previous flag"""
+    """Test has_previous flag."""
     # Offset 0 should have no previous
     r = client.get("/api/v1/candidates?offset=0&limit=5", headers=AUTH)
     data = r.json()
@@ -101,7 +103,7 @@ def test_list_candidates_pagination_has_previous():
 
 
 def test_list_candidates_pagination_max_limit():
-    """Test maximum limit enforcement"""
+    """Test maximum limit enforcement."""
     r = client.get("/api/v1/candidates?limit=50", headers=AUTH)
     assert r.status_code == 200
     data = r.json()
@@ -109,13 +111,13 @@ def test_list_candidates_pagination_max_limit():
 
 
 def test_list_candidates_pagination_invalid_limit():
-    """Test limit validation"""
+    """Test limit validation."""
     r = client.get("/api/v1/candidates?limit=150", headers=AUTH)
     assert r.status_code == 422  # Validation error - limit > 100
 
 
 def test_list_candidates_pagination_total_pages():
-    """Test total_pages calculation"""
+    """Test total_pages calculation."""
     r = client.get("/api/v1/candidates?offset=0&limit=5", headers=AUTH)
     data = r.json()
     total = data["total"]
@@ -124,7 +126,7 @@ def test_list_candidates_pagination_total_pages():
 
 
 def test_list_applications_pagination():
-    """Test applications list pagination"""
+    """Test applications list pagination."""
     r = client.get("/api/v1/applications?offset=0&limit=5", headers=AUTH)
     assert r.status_code == 200
     data = r.json()
@@ -137,7 +139,7 @@ def test_list_applications_pagination():
 
 
 def test_list_interviews_pagination():
-    """Test interviews list pagination"""
+    """Test interviews list pagination."""
     # Create a candidate first
     payload = {
         "email": "interview_test@example.com",
@@ -160,9 +162,7 @@ def test_list_interviews_pagination():
             "location": "Remote",
             "status": "scheduled",
         }
-        client.post(
-            f"/api/v1/candidates/{candidate_id}/interviews", json=interview_payload, headers=AUTH
-        )
+        client.post(f"/api/v1/candidates/{candidate_id}/interviews", json=interview_payload, headers=AUTH)
 
     # Test pagination
     r = client.get(f"/api/v1/candidates/{candidate_id}/interviews?offset=0&limit=2", headers=AUTH)
@@ -174,7 +174,7 @@ def test_list_interviews_pagination():
 
 
 def test_list_assessments_pagination():
-    """Test assessments list pagination"""
+    """Test assessments list pagination."""
     # Create a candidate first
     payload = {
         "email": "assess_test@example.com",
@@ -194,9 +194,7 @@ def test_list_assessments_pagination():
             "assessment_type": "coding",
             "status": "pending",
         }
-        client.post(
-            f"/api/v1/candidates/{candidate_id}/assessments", json=assess_payload, headers=AUTH
-        )
+        client.post(f"/api/v1/candidates/{candidate_id}/assessments", json=assess_payload, headers=AUTH)
 
     # Test pagination
     r = client.get(f"/api/v1/candidates/{candidate_id}/assessments?offset=0&limit=2", headers=AUTH)
@@ -208,7 +206,7 @@ def test_list_assessments_pagination():
 
 
 def test_list_availability_pagination():
-    """Test availability list pagination"""
+    """Test availability list pagination."""
     # Create a candidate first
     payload = {
         "email": "avail_test@example.com",
@@ -230,9 +228,7 @@ def test_list_availability_pagination():
             "timezone": "UTC",
             "is_available": True,
         }
-        client.post(
-            f"/api/v1/candidates/{candidate_id}/availability", json=avail_payload, headers=AUTH
-        )
+        client.post(f"/api/v1/candidates/{candidate_id}/availability", json=avail_payload, headers=AUTH)
 
     # Test pagination
     r = client.get(f"/api/v1/candidates/{candidate_id}/availability?offset=0&limit=2", headers=AUTH)
@@ -244,7 +240,7 @@ def test_list_availability_pagination():
 
 
 def test_list_skills_pagination():
-    """Test skills list pagination"""
+    """Test skills list pagination."""
     # Create a candidate first
     payload = {
         "email": "skills_test@example.com",
@@ -272,7 +268,7 @@ def test_list_skills_pagination():
 
 
 def test_pagination_offset_boundary():
-    """Test pagination at offset boundary"""
+    """Test pagination at offset boundary."""
     # Get candidates with very high offset
     r = client.get("/api/v1/candidates?offset=1000&limit=10", headers=AUTH)
     assert r.status_code == 200
@@ -283,7 +279,7 @@ def test_pagination_offset_boundary():
 
 
 def test_pagination_single_item():
-    """Test pagination with single item per page"""
+    """Test pagination with single item per page."""
     r = client.get("/api/v1/candidates?offset=0&limit=1", headers=AUTH)
     assert r.status_code == 200
     data = r.json()
@@ -292,7 +288,7 @@ def test_pagination_single_item():
 
 
 def test_pagination_metadata_consistency():
-    """Test pagination metadata consistency"""
+    """Test pagination metadata consistency."""
     r = client.get("/api/v1/candidates?offset=10&limit=5", headers=AUTH)
     assert r.status_code == 200
     data = r.json()
@@ -304,5 +300,5 @@ def test_pagination_metadata_consistency():
     expected_has_previous = 10 > 0  # = True
     assert data["has_previous"] == expected_has_previous
 
-    expected_has_next = (10 + 5) < data["total"]
+    expected_has_next = data["total"] > (10 + 5)
     assert data["has_next"] == expected_has_next

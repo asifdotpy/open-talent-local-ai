@@ -3,12 +3,12 @@ Pytest configuration and shared fixtures for all microservices
 Located at: /services/conftest.py
 """
 
-import pytest
-import httpx
 import asyncio
 import os
-from typing import Generator, AsyncGenerator
+from collections.abc import AsyncGenerator, Generator
 
+import httpx
+import pytest
 
 # ============================================================================
 # ASYNCIO CONFIGURATION

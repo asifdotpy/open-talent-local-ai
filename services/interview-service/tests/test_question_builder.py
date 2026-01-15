@@ -21,9 +21,7 @@ from services.question_builder import (
 @pytest.fixture
 def question_builder():
     """Create question builder instance for testing."""
-    return NaturalLanguageQuestionBuilder(
-        ollama_base_url="http://localhost:11434"
-    )
+    return NaturalLanguageQuestionBuilder(ollama_base_url="http://localhost:11434")
 
 
 @pytest.fixture
