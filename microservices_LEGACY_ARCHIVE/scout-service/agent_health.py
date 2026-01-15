@@ -1,5 +1,5 @@
 """Agent Health Monitoring Module
-Handles ongoing health checks and status reporting
+Handles ongoing health checks and status reporting.
 
 Author: OpenTalent Team
 Updated: December 13, 2025
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class HealthCheckResult(BaseModel):
-    """Result of a single health check"""
+    """Result of a single health check."""
 
     timestamp: datetime
     agent_name: str
@@ -30,7 +30,7 @@ class HealthCheckResult(BaseModel):
 
 
 class HealthReport(BaseModel):
-    """Overall health report for all agents"""
+    """Overall health report for all agents."""
 
     timestamp: datetime
     total_agents: int
@@ -43,7 +43,7 @@ class HealthReport(BaseModel):
 
     @property
     def health_percentage(self) -> float:
-        """Calculate percentage of healthy agents"""
+        """Calculate percentage of healthy agents."""
         if self.total_agents == 0:
             return 0.0
         return (self.healthy_agents / self.total_agents) * 100
@@ -55,10 +55,10 @@ class HealthReport(BaseModel):
 
 
 class HealthMonitor:
-    """Monitors agent health and provides reports"""
+    """Monitors agent health and provides reports."""
 
     def __init__(self, registry: AgentRegistry, retention_hours: int = 1):
-        """Initialize health monitor
+        """Initialize health monitor.
 
         Args:
             registry: Agent registry instance
@@ -70,7 +70,7 @@ class HealthMonitor:
         self.last_full_check: datetime | None = None
 
     async def perform_health_check(self) -> HealthReport:
-        """Perform comprehensive health check of all agents
+        """Perform comprehensive health check of all agents.
 
         Returns:
             HealthReport with current status of all agents
@@ -78,7 +78,7 @@ class HealthMonitor:
         logger.info("Performing comprehensive health check")
 
         # Check all agents
-        health_statuses = await self.registry.check_all_agents_health()
+        await self.registry.check_all_agents_health()
 
         # Record results
         now = datetime.now()
@@ -110,12 +110,12 @@ class HealthMonitor:
         return report
 
     def _get_recent_checks(self, limit: int = 10) -> list[HealthCheckResult]:
-        """Get most recent health checks"""
+        """Get most recent health checks."""
         self._cleanup_old_history()
         return self.health_history[-limit:] if self.health_history else []
 
     def _cleanup_old_history(self):
-        """Remove health check history older than retention period"""
+        """Remove health check history older than retention period."""
         if not self.health_history:
             return
 
@@ -123,12 +123,12 @@ class HealthMonitor:
         self.health_history = [check for check in self.health_history if check.timestamp > cutoff_time]
 
     def get_agent_status(self, agent_name: str) -> AgentStatus | None:
-        """Get current status of a specific agent"""
+        """Get current status of a specific agent."""
         agent = self.registry.get_agent(agent_name)
         return agent.status if agent else None
 
     def get_critical_agents(self) -> list[AgentMetadata]:
-        """Get agents that are unhealthy or unreachable"""
+        """Get agents that are unhealthy or unreachable."""
         critical = []
         for agent in self.registry.get_all_agents():
             if agent.status in [AgentStatus.UNHEALTHY, AgentStatus.UNREACHABLE]:
@@ -136,7 +136,7 @@ class HealthMonitor:
         return critical
 
     def get_status_summary(self) -> dict[str, int]:
-        """Get summary of agent statuses"""
+        """Get summary of agent statuses."""
         agents = self.registry.get_all_agents()
         return {
             "total": len(agents),

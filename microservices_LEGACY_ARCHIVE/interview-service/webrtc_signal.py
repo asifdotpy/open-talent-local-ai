@@ -37,7 +37,7 @@ peers_by_ws: dict[WebSocket, Peer] = {}
 
 @app.get("/webrtc/info")
 def info():
-    """Return signaling server status and session count"""
+    """Return signaling server status and session count."""
     return {"status": "ok", "sessions": len(sessions), "total_peers": len(peers_by_ws)}
 
 

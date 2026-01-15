@@ -72,7 +72,7 @@ class GoogleCSEClient:
                 error_text = await response.text()
                 raise Exception(f"API test failed {response.status}: {error_text}")
 
-            data = await response.json()
+            await response.json()
             logger.info(
                 f"Google CSE test successful. Quota: {self.daily_quota_limit - self.daily_quota_used} remaining"
             )

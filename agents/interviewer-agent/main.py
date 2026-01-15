@@ -28,13 +28,6 @@ shared_path = Path(__file__).parent.parent / "shared"
 sys.path.insert(0, str(shared_path))
 
 from message_bus import MessageBus, Topics
-from models import (
-    AgentMessage,
-    CandidateProfile,
-    InterviewResult,
-    InterviewSession,
-    MessageType,
-)
 from service_clients import (
     AvatarServiceClient,
     CandidateServiceClient,
@@ -43,6 +36,13 @@ from service_clients import (
 )
 
 from config import Config
+from models import (
+    AgentMessage,
+    CandidateProfile,
+    InterviewResult,
+    InterviewSession,
+    MessageType,
+)
 
 # Configure structured logging
 structlog.configure(

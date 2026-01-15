@@ -112,7 +112,7 @@ async def generate_avatar_video(request: AvatarRequest):
             audio_data = voice_data.get("audio_data")
             duration = voice_data.get("duration", 5.0)
             phonemes = voice_data.get("phonemes", [])
-            words = voice_data.get("words", [])
+            voice_data.get("words", [])
 
         if not audio_data:
             raise HTTPException(status_code=500, detail="No audio data from voice service")

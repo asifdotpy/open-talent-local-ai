@@ -1,4 +1,4 @@
-"""Unit Tests for Whisper STT Service
+"""Unit Tests for Whisper STT Service.
 
 Following TDD principles:
 - Red-Green-Refactor cycle

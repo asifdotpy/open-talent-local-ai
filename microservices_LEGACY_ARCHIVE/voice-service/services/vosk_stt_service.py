@@ -1,5 +1,5 @@
 """Vosk Speech-to-Text Service
-Lightweight, local SST with streaming support and word-level timing
+Lightweight, local SST with streaming support and word-level timing.
 """
 
 import json
@@ -19,7 +19,7 @@ import soundfile as sf
 
 
 class VoskSTTService:
-    """Local Speech-to-Text service using Vosk (Kaldi-based)
+    """Local Speech-to-Text service using Vosk (Kaldi-based).
 
     Features:
     - 5-8% WER on American English

@@ -1,4 +1,4 @@
-"""Tests for the current Interview Service implementation (main.py)
+"""Tests for the current Interview Service implementation (main.py).
 
 Tests room management, WebRTC streaming, transcription, and AI intelligence features.
 """

@@ -1,5 +1,5 @@
 """Vetta AI v4 Integration for Interview Service
-Uses fine-tuned Granite 3.0 2B GGUF model via Ollama for comprehensive recruiting AI
+Uses fine-tuned Granite 3.0 2B GGUF model via Ollama for comprehensive recruiting AI.
 """
 
 import logging
@@ -28,7 +28,7 @@ except ImportError:
 
 
 class VettaAI:
-    """Vetta AI v4 - Comprehensive Recruiting AI via Ollama
+    """Vetta AI v4 - Comprehensive Recruiting AI via Ollama.
 
     Supports 8 domains:
     1. Interview - Avatar interview orchestration

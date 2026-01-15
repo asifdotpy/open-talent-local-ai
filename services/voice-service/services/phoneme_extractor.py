@@ -1,4 +1,4 @@
-"""Phoneme Extractor Service for Voice Service
+"""Phoneme Extractor Service for Voice Service.
 
 Provides phoneme timing extraction for lip-sync animation.
 Uses phonemizer for phoneme identification and estimated timing.
@@ -97,7 +97,7 @@ class PhonemeExtractor:
         current_time = 0.0
         phoneme_idx = 0
 
-        for word_idx, word in enumerate(word_list):
+        for _word_idx, word in enumerate(word_list):
             # Estimate phonemes per word based on syllable count
             syllable_count = self._count_syllables(word)
             phonemes_in_word = max(1, syllable_count * 2)  # ~2 phonemes per syllable

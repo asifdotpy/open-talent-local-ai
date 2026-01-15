@@ -1,5 +1,5 @@
 """Agent Routing Module
-Handles request routing to appropriate agents
+Handles request routing to appropriate agents.
 
 Author: OpenTalent Team
 Updated: December 13, 2025
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class AgentRequest(BaseModel):
-    """Request routed to an agent"""
+    """Request routed to an agent."""
 
     agent_name: str | None = Field(None, description="Specific agent to route to")
     capability: str | None = Field(None, description="Required capability")
@@ -31,7 +31,7 @@ class AgentRequest(BaseModel):
 
 
 class AgentResponse(BaseModel):
-    """Response from an agent"""
+    """Response from an agent."""
 
     agent_name: str
     status_code: int
@@ -41,7 +41,7 @@ class AgentResponse(BaseModel):
 
 
 class MultiAgentResponse(BaseModel):
-    """Response from multiple agents"""
+    """Response from multiple agents."""
 
     requested_agents: list[str]
     responses: list[AgentResponse]
@@ -56,10 +56,10 @@ class MultiAgentResponse(BaseModel):
 
 
 class AgentRouter:
-    """Routes requests to appropriate agents"""
+    """Routes requests to appropriate agents."""
 
     def __init__(self, registry: AgentRegistry):
-        """Initialize agent router
+        """Initialize agent router.
 
         Args:
             registry: Agent registry instance
@@ -74,7 +74,7 @@ class AgentRouter:
         payload: dict | None = None,
         params: dict | None = None,
     ) -> AgentResponse:
-        """Route request to a specific agent
+        """Route request to a specific agent.
 
         Args:
             agent_name: Name of the target agent
@@ -112,7 +112,7 @@ class AgentRouter:
         payload: dict | None = None,
         params: dict | None = None,
     ) -> MultiAgentResponse:
-        """Route request to multiple agents in parallel
+        """Route request to multiple agents in parallel.
 
         Args:
             agent_names: List of agent names
@@ -149,7 +149,7 @@ class AgentRouter:
         params: dict | None = None,
         healthy_only: bool = True,
     ) -> MultiAgentResponse:
-        """Route request to all agents with specific capability
+        """Route request to all agents with specific capability.
 
         Args:
             capability: Required capability
@@ -180,7 +180,7 @@ class AgentRouter:
     async def route_search_request(
         self, query: str, location: str = "Ireland", max_results: int = 20
     ) -> dict[str, Any]:
-        """Route search request through agents (multi-agent search)
+        """Route search request through agents (multi-agent search).
 
         Args:
             query: Search query
@@ -252,7 +252,7 @@ class AgentRouter:
     async def route_interview_handoff(
         self, search_criteria: dict[str, Any], candidate_profile: dict[str, Any]
     ) -> dict[str, Any]:
-        """Route interview handoff through appropriate agents
+        """Route interview handoff through appropriate agents.
 
         Args:
             search_criteria: Search criteria for the role

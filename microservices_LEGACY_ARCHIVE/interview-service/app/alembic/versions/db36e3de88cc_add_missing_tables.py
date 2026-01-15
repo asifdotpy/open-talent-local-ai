@@ -1,4 +1,4 @@
-"""add missing tables
+"""add missing tables.
 
 Revision ID: db36e3de88cc
 Revises: a4bf562f4cf9

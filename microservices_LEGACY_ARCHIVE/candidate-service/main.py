@@ -1,5 +1,5 @@
 """Candidate Service - Candidate management, applications, profiles, and vector-based matching
-Port: 8008
+Port: 8008.
 
 MERGED VERSION combining:
 - Candidate management API with enum-based validation (from services/)
@@ -135,7 +135,7 @@ class CandidateDB(Base):
 
 
 class ApplicationStatus(str, Enum):
-    """Application status enumeration"""
+    """Application status enumeration."""
 
     APPLIED = "applied"
     REVIEWING = "reviewing"
@@ -145,7 +145,7 @@ class ApplicationStatus(str, Enum):
 
 
 class SkillProficiency(str, Enum):
-    """Skill proficiency enumeration"""
+    """Skill proficiency enumeration."""
 
     BEGINNER = "beginner"
     INTERMEDIATE = "intermediate"
@@ -159,7 +159,7 @@ class SkillProficiency(str, Enum):
 
 
 class CandidateStatus(str, Enum):
-    """Candidate lifecycle status"""
+    """Candidate lifecycle status."""
 
     NEW = "new"
     REVIEWING = "reviewing"
@@ -175,7 +175,7 @@ class CandidateStatus(str, Enum):
 
 
 class CandidateCreate(BaseModel):
-    """Schema for creating a candidate"""
+    """Schema for creating a candidate."""
 
     email: EmailStr
     first_name: str = Field(..., min_length=1, max_length=100)
@@ -196,7 +196,7 @@ class CandidateCreate(BaseModel):
 
 
 class CandidateUpdate(BaseModel):
-    """Schema for updating a candidate"""
+    """Schema for updating a candidate."""
 
     email: EmailStr | None = None
     first_name: str | None = Field(None, min_length=1, max_length=100)
@@ -206,7 +206,7 @@ class CandidateUpdate(BaseModel):
 
 
 class CandidateResponse(BaseModel):
-    """Schema for candidate response"""
+    """Schema for candidate response."""
 
     id: str
     email: str
@@ -220,7 +220,7 @@ class CandidateResponse(BaseModel):
 
 
 class ApplicationCreate(BaseModel):
-    """Schema for creating an application"""
+    """Schema for creating an application."""
 
     candidate_id: str
     job_id: str
@@ -239,7 +239,7 @@ class ApplicationCreate(BaseModel):
 
 
 class ApplicationUpdate(BaseModel):
-    """Schema for updating an application"""
+    """Schema for updating an application."""
 
     status: ApplicationStatus = Field(
         ...,
@@ -249,7 +249,7 @@ class ApplicationUpdate(BaseModel):
 
 
 class ApplicationResponse(BaseModel):
-    """Schema for application response"""
+    """Schema for application response."""
 
     id: str
     job_id: str
@@ -261,7 +261,7 @@ class ApplicationResponse(BaseModel):
 
 
 class SkillCreate(BaseModel):
-    """Schema for adding a skill"""
+    """Schema for adding a skill."""
 
     skill: str = Field(..., min_length=1, max_length=100)
     proficiency: SkillProficiency = Field(default=SkillProficiency.INTERMEDIATE)
@@ -271,7 +271,7 @@ class SkillCreate(BaseModel):
 
 
 class SkillResponse(BaseModel):
-    """Schema for skill response"""
+    """Schema for skill response."""
 
     skill: str
     proficiency: SkillProficiency
@@ -279,14 +279,14 @@ class SkillResponse(BaseModel):
 
 
 class SkillListResponse(BaseModel):
-    """Schema for skill list response"""
+    """Schema for skill list response."""
 
     candidate_id: str
     skills: list[SkillResponse]
 
 
 class ResumeResponse(BaseModel):
-    """Schema for resume response"""
+    """Schema for resume response."""
 
     candidate_id: str
     resume_url: str
@@ -311,14 +311,14 @@ class SearchResponse(BaseModel):
 
 
 class PaginationParams(BaseModel):
-    """Pagination parameters for list endpoints"""
+    """Pagination parameters for list endpoints."""
 
     offset: int = Field(default=0, ge=0, description="Number of items to skip")
     limit: int = Field(default=20, ge=1, le=100, description="Number of items to return (1-100)")
 
 
 class PaginatedResponse(BaseModel, Generic[T]):
-    """Generic paginated response wrapper"""
+    """Generic paginated response wrapper."""
 
     total: int = Field(..., description="Total number of items")
     offset: int = Field(..., description="Number of items skipped")
@@ -327,22 +327,22 @@ class PaginatedResponse(BaseModel, Generic[T]):
 
     @property
     def has_next(self) -> bool:
-        """Check if there are more items"""
+        """Check if there are more items."""
         return (self.offset + self.limit) < self.total
 
     @property
     def has_previous(self) -> bool:
-        """Check if there are previous items"""
+        """Check if there are previous items."""
         return self.offset > 0
 
     @property
     def page(self) -> int:
-        """Calculate current page number (1-based)"""
+        """Calculate current page number (1-based)."""
         return (self.offset // self.limit) + 1
 
     @property
     def total_pages(self) -> int:
-        """Calculate total number of pages"""
+        """Calculate total number of pages."""
         return (self.total + self.limit - 1) // self.limit
 
 
@@ -439,7 +439,7 @@ def get_current_user(authorization: str | None = Header(None)) -> str | None:
 
 
 def generate_id() -> str:
-    """Generate unique ID"""
+    """Generate unique ID."""
     return str(uuid.uuid4())
 
 
@@ -592,7 +592,7 @@ def on_startup():
 
 @app.get("/")
 async def root():
-    """Root endpoint"""
+    """Root endpoint."""
     return {
         "service": "candidate",
         "version": "2.0.0",
@@ -608,7 +608,7 @@ async def root():
 
 @app.get("/health")
 async def health():
-    """Health check endpoint"""
+    """Health check endpoint."""
     return {
         "service": "candidate",
         "status": "healthy",
@@ -664,7 +664,7 @@ async def api_docs_info():
     },
 )
 async def create_candidate(payload: CandidateCreate, current_user: str | None = Depends(get_current_user)):
-    """Create a new candidate"""
+    """Create a new candidate."""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
@@ -803,7 +803,7 @@ async def search_candidates(
     },
 )
 async def get_candidate(candidate_id: str, current_user: str | None = Depends(get_current_user)):
-    """Get candidate by ID"""
+    """Get candidate by ID."""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
@@ -825,7 +825,7 @@ async def list_candidates(
     limit: int = Query(default=20, ge=1, le=100, description="Number of items to return"),
     current_user: str | None = Depends(get_current_user),
 ):
-    """List all candidates with pagination (offset, limit)"""
+    """List all candidates with pagination (offset, limit)."""
     if not current_user:
         return JSONResponse(status_code=403, content={"error": "Forbidden"})
 
@@ -876,7 +876,7 @@ class BulkImportResponse(BaseModel):
     },
 )
 async def bulk_import_candidates(payload: BulkCandidateImport, current_user: str | None = Depends(get_current_user)):
-    """Bulk import candidates from a list"""
+    """Bulk import candidates from a list."""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
@@ -923,7 +923,7 @@ async def bulk_import_candidates(payload: BulkCandidateImport, current_user: str
     responses={200: {"description": "Exported candidates"}, 403: {"description": "Forbidden"}},
 )
 async def bulk_export_candidates(current_user: str | None = Depends(get_current_user)):
-    """Export all candidates as JSON"""
+    """Export all candidates as JSON."""
     if not current_user:
         return JSONResponse(status_code=403, content={"error": "Forbidden"})
 
@@ -949,7 +949,7 @@ async def bulk_export_candidates(current_user: str | None = Depends(get_current_
 async def update_candidate(
     candidate_id: str, payload: CandidateUpdate, current_user: str | None = Depends(get_current_user)
 ):
-    """Update candidate information"""
+    """Update candidate information."""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
@@ -992,7 +992,7 @@ class CandidateStatusUpdate(BaseModel):
 async def update_candidate_status(
     candidate_id: str, payload: CandidateStatusUpdate, current_user: str | None = Depends(get_current_user)
 ):
-    """Update the lifecycle status of a candidate"""
+    """Update the lifecycle status of a candidate."""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
@@ -1017,7 +1017,7 @@ async def update_candidate_status(
     },
 )
 async def delete_candidate(candidate_id: str, current_user: str | None = Depends(get_current_user)):
-    """Delete a candidate"""
+    """Delete a candidate."""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
@@ -1055,7 +1055,7 @@ async def delete_candidate(candidate_id: str, current_user: str | None = Depends
     },
 )
 async def create_application(payload: ApplicationCreate, current_user: str | None = Depends(get_current_user)):
-    """Create a new application"""
+    """Create a new application."""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
@@ -1087,7 +1087,7 @@ async def get_applications(
     limit: int = Query(default=20, ge=1, le=100, description="Number of items to return"),
     current_user: str | None = Depends(get_current_user),
 ):
-    """Get all applications with pagination (offset, limit)"""
+    """Get all applications with pagination (offset, limit)."""
     if not current_user:
         return JSONResponse(status_code=403, content={"error": "Forbidden"})
 
@@ -1120,7 +1120,7 @@ async def get_applications(
     },
 )
 async def get_candidate_applications(candidate_id: str, current_user: str | None = Depends(get_current_user)):
-    """Get applications for a candidate"""
+    """Get applications for a candidate."""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
@@ -1147,7 +1147,7 @@ async def get_candidate_applications(candidate_id: str, current_user: str | None
 async def update_application_status(
     app_id: str, payload: ApplicationUpdate, current_user: str | None = Depends(get_current_user)
 ):
-    """Update application status"""
+    """Update application status."""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
@@ -1180,7 +1180,7 @@ async def update_application_status(
     },
 )
 async def get_candidate_resume(candidate_id: str, current_user: str | None = Depends(get_current_user)):
-    """Get candidate resume"""
+    """Get candidate resume."""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
@@ -1205,7 +1205,7 @@ async def get_candidate_resume(candidate_id: str, current_user: str | None = Dep
 async def upload_resume(
     candidate_id: str, payload: dict = Body(...), current_user: str | None = Depends(get_current_user)
 ):
-    """Upload candidate resume"""
+    """Upload candidate resume."""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
@@ -1237,7 +1237,7 @@ async def get_candidate_skills(
     limit: int = Query(default=20, ge=1, le=100, description="Number of items to return"),
     current_user: str | None = Depends(get_current_user),
 ):
-    """Get candidate skills with pagination"""
+    """Get candidate skills with pagination."""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 
@@ -1274,7 +1274,7 @@ async def get_candidate_skills(
     },
 )
 async def add_skill(candidate_id: str, payload: SkillCreate, current_user: str | None = Depends(get_current_user)):
-    """Add skill to candidate"""
+    """Add skill to candidate."""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
 

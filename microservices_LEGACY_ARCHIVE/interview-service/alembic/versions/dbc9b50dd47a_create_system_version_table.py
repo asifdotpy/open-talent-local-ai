@@ -1,4 +1,4 @@
-"""Create system_version table
+"""Create system_version table.
 
 Revision ID: dbc9b50dd47a
 Revises: f6de77eb2e44

@@ -230,7 +230,7 @@ async def health_check():
 @app.post("/render/lipsync")
 async def render_lipsync(request: RenderRequest):
     """Render avatar video with lip-sync
-    Uses face.glb in production, allows model override in dev
+    Uses face.glb in production, allows model override in dev.
     """
     # Call Node.js renderer
     renderer_script = os.path.join(os.path.dirname(__file__), "renderer", "render.js")

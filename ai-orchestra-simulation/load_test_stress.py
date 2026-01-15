@@ -266,7 +266,7 @@ class StressTester:
         if not self.results:
             return {}
 
-        response_times = [r["response_time"] for r in self.results]
+        [r["response_time"] for r in self.results]
 
         # Calculate throughput stability
         time_windows = {}

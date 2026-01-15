@@ -1,4 +1,4 @@
-"""Legacy Ollama Service - Now uses Modular LLM Service
+"""Legacy Ollama Service - Now uses Modular LLM Service.
 
 This service maintains backward compatibility while using the new modular LLM service.
 For new implementations, use modular_llm_service directly.
@@ -75,7 +75,7 @@ Do not include any other text, explanations, or markdown formatting in your resp
             from .modular_llm_service import LLMConfig, LLMProvider, MockProvider
 
             mock_config = LLMConfig(provider=LLMProvider.MOCK, model="mock")
-            mock_provider = MockProvider(mock_config)
+            MockProvider(mock_config)
 
             # Generate mock questions (same logic as before)
             return _generate_mock_questions(job_description, num_questions, difficulty)

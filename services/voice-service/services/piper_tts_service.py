@@ -1,5 +1,5 @@
 """Piper Text-to-Speech Service
-High-quality, local TTS with phoneme extraction for lip-sync
+High-quality, local TTS with phoneme extraction for lip-sync.
 """
 
 import json
@@ -14,7 +14,7 @@ from .phoneme_extractor import PhonemeExtractor
 
 
 class PiperTTSService:
-    """Local Text-to-Speech service using Piper (VITS-based)
+    """Local Text-to-Speech service using Piper (VITS-based).
 
     Features:
     - MOS 4.1-4.3 quality (human-like speech)

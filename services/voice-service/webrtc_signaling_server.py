@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Simple WebRTC Signaling Server for Voice Service Testing
-Provides WebSocket signaling for WebRTC connections during testing
+Provides WebSocket signaling for WebRTC connections during testing.
 """
 
 import logging
@@ -29,7 +29,7 @@ connected_clients: dict[str, dict[str, WebSocket]] = {}
 
 @app.websocket("/webrtc/signal")
 async def signaling_endpoint(websocket: WebSocket):
-    """WebRTC signaling endpoint for peer-to-peer connections"""
+    """WebRTC signaling endpoint for peer-to-peer connections."""
     await websocket.accept()
 
     session_id = None
@@ -85,7 +85,7 @@ async def signaling_endpoint(websocket: WebSocket):
 
 
 async def handle_signaling_message(session_id: str, sender_type: str, message: dict):
-    """Forward signaling messages between peers"""
+    """Forward signaling messages between peers."""
     try:
         msg_type = message.get("type")
 
@@ -116,7 +116,7 @@ async def handle_signaling_message(session_id: str, sender_type: str, message: d
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
+    """Health check endpoint."""
     return {
         "status": "healthy",
         "service": "webrtc-signaling",
@@ -127,7 +127,7 @@ async def health_check():
 
 @app.get("/sessions")
 async def list_sessions():
-    """List active sessions"""
+    """List active sessions."""
     return {
         "sessions": [
             {"session_id": session_id, "clients": list(clients.keys()), "count": len(clients)}

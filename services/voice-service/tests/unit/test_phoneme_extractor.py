@@ -1,4 +1,4 @@
-"""Unit Tests for PhonemeExtractor
+"""Unit Tests for PhonemeExtractor.
 
 Tests phoneme extraction, timing accuracy, syllable counting, and basic phoneme mapping.
 """

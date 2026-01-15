@@ -121,7 +121,7 @@ class TestHealthAndInfo:
         response = client.get("/info")
 
         # Assert
-        data = validate_json_response(response, ["stt", "tts", "vad"])
+        validate_json_response(response, ["stt", "tts", "vad"])
 
     def test_voices_endpoint_returns_available_voices(self, client):
         """Test /voices returns list of available TTS voices."""

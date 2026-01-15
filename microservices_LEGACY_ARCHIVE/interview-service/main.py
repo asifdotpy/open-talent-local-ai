@@ -95,19 +95,19 @@ app.include_router(vetta_router)
 
 @app.get("/docs", include_in_schema=False)
 async def docs_redirect():
-    """Redirect to Swagger UI documentation"""
+    """Redirect to Swagger UI documentation."""
     return RedirectResponse(url="/docs")
 
 
 @app.get("/doc", include_in_schema=False)
 async def doc_redirect():
-    """Alternative redirect to Swagger UI documentation"""
+    """Alternative redirect to Swagger UI documentation."""
     return RedirectResponse(url="/docs")
 
 
 @app.get("/api-docs", include_in_schema=False)
 async def api_docs():
-    """Comprehensive API documentation with route scanning"""
+    """Comprehensive API documentation with route scanning."""
     routes_info = []
 
     for route in app.routes:
@@ -1783,7 +1783,7 @@ async def generate_intelligence_report(
         expertise_evaluation={
             "level": most_common_expertise,
             "technical_skills_identified": list(
-                set(skill for a in analyses for skill in a.expertise_assessment.technical_skills)
+                {skill for a in analyses for skill in a.expertise_assessment.technical_skills}
             ),
             "average_experience_years": sum(a.expertise_assessment.experience_years or 0 for a in analyses)
             / len(analyses),
@@ -1812,7 +1812,7 @@ async def get_next_ai_question(room_id: str, request: NextQuestionRequest):
     - Candidate's expertise level assessment
     - Job requirements matching
     - Sentiment analysis of responses
-    - Bias detection and mitigation
+    - Bias detection and mitigation.
     """
     if room_id not in rooms_store:
         raise HTTPException(status_code=404, detail="Room not found")
@@ -1899,7 +1899,7 @@ async def analyze_candidate_response(room_id: str, request: ResponseAnalysisRequ
     - Content quality assessment
     - Expertise level evaluation
     - Bias detection in response patterns
-    - Follow-up question suggestions
+    - Follow-up question suggestions.
     """
     if room_id not in rooms_store:
         raise HTTPException(status_code=404, detail="Room not found")
@@ -1975,7 +1975,7 @@ async def adapt_interview_strategy(room_id: str, request: InterviewAdaptationReq
     - Adjust question difficulty
     - Modify interview focus areas
     - Suggest early termination or extension
-    - Provide real-time feedback to interviewer
+    - Provide real-time feedback to interviewer.
     """
     if room_id not in rooms_store:
         raise HTTPException(status_code=404, detail="Room not found")
@@ -2025,7 +2025,7 @@ async def get_interview_intelligence_report(room_id: str):
     - Bias detection results
     - Expertise assessment
     - Interview effectiveness metrics
-    - Recommendations for improvement
+    - Recommendations for improvement.
     """
     if room_id not in rooms_store:
         raise HTTPException(status_code=404, detail="Room not found")

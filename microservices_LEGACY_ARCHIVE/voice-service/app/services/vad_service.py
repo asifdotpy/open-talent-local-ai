@@ -112,7 +112,7 @@ class VoiceActivityDetector:
 
         try:
             # Convert to 16-bit PCM bytes
-            if audio_array.dtype == np.float32 or audio_array.dtype == np.float64:
+            if audio_array.dtype in (np.float32, np.float64):
                 # Convert float to int16
                 audio_array = (audio_array * 32767).astype(np.int16)
             elif audio_array.dtype != np.int16:

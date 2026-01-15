@@ -35,7 +35,7 @@ class Interviewer:
         try:
             # Analyze candidate profile
             skills = candidate_profile.get("skills", [])
-            experience = candidate_profile.get("experience_years", 0)
+            candidate_profile.get("experience_years", 0)
             job_requirements = candidate_profile.get("job_requirements", {})
 
             # Determine question type based on interview progress

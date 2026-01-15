@@ -1,5 +1,5 @@
 """Silero Voice Activity Detection Service
-Efficient voice detection for audio preprocessing
+Efficient voice detection for audio preprocessing.
 """
 
 import logging
@@ -18,7 +18,7 @@ except ImportError:
 
 
 class SileroVADService:
-    """Voice Activity Detection using Silero VAD
+    """Voice Activity Detection using Silero VAD.
 
     Features:
     - 60-70% computational savings by filtering silence
@@ -163,10 +163,7 @@ class SileroVADService:
             for start, end in voice_segments:
                 filtered_audio.append(audio_data[start:end])
 
-            if filtered_audio:
-                filtered_audio = np.concatenate(filtered_audio)
-            else:
-                filtered_audio = np.array([])
+            filtered_audio = np.concatenate(filtered_audio) if filtered_audio else np.array([])
 
             # Save filtered audio
             sf.write(output_path, filtered_audio, self.sample_rate)

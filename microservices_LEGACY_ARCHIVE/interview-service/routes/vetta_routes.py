@@ -1,5 +1,5 @@
 """Vetta AI API Routes for Interview Service
-Provides REST endpoints for all Vetta AI v4 capabilities
+Provides REST endpoints for all Vetta AI v4 capabilities.
 """
 
 from datetime import datetime

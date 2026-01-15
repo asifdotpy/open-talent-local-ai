@@ -69,7 +69,7 @@ class TestRNNoiseTrack:
             result_frame = await rnnoise_track.recv()
 
             # Verify stereo was converted to mono (mean of channels)
-            expected_mono = stereo_audio.mean(axis=0)
+            stereo_audio.mean(axis=0)
             assert result_frame is not None
 
     @pytest.mark.asyncio

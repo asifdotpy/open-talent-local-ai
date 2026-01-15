@@ -1,4 +1,4 @@
-"""Unit Tests for Vosk STT Service
+"""Unit Tests for Vosk STT Service.
 
 Following TDD principles with comprehensive test coverage for production-ready
 speech-to-text service using Vosk (Kaldi-based, CPU-only inference).
@@ -287,7 +287,7 @@ class TestVoskStreamingTranscription:
         audio_chunk = b"test audio data"
 
         # Act
-        result = vosk_service.transcribe_streaming(audio_chunk)
+        vosk_service.transcribe_streaming(audio_chunk)
 
         # Assert
         mock_vosk_recognizer.AcceptWaveform.assert_called_once_with(audio_chunk)

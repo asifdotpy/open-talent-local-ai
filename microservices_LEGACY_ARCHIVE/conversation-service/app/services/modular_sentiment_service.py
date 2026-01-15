@@ -1,4 +1,4 @@
-"""Modular Sentiment Analysis Service for OpenTalent Platform
+"""Modular Sentiment Analysis Service for OpenTalent Platform.
 
 This service provides sentiment analysis capabilities using various models:
 - BERT (via transformers library)

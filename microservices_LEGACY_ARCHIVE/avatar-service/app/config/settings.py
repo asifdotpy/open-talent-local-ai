@@ -12,9 +12,11 @@ ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
 
+import tempfile
+
 # Audio Settings (for future local implementation)
 AUDIO_OUTPUT_FORMAT = "mp3_44100_128"
-TEMP_AUDIO_PATH = "/tmp"
+TEMP_AUDIO_PATH = tempfile.gettempdir()
 
 # Service Information
 SERVICE_TITLE = "OpenTalent - Avatar Service"

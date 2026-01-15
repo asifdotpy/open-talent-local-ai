@@ -1,4 +1,4 @@
-"""Unit Tests for Piper TTS Service
+"""Unit Tests for Piper TTS Service.
 
 Following TDD principles:
 - Test behavior, not implementation
@@ -250,7 +250,7 @@ class TestSpeechSynthesis:
 
         # Act
         with patch("os.path.exists", return_value=True):
-            result = tts_service.synthesize(empty_text, output_file)
+            tts_service.synthesize(empty_text, output_file)
 
         # Assert - should still attempt synthesis, Piper will handle it
         assert mock_popen.called
@@ -269,7 +269,7 @@ class TestSpeechSynthesis:
 
         # Act
         with patch("os.path.exists", return_value=True):
-            result = tts_service.synthesize(special_characters_text, output_file)
+            tts_service.synthesize(special_characters_text, output_file)
 
         # Assert
         mock_process.communicate.assert_called_once()
@@ -325,7 +325,7 @@ class TestEdgeCasesAndErrorHandling:
             mock_popen.return_value = mock_process
 
             with patch("os.path.exists", return_value=True):
-                result = tts_service.synthesize(unicode_text, output_file)
+                tts_service.synthesize(unicode_text, output_file)
 
             # Should attempt to process (actual handling depends on Piper)
             assert mock_popen.called

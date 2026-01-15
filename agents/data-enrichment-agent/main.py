@@ -1334,9 +1334,6 @@ async def health_check():
     """Health check"""
     playwright_status = "✅ Available" if PLAYWRIGHT_AVAILABLE else "❌ Not installed"
     duckduckgo_status = "✅ Available" if DUCKDUCKGO_AVAILABLE else "❌ Not installed"
-    candidate_search_status = (
-        "✅ Ready" if (PLAYWRIGHT_AVAILABLE and DUCKDUCKGO_AVAILABLE) else "⚠️ Limited"
-    )
 
     return {
         "status": "✅ healthy",

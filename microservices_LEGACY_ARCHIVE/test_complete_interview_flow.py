@@ -269,7 +269,7 @@ async def run_complete_flow():
             return False
 
         # Step 7: Complete interview
-        completion_success = await test_interview_completion(client, room_id)
+        await test_interview_completion(client, room_id)
 
         # Summary
         elapsed = time.time() - start_time

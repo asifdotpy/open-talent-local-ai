@@ -16,7 +16,7 @@ class FallbackProvider(NotificationProvider):
 
     async def _try(self, func_name: str, *args, **kwargs):
         last_error = None
-        for attempt in range(RETRY_ATTEMPTS):
+        for _attempt in range(RETRY_ATTEMPTS):
             try:
                 func = getattr(self.primary, func_name)
                 return await func(*args, **kwargs)

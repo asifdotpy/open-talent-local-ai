@@ -1,4 +1,4 @@
-"""Modular LLM Service for OpenTalent Platform
+"""Modular LLM Service for OpenTalent Platform.
 
 This service provides a unified interface for different LLM providers:
 - Ollama (local models like granite4:350m-h)

@@ -146,7 +146,7 @@ def test_role(role_config, role_index):
             "Data Analyst": "You are an experienced data analysis interviewer. Ask technical questions about SQL, statistics, and analytics. Keep responses concise.",
         }
 
-        system_prompt = system_prompts.get(role_config["role"], "You are an interviewer.")
+        system_prompts.get(role_config["role"], "You are an interviewer.")
 
         print(f"Starting {role_config['role']} interview...")
 

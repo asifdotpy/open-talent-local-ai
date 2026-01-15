@@ -1,4 +1,4 @@
-"""Pydantic models for Demo Interview Session"""
+"""Pydantic models for Demo Interview Session."""
 
 from datetime import datetime
 

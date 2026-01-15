@@ -93,7 +93,7 @@ async def test_auth_flow_and_rate_limit_behavior():
         too_many = 0
         refresh_token = None
         token = None
-        for i in range(8):
+        for _i in range(8):
             resp = await _login(client, email, password)
             if resp.status_code == 200:
                 successes += 1

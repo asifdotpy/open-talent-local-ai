@@ -1,4 +1,4 @@
-"""Add initial system version record
+"""Add initial system version record.
 
 Revision ID: f6de77eb2e44
 Revises: 1f2b8ae492b8

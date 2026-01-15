@@ -1,4 +1,4 @@
-"""Conversation Service Unit Tests
+"""Conversation Service Unit Tests.
 
 Unit tests for individual components of the conversation service.
 Focus on service logic, models, and utilities without external dependencies.

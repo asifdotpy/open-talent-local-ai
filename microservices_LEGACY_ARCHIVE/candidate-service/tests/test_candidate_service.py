@@ -1,7 +1,7 @@
 """Tests for Candidate Service
 Following TDD principles - tests written before implementation
 Port: 8008
-Purpose: Candidate management, applications, profiles
+Purpose: Candidate management, applications, profiles.
 """
 
 import time

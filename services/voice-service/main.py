@@ -1,5 +1,5 @@
 """Voice Service - Local Speech Processing
-Powered by Vosk (STT), Piper (TTS), and Silero (VAD)
+Powered by Vosk (STT), Piper (TTS), and Silero (VAD).
 """
 
 import asyncio
@@ -349,7 +349,6 @@ async def health_check():
 
     # Core services (STT/TTS) must be healthy, VAD is optional
     core_healthy = stt_health and tts_health
-    all_healthy = core_healthy and vad_health
 
     return {
         "status": "healthy" if core_healthy else "unhealthy",
@@ -614,7 +613,7 @@ if WEBRTC_AVAILABLE:
         Called by interview-service when a new interview begins.
         """
         session_id = payload.get("session_id")
-        job_description = payload.get("job_description", "General software engineering position")
+        payload.get("job_description", "General software engineering position")
 
         if not session_id:
             return {"error": "Missing session_id"}, 400
@@ -633,7 +632,7 @@ if WEBRTC_AVAILABLE:
 
     @app.post("/webrtc/stop", tags=["webrtc"], summary="Stop WebRTC session")
     async def stop_webrtc_session(payload: dict = Body(...)):
-        """Stop an active WebRTC session"""
+        """Stop an active WebRTC session."""
         session_id = payload.get("session_id")
 
         if not session_id:
@@ -645,7 +644,7 @@ if WEBRTC_AVAILABLE:
 
     @app.post("/webrtc/tts", tags=["webrtc"], summary="Send TTS to WebRTC session")
     async def send_webrtc_tts(payload: dict = Body(...)):
-        """Generate and send TTS audio to active WebRTC session
+        """Generate and send TTS audio to active WebRTC session.
 
         Args:
             session_id: Active session ID
@@ -663,7 +662,7 @@ if WEBRTC_AVAILABLE:
 
     @app.get("/webrtc/status", tags=["webrtc"], summary="Get WebRTC status")
     async def get_webrtc_status():
-        """Get status of WebRTC functionality"""
+        """Get status of WebRTC functionality."""
         return {
             "webrtc_enabled": ENABLE_WEBRTC,
             "webrtc_available": WEBRTC_AVAILABLE,

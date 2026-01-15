@@ -2,16 +2,15 @@
 These legacy async-httpx tests target endpoints no longer present; module is skipped to avoid false failures.
 """
 
+from typing import Any
+
+import httpx
 import pytest
 
 pytest.skip(
     "Legacy avatar-service tests are deprecated; replaced by plan-aligned TestClient suite.",
     allow_module_level=True,
 )
-
-from typing import Any
-
-import httpx
 
 
 @pytest.fixture

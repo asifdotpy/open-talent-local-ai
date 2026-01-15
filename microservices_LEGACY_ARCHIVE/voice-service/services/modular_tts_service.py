@@ -1,5 +1,5 @@
 """Modular Text-to-Speech Service
-Supports both local Piper TTS and OpenAI API TTS with unified interface
+Supports both local Piper TTS and OpenAI API TTS with unified interface.
 """
 
 import logging
@@ -18,7 +18,7 @@ except ImportError:
 
 
 class ModularTTSService:
-    """Modular TTS service that can use either local Piper or OpenAI API
+    """Modular TTS service that can use either local Piper or OpenAI API.
 
     Features:
     - Unified interface for both local and API TTS

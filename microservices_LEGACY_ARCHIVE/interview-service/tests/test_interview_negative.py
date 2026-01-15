@@ -111,7 +111,7 @@ def test_start_interview_database_failure(client: TestClient, db: Session) -> No
                 side_effect=SQLAlchemyError("Database insertion error"),
             ):
                 # This will raise an exception because we don't have error handling middleware
-                response = client.post(f"{settings.API_V1_STR}/interview/start", json=payload)
+                client.post(f"{settings.API_V1_STR}/interview/start", json=payload)
                 # If we had proper error handling, we would expect:
                 # assert response.status_code == 500  # Server error
     except SQLAlchemyError:
@@ -164,7 +164,7 @@ def test_start_interview_conversation_service_failure(client: TestClient) -> Non
                 side_effect=Exception("Conversation service unavailable"),
             ):
                 # This will raise an exception because we don't have proper error handling
-                response = client.post(f"{settings.API_V1_STR}/interview/start", json=payload)
+                client.post(f"{settings.API_V1_STR}/interview/start", json=payload)
                 # If we had proper error handling, we would expect:
                 # assert response.status_code == 500  # Server error
                 # assert "error" in response.json()
@@ -215,7 +215,7 @@ def test_start_interview_avatar_service_failure(client: TestClient) -> None:
                 side_effect=Exception("Avatar service unavailable"),
             ):
                 # This will raise an exception because we don't have proper error handling
-                response = client.post(f"{settings.API_V1_STR}/interview/start", json=payload)
+                client.post(f"{settings.API_V1_STR}/interview/start", json=payload)
                 # If we had proper error handling, we would expect:
                 # assert response.status_code == 500  # Server error
                 # assert "error" in response.json()

@@ -23,7 +23,7 @@ def test_settings_loading():
     assert granite_config is not None
     assert granite_config.architecture == "granite"
     assert granite_config.size == "350m"
-    assert granite_config.fine_tuning_supported == True
+    assert granite_config.fine_tuning_supported
 
 
 def test_model_config_validation():
@@ -36,7 +36,7 @@ def test_model_config_validation():
 
     # Test invalid model
     validation = settings.validate_model_compatibility("nonexistent-model")
-    assert validation["compatible"] == False
+    assert not validation["compatible"]
 
 
 def test_training_prerequisites():
@@ -46,7 +46,7 @@ def test_training_prerequisites():
     # Test with valid model and dataset
     validation = training_service.validate_training_prerequisites("granite4:350m-h", "interview_v1")
 
-    assert validation["valid"] == True
+    assert validation["valid"]
     assert "model_config" in validation
     assert "dataset_path" in validation
 
@@ -69,7 +69,7 @@ def test_model_registry(mock_load):
 
     # Test loading a model
     result = model_registry.load_model("granite4:350m-h")
-    assert result == True
+    assert result
 
     # Test getting loaded models
     loaded = model_registry.get_loaded_models()

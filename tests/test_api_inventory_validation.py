@@ -493,7 +493,7 @@ class TestServiceIntegration:
                 )
 
                 # Check all endpoints
-                for method, endpoint in service_config["core_endpoints"]:
+                for _method, endpoint in service_config["core_endpoints"]:
                     response = await client.get(f"{base_url}{endpoint}")
                     assert response.status_code in [200, 201, 204], (
                         f"Notification Service {endpoint} returned {response.status_code}"

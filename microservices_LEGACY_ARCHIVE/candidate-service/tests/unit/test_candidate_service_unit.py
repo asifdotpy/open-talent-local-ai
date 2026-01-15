@@ -1,4 +1,4 @@
-"""Candidate Service Unit Tests
+"""Candidate Service Unit Tests.
 
 Unit tests for individual components of the candidate service.
 Focus on vector search, profile management, and data validation without external dependencies.
@@ -306,7 +306,7 @@ class TestEmbeddingGeneration:
             initial_questions=[],
         )
 
-        embedding = create_candidate_embedding(profile)
+        create_candidate_embedding(profile)
 
         # Verify embed was called
         mock_embedding_model.embed.assert_called_once()

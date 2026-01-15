@@ -1,4 +1,4 @@
-"""Candidate Service Integration Tests
+"""Candidate Service Integration Tests.
 
 Comprehensive testing of the candidate service endpoints with honest validation
 of actual service behavior. Tests vector search functionality and profile management.

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Safe Development Tests for Voice Service
-Tests basic functionality without system-crashing stress tests
+Tests basic functionality without system-crashing stress tests.
 """
 
 import asyncio

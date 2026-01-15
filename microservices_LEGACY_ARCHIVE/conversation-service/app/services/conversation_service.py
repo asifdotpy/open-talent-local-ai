@@ -630,7 +630,7 @@ Current interview stage: {self._get_interview_stage(context.get("question_count"
         self,
         room_id: str,
         session_id: str,
-        previous_responses: list[dict[str, Any]] = [],
+        previous_responses: list[dict[str, Any]] = None,
         expertise_level: str = "intermediate",
         job_requirements: str = "",
         question_number: int = 1,
@@ -638,6 +638,8 @@ Current interview stage: {self._get_interview_stage(context.get("question_count"
         bias_mitigation: bool = True,
     ) -> dict[str, Any]:
         """Generate the next adaptive interview question based on context."""
+        if previous_responses is None:
+            previous_responses = []
         try:
             # Generate question based on phase and expertise
             question_text = self._generate_question_for_phase(expertise_level, interview_phase, question_number)
@@ -674,10 +676,14 @@ Current interview stage: {self._get_interview_stage(context.get("question_count"
         self,
         response_text: str,
         question_context: str,
-        sentiment: dict[str, Any] = {},
-        quality: dict[str, Any] = {},
+        sentiment: dict[str, Any] = None,
+        quality: dict[str, Any] = None,
     ) -> dict[str, Any]:
         """Generate follow-up questions based on response analysis."""
+        if quality is None:
+            quality = {}
+        if sentiment is None:
+            sentiment = {}
         try:
             questions = []
 
@@ -733,9 +739,11 @@ Current interview stage: {self._get_interview_stage(context.get("question_count"
         self,
         current_phase: str,
         time_remaining_minutes: int,
-        performance_indicators: dict[str, Any] = {},
+        performance_indicators: dict[str, Any] = None,
     ) -> dict[str, Any]:
         """Generate interview adaptation recommendations."""
+        if performance_indicators is None:
+            performance_indicators = {}
         try:
             adaptations = {
                 "question_difficulty": "medium",

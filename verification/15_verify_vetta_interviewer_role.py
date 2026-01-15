@@ -5,6 +5,7 @@
 # Install required packages (run this first if not installed)
 # !pip install torch transformers unsloth huggingface_hub
 
+import os
 import time
 
 import torch

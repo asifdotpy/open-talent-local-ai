@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Model Download Script for Voice Service
-Downloads Vosk, Piper, and Silero models with progress tracking
+Downloads Vosk, Piper, and Silero models with progress tracking.
 """
 
 import hashlib
@@ -166,10 +166,9 @@ class ModelDownloader:
             return False
 
         # Verify checksum if available
-        if model_info["checksum"]:
-            if not self.verify_checksum(archive_path, model_info["checksum"]):
-                archive_path.unlink()
-                return False
+        if model_info["checksum"] and not self.verify_checksum(archive_path, model_info["checksum"]):
+            archive_path.unlink()
+            return False
 
         # Extract archive
         if not self.extract_archive(archive_path, self.models_dir):

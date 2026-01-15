@@ -1,5 +1,5 @@
 """OpenAI Text-to-Speech Service
-Production TTS using OpenAI's gpt-4o-mini-tts model
+Production TTS using OpenAI's gpt-4o-mini-tts model.
 """
 
 import logging
@@ -13,7 +13,7 @@ from .phoneme_extractor import PhonemeExtractor
 
 
 class OpenAITTSService:
-    """OpenAI Text-to-Speech service using gpt-4o-mini-tts model
+    """OpenAI Text-to-Speech service using gpt-4o-mini-tts model.
 
     Features:
     - Cost-effective: $0.015 per minute

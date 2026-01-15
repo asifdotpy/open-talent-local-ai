@@ -1,5 +1,5 @@
 """OpenTalent - Natural Language Question Builder API Routes
-FastAPI endpoints for question generation service
+FastAPI endpoints for question generation service.
 
 Inspired by PeopleGPT's conversational search paradigm
 """
@@ -19,7 +19,7 @@ router = APIRouter(tags=["Question Generation"])
 
 
 class QuestionGenerationResponse(BaseModel):
-    """Response from question generation endpoint"""
+    """Response from question generation endpoint."""
 
     questions: list[InterviewQuestion]
     total_questions: int
@@ -30,7 +30,7 @@ class QuestionGenerationResponse(BaseModel):
 
 
 class PinQuestionRequest(BaseModel):
-    """Request to pin/unpin a question"""
+    """Request to pin/unpin a question."""
 
     question_index: int
     pinned: bool
@@ -58,7 +58,7 @@ async def generate_questions(
     prompt: NaturalLanguagePrompt,
     builder: NaturalLanguageQuestionBuilder = Depends(get_question_builder),
 ) -> QuestionGenerationResponse:
-    """Generate interview questions from natural language prompt
+    """Generate interview questions from natural language prompt.
 
     Args:
         prompt: Natural language description of interview needs
@@ -116,7 +116,7 @@ async def list_templates(
     job_role: str | None = None,
     builder: NaturalLanguageQuestionBuilder = Depends(get_question_builder),
 ) -> list[QuestionTemplate]:
-    """List available question templates
+    """List available question templates.
 
     Args:
         job_role: Optional filter by job role
@@ -137,7 +137,7 @@ async def list_templates(
 async def get_template(
     template_id: str, builder: NaturalLanguageQuestionBuilder = Depends(get_question_builder)
 ) -> QuestionTemplate:
-    """Get a specific question template
+    """Get a specific question template.
 
     Args:
         template_id: Template identifier
@@ -171,7 +171,7 @@ async def use_template(
     num_questions: int | None = None,
     builder: NaturalLanguageQuestionBuilder = Depends(get_question_builder),
 ) -> QuestionGenerationResponse:
-    """Generate questions from a template
+    """Generate questions from a template.
 
     Args:
         template_id: Template to use
@@ -231,7 +231,7 @@ async def create_template(
     is_public: bool = False,
     builder: NaturalLanguageQuestionBuilder = Depends(get_question_builder),
 ) -> QuestionTemplate:
-    """Create a custom question template
+    """Create a custom question template.
 
     Args:
         template_name: Name of the template
@@ -266,7 +266,7 @@ async def create_template(
     description="Check if question generation service is operational",
 )
 async def health_check():
-    """Health check endpoint"""
+    """Health check endpoint."""
     return {
         "status": "healthy",
         "service": "question-generation",

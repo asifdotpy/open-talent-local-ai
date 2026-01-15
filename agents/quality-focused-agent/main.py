@@ -204,8 +204,8 @@ async def detect_bias(candidate_data: dict[str, Any]) -> list[str]:
     bias_flags = []
 
     # Check for common bias indicators
-    name = candidate_data.get("name", "")
-    location = candidate_data.get("location", "")
+    candidate_data.get("name", "")
+    candidate_data.get("location", "")
 
     # Gender bias check (simplified)
     # In production, use sophisticated NLP models
@@ -218,7 +218,7 @@ async def detect_bias(candidate_data: dict[str, Any]) -> list[str]:
 
     # University bias check
     if "education" in candidate_data:
-        education = candidate_data["education"]
+        candidate_data["education"]
         # Check if only considering elite universities
 
     return bias_flags

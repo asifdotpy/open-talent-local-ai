@@ -496,7 +496,7 @@ async def get_user_sessions(
     query = select(UserSession).where(UserSession.user_id == user_id)
 
     if active_only:
-        query = query.where(UserSession.revoked == False)
+        query = query.where(not UserSession.revoked)
 
     query = query.order_by(UserSession.last_seen.desc())
     result = await session.execute(query)

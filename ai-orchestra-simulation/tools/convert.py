@@ -11,7 +11,7 @@ def convert_all():
     os.makedirs(commands_dir, exist_ok=True)
 
     # Walk through the agents-temp directory
-    for root, dirs, files in os.walk("agents-temp"):
+    for root, _dirs, files in os.walk("agents-temp"):
         for file in files:
             if file.endswith(".md"):
                 md_file_path = os.path.join(root, file)

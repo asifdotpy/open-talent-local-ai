@@ -1,4 +1,4 @@
-"""Integration Tests for Voice Service API
+"""Integration Tests for Voice Service API.
 
 Following TDD principles:
 - Test real API interactions
@@ -702,7 +702,7 @@ class TestPerformanceAndConcurrency:
         assert success_count >= 3, f"Only {success_count}/5 concurrent requests succeeded"
 
         # Validate successful responses
-        for i, response in enumerate(responses):
+        for _i, response in enumerate(responses):
             if not isinstance(response, Exception) and response.status_code == 200:
                 data = validate_json_response(response, ["audio_data"])
                 validate_audio_data(data["audio_data"])

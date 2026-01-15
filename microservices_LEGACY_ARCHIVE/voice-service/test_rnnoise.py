@@ -13,7 +13,7 @@ from services.audio_processing_service import RNNoiseTrack
 
 
 class MockAudioTrack(AudioStreamTrack):
-    """Mock audio track for testing"""
+    """Mock audio track for testing."""
 
     kind = "audio"
 
@@ -45,7 +45,7 @@ class MockAudioTrack(AudioStreamTrack):
 
 
 def test_rnnoise():
-    """Test RNNoise noise suppression"""
+    """Test RNNoise noise suppression."""
     print("Testing RNNoise integration...")
 
     # Generate test audio with noise
@@ -101,8 +101,8 @@ def test_rnnoise():
         def calculate_snr(signal, noise):
             return 10 * np.log10(np.mean(signal**2) / np.mean(noise**2))
 
-        original_snr = calculate_snr(clean_signal[: len(processed_audio)], noise[: len(processed_audio)])
-        processed_snr = calculate_snr(processed_audio, processed_audio - clean_signal[: len(processed_audio)])
+        calculate_snr(clean_signal[: len(processed_audio)], noise[: len(processed_audio)])
+        calculate_snr(processed_audio, processed_audio - clean_signal[: len(processed_audio)])
 
         print(".2f")
         print(".2f")

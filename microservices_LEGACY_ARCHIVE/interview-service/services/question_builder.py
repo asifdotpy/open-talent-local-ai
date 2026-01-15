@@ -1,5 +1,5 @@
 """OpenTalent - Natural Language Question Builder Service
-Production-Ready - Multi-Model AI Question Generation with Ollama
+Production-Ready - Multi-Model AI Question Generation with Ollama.
 
 Model Strategy:
 - Primary: granite4:350m-h (configurable via QUESTION_BUILDER_MODEL)
@@ -27,7 +27,7 @@ from pydantic import BaseModel, Field
 
 
 class QuestionDifficulty(str, Enum):
-    """Question difficulty levels"""
+    """Question difficulty levels."""
 
     JUNIOR = "junior"
     MID_LEVEL = "mid_level"
@@ -37,7 +37,7 @@ class QuestionDifficulty(str, Enum):
 
 
 class QuestionType(str, Enum):
-    """Types of interview questions"""
+    """Types of interview questions."""
 
     TECHNICAL = "technical"
     BEHAVIORAL = "behavioral"
@@ -49,14 +49,14 @@ class QuestionType(str, Enum):
 
 
 class QuestionPriority(str, Enum):
-    """Question priority - inspired by PeopleGPT's pinned skills logic"""
+    """Question priority - inspired by PeopleGPT's pinned skills logic."""
 
     MUST_ASK = "must_ask"  # Pinned - AND logic
     NICE_TO_ASK = "nice_to_ask"  # Unpinned - OR logic
 
 
 class InterviewQuestion(BaseModel):
-    """Generated interview question with metadata"""
+    """Generated interview question with metadata."""
 
     question_text: str = Field(..., description="The actual question to ask")
     question_type: QuestionType = Field(..., description="Type of question")
@@ -73,7 +73,7 @@ class InterviewQuestion(BaseModel):
 
 
 class NaturalLanguagePrompt(BaseModel):
-    """Natural language input for question generation"""
+    """Natural language input for question generation."""
 
     prompt: str = Field(..., description="Natural language description of what to assess")
     job_title: str | None = Field(default=None, description="Job title for context")
@@ -85,7 +85,7 @@ class NaturalLanguagePrompt(BaseModel):
 
 
 class QuestionTemplate(BaseModel):
-    """Reusable question template - inspired by PeopleGPT presets"""
+    """Reusable question template - inspired by PeopleGPT presets."""
 
     template_id: str = Field(..., description="Unique template identifier")
     template_name: str = Field(..., description="Human-readable template name")
@@ -98,7 +98,7 @@ class QuestionTemplate(BaseModel):
 
 
 class NaturalLanguageQuestionBuilder:
-    """Natural Language Question Builder Service with Ollama
+    """Natural Language Question Builder Service with Ollama.
 
     Inspired by PeopleGPT's conversational search paradigm:
     - Users describe what they want in plain English
@@ -109,7 +109,7 @@ class NaturalLanguageQuestionBuilder:
     """
 
     def __init__(self, ollama_base_url: str | None = None):
-        """Initialize the question builder with Ollama integration"""
+        """Initialize the question builder with Ollama integration."""
         self.ollama_base_url = ollama_base_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 
         # Model selection with environment variables and fallback logic
@@ -229,7 +229,7 @@ class NaturalLanguageQuestionBuilder:
         }
 
     async def generate_questions(self, prompt: NaturalLanguagePrompt) -> list[InterviewQuestion]:
-        """Generate interview questions from natural language prompt using Ollama with fallback logic
+        """Generate interview questions from natural language prompt using Ollama with fallback logic.
 
         Model Priority (configurable via environment variables):
         1. Primary: QUESTION_BUILDER_MODEL (default: granite4:350m-h)
@@ -275,7 +275,7 @@ class NaturalLanguageQuestionBuilder:
         return self._generate_from_template(prompt)
 
     async def _generate_with_ollama(self, prompt: NaturalLanguagePrompt, model_name: str) -> list[InterviewQuestion]:
-        """Generate questions using Ollama with specified model"""
+        """Generate questions using Ollama with specified model."""
         response = await self.client.post(
             f"{self.ollama_base_url}/api/generate",
             json={
@@ -292,7 +292,7 @@ class NaturalLanguageQuestionBuilder:
         return self._parse_ollama_response(result, prompt)
 
     async def _generate_with_gemini(self, prompt: NaturalLanguagePrompt) -> list[InterviewQuestion]:
-        """Generate questions using Google Gemini API"""
+        """Generate questions using Google Gemini API."""
         if not self.gemini_api_key:
             raise ValueError("GEMINI_API_KEY not configured")
 
@@ -334,7 +334,7 @@ Output JSON array:"""
         return self._parse_gemini_response(response.text, prompt)
 
     def _build_job_description(self, prompt: NaturalLanguagePrompt) -> str:
-        """Build prompt for Ollama Granite4 model"""
+        """Build prompt for Ollama Granite4 model."""
         return f"""You are an expert interview question generator using the Granite4 enterprise model. Generate exactly {prompt.num_questions} interview questions in JSON format.
 
 Requirements:
@@ -360,7 +360,7 @@ Request: {prompt.prompt}
 Output JSON array:"""
 
     def _parse_ollama_response(self, response: dict, prompt: NaturalLanguagePrompt) -> list[InterviewQuestion]:
-        """Parse Ollama response into InterviewQuestion objects"""
+        """Parse Ollama response into InterviewQuestion objects."""
         import json
         import re
 
@@ -461,7 +461,7 @@ Output JSON array:"""
             return self._generate_from_template(prompt)
 
     def _parse_gemini_response(self, response_text: str, prompt: NaturalLanguagePrompt) -> list[InterviewQuestion]:
-        """Parse Gemini API response into InterviewQuestion objects"""
+        """Parse Gemini API response into InterviewQuestion objects."""
         import json
         import re
 
@@ -521,7 +521,7 @@ Output JSON array:"""
 
     def _generate_from_template(self, prompt: NaturalLanguagePrompt) -> list[InterviewQuestion]:
         """Fallback: Generate questions from templates
-        Used when GPT-4 API is unavailable or fails
+        Used when GPT-4 API is unavailable or fails.
         """
         # Try to match job title to template
         if prompt.job_title:
@@ -543,11 +543,11 @@ Output JSON array:"""
         return template.questions[: prompt.num_questions]
 
     def get_template(self, template_id: str) -> QuestionTemplate | None:
-        """Get a specific question template by ID"""
+        """Get a specific question template by ID."""
         return self.general_templates.get(template_id)
 
     def list_templates(self, job_role: str | None = None) -> list[QuestionTemplate]:
-        """List available question templates
+        """List available question templates.
 
         Args:
             job_role: Filter templates by job role
@@ -565,14 +565,14 @@ Output JSON array:"""
 
     def pin_question(self, question: InterviewQuestion) -> InterviewQuestion:
         """Pin a question (make it must-ask)
-        Inspired by PeopleGPT's pinned skills logic
+        Inspired by PeopleGPT's pinned skills logic.
         """
         question.priority = QuestionPriority.MUST_ASK
         return question
 
     def unpin_question(self, question: InterviewQuestion) -> InterviewQuestion:
         """Unpin a question (make it nice-to-ask)
-        Inspired by PeopleGPT's unpinned skills logic
+        Inspired by PeopleGPT's unpinned skills logic.
         """
         question.priority = QuestionPriority.NICE_TO_ASK
         return question
@@ -587,7 +587,7 @@ Output JSON array:"""
         is_public: bool = False,
     ) -> QuestionTemplate:
         """Create a custom question template
-        Similar to PeopleGPT's organization presets
+        Similar to PeopleGPT's organization presets.
 
         Args:
             template_name: Name of the template
@@ -621,7 +621,7 @@ _question_builder: NaturalLanguageQuestionBuilder | None = None
 
 
 def get_question_builder() -> NaturalLanguageQuestionBuilder:
-    """Get or create singleton question builder instance"""
+    """Get or create singleton question builder instance."""
     global _question_builder
     if _question_builder is None:
         _question_builder = NaturalLanguageQuestionBuilder()

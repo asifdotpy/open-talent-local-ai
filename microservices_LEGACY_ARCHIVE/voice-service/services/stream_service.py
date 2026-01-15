@@ -1,8 +1,10 @@
 """Unified Streaming Service for Voice Service
-Provides WebSocket-based real-time audio processing
+Provides WebSocket-based real-time audio processing.
 """
 
 import asyncio
+import builtins
+import contextlib
 import logging
 from typing import Any
 
@@ -83,10 +85,8 @@ class UnifiedStreamService:
             self.logger.info("STT streaming connection closed")
         except Exception as e:
             self.logger.error(f"STT streaming error: {e}")
-            try:
+            with contextlib.suppress(builtins.BaseException):
                 await websocket.send_json({"error": str(e)})
-            except:
-                pass
         finally:
             self.active_connections.discard(websocket)
 
@@ -145,10 +145,8 @@ class UnifiedStreamService:
             self.logger.info("TTS streaming connection closed")
         except Exception as e:
             self.logger.error(f"TTS streaming error: {e}")
-            try:
+            with contextlib.suppress(builtins.BaseException):
                 await websocket.send_json({"error": str(e)})
-            except:
-                pass
         finally:
             self.active_connections.discard(websocket)
 

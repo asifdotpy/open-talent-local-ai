@@ -130,7 +130,7 @@ def test_interview_session_model():
     assert session.config.role == "Software Engineer"
     assert len(session.messages) == 2
     assert session.currentQuestion == 1
-    assert session.isComplete == False
+    assert not session.isComplete
 
     # Test serialization
     session_dict = session.dict()

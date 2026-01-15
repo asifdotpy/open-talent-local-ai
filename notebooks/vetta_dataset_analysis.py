@@ -131,7 +131,7 @@ def main():
     # Analyze expanded dataset
     try:
         dataset = load_dataset(expanded_dataset)
-        stats = analyze_dataset(dataset)
+        analyze_dataset(dataset)
 
         # Compare with original
         compare_datasets(original_dataset, expanded_dataset)
