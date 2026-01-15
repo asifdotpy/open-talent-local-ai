@@ -3,12 +3,10 @@ User Service - User management, profiles, preferences
 Port: 8007
 """
 
-from fastapi import FastAPI, Depends, Body, Header, HTTPException
+from typing import Any
+
+from fastapi import Body, Depends, FastAPI, Header
 from fastapi.responses import JSONResponse
-from typing import Dict, Any, Optional, List
-from datetime import datetime
-import uuid
-import time
 
 app = FastAPI(title="User Service", version="1.0.0")
 
@@ -16,19 +14,19 @@ app = FastAPI(title="User Service", version="1.0.0")
 # IN-MEMORY STORAGE
 # ============================================================================
 
-users_db: Dict[str, Dict[str, Any]] = {}
-user_preferences_db: Dict[str, Dict[str, Any]] = {}
-user_emails_db: Dict[str, List[str]] = {}
-user_phones_db: Dict[str, List[str]] = {}
-user_activity_db: Dict[str, List[Dict[str, Any]]] = {}
-user_sessions_db: Dict[str, List[Dict[str, Any]]] = {}
+users_db: dict[str, dict[str, Any]] = {}
+user_preferences_db: dict[str, dict[str, Any]] = {}
+user_emails_db: dict[str, list[str]] = {}
+user_phones_db: dict[str, list[str]] = {}
+user_activity_db: dict[str, list[dict[str, Any]]] = {}
+user_sessions_db: dict[str, list[dict[str, Any]]] = {}
 
 # ============================================================================
 # HELPER FUNCTIONS
 # ============================================================================
 
 
-def get_current_user(authorization: Optional[str] = Header(None)) -> Optional[str]:
+def get_current_user(authorization: str | None = Header(None)) -> str | None:
     """Extract user ID from authorization header"""
     if not authorization:
         return None
@@ -48,9 +46,7 @@ def get_current_user(authorization: Optional[str] = Header(None)) -> Optional[st
 
 
 @app.get("/api/v1/users/{user_id}/preferences")
-async def get_user_preferences(
-    user_id: str, current_user: Optional[str] = Depends(get_current_user)
-):
+async def get_user_preferences(user_id: str, current_user: str | None = Depends(get_current_user)):
     """Get user preferences"""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
@@ -63,7 +59,7 @@ async def get_user_preferences(
 
 @app.put("/api/v1/users/{user_id}/preferences")
 async def update_user_preferences(
-    user_id: str, payload: dict = Body(...), current_user: Optional[str] = Depends(get_current_user)
+    user_id: str, payload: dict = Body(...), current_user: str | None = Depends(get_current_user)
 ):
     """Update user preferences"""
     if not current_user:
@@ -79,7 +75,7 @@ async def update_user_preferences(
 
 
 @app.get("/api/v1/users/me/preferences")
-async def get_current_user_preferences(current_user: Optional[str] = Depends(get_current_user)):
+async def get_current_user_preferences(current_user: str | None = Depends(get_current_user)):
     """Get current user's preferences"""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
@@ -92,7 +88,7 @@ async def get_current_user_preferences(current_user: Optional[str] = Depends(get
 
 @app.put("/api/v1/users/me/preferences")
 async def update_current_user_preferences(
-    payload: dict = Body(...), current_user: Optional[str] = Depends(get_current_user)
+    payload: dict = Body(...), current_user: str | None = Depends(get_current_user)
 ):
     """Update current user's preferences"""
     if not current_user:
@@ -126,7 +122,7 @@ async def update_current_user_preferences(
 
 
 @app.get("/api/v1/users/{user_id}/emails")
-async def get_user_emails(user_id: str, current_user: Optional[str] = Depends(get_current_user)):
+async def get_user_emails(user_id: str, current_user: str | None = Depends(get_current_user)):
     """Get user email addresses"""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
@@ -139,7 +135,7 @@ async def get_user_emails(user_id: str, current_user: Optional[str] = Depends(ge
 
 @app.post("/api/v1/users/{user_id}/emails")
 async def add_secondary_email(
-    user_id: str, payload: dict = Body(...), current_user: Optional[str] = Depends(get_current_user)
+    user_id: str, payload: dict = Body(...), current_user: str | None = Depends(get_current_user)
 ):
     """Add secondary email"""
     if not current_user:
@@ -161,7 +157,7 @@ async def add_secondary_email(
 
 @app.delete("/api/v1/users/{user_id}/emails/{email}")
 async def remove_email(
-    user_id: str, email: str, current_user: Optional[str] = Depends(get_current_user)
+    user_id: str, email: str, current_user: str | None = Depends(get_current_user)
 ):
     """Remove email address"""
     if not current_user:
@@ -178,7 +174,7 @@ async def remove_email(
 
 @app.get("/api/v1/users/{user_id}/phones")
 async def get_user_phone_numbers(
-    user_id: str, current_user: Optional[str] = Depends(get_current_user)
+    user_id: str, current_user: str | None = Depends(get_current_user)
 ):
     """Get user phone numbers"""
     if not current_user:
@@ -192,7 +188,7 @@ async def get_user_phone_numbers(
 
 @app.post("/api/v1/users/{user_id}/phones")
 async def add_phone_number(
-    user_id: str, payload: dict = Body(...), current_user: Optional[str] = Depends(get_current_user)
+    user_id: str, payload: dict = Body(...), current_user: str | None = Depends(get_current_user)
 ):
     """Add phone number"""
     if not current_user:
@@ -211,7 +207,7 @@ async def add_phone_number(
 
 @app.delete("/api/v1/users/{user_id}/phones/{phone}")
 async def remove_phone_number(
-    user_id: str, phone: str, current_user: Optional[str] = Depends(get_current_user)
+    user_id: str, phone: str, current_user: str | None = Depends(get_current_user)
 ):
     """Remove phone number"""
     if not current_user:
@@ -232,9 +228,7 @@ async def remove_phone_number(
 
 
 @app.get("/api/v1/users/{user_id}/activity")
-async def get_user_activity_log(
-    user_id: str, current_user: Optional[str] = Depends(get_current_user)
-):
+async def get_user_activity_log(user_id: str, current_user: str | None = Depends(get_current_user)):
     """Get user activity log"""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
@@ -246,7 +240,7 @@ async def get_user_activity_log(
 
 
 @app.get("/api/v1/users/{user_id}/sessions")
-async def get_user_sessions(user_id: str, current_user: Optional[str] = Depends(get_current_user)):
+async def get_user_sessions(user_id: str, current_user: str | None = Depends(get_current_user)):
     """Get user sessions"""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})
@@ -259,7 +253,7 @@ async def get_user_sessions(user_id: str, current_user: Optional[str] = Depends(
 
 @app.delete("/api/v1/users/{user_id}/sessions/{session_id}")
 async def revoke_user_session(
-    user_id: str, session_id: str, current_user: Optional[str] = Depends(get_current_user)
+    user_id: str, session_id: str, current_user: str | None = Depends(get_current_user)
 ):
     """Revoke a user session"""
     if not current_user:
@@ -281,9 +275,7 @@ async def revoke_user_session(
 
 
 @app.get("/api/v1/users/{user_id}/statistics")
-async def get_user_statistics(
-    user_id: str, current_user: Optional[str] = Depends(get_current_user)
-):
+async def get_user_statistics(user_id: str, current_user: str | None = Depends(get_current_user)):
     """Get user statistics"""
     if not current_user:
         return JSONResponse(status_code=401, content={"error": "Unauthorized"})

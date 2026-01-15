@@ -4,9 +4,9 @@ Services module for Granite Interview Service.
 Contains model loading, inference, and training services.
 """
 
-from .model_loader import model_loader, ModelLoader
-from .inference_engine import inference_engine, InferenceEngine
-from .training_service import training_service, TrainingService
+from .inference_engine import InferenceEngine, inference_engine
+from .model_loader import ModelLoader, model_loader
+from .training_service import TrainingService, training_service
 
 __all__ = [
     "model_loader",

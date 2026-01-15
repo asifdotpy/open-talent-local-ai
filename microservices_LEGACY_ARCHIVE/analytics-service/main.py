@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -37,7 +37,7 @@ class ResponseQuality(BaseModel):
 
 class BiasDetectionRequest(BaseModel):
     text: str
-    participants: Optional[list[dict[str, Any]]] = None
+    participants: list[dict[str, Any]] | None = None
 
 
 class BiasDetection(BaseModel):
@@ -58,7 +58,7 @@ class ExpertiseAssessment(BaseModel):
     confidence: float = 0.7
     technical_skills: list[str] = []
     knowledge_gaps: list[str] = []
-    experience_years: Optional[int] = 3
+    experience_years: int | None = 3
 
 
 class InterviewPerformanceRequest(BaseModel):
@@ -161,11 +161,7 @@ async def analyze_response_quality(request: ResponseQualityRequest):
         # Relevance check (simple keyword matching)
         question_keywords = set(request.question_context.lower().split())
         response_keywords = set(request.response_text.lower().split())
-        relevance_score = (
-            len(question_keywords.intersection(response_keywords))
-            / max(len(question_keywords), 1)
-            * 2.5
-        )
+        relevance_score = len(question_keywords.intersection(response_keywords)) / max(len(question_keywords), 1) * 2.5
 
         # Clarity assessment (sentence structure)
         sentences = request.response_text.split(".")
@@ -281,7 +277,7 @@ async def assess_expertise(request: ExpertiseAssessmentRequest):
             "expert": ["designed systems", "mentored", "innovated", "pioneered"],
         }
 
-        expertise_scores = {level: 0 for level in experience_indicators.keys()}
+        expertise_scores = dict.fromkeys(experience_indicators.keys(), 0)
 
         for level, indicators in experience_indicators.items():
             for indicator in indicators:
@@ -296,9 +292,7 @@ async def assess_expertise(request: ExpertiseAssessmentRequest):
             level = max(expertise_scores, key=expertise_scores.get)
 
         # Estimate years of experience
-        years_estimate = {"beginner": 1, "intermediate": 3, "advanced": 5, "expert": 8}.get(
-            level, 3
-        )
+        years_estimate = {"beginner": 1, "intermediate": 3, "advanced": 5, "expert": 8}.get(level, 3)
 
         # Knowledge gaps
         knowledge_gaps = []
@@ -333,27 +327,17 @@ async def analyze_interview_performance(request: InterviewPerformanceRequest):
             )
 
         # Calculate averages
-        avg_sentiment = sum(a.get("sentiment", {}).get("polarity", 0) for a in analyses) / len(
-            analyses
-        )
-        avg_quality = sum(a.get("quality", {}).get("overall_score", 5) for a in analyses) / len(
-            analyses
-        )
+        avg_sentiment = sum(a.get("sentiment", {}).get("polarity", 0) for a in analyses) / len(analyses)
+        avg_quality = sum(a.get("quality", {}).get("overall_score", 5) for a in analyses) / len(analyses)
         total_bias = sum(len(a.get("bias_detection", {}).get("flags", [])) for a in analyses)
 
         # Determine trends
-        sentiment_trend = (
-            "positive" if avg_sentiment > 0.2 else "negative" if avg_sentiment < -0.2 else "neutral"
-        )
-        quality_trend = (
-            "improving" if avg_quality > 7 else "declining" if avg_quality < 5 else "stable"
-        )
+        sentiment_trend = "positive" if avg_sentiment > 0.2 else "negative" if avg_sentiment < -0.2 else "neutral"
+        quality_trend = "improving" if avg_quality > 7 else "declining" if avg_quality < 5 else "stable"
 
         # Expertise level (use latest assessment)
         expertise_level = (
-            analyses[-1].get("expertise_assessment", {}).get("level", "unknown")
-            if analyses
-            else "unknown"
+            analyses[-1].get("expertise_assessment", {}).get("level", "unknown") if analyses else "unknown"
         )
 
         overall_score = (avg_quality + (1 - total_bias * 0.1) * 10) / 2
@@ -394,56 +378,35 @@ async def generate_intelligence_report(request: IntelligenceReportRequest):
 
         # Summary statistics
         total_responses = len(responses)
-        avg_quality = sum(a.get("quality", {}).get("overall_score", 5) for a in analyses) / len(
-            analyses
-        )
-        avg_sentiment = sum(a.get("sentiment", {}).get("polarity", 0) for a in analyses) / len(
-            analyses
-        )
+        avg_quality = sum(a.get("quality", {}).get("overall_score", 5) for a in analyses) / len(analyses)
+        avg_sentiment = sum(a.get("sentiment", {}).get("polarity", 0) for a in analyses) / len(analyses)
 
         # Sentiment analysis summary
         sentiment_distribution = {
-            "positive": len(
-                [a for a in analyses if a.get("sentiment", {}).get("polarity", 0) > 0.2]
-            ),
-            "neutral": len(
-                [a for a in analyses if -0.2 <= a.get("sentiment", {}).get("polarity", 0) <= 0.2]
-            ),
-            "negative": len(
-                [a for a in analyses if a.get("sentiment", {}).get("polarity", 0) < -0.2]
-            ),
+            "positive": len([a for a in analyses if a.get("sentiment", {}).get("polarity", 0) > 0.2]),
+            "neutral": len([a for a in analyses if -0.2 <= a.get("sentiment", {}).get("polarity", 0) <= 0.2]),
+            "negative": len([a for a in analyses if a.get("sentiment", {}).get("polarity", 0) < -0.2]),
         }
 
         # Bias report
-        total_bias_incidents = sum(
-            len(a.get("bias_detection", {}).get("flags", [])) for a in analyses
-        )
+        total_bias_incidents = sum(len(a.get("bias_detection", {}).get("flags", [])) for a in analyses)
         bias_categories = {}
         for a in analyses:
             for category in a.get("bias_detection", {}).get("categories", []):
                 bias_categories[category] = bias_categories.get(category, 0) + 1
 
         # Expertise evaluation
-        expertise_levels = [
-            a.get("expertise_assessment", {}).get("level", "unknown") for a in analyses
-        ]
+        expertise_levels = [a.get("expertise_assessment", {}).get("level", "unknown") for a in analyses]
         most_common_expertise = (
-            max(set(expertise_levels), key=expertise_levels.count)
-            if expertise_levels
-            else "unknown"
+            max(set(expertise_levels), key=expertise_levels.count) if expertise_levels else "unknown"
         )
 
         # Quality metrics
         quality_trends = {
-            "completeness": sum(a.get("quality", {}).get("completeness", 0.5) for a in analyses)
-            / len(analyses),
-            "relevance": sum(a.get("quality", {}).get("relevance", 0.5) for a in analyses)
-            / len(analyses),
-            "clarity": sum(a.get("quality", {}).get("clarity", 0.5) for a in analyses)
-            / len(analyses),
-            "technical_accuracy": sum(
-                a.get("quality", {}).get("technical_accuracy", 0.5) for a in analyses
-            )
+            "completeness": sum(a.get("quality", {}).get("completeness", 0.5) for a in analyses) / len(analyses),
+            "relevance": sum(a.get("quality", {}).get("relevance", 0.5) for a in analyses) / len(analyses),
+            "clarity": sum(a.get("quality", {}).get("clarity", 0.5) for a in analyses) / len(analyses),
+            "technical_accuracy": sum(a.get("quality", {}).get("technical_accuracy", 0.5) for a in analyses)
             / len(analyses),
         }
 
@@ -467,9 +430,7 @@ async def generate_intelligence_report(request: IntelligenceReportRequest):
                 "total_responses": total_responses,
                 "average_quality": round(avg_quality, 2),
                 "average_sentiment": round(avg_sentiment, 2),
-                "duration_minutes": (
-                    datetime.now() - datetime.fromisoformat(request.room_created_at)
-                ).total_seconds()
+                "duration_minutes": (datetime.now() - datetime.fromisoformat(request.room_created_at)).total_seconds()
                 / 60,
             },
             sentiment_analysis={
@@ -479,36 +440,18 @@ async def generate_intelligence_report(request: IntelligenceReportRequest):
                 if avg_sentiment < -0.2
                 else "neutral",
                 "distribution": sentiment_distribution,
-                "emotional_intensity": sum(
-                    a.get("sentiment", {}).get("intensity", 0) for a in analyses
-                )
+                "emotional_intensity": sum(a.get("sentiment", {}).get("intensity", 0) for a in analyses)
                 / len(analyses),
             },
             bias_report={
                 "total_incidents": total_bias_incidents,
                 "categories": bias_categories,
                 "severity_distribution": {
-                    "low": len(
-                        [
-                            a
-                            for a in analyses
-                            if a.get("bias_detection", {}).get("severity", "low") == "low"
-                        ]
-                    ),
+                    "low": len([a for a in analyses if a.get("bias_detection", {}).get("severity", "low") == "low"]),
                     "medium": len(
-                        [
-                            a
-                            for a in analyses
-                            if a.get("bias_detection", {}).get("severity", "low") == "medium"
-                        ]
+                        [a for a in analyses if a.get("bias_detection", {}).get("severity", "low") == "medium"]
                     ),
-                    "high": len(
-                        [
-                            a
-                            for a in analyses
-                            if a.get("bias_detection", {}).get("severity", "low") == "high"
-                        ]
-                    ),
+                    "high": len([a for a in analyses if a.get("bias_detection", {}).get("severity", "low") == "high"]),
                 },
             },
             expertise_evaluation={
@@ -521,8 +464,7 @@ async def generate_intelligence_report(request: IntelligenceReportRequest):
                     )
                 ),
                 "average_experience_years": sum(
-                    a.get("expertise_assessment", {}).get("experience_years", 0) or 0
-                    for a in analyses
+                    a.get("expertise_assessment", {}).get("experience_years", 0) or 0 for a in analyses
                 )
                 / len(analyses),
             },
@@ -530,19 +472,11 @@ async def generate_intelligence_report(request: IntelligenceReportRequest):
                 "average_score": round(avg_quality, 2),
                 "trends": quality_trends,
                 "strengths_distribution": {
-                    "high_quality": len(
-                        [a for a in analyses if a.get("quality", {}).get("overall_score", 5) >= 8]
-                    ),
+                    "high_quality": len([a for a in analyses if a.get("quality", {}).get("overall_score", 5) >= 8]),
                     "medium_quality": len(
-                        [
-                            a
-                            for a in analyses
-                            if 6 <= a.get("quality", {}).get("overall_score", 5) < 8
-                        ]
+                        [a for a in analyses if 6 <= a.get("quality", {}).get("overall_score", 5) < 8]
                     ),
-                    "low_quality": len(
-                        [a for a in analyses if a.get("quality", {}).get("overall_score", 5) < 6]
-                    ),
+                    "low_quality": len([a for a in analyses if a.get("quality", {}).get("overall_score", 5) < 6]),
                 },
             },
             recommendations=recommendations,

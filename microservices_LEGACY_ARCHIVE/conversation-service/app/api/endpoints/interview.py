@@ -1,25 +1,24 @@
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+
 from app.models.interview_models import (
-    GenerateQuestionsRequest,
-    GenerateQuestionsResponse,
-    StartConversationRequest,
-    StartConversationResponse,
-    SendMessageRequest,
+    AdaptationResponse,
+    AdaptiveQuestionRequest,
     ConversationResponse,
     ConversationStatus,
-    AdaptiveQuestionRequest,
-    QuestionGenerationResponse,
-    FollowupQuestion,
     FollowupRequest,
     FollowupResponse,
+    GenerateQuestionsRequest,
+    GenerateQuestionsResponse,
     InterviewAdaptationRequest,
-    InterviewAdaptation,
-    AdaptationResponse,
+    QuestionGenerationResponse,
+    SendMessageRequest,
+    StartConversationRequest,
+    StartConversationResponse,
 )
-from app.services.ollama_service import generate_questions_from_ollama
 from app.services.conversation_service import conversation_service
 from app.services.job_description_service import job_description_service
-from pydantic import BaseModel
+from app.services.ollama_service import generate_questions_from_ollama
 
 router = APIRouter()
 
@@ -28,9 +27,7 @@ router = APIRouter()
 
 @router.post("/conversation/generate-questions", response_model=GenerateQuestionsResponse)
 async def generate_questions(request: GenerateQuestionsRequest):
-    """
-    Generates interview questions based on a job description by calling the Ollama service.
-    """
+    """Generates interview questions based on a job description by calling the Ollama service."""
     try:
         # Call the Ollama service with the data from the request
         generated_data = generate_questions_from_ollama(
@@ -58,8 +55,7 @@ async def generate_questions(request: GenerateQuestionsRequest):
 
 @router.post("/conversation/start", response_model=StartConversationResponse)
 async def start_conversation(request: StartConversationRequest):
-    """
-    Start a new real-time interview conversation session.
+    """Start a new real-time interview conversation session.
     Dynamically loads job description if project_id/job_id provided.
     """
     try:
@@ -78,9 +74,7 @@ async def start_conversation(request: StartConversationRequest):
         # Fetch candidate profile if candidate_id available
         candidate_profile = request.candidate_profile
         if not candidate_profile and hasattr(request, "candidate_id"):
-            candidate_profile = await job_description_service.get_candidate_profile(
-                request.candidate_id
-            )
+            candidate_profile = await job_description_service.get_candidate_profile(request.candidate_id)
 
         result = await conversation_service.start_conversation(
             session_id=request.session_id,
@@ -96,9 +90,7 @@ async def start_conversation(request: StartConversationRequest):
 
 @router.post("/conversation/message", response_model=ConversationResponse)
 async def send_message(request: SendMessageRequest):
-    """
-    Send a message to an active conversation and get an adaptive response.
-    """
+    """Send a message to an active conversation and get an adaptive response."""
     try:
         response = await conversation_service.process_message(
             session_id=request.session_id,
@@ -108,9 +100,7 @@ async def send_message(request: SendMessageRequest):
         )
 
         if response is None:
-            raise HTTPException(
-                status_code=404, detail="No active conversation found for this session"
-            )
+            raise HTTPException(status_code=404, detail="No active conversation found for this session")
 
         return response
     except HTTPException:
@@ -121,16 +111,12 @@ async def send_message(request: SendMessageRequest):
 
 @router.get("/conversation/status/{session_id}", response_model=ConversationStatus)
 async def get_conversation_status(session_id: str):
-    """
-    Get the status of an active conversation.
-    """
+    """Get the status of an active conversation."""
     try:
         status = await conversation_service.get_conversation_status(session_id)
 
         if status is None:
-            raise HTTPException(
-                status_code=404, detail="No active conversation found for this session"
-            )
+            raise HTTPException(status_code=404, detail="No active conversation found for this session")
 
         return status
     except HTTPException:
@@ -141,16 +127,12 @@ async def get_conversation_status(session_id: str):
 
 @router.post("/conversation/end/{session_id}")
 async def end_conversation(session_id: str):
-    """
-    End an active conversation session.
-    """
+    """End an active conversation session."""
     try:
         success = await conversation_service.end_conversation(session_id)
 
         if not success:
-            raise HTTPException(
-                status_code=404, detail="No active conversation found for this session"
-            )
+            raise HTTPException(status_code=404, detail="No active conversation found for this session")
 
         return {"message": "Conversation ended successfully", "session_id": session_id}
     except HTTPException:
@@ -160,9 +142,7 @@ async def end_conversation(session_id: str):
 
 
 # --- New Adaptive Question Generation Endpoints ---
-@router.post(
-    "/api/v1/conversation/generate-adaptive-question", response_model=QuestionGenerationResponse
-)
+@router.post("/api/v1/conversation/generate-adaptive-question", response_model=QuestionGenerationResponse)
 async def generate_adaptive_question(request: AdaptiveQuestionRequest):
     """Generate the next adaptive interview question based on context."""
     try:
@@ -241,9 +221,7 @@ async def switch_interviewer_persona(request: SwitchPersonaRequest):
         }
 
         if request.persona not in persona_models:
-            raise HTTPException(
-                status_code=400, detail=f"Invalid persona. Available: {list(persona_models.keys())}"
-            )
+            raise HTTPException(status_code=400, detail=f"Invalid persona. Available: {list(persona_models.keys())}")
 
         previous_persona = modular_llm_service.get_current_persona()
         target_model = persona_models[request.persona]

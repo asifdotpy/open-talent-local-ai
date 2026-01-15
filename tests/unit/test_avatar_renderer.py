@@ -7,10 +7,11 @@ Part of Phase 2: Avatar Service Real Rendering
 Created: November 11, 2025
 """
 
-import pytest
-import httpx
 import asyncio
 import os
+
+import httpx
+import pytest
 
 
 @pytest.fixture
@@ -26,7 +27,7 @@ def sample_phonemes():
         {"phoneme": "HH", "start": 0.0, "end": 0.05},
         {"phoneme": "EH", "start": 0.05, "end": 0.15},
         {"phoneme": "L", "start": 0.15, "end": 0.25},
-        {"phoneme": "OW", "start": 0.25, "end": 0.45}
+        {"phoneme": "OW", "start": 0.25, "end": 0.45},
     ]
 
 
@@ -36,7 +37,7 @@ def vowel_phonemes():
     return [
         {"phoneme": "AA", "start": 0.0, "end": 0.2},  # Wide open
         {"phoneme": "AO", "start": 0.2, "end": 0.4},  # Open
-        {"phoneme": "IY", "start": 0.4, "end": 0.6}   # Narrow
+        {"phoneme": "IY", "start": 0.4, "end": 0.6},  # Narrow
     ]
 
 
@@ -44,9 +45,9 @@ def vowel_phonemes():
 def consonant_phonemes():
     """Consonant phonemes for mouth closing tests."""
     return [
-        {"phoneme": "M", "start": 0.0, "end": 0.1},   # Closed
-        {"phoneme": "P", "start": 0.1, "end": 0.2},   # Closed
-        {"phoneme": "B", "start": 0.2, "end": 0.3}    # Slightly open
+        {"phoneme": "M", "start": 0.0, "end": 0.1},  # Closed
+        {"phoneme": "P", "start": 0.1, "end": 0.2},  # Closed
+        {"phoneme": "B", "start": 0.2, "end": 0.3},  # Slightly open
     ]
 
 
@@ -81,11 +82,7 @@ class TestLipSyncRendering:
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
                 f"{renderer_url}/render/lipsync",
-                json={
-                    "phonemes": sample_phonemes,
-                    "model": "face",
-                    "duration": 0.5
-                }
+                json={"phonemes": sample_phonemes, "model": "face", "duration": 0.5},
             )
 
             assert response.status_code == 200
@@ -99,16 +96,13 @@ class TestLipSyncRendering:
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
                 f"{renderer_url}/render/lipsync",
-                json={
-                    "phonemes": sample_phonemes,
-                    "duration": 0.5
-                }
+                json={"phonemes": sample_phonemes, "duration": 0.5},
             )
 
             video_data = response.content
 
             # WebM signature: 0x1A 0x45 0xDF 0xA3
-            assert video_data[:4] == b'\x1a\x45\xdf\xa3'
+            assert video_data[:4] == b"\x1a\x45\xdf\xa3"
 
     @pytest.mark.asyncio
     async def test_render_with_processing_headers(self, renderer_url, sample_phonemes):
@@ -116,10 +110,7 @@ class TestLipSyncRendering:
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
                 f"{renderer_url}/render/lipsync",
-                json={
-                    "phonemes": sample_phonemes,
-                    "duration": 0.5
-                }
+                json={"phonemes": sample_phonemes, "duration": 0.5},
             )
 
             assert "x-processing-time" in response.headers
@@ -134,11 +125,7 @@ class TestPhonemeProcessing:
         """Test handling of empty phoneme array."""
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(
-                f"{renderer_url}/render/lipsync",
-                json={
-                    "phonemes": [],
-                    "duration": 1.0
-                }
+                f"{renderer_url}/render/lipsync", json={"phonemes": [], "duration": 1.0}
             )
 
             # Should handle gracefully - either error or default video
@@ -148,12 +135,7 @@ class TestPhonemeProcessing:
     async def test_missing_phonemes_field(self, renderer_url):
         """Test error handling when phonemes field is missing."""
         async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(
-                f"{renderer_url}/render/lipsync",
-                json={
-                    "duration": 1.0
-                }
-            )
+            response = await client.post(f"{renderer_url}/render/lipsync", json={"duration": 1.0})
 
             assert response.status_code == 400
             data = response.json()
@@ -164,11 +146,7 @@ class TestPhonemeProcessing:
         """Test that vowel phonemes result in mouth opening."""
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
-                f"{renderer_url}/render/lipsync",
-                json={
-                    "phonemes": vowel_phonemes,
-                    "duration": 0.6
-                }
+                f"{renderer_url}/render/lipsync", json={"phonemes": vowel_phonemes, "duration": 0.6}
             )
 
             assert response.status_code == 200
@@ -182,10 +160,7 @@ class TestPhonemeProcessing:
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
                 f"{renderer_url}/render/lipsync",
-                json={
-                    "phonemes": consonant_phonemes,
-                    "duration": 0.3
-                }
+                json={"phonemes": consonant_phonemes, "duration": 0.3},
             )
 
             assert response.status_code == 200
@@ -203,10 +178,7 @@ class TestVideoProperties:
         async with httpx.AsyncClient(timeout=90.0) as client:
             response = await client.post(
                 f"{renderer_url}/render/lipsync",
-                json={
-                    "phonemes": sample_phonemes,
-                    "duration": duration
-                }
+                json={"phonemes": sample_phonemes, "duration": duration},
             )
 
             assert response.status_code == 200
@@ -219,10 +191,7 @@ class TestVideoProperties:
             # Short video
             short_response = await client.post(
                 f"{renderer_url}/render/lipsync",
-                json={
-                    "phonemes": sample_phonemes,
-                    "duration": 0.5
-                }
+                json={"phonemes": sample_phonemes, "duration": 0.5},
             )
 
             # Longer video
@@ -230,8 +199,8 @@ class TestVideoProperties:
                 f"{renderer_url}/render/lipsync",
                 json={
                     "phonemes": sample_phonemes * 4,  # More phonemes
-                    "duration": 2.0
-                }
+                    "duration": 2.0,
+                },
             )
 
             short_size = len(short_response.content)
@@ -250,11 +219,7 @@ class TestModelSupport:
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
                 f"{renderer_url}/render/lipsync",
-                json={
-                    "phonemes": sample_phonemes,
-                    "model": "face",
-                    "duration": 0.5
-                }
+                json={"phonemes": sample_phonemes, "model": "face", "duration": 0.5},
             )
 
             assert response.status_code == 200
@@ -266,10 +231,7 @@ class TestModelSupport:
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
                 f"{renderer_url}/render/lipsync",
-                json={
-                    "phonemes": sample_phonemes,
-                    "duration": 0.5
-                }
+                json={"phonemes": sample_phonemes, "duration": 0.5},
             )
 
             assert response.status_code == 200
@@ -288,10 +250,7 @@ class TestPerformance:
 
             response = await client.post(
                 f"{renderer_url}/render/lipsync",
-                json={
-                    "phonemes": sample_phonemes,
-                    "duration": 0.5
-                }
+                json={"phonemes": sample_phonemes, "duration": 0.5},
             )
 
             elapsed = time.time() - start
@@ -307,10 +266,7 @@ class TestPerformance:
             tasks = [
                 client.post(
                     f"{renderer_url}/render/lipsync",
-                    json={
-                        "phonemes": sample_phonemes,
-                        "duration": 0.5
-                    }
+                    json={"phonemes": sample_phonemes, "duration": 0.5},
                 )
                 for _ in range(3)
             ]
@@ -331,10 +287,7 @@ class TestErrorHandling:
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(
                 f"{renderer_url}/render/lipsync",
-                json={
-                    "phonemes": [{"invalid": "format"}],
-                    "duration": 1.0
-                }
+                json={"phonemes": [{"invalid": "format"}], "duration": 1.0},
             )
 
             # Should handle gracefully
@@ -346,10 +299,7 @@ class TestErrorHandling:
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(
                 f"{renderer_url}/render/lipsync",
-                json={
-                    "phonemes": sample_phonemes,
-                    "duration": -1.0
-                }
+                json={"phonemes": sample_phonemes, "duration": -1.0},
             )
 
             # Should either reject or use default
@@ -363,8 +313,8 @@ class TestErrorHandling:
                 f"{renderer_url}/render/lipsync",
                 json={
                     "phonemes": sample_phonemes,
-                    "duration": 10.0  # Long video
-                }
+                    "duration": 10.0,  # Long video
+                },
             )
 
             # Should handle long videos

@@ -1,16 +1,15 @@
-import asyncio
 import logging
+
+import numpy as np
 from aiortc import AudioStreamTrack
 from av import AudioFrame
-import numpy as np
 from pyrnnoise import RNNoise
 
 logger = logging.getLogger(__name__)
 
 
 class RNNoiseTrack(AudioStreamTrack):
-    """
-    AudioStreamTrack that applies RNNoise noise suppression to incoming audio frames.
+    """AudioStreamTrack that applies RNNoise noise suppression to incoming audio frames.
     Buffers audio to ensure 10ms (480 sample) frames for RNNoise processing.
     """
 
@@ -59,9 +58,7 @@ class RNNoiseTrack(AudioStreamTrack):
                 denoised = frame_chunk  # Fallback to original
 
             # Create new frame
-            new_frame = AudioFrame.from_ndarray(
-                denoised.reshape(1, -1), format="s16", layout="mono"
-            )
+            new_frame = AudioFrame.from_ndarray(denoised.reshape(1, -1), format="s16", layout="mono")
             new_frame.sample_rate = self.sample_rate
             new_frame.pts = self.pts_counter
             new_frame.time_base = frame.time_base
@@ -72,9 +69,7 @@ class RNNoiseTrack(AudioStreamTrack):
             # Not enough data, return silence or wait
             # For now, return a silence frame
             silence = np.zeros(self.frame_size, dtype=np.int16)
-            silence_frame = AudioFrame.from_ndarray(
-                silence.reshape(1, -1), format="s16", layout="mono"
-            )
+            silence_frame = AudioFrame.from_ndarray(silence.reshape(1, -1), format="s16", layout="mono")
             silence_frame.sample_rate = self.sample_rate
             silence_frame.pts = self.pts_counter
             silence_frame.time_base = frame.time_base

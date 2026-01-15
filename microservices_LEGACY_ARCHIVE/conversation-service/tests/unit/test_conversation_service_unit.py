@@ -1,5 +1,4 @@
-"""
-Conversation Service Unit Tests
+"""Conversation Service Unit Tests
 
 Unit tests for individual components of the conversation service.
 Focus on service logic, models, and utilities without external dependencies.
@@ -14,27 +13,19 @@ Test Coverage:
 Total: 30 tests
 """
 
-import pytest
-from unittest.mock import Mock, patch, AsyncMock, MagicMock
-import json
-import sys
 from datetime import datetime
+from unittest.mock import MagicMock, Mock, patch
 
-from textblob import TextBlob
-from app.services.conversation_service import conversation_service, ConversationService
-from app.services.ollama_service import generate_questions_from_ollama
-from app.services.job_description_service import job_description_service
+import pytest
+
+from app.api.endpoints.interview import SentimentAnalysisRequest
 from app.models.interview_models import (
-    GenerateQuestionsRequest,
-    GenerateQuestionsResponse,
-    StartConversationRequest,
-    StartConversationResponse,
-    SendMessageRequest,
     ConversationResponse,
-    ConversationStatus,
+    GenerateQuestionsRequest,
+    StartConversationRequest,
 )
-from app.api.endpoints.interview import SentimentAnalysisRequest, SentimentAnalysisResponse
-from textblob import TextBlob
+from app.services.conversation_service import ConversationService
+from app.services.ollama_service import generate_questions_from_ollama
 
 
 class TestConversationService:
@@ -47,25 +38,22 @@ class TestConversationService:
     def test_initialization(self):
         """Test service initialization."""
         assert self.service.active_conversations == {}
-        assert hasattr(self.service, 'conversation_timeout')
-        assert hasattr(self.service, 'ollama_client')
+        assert hasattr(self.service, "conversation_timeout")
+        assert hasattr(self.service, "ollama_client")
 
     @pytest.mark.asyncio
     async def test_start_conversation_success(self):
         """Test successful conversation start."""
         request = StartConversationRequest(
-            session_id="test-123",
-            job_description="Python Developer",
-            interview_type="technical",
-            tone="professional"
+            session_id="test-123", job_description="Python Developer", interview_type="technical", tone="professional"
         )
 
-        with patch.object(self.service, '_generate_initial_message', return_value="Welcome!"):
+        with patch.object(self.service, "_generate_initial_message", return_value="Welcome!"):
             result = await self.service.start_conversation(
                 session_id=request.session_id,
                 job_description=request.job_description,
                 interview_type=request.interview_type,
-                tone=request.tone
+                tone=request.tone,
             )
 
             assert "conversation_id" in result
@@ -87,22 +75,20 @@ class TestConversationService:
             "messages": [],
             "question_count": 0,
             "current_topic": None,
-            "last_activity": datetime.now()
+            "last_activity": datetime.now(),
         }
 
-        with patch.object(self.service, '_process_transcript') as mock_process:
+        with patch.object(self.service, "_process_transcript") as mock_process:
             mock_process.return_value = {
                 "conversation_id": conv_id,
                 "session_id": "session-123",
                 "response_text": "Good answer!",
                 "response_type": "feedback",
-                "should_speak": True
+                "should_speak": True,
             }
 
             result = await self.service.process_message(
-                session_id="session-123",
-                message="I have 3 years experience",
-                message_type="transcript"
+                session_id="session-123", message="I have 3 years experience", message_type="transcript"
             )
 
             assert result["response_text"] == "Good answer!"
@@ -112,9 +98,7 @@ class TestConversationService:
     async def test_process_message_no_conversation(self):
         """Test processing message when no conversation exists."""
         result = await self.service.process_message(
-            session_id="nonexistent",
-            message="Hello",
-            message_type="transcript"
+            session_id="nonexistent", message="Hello", message_type="transcript"
         )
 
         assert result is None
@@ -129,7 +113,7 @@ class TestConversationService:
             "status": "active",
             "messages": [{"type": "test"}],
             "last_activity": datetime.now(),
-            "current_topic": "experience"
+            "current_topic": "experience",
         }
 
         result = await self.service.get_conversation_status("session-status")
@@ -153,7 +137,7 @@ class TestConversationService:
         self.service.active_conversations[conv_id] = {
             "conversation_id": conv_id,
             "session_id": "session-end",
-            "status": "active"
+            "status": "active",
         }
 
         result = await self.service.end_conversation("session-end")
@@ -184,12 +168,10 @@ class TestConversationService:
             "conversation_id": "conv-test",
             "session_id": "session-test",
             "messages": [],
-            "question_count": 0
+            "question_count": 0,
         }
 
-        result = self.service._generate_mock_transcript_response(
-            conversation, "I have Python experience", None
-        )
+        result = self.service._generate_mock_transcript_response(conversation, "I have Python experience", None)
 
         assert "conversation_id" in result
         assert "response_text" in result
@@ -213,7 +195,7 @@ class TestConversationService:
             "job_description": "Python Developer",
             "interview_type": "technical",
             "tone": "professional",
-            "question_count": 2
+            "question_count": 2,
         }
 
         prompt = self.service._build_system_prompt(context)
@@ -255,7 +237,7 @@ class TestSentimentAnalysis:
     @pytest.mark.asyncio
     async def test_sentiment_analysis_positive(self):
         """Test sentiment analysis with positive text."""
-        with patch('app.api.endpoints.interview.TextBlob') as mock_blob:
+        with patch("app.api.endpoints.interview.TextBlob") as mock_blob:
             mock_instance = Mock()
             mock_instance.sentiment.polarity = 0.8
             mock_instance.sentiment.subjectivity = 0.6
@@ -263,10 +245,7 @@ class TestSentimentAnalysis:
 
             from app.api.endpoints.interview import analyze_sentiment
 
-            request = SentimentAnalysisRequest(
-                text="I'm very excited about this opportunity!",
-                context="interview"
-            )
+            request = SentimentAnalysisRequest(text="I'm very excited about this opportunity!", context="interview")
 
             # Call the actual endpoint function
             result = await analyze_sentiment(request)
@@ -280,7 +259,7 @@ class TestSentimentAnalysis:
     @pytest.mark.asyncio
     async def test_sentiment_analysis_negative(self):
         """Test sentiment analysis with negative text."""
-        with patch('app.api.endpoints.interview.TextBlob') as mock_blob:
+        with patch("app.api.endpoints.interview.TextBlob") as mock_blob:
             mock_instance = Mock()
             mock_instance.sentiment.polarity = -0.6
             mock_instance.sentiment.subjectivity = 0.7
@@ -289,8 +268,7 @@ class TestSentimentAnalysis:
             from app.api.endpoints.interview import analyze_sentiment
 
             request = SentimentAnalysisRequest(
-                text="I'm not confident about my skills for this role",
-                context="interview"
+                text="I'm not confident about my skills for this role", context="interview"
             )
 
             result = await analyze_sentiment(request)
@@ -303,7 +281,7 @@ class TestSentimentAnalysis:
     @pytest.mark.asyncio
     async def test_sentiment_analysis_neutral(self):
         """Test sentiment analysis with neutral text."""
-        with patch('app.api.endpoints.interview.TextBlob') as mock_blob:
+        with patch("app.api.endpoints.interview.TextBlob") as mock_blob:
             mock_instance = Mock()
             mock_instance.sentiment.polarity = 0.1
             mock_instance.sentiment.subjectivity = 0.3
@@ -312,8 +290,7 @@ class TestSentimentAnalysis:
             from app.api.endpoints.interview import analyze_sentiment
 
             request = SentimentAnalysisRequest(
-                text="I have experience with Java and Spring framework",
-                context="general"
+                text="I have experience with Java and Spring framework", context="general"
             )
 
             result = await analyze_sentiment(request)
@@ -327,7 +304,7 @@ class TestSentimentAnalysis:
     async def test_sentiment_analysis_clamping(self):
         """Test sentiment value clamping."""
         # Test upper bound
-        with patch('app.api.endpoints.interview.TextBlob') as mock_blob:
+        with patch("app.api.endpoints.interview.TextBlob") as mock_blob:
             mock_instance = Mock()
             mock_instance.sentiment.polarity = 2.0  # Above max
             mock_instance.sentiment.subjectivity = 0.5
@@ -335,10 +312,7 @@ class TestSentimentAnalysis:
 
             from app.api.endpoints.interview import analyze_sentiment
 
-            request = SentimentAnalysisRequest(
-                text="Very positive text",
-                context="general"
-            )
+            request = SentimentAnalysisRequest(text="Very positive text", context="general")
 
             result = await analyze_sentiment(request)
 
@@ -346,7 +320,7 @@ class TestSentimentAnalysis:
             assert result.polarity == 2.0
 
         # Test lower bound
-        with patch('app.api.endpoints.interview.TextBlob') as mock_blob:
+        with patch("app.api.endpoints.interview.TextBlob") as mock_blob:
             mock_instance = Mock()
             mock_instance.sentiment.polarity = -2.0  # Below min
             mock_instance.sentiment.subjectivity = 0.5
@@ -354,10 +328,7 @@ class TestSentimentAnalysis:
 
             from app.api.endpoints.interview import analyze_sentiment
 
-            request = SentimentAnalysisRequest(
-                text="Very negative text",
-                context="general"
-            )
+            request = SentimentAnalysisRequest(text="Very negative text", context="general")
 
             result = await analyze_sentiment(request)
 
@@ -370,23 +341,22 @@ class TestOllamaService:
 
     def test_generate_questions_success_mock(self):
         """Test successful question generation with mock responses."""
-        with patch('app.services.ollama_service.USE_MOCK', True):
-            request = GenerateQuestionsRequest(
-                job_description="Software Engineer",
-                num_questions=2
-            )
+        with patch("app.services.ollama_service.USE_MOCK", True):
+            request = GenerateQuestionsRequest(job_description="Software Engineer", num_questions=2)
 
             result = generate_questions_from_ollama(
                 job_description=request.job_description,
                 num_questions=request.num_questions,
-                difficulty=request.difficulty
+                difficulty=request.difficulty,
             )
 
             assert isinstance(result, dict)
             assert "questions" in result
             assert len(result["questions"]) == 2
-            assert all("id" in q and "text" in q and "category" in q and "expected_duration_seconds" in q
-                      for q in result["questions"])
+            assert all(
+                "id" in q and "text" in q and "category" in q and "expected_duration_seconds" in q
+                for q in result["questions"]
+            )
 
     def test_generate_questions_success_real(self):
         """Test successful question generation with real Ollama."""
@@ -397,13 +367,9 @@ class TestOllamaService:
             }
         }
 
-        with patch('app.services.ollama_service.USE_MOCK', False), \
-             patch.dict('sys.modules', {'ollama': mock_ollama}):
-
+        with patch("app.services.ollama_service.USE_MOCK", False), patch.dict("sys.modules", {"ollama": mock_ollama}):
             result = generate_questions_from_ollama(
-                job_description="Software Engineer",
-                num_questions=1,
-                difficulty="easy"
+                job_description="Software Engineer", num_questions=1, difficulty="easy"
             )
 
             assert isinstance(result, dict)
@@ -416,15 +382,12 @@ class TestOllamaService:
         mock_ollama = MagicMock()
         mock_ollama.chat.side_effect = Exception("Ollama connection failed")
 
-        with patch('app.services.ollama_service.USE_MOCK', False), \
-             patch.dict('sys.modules', {'ollama': mock_ollama}):
-
-            with pytest.raises(Exception):
-                generate_questions_from_ollama(
-                    job_description="Test job",
-                    num_questions=1,
-                    difficulty="easy"
-                )
+        with (
+            patch("app.services.ollama_service.USE_MOCK", False),
+            patch.dict("sys.modules", {"ollama": mock_ollama}),
+            pytest.raises(Exception),
+        ):
+            generate_questions_from_ollama(job_description="Test job", num_questions=1, difficulty="easy")
 
 
 class TestDataValidation:
@@ -432,11 +395,7 @@ class TestDataValidation:
 
     def test_generate_questions_request_valid(self):
         """Test valid GenerateQuestionsRequest creation."""
-        request = GenerateQuestionsRequest(
-            job_description="Python Developer",
-            num_questions=5,
-            difficulty="medium"
-        )
+        request = GenerateQuestionsRequest(job_description="Python Developer", num_questions=5, difficulty="medium")
 
         assert request.job_description == "Python Developer"
         assert request.num_questions == 5
@@ -445,24 +404,21 @@ class TestDataValidation:
     def test_generate_questions_request_validation(self):
         """Test GenerateQuestionsRequest validation."""
         # Valid request
-        request = GenerateQuestionsRequest(
-            job_description="Developer",
-            num_questions=10
-        )
+        request = GenerateQuestionsRequest(job_description="Developer", num_questions=10)
         assert request.num_questions == 10
 
         # Invalid num_questions (too high)
         with pytest.raises(ValueError):
             GenerateQuestionsRequest(
                 job_description="Developer",
-                num_questions=25  # Above max
+                num_questions=25,  # Above max
             )
 
         # Invalid num_questions (too low)
         with pytest.raises(ValueError):
             GenerateQuestionsRequest(
                 job_description="Developer",
-                num_questions=0  # Below min
+                num_questions=0,  # Below min
             )
 
     def test_conversation_response_model(self):
@@ -473,7 +429,7 @@ class TestDataValidation:
             response_text="That's a good answer!",
             response_type="feedback",
             should_speak=True,
-            metadata={"confidence": 0.9}
+            metadata={"confidence": 0.9},
         )
 
         assert response.conversation_id == "conv-123"
@@ -484,10 +440,7 @@ class TestDataValidation:
 
     def test_sentiment_analysis_request_model(self):
         """Test SentimentAnalysisRequest model."""
-        request = SentimentAnalysisRequest(
-            text="I'm excited about this role!",
-            context="interview"
-        )
+        request = SentimentAnalysisRequest(text="I'm excited about this role!", context="interview")
 
         assert request.text == "I'm excited about this role!"
         assert request.context == "interview"

@@ -1,5 +1,4 @@
-"""
-Vetta AI Service - Ollama Integration
+"""Vetta AI Service - Ollama Integration
 Simple alternative to the Unsloth-based service using Ollama for inference.
 
 This module provides the same VettaAI interface but uses Ollama backend,
@@ -17,8 +16,8 @@ Usage:
 """
 
 import logging
-from typing import Dict, Any, Optional, List
 from datetime import datetime
+from typing import Any
 
 # Check if ollama is available
 try:
@@ -36,8 +35,7 @@ class VettaAIOllama:
     """Vetta AI service using Ollama backend."""
 
     def __init__(self, model_name: str = "vetta-granite-2b"):
-        """
-        Initialize Vetta AI with Ollama backend.
+        """Initialize Vetta AI with Ollama backend.
 
         Args:
             model_name: Name of the Ollama model to use
@@ -62,9 +60,7 @@ class VettaAIOllama:
             # Check if our model exists
             model_names = [m["name"] for m in models.get("models", [])]
             if self.model_name not in model_names:
-                logger.warning(
-                    f"Model '{self.model_name}' not found in Ollama. Available: {model_names}"
-                )
+                logger.warning(f"Model '{self.model_name}' not found in Ollama. Available: {model_names}")
                 logger.info(f"Create model with: ollama create {self.model_name} -f Modelfile")
                 return False
 
@@ -74,8 +70,7 @@ class VettaAIOllama:
             return False
 
     def _format_prompt(self, instruction: str, context: str = "") -> str:
-        """
-        Format prompt in Alpaca structure.
+        """Format prompt in Alpaca structure.
 
         Args:
             instruction: The instruction/task description
@@ -113,8 +108,7 @@ class VettaAIOllama:
         temperature: float = 0.7,
         top_p: float = 0.9,
     ) -> str:
-        """
-        Generate text using Ollama.
+        """Generate text using Ollama.
 
         Args:
             instruction: The task instruction
@@ -157,9 +151,8 @@ class VettaAIOllama:
         candidate_info: str,
         job_description: str,
         role: str,
-    ) -> Dict[str, Any]:
-        """
-        Assess candidate fit for a role.
+    ) -> dict[str, Any]:
+        """Assess candidate fit for a role.
 
         Args:
             candidate_info: Candidate background and skills
@@ -194,12 +187,11 @@ Job Requirements: {job_description}"""
 
     def generate_interview_question(
         self,
-        previous_responses: List[str],
+        previous_responses: list[str],
         job_requirements: str,
         expertise_level: str = "intermediate",
     ) -> str:
-        """
-        Generate context-aware interview question.
+        """Generate context-aware interview question.
 
         Args:
             previous_responses: List of candidate's previous answers
@@ -217,7 +209,7 @@ The question should:
 4. Allow for deep technical discussion"""
 
         context = f"""Previous responses:
-{chr(10).join(f'- {r}' for r in previous_responses)}
+{chr(10).join(f"- {r}" for r in previous_responses)}
 
 Requirements: {job_requirements}"""
 
@@ -231,8 +223,7 @@ Requirements: {job_requirements}"""
         role: str,
         company: str,
     ) -> str:
-        """
-        Generate personalized outreach message.
+        """Generate personalized outreach message.
 
         Args:
             candidate_name: Candidate's name
@@ -263,10 +254,9 @@ Company: {company}"""
         self,
         candidate_profile: str,
         job_requirements: str,
-        scoring_criteria: List[str],
-    ) -> Dict[str, Any]:
-        """
-        Score candidate quality across multiple criteria.
+        scoring_criteria: list[str],
+    ) -> dict[str, Any]:
+        """Score candidate quality across multiple criteria.
 
         Args:
             candidate_profile: Candidate background
@@ -277,7 +267,7 @@ Company: {company}"""
             Scores and overall assessment
         """
         instruction = f"""Score this candidate on the following criteria (1-10 each):
-{chr(10).join(f'- {c}' for c in scoring_criteria)}
+{chr(10).join(f"- {c}" for c in scoring_criteria)}
 
 Provide scores and brief justification for each."""
 
@@ -296,9 +286,8 @@ Requirements: {job_requirements}"""
     def analyze_response_sentiment(
         self,
         response_text: str,
-    ) -> Dict[str, Any]:
-        """
-        Analyze sentiment of candidate response.
+    ) -> dict[str, Any]:
+        """Analyze sentiment of candidate response.
 
         Args:
             response_text: Text to analyze
@@ -323,9 +312,8 @@ Provide:
             "timestamp": datetime.utcnow().isoformat(),
         }
 
-    def get_model_info(self) -> Dict[str, Any]:
-        """
-        Get model information and status.
+    def get_model_info(self) -> dict[str, Any]:
+        """Get model information and status.
 
         Returns:
             Model metadata and status
@@ -364,12 +352,11 @@ Provide:
 
 
 # Global singleton instance
-_vetta_instance: Optional[VettaAIOllama] = None
+_vetta_instance: VettaAIOllama | None = None
 
 
 def get_vetta_ai(model_name: str = "vetta-granite-2b") -> VettaAIOllama:
-    """
-    Get global VettaAI instance (singleton pattern).
+    """Get global VettaAI instance (singleton pattern).
 
     Args:
         model_name: Ollama model name
@@ -393,7 +380,7 @@ if __name__ == "__main__":
 
     # Check status
     info = vetta.get_model_info()
-    print(f"\n📊 Model Info:")
+    print("\n📊 Model Info:")
     for key, value in info.items():
         print(f"  {key}: {value}")
 

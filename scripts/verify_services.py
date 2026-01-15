@@ -46,9 +46,9 @@ async def check_service(port, name):
 
 
 async def main():
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"{'OpenTalent Service Health Sweep':^60}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     tasks = [check_service(port, name) for port, name in SERVICES.items()]
     results = await asyncio.gather(*tasks)
@@ -56,9 +56,9 @@ async def main():
     alive = sum(1 for r in results if r)
     total = len(SERVICES)
 
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"Summary: {alive}/{total} services are reachable.")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
 
 if __name__ == "__main__":

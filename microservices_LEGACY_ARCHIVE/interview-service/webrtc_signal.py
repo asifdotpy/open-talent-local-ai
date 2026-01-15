@@ -1,13 +1,12 @@
 # Session-based FastAPI WebSocket signaling server for WebRTC
 # Orchestrates browser <-> voice-service negotiation with targeted routing
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import JSONResponse
-from typing import Dict, Any, Optional
-import asyncio
 import logging
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any
+
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -25,15 +24,15 @@ class PeerType(str, Enum):
 class Peer:
     ws: WebSocket
     peer_type: PeerType
-    session_id: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    session_id: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 # Session registry: session_id -> {client, voice_service, avatar_service}
-sessions: Dict[str, Dict[PeerType, Peer]] = {}
+sessions: dict[str, dict[PeerType, Peer]] = {}
 
 # Peer lookup: ws object -> Peer
-peers_by_ws: Dict[WebSocket, Peer] = {}
+peers_by_ws: dict[WebSocket, Peer] = {}
 
 
 @app.get("/webrtc/info")
@@ -44,14 +43,13 @@ def info():
 
 @app.websocket("/webrtc/signal")
 async def websocket_endpoint(ws: WebSocket):
-    """
-    Main signaling endpoint with session-based routing.
+    """Main signaling endpoint with session-based routing.
 
     Expected first message: {"type": "register", "peer_type": "client"|"voice", "session_id": "...", ...}
     Subsequent messages are routed based on session and peer type.
     """
     await ws.accept()
-    peer: Optional[Peer] = None
+    peer: Peer | None = None
 
     try:
         # First message must be registration
@@ -78,9 +76,7 @@ async def websocket_endpoint(ws: WebSocket):
             return
 
         # Create peer and register
-        peer = Peer(
-            ws=ws, peer_type=peer_type, session_id=session_id, metadata=reg_msg.get("metadata", {})
-        )
+        peer = Peer(ws=ws, peer_type=peer_type, session_id=session_id, metadata=reg_msg.get("metadata", {}))
 
         if session_id not in sessions:
             sessions[session_id] = {}
@@ -91,9 +87,7 @@ async def websocket_endpoint(ws: WebSocket):
         logger.info(f"Peer registered: session={session_id}, type={peer_type}")
 
         # Acknowledge registration
-        await ws.send_json(
-            {"type": "registered", "session_id": session_id, "peer_type": peer_type.value}
-        )
+        await ws.send_json({"type": "registered", "session_id": session_id, "peer_type": peer_type.value})
 
         # Main signaling loop
         while True:
@@ -114,9 +108,8 @@ async def websocket_endpoint(ws: WebSocket):
                     sessions.pop(peer.session_id)
 
 
-async def route_message(sender: Peer, message: Dict[str, Any]):
-    """
-    Route signaling messages between peers in the same session.
+async def route_message(sender: Peer, message: dict[str, Any]):
+    """Route signaling messages between peers in the same session.
 
     Client -> Voice Service: offer, ice_candidate
     Voice Service -> Client: answer, ice_candidate

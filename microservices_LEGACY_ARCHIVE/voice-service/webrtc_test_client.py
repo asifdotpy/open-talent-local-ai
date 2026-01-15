@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-WebRTC Test Client for Voice Service
+"""WebRTC Test Client for Voice Service
 Tests real-time audio processing with RNNoise integration
 Enhanced with proper error handling, logging, and comprehensive validation
 """
@@ -8,21 +7,21 @@ Enhanced with proper error handling, logging, and comprehensive validation
 import asyncio
 import json
 import logging
+import os
 import sys
+import tempfile
+import time
+
+import aiohttp
 import numpy as np
 import soundfile as sf
 from aiortc import (
-    RTCPeerConnection,
-    RTCIceCandidate,
-    RTCSessionDescription,
     RTCConfiguration,
-    RTCIceServer,
+    RTCIceCandidate,
+    RTCPeerConnection,
+    RTCSessionDescription,
 )
-import aiohttp
-import tempfile
-import os
-import time
-from typing import Dict, List, Optional, Tuple
+
 from audio_processing_validator import AudioProcessingValidator, ValidationResult
 
 # Configure logging
@@ -92,7 +91,7 @@ class WebRTCTestClient:
             # Start signaling loop with session timeout
             await asyncio.wait_for(self._signaling_loop(), timeout=self.session_timeout)
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.error(f"Operation timed out after {self.session_timeout}s")
             await self._handle_timeout()
         except aiohttp.ClientError as e:
@@ -133,9 +132,7 @@ class WebRTCTestClient:
                 await self.start()
                 results["audio_quality_test"] = await self._validate_audio_processing()
             else:
-                results["audio_quality_test"] = self._create_error_result(
-                    "Failed to generate test audio"
-                )
+                results["audio_quality_test"] = self._create_error_result("Failed to generate test audio")
 
         except Exception as e:
             logger.error(f"Audio quality test failed: {e}")
@@ -189,7 +186,7 @@ class WebRTCTestClient:
             # Start signaling loop with session timeout
             await asyncio.wait_for(self._signaling_loop(), timeout=self.session_timeout)
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.error(f"Operation timed out after {self.session_timeout}s")
             await self._handle_timeout()
         except aiohttp.ClientError as e:
@@ -224,9 +221,7 @@ class WebRTCTestClient:
         offer = await self.pc.createOffer()
         await self.pc.setLocalDescription(offer)
 
-        await self.ws.send_json(
-            {"type": "offer", "session_id": self.session_id, "sdp": self.pc.localDescription.sdp}
-        )
+        await self.ws.send_json({"type": "offer", "session_id": self.session_id, "sdp": self.pc.localDescription.sdp})
 
     async def _add_dummy_audio_track(self):
         """Add a dummy audio track to complete WebRTC connection"""
@@ -367,7 +362,7 @@ class WebRTCTestClient:
                     if frame_count % 20 == 0:
                         logger.debug(f"Collected {frame_count} audio frames")
 
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     logger.debug("Timeout waiting for audio frame")
                     self.audio_dropouts += 1
                     break
@@ -375,9 +370,7 @@ class WebRTCTestClient:
                     logger.error(f"Error receiving audio frame: {e}")
                     break
 
-            logger.info(
-                f"Audio collection completed: {len(self.audio_frames)} samples, {self.audio_dropouts} dropouts"
-            )
+            logger.info(f"Audio collection completed: {len(self.audio_frames)} samples, {self.audio_dropouts} dropouts")
 
             if self.audio_frames:
                 await self._save_audio_for_analysis()
@@ -472,7 +465,7 @@ class WebRTCTestClient:
                         logger.info("WebSocket connection closed")
                         break
 
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     # Check if we should continue waiting
                     elapsed = time.time() - self.start_time
                     if elapsed > self.session_timeout:
@@ -623,7 +616,7 @@ class WebRTCTestClient:
         successful_connections = 0
 
         for i in range(num_connections):
-            logger.info(f"Stress test connection {i+1}/{num_connections}")
+            logger.info(f"Stress test connection {i + 1}/{num_connections}")
             try:
                 # Create new client instance
                 stress_client = WebRTCTestClient(session_timeout=15)
@@ -632,20 +625,18 @@ class WebRTCTestClient:
                 if stress_client.connection_established:
                     successful_connections += 1
                 else:
-                    errors.append(f"Connection {i+1} failed to establish")
+                    errors.append(f"Connection {i + 1} failed to establish")
 
                 await stress_client.stop()
                 await asyncio.sleep(0.5)  # Brief pause between connections
 
             except Exception as e:
-                errors.append(f"Connection {i+1} error: {e}")
+                errors.append(f"Connection {i + 1} error: {e}")
 
         passed = successful_connections == num_connections
 
         if successful_connections < num_connections:
-            warnings.append(
-                f"Only {successful_connections}/{num_connections} connections successful"
-            )
+            warnings.append(f"Only {successful_connections}/{num_connections} connections successful")
             recommendations.append("Check server capacity and connection limits")
 
         from audio_processing_validator import AudioMetrics

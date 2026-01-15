@@ -1,6 +1,5 @@
 """Main tests for the Interview Service, covering core functionalities."""
 
-
 import pytest
 from app.core.config import settings
 from fastapi.testclient import TestClient
@@ -50,13 +49,9 @@ def interview_payload():
 
 def test_start_interview(test_client: TestClient, interview_payload) -> None:
     """Test the start_interview endpoint."""
-    response = test_client.post(
-        f"{settings.API_V1_STR}/interview/start", json=interview_payload
-    )
+    response = test_client.post(f"{settings.API_V1_STR}/interview/start", json=interview_payload)
     assert response.status_code == 201
     data = response.json()
-    assert (
-        data["message"] == "Handoff received successfully. Interview process initiated."
-    )
+    assert data["message"] == "Handoff received successfully. Interview process initiated."
     assert "interview_session_id" in data
     assert data["candidate"] == "Jane Doe"

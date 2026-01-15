@@ -1,25 +1,22 @@
-"""
-Embedding generation using sentence-transformers.
+"""Embedding generation using sentence-transformers.
 Generates 384-dimensional embeddings for semantic search.
 """
 
 import logging
-from typing import List, Union
-from sentence_transformers import SentenceTransformer
+
 import numpy as np
+from sentence_transformers import SentenceTransformer
 
 logger = logging.getLogger(__name__)
 
 
 class EmbeddingGenerator:
-    """
-    Generates embeddings for candidate profiles and job descriptions.
+    """Generates embeddings for candidate profiles and job descriptions.
     Uses 'all-MiniLM-L6-v2' model (384 dimensions, fast and efficient).
     """
 
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
-        """
-        Initialize the embedding generator.
+        """Initialize the embedding generator.
 
         Args:
             model_name: Name of the sentence-transformer model to use
@@ -32,13 +29,12 @@ class EmbeddingGenerator:
     def generate_candidate_embedding(
         self,
         full_name: str,
-        skills: List[str],
-        experience: List[str],
-        education: List[str],
+        skills: list[str],
+        experience: list[str],
+        education: list[str],
         summary: str = "",
-    ) -> List[float]:
-        """
-        Generate embedding for a candidate profile.
+    ) -> list[float]:
+        """Generate embedding for a candidate profile.
 
         Args:
             full_name: Candidate's full name
@@ -72,11 +68,10 @@ class EmbeddingGenerator:
         self,
         title: str,
         description: str,
-        required_skills: List[str],
-        responsibilities: List[str] = None,
-    ) -> List[float]:
-        """
-        Generate embedding for a job description.
+        required_skills: list[str],
+        responsibilities: list[str] = None,
+    ) -> list[float]:
+        """Generate embedding for a job description.
 
         Args:
             title: Job title
@@ -104,9 +99,8 @@ class EmbeddingGenerator:
 
         return embedding.tolist()
 
-    def generate_embedding(self, text: str) -> List[float]:
-        """
-        Generate embedding for arbitrary text.
+    def generate_embedding(self, text: str) -> list[float]:
+        """Generate embedding for arbitrary text.
 
         Args:
             text: Text to embed
@@ -117,11 +111,8 @@ class EmbeddingGenerator:
         embedding = self.model.encode(text, convert_to_numpy=True)
         return embedding.tolist()
 
-    def calculate_similarity(
-        self, embedding1: Union[List[float], np.ndarray], embedding2: Union[List[float], np.ndarray]
-    ) -> float:
-        """
-        Calculate cosine similarity between two embeddings.
+    def calculate_similarity(self, embedding1: list[float] | np.ndarray, embedding2: list[float] | np.ndarray) -> float:
+        """Calculate cosine similarity between two embeddings.
 
         Args:
             embedding1: First embedding vector

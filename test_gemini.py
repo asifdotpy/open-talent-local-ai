@@ -1,33 +1,35 @@
 import asyncio
-import sys
 import os
-sys.path.append('.')
+import sys
+
+sys.path.append(".")
 
 # Test Gemini directly
-os.environ['OLLAMA_MODEL'] = 'nonexistent-model'
+os.environ["OLLAMA_MODEL"] = "nonexistent-model"
 
-from services.question_builder import NaturalLanguageQuestionBuilder, NaturalLanguagePrompt
 import google.generativeai as genai
+from services.question_builder import NaturalLanguagePrompt
+
 
 async def test_gemini_direct():
-    print('🧪 Testing Gemini API Directly')
-    print('=' * 50)
+    print("🧪 Testing Gemini API Directly")
+    print("=" * 50)
 
     # Get API key
-    api_key = os.getenv('GEMINI_API_KEY')
+    api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
-        print('❌ GEMINI_API_KEY not found')
+        print("❌ GEMINI_API_KEY not found")
         return
 
     # Configure Gemini
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-2.0-flash')
+    model = genai.GenerativeModel("gemini-2.0-flash")
 
     prompt = NaturalLanguagePrompt(
-        prompt='Generate questions for junior React developer role',
-        job_title='Junior React Developer',
-        required_skills=['React', 'JavaScript', 'CSS'],
-        num_questions=2
+        prompt="Generate questions for junior React developer role",
+        job_title="Junior React Developer",
+        required_skills=["React", "JavaScript", "CSS"],
+        num_questions=2,
     )
 
     # Build prompt for Gemini (same as in code)
@@ -46,8 +48,8 @@ Requirements:
 - skill_assessed as array of strings
 
 Context:
-Job Title: {prompt.job_title or 'Software Engineer'}
-Skills: {', '.join(prompt.required_skills) if prompt.required_skills else 'General technical skills'}
+Job Title: {prompt.job_title or "Software Engineer"}
+Skills: {", ".join(prompt.required_skills) if prompt.required_skills else "General technical skills"}
 Difficulty: {prompt.difficulty.value}
 Duration: {prompt.interview_duration} minutes
 
@@ -55,19 +57,20 @@ Request: {prompt.prompt}
 
 Output JSON array:"""
 
-    print('📤 Sending prompt to Gemini...')
-    print(gemini_prompt[:200] + '...')
+    print("📤 Sending prompt to Gemini...")
+    print(gemini_prompt[:200] + "...")
     print()
 
     try:
         response = model.generate_content(gemini_prompt)
-        print('📥 Gemini Response:')
-        print('=' * 30)
+        print("📥 Gemini Response:")
+        print("=" * 30)
         print(response.text)
-        print('=' * 30)
+        print("=" * 30)
 
         # Try to parse it
         import json
+
         content = response.text.strip()
 
         # Try to extract JSON from markdown code blocks
@@ -82,17 +85,19 @@ Output JSON array:"""
             if json_end > json_start:
                 content = content[json_start:json_end].strip()
 
-        print('🔍 Extracted JSON content:')
+        print("🔍 Extracted JSON content:")
         print(content)
         print()
 
         questions_data = json.loads(content)
-        print(f'✅ Successfully parsed {len(questions_data)} questions')
+        print(f"✅ Successfully parsed {len(questions_data)} questions")
 
     except Exception as e:
-        print(f'❌ Error: {e}')
+        print(f"❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
+
 
 if __name__ == "__main__":
     asyncio.run(test_gemini_direct())

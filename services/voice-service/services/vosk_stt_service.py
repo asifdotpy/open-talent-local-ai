@@ -29,9 +29,7 @@ class VoskSTTService:
     - Streaming support for real-time transcription
     """
 
-    def __init__(
-        self, model_path: str = "models/vosk-model-small-en-us-0.15", sample_rate: int = 16000
-    ):
+    def __init__(self, model_path: str = "models/vosk-model-small-en-us-0.15", sample_rate: int = 16000):
         """Initialize Vosk SST service.
 
         Args:

@@ -21,7 +21,6 @@ NOTE: Resume semantic search moved to separate Resume Analysis Service
 import os
 from datetime import datetime
 from enum import Enum
-from typing import Optional
 
 import httpx
 from pydantic import BaseModel, Field
@@ -66,36 +65,22 @@ class InterviewQuestion(BaseModel):
         default=QuestionPriority.NICE_TO_ASK, description="Must-ask vs nice-to-ask (pinned logic)"
     )
     expected_duration: int = Field(default=5, description="Expected answer duration in minutes")
-    evaluation_criteria: list[str] = Field(
-        default_factory=list, description="What to look for in the answer"
-    )
-    follow_up_questions: list[str] = Field(
-        default_factory=list, description="Suggested follow-up questions"
-    )
-    skill_assessed: list[str] = Field(
-        default_factory=list, description="Skills this question evaluates"
-    )
+    evaluation_criteria: list[str] = Field(default_factory=list, description="What to look for in the answer")
+    follow_up_questions: list[str] = Field(default_factory=list, description="Suggested follow-up questions")
+    skill_assessed: list[str] = Field(default_factory=list, description="Skills this question evaluates")
     ai_generated: bool = Field(default=True, description="Whether question was AI-generated")
-    generated_at: datetime = Field(
-        default_factory=datetime.utcnow, description="When question was generated"
-    )
+    generated_at: datetime = Field(default_factory=datetime.utcnow, description="When question was generated")
 
 
 class NaturalLanguagePrompt(BaseModel):
     """Natural language input for question generation"""
 
     prompt: str = Field(..., description="Natural language description of what to assess")
-    job_title: Optional[str] = Field(default=None, description="Job title for context")
-    required_skills: Optional[list[str]] = Field(
-        default=None, description="Required skills to assess"
-    )
-    company_culture: Optional[list[str]] = Field(default=None, description="Company culture values")
-    num_questions: int = Field(
-        default=5, description="Number of questions to generate", ge=1, le=20
-    )
-    difficulty: QuestionDifficulty = Field(
-        default=QuestionDifficulty.MID_LEVEL, description="Target difficulty level"
-    )
+    job_title: str | None = Field(default=None, description="Job title for context")
+    required_skills: list[str] | None = Field(default=None, description="Required skills to assess")
+    company_culture: list[str] | None = Field(default=None, description="Company culture values")
+    num_questions: int = Field(default=5, description="Number of questions to generate", ge=1, le=20)
+    difficulty: QuestionDifficulty = Field(default=QuestionDifficulty.MID_LEVEL, description="Target difficulty level")
     interview_duration: int = Field(default=45, description="Total interview duration in minutes")
 
 
@@ -106,11 +91,9 @@ class QuestionTemplate(BaseModel):
     template_name: str = Field(..., description="Human-readable template name")
     description: str = Field(..., description="What this template is for")
     job_roles: list[str] = Field(default_factory=list, description="Applicable job roles")
-    questions: list[InterviewQuestion] = Field(
-        default_factory=list, description="Pre-defined questions"
-    )
+    questions: list[InterviewQuestion] = Field(default_factory=list, description="Pre-defined questions")
     is_public: bool = Field(default=True, description="Public template or organization-specific")
-    created_by: Optional[str] = Field(None, description="User who created this template")
+    created_by: str | None = Field(None, description="User who created this template")
     usage_count: int = Field(default=0, description="How many times this template has been used")
 
 
@@ -125,22 +108,14 @@ class NaturalLanguageQuestionBuilder:
     - Lightweight and production-ready (no vector database overhead)
     """
 
-    def __init__(self, ollama_base_url: Optional[str] = None):
+    def __init__(self, ollama_base_url: str | None = None):
         """Initialize the question builder with Ollama integration"""
-        self.ollama_base_url = ollama_base_url or os.getenv(
-            "OLLAMA_BASE_URL", "http://localhost:11434"
-        )
+        self.ollama_base_url = ollama_base_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 
         # Model selection with environment variables and fallback logic
-        self.model_name = os.getenv(
-            "QUESTION_BUILDER_MODEL", "granite4:350m-h"
-        )  # Default: granite4
-        self.fallback_model = os.getenv(
-            "QUESTION_BUILDER_FALLBACK_MODEL", "smollm:135m"
-        )  # Fallback: smollm
-        self.advanced_model = os.getenv(
-            "QUESTION_BUILDER_ADVANCED_MODEL", "gemini"
-        )  # Advanced: Gemini
+        self.model_name = os.getenv("QUESTION_BUILDER_MODEL", "granite4:350m-h")  # Default: granite4
+        self.fallback_model = os.getenv("QUESTION_BUILDER_FALLBACK_MODEL", "smollm:135m")  # Fallback: smollm
+        self.advanced_model = os.getenv("QUESTION_BUILDER_ADVANCED_MODEL", "gemini")  # Advanced: Gemini
 
         # Get API keys
         self.gemini_api_key = os.getenv("GEMINI_API_KEY")
@@ -299,9 +274,7 @@ class NaturalLanguageQuestionBuilder:
         print("All AI models failed. Falling back to templates.")
         return self._generate_from_template(prompt)
 
-    async def _generate_with_ollama(
-        self, prompt: NaturalLanguagePrompt, model_name: str
-    ) -> list[InterviewQuestion]:
+    async def _generate_with_ollama(self, prompt: NaturalLanguagePrompt, model_name: str) -> list[InterviewQuestion]:
         """Generate questions using Ollama with specified model"""
         response = await self.client.post(
             f"{self.ollama_base_url}/api/generate",
@@ -345,8 +318,8 @@ Requirements:
 - skill_assessed as array of strings
 
 Context:
-Job Title: {prompt.job_title or 'Software Engineer'}
-Skills: {', '.join(prompt.required_skills) if prompt.required_skills else 'General technical skills'}
+Job Title: {prompt.job_title or "Software Engineer"}
+Skills: {", ".join(prompt.required_skills) if prompt.required_skills else "General technical skills"}
 Difficulty: {prompt.difficulty.value}
 Duration: {prompt.interview_duration} minutes
 
@@ -377,8 +350,8 @@ Requirements:
 - skill_assessed as array of strings
 
 Context:
-Job Title: {prompt.job_title or 'Software Engineer'}
-Skills: {', '.join(prompt.required_skills) if prompt.required_skills else 'General technical skills'}
+Job Title: {prompt.job_title or "Software Engineer"}
+Skills: {", ".join(prompt.required_skills) if prompt.required_skills else "General technical skills"}
 Difficulty: {prompt.difficulty.value}
 Duration: {prompt.interview_duration} minutes
 
@@ -386,9 +359,7 @@ Request: {prompt.prompt}
 
 Output JSON array:"""
 
-    def _parse_ollama_response(
-        self, response: dict, prompt: NaturalLanguagePrompt
-    ) -> list[InterviewQuestion]:
+    def _parse_ollama_response(self, response: dict, prompt: NaturalLanguagePrompt) -> list[InterviewQuestion]:
         """Parse Ollama response into InterviewQuestion objects"""
         import json
         import re
@@ -489,9 +460,7 @@ Output JSON array:"""
             # Fallback to template
             return self._generate_from_template(prompt)
 
-    def _parse_gemini_response(
-        self, response_text: str, prompt: NaturalLanguagePrompt
-    ) -> list[InterviewQuestion]:
+    def _parse_gemini_response(self, response_text: str, prompt: NaturalLanguagePrompt) -> list[InterviewQuestion]:
         """Parse Gemini API response into InterviewQuestion objects"""
         import json
         import re
@@ -573,11 +542,11 @@ Output JSON array:"""
         # Return template questions (limited to requested number)
         return template.questions[: prompt.num_questions]
 
-    def get_template(self, template_id: str) -> Optional[QuestionTemplate]:
+    def get_template(self, template_id: str) -> QuestionTemplate | None:
         """Get a specific question template by ID"""
         return self.general_templates.get(template_id)
 
-    def list_templates(self, job_role: Optional[str] = None) -> list[QuestionTemplate]:
+    def list_templates(self, job_role: str | None = None) -> list[QuestionTemplate]:
         """List available question templates
 
         Args:
@@ -590,9 +559,7 @@ Output JSON array:"""
 
         if job_role:
             job_lower = job_role.lower()
-            templates = [
-                t for t in templates if any(job_lower in role.lower() for role in t.job_roles)
-            ]
+            templates = [t for t in templates if any(job_lower in role.lower() for role in t.job_roles)]
 
         return templates
 
@@ -650,7 +617,7 @@ Output JSON array:"""
 
 
 # Singleton instance
-_question_builder: Optional[NaturalLanguageQuestionBuilder] = None
+_question_builder: NaturalLanguageQuestionBuilder | None = None
 
 
 def get_question_builder() -> NaturalLanguageQuestionBuilder:

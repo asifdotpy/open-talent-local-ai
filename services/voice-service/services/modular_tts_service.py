@@ -74,8 +74,7 @@ class ModularTTSService:
             self._tts_service = PiperTTSService(
                 model_path=piper_model_path or "models/en_US-lessac-medium.onnx",
                 config_path=piper_config_path or "models/en_US-lessac-medium.onnx.json",
-                piper_binary=piper_binary
-                or "/home/asif1/open-talent-platform/microservices/voice-service/piper/piper",
+                piper_binary=piper_binary or "/home/asif1/open-talent-platform/microservices/voice-service/piper/piper",
             )
         else:
             raise ValueError(f"Unsupported TTS provider: {provider}. Use 'local' or 'openai'")
@@ -139,9 +138,7 @@ class ModularTTSService:
 
         return result
 
-    def synthesize_streaming(
-        self, text: str, chunk_size: int = 4096, voice: str = None
-    ) -> list[bytes]:
+    def synthesize_streaming(self, text: str, chunk_size: int = 4096, voice: str = None) -> list[bytes]:
         """Synthesize speech in chunks for streaming.
 
         Args:
@@ -245,13 +242,9 @@ class MockModularTTSService:
 
         return result
 
-    def synthesize_streaming(
-        self, text: str, chunk_size: int = 4096, voice: str = "lessac"
-    ) -> list[bytes]:
+    def synthesize_streaming(self, text: str, chunk_size: int = 4096, voice: str = "lessac") -> list[bytes]:
         """Return mock streaming chunks."""
-        return self._mock_service.synthesize_streaming(
-            text=text, chunk_size=chunk_size, voice=voice
-        )
+        return self._mock_service.synthesize_streaming(text=text, chunk_size=chunk_size, voice=voice)
 
     def get_available_voices(self) -> list[dict]:
         """Return mock voices."""

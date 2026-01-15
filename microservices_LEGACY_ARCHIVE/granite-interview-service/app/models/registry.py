@@ -7,7 +7,7 @@ proper initialization, loading, and management.
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 import torch
 from peft import PeftConfig, PeftModel
@@ -341,7 +341,7 @@ class ModelRegistry:
         }
         self.loaded_models: dict[str, BaseModelHandler] = {}
 
-    def get_handler_class(self, architecture: str) -> Optional[type[BaseModelHandler]]:
+    def get_handler_class(self, architecture: str) -> type[BaseModelHandler] | None:
         """Get handler class for architecture."""
         return self.handlers.get(architecture.lower())
 
@@ -385,7 +385,7 @@ class ModelRegistry:
         """Get list of currently loaded models."""
         return list(self.loaded_models.keys())
 
-    def get_model_handler(self, model_name: str) -> Optional[BaseModelHandler]:
+    def get_model_handler(self, model_name: str) -> BaseModelHandler | None:
         """Get handler for a loaded model."""
         return self.loaded_models.get(model_name)
 
@@ -397,7 +397,7 @@ class ModelRegistry:
 
         return handler.generate_response(prompt, **kwargs)
 
-    def get_model_info(self, model_name: str) -> Optional[dict[str, Any]]:
+    def get_model_info(self, model_name: str) -> dict[str, Any] | None:
         """Get information about a model."""
         handler = self.get_model_handler(model_name)
         if handler:

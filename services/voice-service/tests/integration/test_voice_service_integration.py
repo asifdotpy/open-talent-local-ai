@@ -55,14 +55,10 @@ def validate_phoneme_data(phonemes: list) -> None:
         assert isinstance(phoneme["phoneme"], str), f"Phoneme {i}: 'phoneme' must be string"
         assert isinstance(phoneme["start"], (int, float)), f"Phoneme {i}: 'start' must be number"
         assert isinstance(phoneme["end"], (int, float)), f"Phoneme {i}: 'end' must be number"
-        assert isinstance(
-            phoneme["duration"], (int, float)
-        ), f"Phoneme {i}: 'duration' must be number"
+        assert isinstance(phoneme["duration"], (int, float)), f"Phoneme {i}: 'duration' must be number"
 
         # Validate timing logic
-        assert (
-            phoneme["end"] >= phoneme["start"]
-        ), f"Phoneme {i}: end must be greater than or equal to start"
+        assert phoneme["end"] >= phoneme["start"], f"Phoneme {i}: end must be greater than or equal to start"
         assert phoneme["duration"] >= 0, f"Phoneme {i}: duration must be positive"
 
 
@@ -72,9 +68,7 @@ def validate_phoneme_sequence(phonemes: list) -> None:
         current = phonemes[i]
         next_phoneme = phonemes[i + 1]
 
-        assert (
-            current["end"] <= next_phoneme["start"]
-        ), f"Phonemes {i} and {i+1} overlap or are out of order"
+        assert current["end"] <= next_phoneme["start"], f"Phonemes {i} and {i + 1} overlap or are out of order"
 
 
 class TestHealthAndInfo:
@@ -173,9 +167,7 @@ class TestTTSEndpoint:
         response = client.post("/voice/tts", json=request_data)
 
         # Assert
-        data = validate_json_response(
-            response, ["audio_data", "duration", "sample_rate", "phonemes"]
-        )
+        data = validate_json_response(response, ["audio_data", "duration", "sample_rate", "phonemes"])
 
         # Validate phoneme data
         validate_phoneme_data(data["phonemes"])
@@ -352,9 +344,7 @@ class TestSTTEndpoint:
     def test_stt_invalid_file_type(self, client):
         """Test STT error handling with invalid file type."""
         # Act
-        response = client.post(
-            "/voice/stt", files={"audio_file": ("test.txt", b"not audio", "text/plain")}
-        )
+        response = client.post("/voice/stt", files={"audio_file": ("test.txt", b"not audio", "text/plain")})
 
         # Assert
         assert response.status_code == 400
@@ -381,9 +371,7 @@ class TestPerformanceAndConcurrency:
         """Benchmark TTS generation latency."""
         # Act
         start = time.time()
-        response = client.post(
-            "/voice/tts", json={"text": short_text, "voice": "en_US-lessac-medium"}
-        )
+        response = client.post("/voice/tts", json={"text": short_text, "voice": "en_US-lessac-medium"})
         latency = time.time() - start
 
         # Assert

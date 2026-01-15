@@ -59,9 +59,7 @@ class TestAssetEndpoints:
 
     def test_model_select(self, client):
         """POST /models/select should select a model."""
-        res = client.post(
-            "/api/v1/avatars/models/select", json={"avatar_id": "avatar-1", "model_id": "model-1"}
-        )
+        res = client.post("/api/v1/avatars/models/select", json={"avatar_id": "avatar-1", "model_id": "model-1"})
         assert res.status_code == 200
         assert res.json()["model_id"] == "model-1"
 
@@ -79,9 +77,7 @@ class TestAssetPathTraversalSafety:
     @pytest.mark.assets
     def test_download_path_traversal_backslash(self, client):
         r"""..\\..\\windows\\system32 should be rejected."""
-        res = client.get(
-            "/api/v1/avatars/assets/download", params={"name": "..\\..\\windows\\system32"}
-        )
+        res = client.get("/api/v1/avatars/assets/download", params={"name": "..\\..\\windows\\system32"})
         assert res.status_code in [400, 403, 404]
 
     @pytest.mark.assets
@@ -99,9 +95,7 @@ class TestAssetPathTraversalSafety:
     @pytest.mark.assets
     def test_download_double_encoding(self, client):
         """URL-encoded traversal ..%2F..%2Fetc%2Fpasswd should be rejected."""
-        res = client.get(
-            "/api/v1/avatars/assets/download", params={"name": "..%2F..%2Fetc%2Fpasswd"}
-        )
+        res = client.get("/api/v1/avatars/assets/download", params={"name": "..%2F..%2Fetc%2Fpasswd"})
         # TestClient auto-decodes; should still be safe
         assert res.status_code in [400, 403, 404]
 

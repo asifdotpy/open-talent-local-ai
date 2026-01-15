@@ -1,5 +1,3 @@
-
-
 # Test the root endpoint
 def test_root(client):
     response = client.get("/")
@@ -17,9 +15,7 @@ def test_health_check(client):
 
 # Test the STT endpoint with invalid file type
 def test_stt_invalid_file(client):
-    response = client.post(
-        "/voice/stt", files={"audio_file": ("test.txt", b"dummy content", "text/plain")}
-    )
+    response = client.post("/voice/stt", files={"audio_file": ("test.txt", b"dummy content", "text/plain")})
     assert response.status_code == 400
     assert "Invalid audio file type" in response.json()["detail"]
 

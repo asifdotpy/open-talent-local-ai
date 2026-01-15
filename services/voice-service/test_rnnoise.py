@@ -101,12 +101,8 @@ def test_rnnoise():
         def calculate_snr(signal, noise):
             return 10 * np.log10(np.mean(signal**2) / np.mean(noise**2))
 
-        original_snr = calculate_snr(
-            clean_signal[: len(processed_audio)], noise[: len(processed_audio)]
-        )
-        processed_snr = calculate_snr(
-            processed_audio, processed_audio - clean_signal[: len(processed_audio)]
-        )
+        original_snr = calculate_snr(clean_signal[: len(processed_audio)], noise[: len(processed_audio)])
+        processed_snr = calculate_snr(processed_audio, processed_audio - clean_signal[: len(processed_audio)])
 
         print(".2f")
         print(".2f")

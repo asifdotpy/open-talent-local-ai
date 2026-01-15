@@ -13,11 +13,12 @@ Requirements:
 """
 
 import os
-import torch
-from unsloth import FastLanguageModel
-from transformers import AutoTokenizer
-from huggingface_hub import login
 import time
+
+import torch
+from huggingface_hub import login
+from unsloth import FastLanguageModel
+
 
 def main():
     print("🔍 Vetta LoRA Model Verification")
@@ -28,7 +29,7 @@ def main():
     BASE_MODEL = "ibm-granite/granite-3.0-2b-instruct"
 
     # Authenticate
-    hf_token = os.getenv('HF_TOKEN')
+    hf_token = os.getenv("HF_TOKEN")
     if not hf_token:
         print("❌ Please set HF_TOKEN environment variable")
         return
@@ -53,7 +54,15 @@ def main():
             lora_path=LORA_REPO,
             r=16,
             lora_alpha=16,
-            target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+            target_modules=[
+                "q_proj",
+                "k_proj",
+                "v_proj",
+                "o_proj",
+                "gate_proj",
+                "up_proj",
+                "down_proj",
+            ],
         )
 
         load_time = time.time() - start_time
@@ -80,7 +89,9 @@ Question: {question}
 
 Response:"""
 
-            inputs = tokenizer(prompt, return_tensors="pt").to("cuda" if torch.cuda.is_available() else "cpu")
+            inputs = tokenizer(prompt, return_tensors="pt").to(
+                "cuda" if torch.cuda.is_available() else "cpu"
+            )
 
             with torch.no_grad():
                 outputs = model.generate(
@@ -88,7 +99,7 @@ Response:"""
                     max_new_tokens=150,
                     temperature=0.7,
                     do_sample=True,
-                    pad_token_id=tokenizer.eos_token_id
+                    pad_token_id=tokenizer.eos_token_id,
                 )
 
             response = tokenizer.decode(outputs[0], skip_special_tokens=True)
@@ -105,6 +116,7 @@ Response:"""
         return 1
 
     return 0
+
 
 if __name__ == "__main__":
     exit(main())

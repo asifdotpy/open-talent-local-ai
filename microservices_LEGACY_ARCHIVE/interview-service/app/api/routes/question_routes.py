@@ -4,8 +4,6 @@ FastAPI endpoints for question generation service
 Inspired by PeopleGPT's conversational search paradigm
 """
 
-from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
@@ -115,7 +113,7 @@ async def generate_questions(
     """,
 )
 async def list_templates(
-    job_role: Optional[str] = None,
+    job_role: str | None = None,
     builder: NaturalLanguageQuestionBuilder = Depends(get_question_builder),
 ) -> list[QuestionTemplate]:
     """List available question templates
@@ -170,7 +168,7 @@ async def get_template(
 )
 async def use_template(
     template_id: str,
-    num_questions: Optional[int] = None,
+    num_questions: int | None = None,
     builder: NaturalLanguageQuestionBuilder = Depends(get_question_builder),
 ) -> QuestionGenerationResponse:
     """Generate questions from a template

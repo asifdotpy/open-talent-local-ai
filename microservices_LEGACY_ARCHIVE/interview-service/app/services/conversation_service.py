@@ -1,13 +1,10 @@
-"""
-Placeholder for the Conversation Service.
-"""
+"""Placeholder for the Conversation Service."""
 
 from app.schemas.interview import CandidateProfile
 
 
 def initiate_conversation(candidate_profile: CandidateProfile) -> str:
-    """
-    Initiates the conversation with the Conversation Service.
+    """Initiates the conversation with the Conversation Service.
     In a real implementation, this would call the Conversation Service.
     """
     print("--- CONVERSATION SERVICE ---")

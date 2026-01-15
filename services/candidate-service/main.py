@@ -474,9 +474,9 @@ def create_candidate_embedding(profile: CandidateProfile) -> np.ndarray:
     profile_text = f"""
     Name: {profile.full_name}
     Summary: {profile.summary}
-    Skills: {', '.join(profile.skills.matched + profile.skills.unmatched)}
-    Work Experience: {'; '.join([f"{exp.title} at {exp.company} ({exp.duration}): {', '.join(exp.responsibilities)}" for exp in profile.work_experience])}
-    Education: {'; '.join([f"{edu.degree} from {edu.institution} ({edu.year})" for edu in profile.education])}
+    Skills: {", ".join(profile.skills.matched + profile.skills.unmatched)}
+    Work Experience: {"; ".join([f"{exp.title} at {exp.company} ({exp.duration}): {', '.join(exp.responsibilities)}" for exp in profile.work_experience])}
+    Education: {"; ".join([f"{edu.degree} from {edu.institution} ({edu.year})" for edu in profile.education])}
     """
 
     # Generate embedding using FastEmbed

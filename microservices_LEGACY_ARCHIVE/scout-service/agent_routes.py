@@ -1,5 +1,4 @@
-"""
-Agent Routing Module
+"""Agent Routing Module
 Handles request routing to appropriate agents
 
 Author: OpenTalent Team
@@ -7,9 +6,11 @@ Updated: December 13, 2025
 """
 
 import logging
-from typing import Dict, List, Optional, Any
+from typing import Any
+
 from pydantic import BaseModel, Field
-from agent_registry import AgentRegistry, AgentMetadata
+
+from agent_registry import AgentRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -21,12 +22,12 @@ logger = logging.getLogger(__name__)
 class AgentRequest(BaseModel):
     """Request routed to an agent"""
 
-    agent_name: Optional[str] = Field(None, description="Specific agent to route to")
-    capability: Optional[str] = Field(None, description="Required capability")
+    agent_name: str | None = Field(None, description="Specific agent to route to")
+    capability: str | None = Field(None, description="Required capability")
     endpoint: str = Field(..., description="Agent endpoint to call")
     method: str = Field(default="POST", description="HTTP method")
-    payload: Optional[Dict[str, Any]] = Field(None, description="Request payload")
-    params: Optional[Dict[str, Any]] = Field(None, description="Query parameters")
+    payload: dict[str, Any] | None = Field(None, description="Request payload")
+    params: dict[str, Any] | None = Field(None, description="Query parameters")
 
 
 class AgentResponse(BaseModel):
@@ -34,17 +35,17 @@ class AgentResponse(BaseModel):
 
     agent_name: str
     status_code: int
-    data: Optional[Dict[str, Any]] = None
-    error: Optional[str] = None
-    execution_time_ms: Optional[float] = None
+    data: dict[str, Any] | None = None
+    error: str | None = None
+    execution_time_ms: float | None = None
 
 
 class MultiAgentResponse(BaseModel):
     """Response from multiple agents"""
 
-    requested_agents: List[str]
-    responses: List[AgentResponse]
-    total_execution_time_ms: Optional[float] = None
+    requested_agents: list[str]
+    responses: list[AgentResponse]
+    total_execution_time_ms: float | None = None
     successful_count: int
     failed_count: int
 
@@ -55,13 +56,10 @@ class MultiAgentResponse(BaseModel):
 
 
 class AgentRouter:
-    """
-    Routes requests to appropriate agents
-    """
+    """Routes requests to appropriate agents"""
 
     def __init__(self, registry: AgentRegistry):
-        """
-        Initialize agent router
+        """Initialize agent router
 
         Args:
             registry: Agent registry instance
@@ -73,11 +71,10 @@ class AgentRouter:
         agent_name: str,
         endpoint: str,
         method: str = "POST",
-        payload: Optional[Dict] = None,
-        params: Optional[Dict] = None,
+        payload: dict | None = None,
+        params: dict | None = None,
     ) -> AgentResponse:
-        """
-        Route request to a specific agent
+        """Route request to a specific agent
 
         Args:
             agent_name: Name of the target agent
@@ -92,9 +89,7 @@ class AgentRouter:
         agent = self.registry.get_agent(agent_name)
         if not agent:
             logger.error(f"Agent {agent_name} not found")
-            return AgentResponse(
-                agent_name=agent_name, status_code=404, error=f"Agent {agent_name} not found"
-            )
+            return AgentResponse(agent_name=agent_name, status_code=404, error=f"Agent {agent_name} not found")
 
         logger.info(f"Routing request to {agent_name}{endpoint}")
 
@@ -111,14 +106,13 @@ class AgentRouter:
 
     async def route_to_agents(
         self,
-        agent_names: List[str],
+        agent_names: list[str],
         endpoint: str,
         method: str = "POST",
-        payload: Optional[Dict] = None,
-        params: Optional[Dict] = None,
+        payload: dict | None = None,
+        params: dict | None = None,
     ) -> MultiAgentResponse:
-        """
-        Route request to multiple agents in parallel
+        """Route request to multiple agents in parallel
 
         Args:
             agent_names: List of agent names
@@ -132,9 +126,7 @@ class AgentRouter:
         """
         logger.info(f"Routing request to {len(agent_names)} agents: {agent_names}")
 
-        tasks = [
-            self.route_to_agent(name, endpoint, method, payload, params) for name in agent_names
-        ]
+        tasks = [self.route_to_agent(name, endpoint, method, payload, params) for name in agent_names]
 
         responses = await asyncio.gather(*tasks)
 
@@ -153,12 +145,11 @@ class AgentRouter:
         capability: str,
         endpoint: str,
         method: str = "POST",
-        payload: Optional[Dict] = None,
-        params: Optional[Dict] = None,
+        payload: dict | None = None,
+        params: dict | None = None,
         healthy_only: bool = True,
     ) -> MultiAgentResponse:
-        """
-        Route request to all agents with specific capability
+        """Route request to all agents with specific capability
 
         Args:
             capability: Required capability
@@ -179,9 +170,7 @@ class AgentRouter:
 
         if not agents:
             logger.warning(f"No agents found with capability '{capability}'")
-            return MultiAgentResponse(
-                requested_agents=[], responses=[], successful_count=0, failed_count=0
-            )
+            return MultiAgentResponse(requested_agents=[], responses=[], successful_count=0, failed_count=0)
 
         agent_names = [a.name for a in agents]
         logger.info(f"Routing to {len(agent_names)} agents with capability '{capability}'")
@@ -190,9 +179,8 @@ class AgentRouter:
 
     async def route_search_request(
         self, query: str, location: str = "Ireland", max_results: int = 20
-    ) -> Dict[str, Any]:
-        """
-        Route search request through agents (multi-agent search)
+    ) -> dict[str, Any]:
+        """Route search request through agents (multi-agent search)
 
         Args:
             query: Search query
@@ -262,10 +250,9 @@ class AgentRouter:
         return aggregated
 
     async def route_interview_handoff(
-        self, search_criteria: Dict[str, Any], candidate_profile: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """
-        Route interview handoff through appropriate agents
+        self, search_criteria: dict[str, Any], candidate_profile: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Route interview handoff through appropriate agents
 
         Args:
             search_criteria: Search criteria for the role

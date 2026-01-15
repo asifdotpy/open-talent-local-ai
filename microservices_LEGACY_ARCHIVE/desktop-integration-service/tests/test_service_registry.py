@@ -6,10 +6,9 @@ and callable through the gateway.
 """
 
 import pytest
-from fastapi.testclient import TestClient
-from app.main import app
 from app.core.service_discovery import ServiceDiscovery
-
+from app.main import app
+from fastapi.testclient import TestClient
 
 client = TestClient(app)
 
@@ -122,8 +121,9 @@ class TestServiceRegistry:
 
         for service_name, expected_port in expected_ports.items():
             assert service_name in all_services, f"Service {service_name} not found"
-            assert all_services[service_name]["port"] == expected_port, \
+            assert all_services[service_name]["port"] == expected_port, (
                 f"Service {service_name} has port {all_services[service_name]['port']}, expected {expected_port}"
+            )
 
     def test_service_descriptions_present(self):
         """Test all services have descriptions."""
@@ -138,15 +138,16 @@ class TestServiceRegistry:
 
         for service_name, service_info in all_services.items():
             assert "description" in service_info, f"Service {service_name} missing description"
-            assert len(service_info["description"]) > 0, f"Service {service_name} has empty description"
+            assert len(service_info["description"]) > 0, (
+                f"Service {service_name} has empty description"
+            )
 
     def test_service_discovery_initialization(self):
         """Test ServiceDiscovery initializes with all services."""
         discovery = ServiceDiscovery()
 
         # Should have 14 services (13 + Ollama)
-        assert len(discovery.services) == 14, \
-            f"Expected 14 services, got {len(discovery.services)}"
+        assert len(discovery.services) == 14, f"Expected 14 services, got {len(discovery.services)}"
 
         # Verify all service names
         expected_services = {
@@ -166,8 +167,9 @@ class TestServiceRegistry:
             "ollama",
         }
 
-        assert set(discovery.services.keys()) == expected_services, \
+        assert set(discovery.services.keys()) == expected_services, (
             f"Service names mismatch. Missing: {expected_services - set(discovery.services.keys())}, Extra: {set(discovery.services.keys()) - expected_services}"
+        )
 
     def test_health_check_covers_all_services(self):
         """Test health check includes all 14 services."""
@@ -178,8 +180,9 @@ class TestServiceRegistry:
         assert "services" in health
 
         # Should have all 14 services in health check
-        assert len(health["services"]) == 14, \
+        assert len(health["services"]) == 14, (
             f"Health check shows {len(health['services'])} services, expected 14"
+        )
 
     def test_system_status_shows_visible_services(self):
         """Test /api/v1/system/status only shows visible services."""
@@ -189,13 +192,15 @@ class TestServiceRegistry:
         data = response.json()
 
         # Should show 13 services (14 - 1 hidden _granite-interview-service)
-        assert data["services_total"] == 13, \
+        assert data["services_total"] == 13, (
             f"System status shows {data['services_total']} visible services, expected 13"
+        )
 
         # Verify no hidden services in details
         for service_name in data["service_details"]:
-            assert not service_name.startswith("_"), \
+            assert not service_name.startswith("_"), (
                 f"Hidden service {service_name} exposed in system status"
+            )
 
 
 class TestServiceCallability:
@@ -209,11 +214,7 @@ class TestServiceCallability:
 
     def test_interviews_endpoint_callable(self):
         """Test /api/v1/interviews/start endpoint is callable."""
-        payload = {
-            "role": "Software Engineer",
-            "model": "granite4:350m",
-            "totalQuestions": 3
-        }
+        payload = {"role": "Software Engineer", "model": "granite4:350m", "totalQuestions": 3}
         response = client.post("/api/v1/interviews/start", json=payload)
         # Should return 200 or graceful fallback
         assert response.status_code in [200, 502]
@@ -242,17 +243,14 @@ class TestModularArchitecture:
 
     def test_config_separate_module(self):
         """Test Settings is in separate config module."""
-        from app.config.settings import Settings
-        from app.config.settings import settings
+        from app.config.settings import Settings, settings
 
         # Settings should be instantiated
         assert isinstance(settings, Settings)
 
     def test_schemas_in_models_module(self):
         """Test schemas are in separate models module."""
-        from app.models.schemas import StartInterviewRequest
-        from app.models.schemas import InterviewSession
-        from app.models.schemas import HealthResponse
+        from app.models.schemas import HealthResponse, InterviewSession, StartInterviewRequest
 
         # All schema classes should be available
         assert StartInterviewRequest is not None

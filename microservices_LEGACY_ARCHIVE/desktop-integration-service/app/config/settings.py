@@ -1,7 +1,6 @@
 """Configuration management for Desktop Integration Service."""
 
-from typing import Optional
-from pydantic import Field, AliasChoices
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -92,7 +91,7 @@ class Settings(BaseSettings):
     )
 
     # Optional: Agent Orchestration Service
-    agents_url: Optional[str] = None
+    agents_url: str | None = None
 
     # Service configuration
     service_timeout: float = Field(

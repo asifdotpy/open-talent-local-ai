@@ -50,9 +50,7 @@ class WhisperSTTService:
         self.model_size = model_size
         self.model = None
         self.device = device or "cpu"
-        logger.info(
-            f"Initializing DEPRECATED Whisper STT (model: {model_size}, device: {self.device})"
-        )
+        logger.info(f"Initializing DEPRECATED Whisper STT (model: {model_size}, device: {self.device})")
 
     def load_model(self):
         """Load Whisper model - DEPRECATED"""
@@ -66,7 +64,6 @@ class WhisperSTTService:
     def transcribe_audio(self, audio_file_path: str, language="en") -> str | None:
         """Transcribe audio file to text - DEPRECATED"""
         logger.error(
-            "WhisperSTTService.transcribe_audio() is deprecated. "
-            "Use VoskSTTService.transcribe_audio() instead."
+            "WhisperSTTService.transcribe_audio() is deprecated. Use VoskSTTService.transcribe_audio() instead."
         )
         return None

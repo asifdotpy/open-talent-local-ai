@@ -18,7 +18,7 @@ from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 
@@ -54,13 +54,13 @@ class LLMConfig:
 
     provider: LLMProvider
     model: str
-    api_key: Optional[str] = None
-    base_url: Optional[str] = None
+    api_key: str | None = None
+    base_url: str | None = None
     timeout: int = 300
     temperature: float = 0.7
-    max_tokens: Optional[int] = None
-    fallback_provider: Optional[LLMProvider] = None
-    lora_adapter: Optional[str] = None  # For vLLM LoRA adapters
+    max_tokens: int | None = None
+    fallback_provider: LLMProvider | None = None
+    lora_adapter: str | None = None  # For vLLM LoRA adapters
 
 
 class LLMResponse:
@@ -88,9 +88,7 @@ class BaseLLMProvider(ABC):
         pass
 
     @abstractmethod
-    async def generate_json(
-        self, prompt: str, schema: dict[str, Any] = None, **kwargs
-    ) -> dict[str, Any]:
+    async def generate_json(self, prompt: str, schema: dict[str, Any] = None, **kwargs) -> dict[str, Any]:
         """Generate structured JSON output."""
         pass
 
@@ -164,9 +162,7 @@ class OllamaProvider(BaseLLMProvider):
             logger.error(f"Ollama generation failed: {e}")
             raise
 
-    async def generate_json(
-        self, prompt: str, schema: dict[str, Any] = None, **kwargs
-    ) -> dict[str, Any]:
+    async def generate_json(self, prompt: str, schema: dict[str, Any] = None, **kwargs) -> dict[str, Any]:
         """Generate JSON using Ollama with format instruction."""
         system_prompt = """
         You are an AI assistant that responds only with valid JSON. Do not include any explanatory text, markdown formatting, or additional content. Your response must be parseable JSON.
@@ -267,9 +263,7 @@ class OpenAIProvider(BaseLLMProvider):
             logger.error(f"OpenAI generation failed: {e}")
             raise
 
-    async def generate_json(
-        self, prompt: str, schema: dict[str, Any] = None, **kwargs
-    ) -> dict[str, Any]:
+    async def generate_json(self, prompt: str, schema: dict[str, Any] = None, **kwargs) -> dict[str, Any]:
         """Generate JSON using OpenAI with structured output."""
         try:
             payload = {
@@ -345,9 +339,7 @@ class MockProvider(BaseLLMProvider):
         llm_response.processing_time = 0.1
         return llm_response
 
-    async def generate_json(
-        self, prompt: str, schema: dict[str, Any] = None, **kwargs
-    ) -> dict[str, Any]:
+    async def generate_json(self, prompt: str, schema: dict[str, Any] = None, **kwargs) -> dict[str, Any]:
         """Generate mock JSON response."""
         return {"mock": True, "prompt": prompt[:50], "response": "Mock JSON response"}
 
@@ -439,9 +431,7 @@ class PEFTProvider(BaseLLMProvider):
             self.pipeline.max_new_tokens = max_tokens
 
             # Generate response
-            outputs = await asyncio.to_thread(
-                self.pipeline, prompt, return_full_text=False, num_return_sequences=1
-            )
+            outputs = await asyncio.to_thread(self.pipeline, prompt, return_full_text=False, num_return_sequences=1)
 
             content = outputs[0]["generated_text"]
             processing_time = (datetime.now() - start_time).total_seconds()
@@ -461,9 +451,7 @@ class PEFTProvider(BaseLLMProvider):
             logger.error(f"PEFT generation failed: {e}")
             raise
 
-    async def generate_json(
-        self, prompt: str, schema: dict[str, Any] = None, **kwargs
-    ) -> dict[str, Any]:
+    async def generate_json(self, prompt: str, schema: dict[str, Any] = None, **kwargs) -> dict[str, Any]:
         """Generate JSON using PEFT model with format instruction."""
         system_prompt = """
         You are an AI assistant that responds only with valid JSON. Do not include any explanatory text, markdown formatting, or additional content. Your response must be parseable JSON.
@@ -494,9 +482,7 @@ class PEFTProvider(BaseLLMProvider):
 
             # For streaming, we'll generate in chunks
             # This is a simplified implementation - in production you'd want proper streaming
-            outputs = await asyncio.to_thread(
-                self.pipeline, prompt, return_full_text=False, num_return_sequences=1
-            )
+            outputs = await asyncio.to_thread(self.pipeline, prompt, return_full_text=False, num_return_sequences=1)
 
             content = outputs[0]["generated_text"]
             words = content.split()
@@ -564,9 +550,7 @@ class VLLMProvider(BaseLLMProvider):
             logger.error(f"vLLM generation failed: {e}")
             raise
 
-    async def generate_json(
-        self, prompt: str, schema: dict[str, Any] = None, **kwargs
-    ) -> dict[str, Any]:
+    async def generate_json(self, prompt: str, schema: dict[str, Any] = None, **kwargs) -> dict[str, Any]:
         """Generate JSON using vLLM with structured output."""
         try:
             payload = {
@@ -640,8 +624,8 @@ class VLLMProvider(BaseLLMProvider):
 
     def __init__(self):
         self.providers: dict[LLMProvider, BaseLLMProvider] = {}
-        self.primary_provider: Optional[LLMProvider] = None
-        self.fallback_provider: Optional[LLMProvider] = None
+        self.primary_provider: LLMProvider | None = None
+        self.fallback_provider: LLMProvider | None = None
 
     def configure_provider(self, config: LLMConfig):
         """Configure a specific LLM provider."""
@@ -672,9 +656,7 @@ class VLLMProvider(BaseLLMProvider):
         """Generate text using primary provider with fallback."""
         return await self._execute_with_fallback("generate", prompt, **kwargs)
 
-    async def generate_json(
-        self, prompt: str, schema: dict[str, Any] = None, **kwargs
-    ) -> dict[str, Any]:
+    async def generate_json(self, prompt: str, schema: dict[str, Any] = None, **kwargs) -> dict[str, Any]:
         """Generate JSON using primary provider with fallback."""
         return await self._execute_with_fallback("generate_json", prompt, schema=schema, **kwargs)
 
@@ -703,14 +685,10 @@ class VLLMProvider(BaseLLMProvider):
                     fallback = self.providers[self.fallback_provider]
                     method = getattr(fallback, method_name)
                     result = await method(*args, **kwargs)
-                    logger.info(
-                        f"Successfully used fallback {self.fallback_provider.value} for {method_name}"
-                    )
+                    logger.info(f"Successfully used fallback {self.fallback_provider.value} for {method_name}")
                     return result
                 except Exception as fallback_e:
-                    logger.error(
-                        f"Fallback provider {self.fallback_provider.value} also failed: {fallback_e}"
-                    )
+                    logger.error(f"Fallback provider {self.fallback_provider.value} also failed: {fallback_e}")
 
             raise e
 
@@ -724,9 +702,7 @@ class VLLMProvider(BaseLLMProvider):
             method = getattr(primary, method_name)
             async for chunk in method(*args, **kwargs):
                 yield chunk
-            logger.info(
-                f"Successfully used {self.primary_provider.value} for streaming {method_name}"
-            )
+            logger.info(f"Successfully used {self.primary_provider.value} for streaming {method_name}")
         except Exception as e:
             logger.warning(f"Primary provider {self.primary_provider.value} failed: {e}")
 
@@ -741,9 +717,7 @@ class VLLMProvider(BaseLLMProvider):
                         f"Successfully used fallback {self.fallback_provider.value} for streaming {method_name}"
                     )
                 except Exception as fallback_e:
-                    logger.error(
-                        f"Fallback provider {self.fallback_provider.value} also failed: {fallback_e}"
-                    )
+                    logger.error(f"Fallback provider {self.fallback_provider.value} also failed: {fallback_e}")
                     raise fallback_e
             else:
                 raise e
@@ -816,9 +790,7 @@ def configure_llm_service():
         base_url=primary_base_url,
         timeout=int(os.getenv("LLM_TIMEOUT", "300")),
         temperature=float(os.getenv("LLM_TEMPERATURE", "0.7")),
-        max_tokens=int(os.getenv("LLM_MAX_TOKENS", "2048"))
-        if os.getenv("LLM_MAX_TOKENS")
-        else None,
+        max_tokens=int(os.getenv("LLM_MAX_TOKENS", "2048")) if os.getenv("LLM_MAX_TOKENS") else None,
         lora_adapter=os.getenv("LLM_LORA_ADAPTER"),  # LoRA adapter for vLLM
     )
 

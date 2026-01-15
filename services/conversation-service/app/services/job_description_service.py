@@ -205,17 +205,17 @@ class JobDescriptionService:
         Returns:
             A formatted multi-line string suitable for prompt injection.
         """
-        text = f"""Position: {job_data.get('title', 'Software Engineer')}
-Department: {job_data.get('department', 'Engineering')}
-Location: {job_data.get('location', 'Remote')}
-Employment Type: {job_data.get('employment_type', 'Full-time')}
-Experience Level: {job_data.get('experience_level', 'mid')}
+        text = f"""Position: {job_data.get("title", "Software Engineer")}
+Department: {job_data.get("department", "Engineering")}
+Location: {job_data.get("location", "Remote")}
+Employment Type: {job_data.get("employment_type", "Full-time")}
+Experience Level: {job_data.get("experience_level", "mid")}
 
 Description:
-{job_data.get('description', 'No description available')}
+{job_data.get("description", "No description available")}
 
 Required Skills:
-{', '.join(job_data.get('required_skills', []))}
+{", ".join(job_data.get("required_skills", []))}
 
 Key Responsibilities:
 """

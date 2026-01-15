@@ -1,4 +1,5 @@
 """Negative tests for system endpoints."""
+
 from unittest.mock import MagicMock, patch
 
 from app.core.config import settings
@@ -52,9 +53,7 @@ def test_db_status_missing_table(test_client: TestClient, db):
     mock_result.scalar_one_or_none.return_value = None
     mock_result.first.return_value = None
 
-    with patch.object(
-        db, "exec" if hasattr(db, "exec") else "execute", return_value=mock_result
-    ):
+    with patch.object(db, "exec" if hasattr(db, "exec") else "execute", return_value=mock_result):
         response = test_client.get(f"{settings.API_V1_STR}/system/db-status")
         assert response.status_code == 200
         data = response.json()

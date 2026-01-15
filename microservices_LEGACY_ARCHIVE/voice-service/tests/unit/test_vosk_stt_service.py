@@ -1,5 +1,4 @@
-"""
-Unit Tests for Vosk STT Service
+"""Unit Tests for Vosk STT Service
 
 Following TDD principles with comprehensive test coverage for production-ready
 speech-to-text service using Vosk (Kaldi-based, CPU-only inference).
@@ -7,12 +6,13 @@ speech-to-text service using Vosk (Kaldi-based, CPU-only inference).
 Created: November 13, 2025
 """
 
-import pytest
 import json
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
-import numpy as np
 import sys
+from pathlib import Path
+from unittest.mock import Mock, patch
+
+import numpy as np
+import pytest
 
 # Mock vosk before importing the service
 sys.modules["vosk"] = Mock()
@@ -23,12 +23,9 @@ from services.vosk_stt_service import VoskSTTService
 @pytest.fixture
 def vosk_service():
     """Create VoskSTTService instance for testing."""
-    with patch("services.vosk_stt_service.VOSK_AVAILABLE", True):
-        with patch.object(VoskSTTService, "load_model"):
-            service = VoskSTTService(
-                model_path="models/vosk-model-small-en-us-0.15", sample_rate=16000
-            )
-            return service
+    with patch("services.vosk_stt_service.VOSK_AVAILABLE", True), patch.object(VoskSTTService, "load_model"):
+        service = VoskSTTService(model_path="models/vosk-model-small-en-us-0.15", sample_rate=16000)
+        return service
 
 
 @pytest.fixture
@@ -109,9 +106,7 @@ class TestVoskModelLoading:
 
     @patch("services.vosk_stt_service.Model")
     @patch("services.vosk_stt_service.KaldiRecognizer")
-    def test_load_model_succeeds_with_valid_configuration(
-        self, mock_recognizer_class, mock_model_class, vosk_service
-    ):
+    def test_load_model_succeeds_with_valid_configuration(self, mock_recognizer_class, mock_model_class, vosk_service):
         """Test successful model loading with valid configuration."""
         # Arrange
         mock_model = Mock()
@@ -195,9 +190,7 @@ class TestVoskAudioTranscription:
         assert "confidence" in result
 
     @patch("services.vosk_stt_service.sf.read")
-    def test_transcribe_handles_stereo_to_mono_conversion(
-        self, mock_sf_read, vosk_service, mock_vosk_recognizer
-    ):
+    def test_transcribe_handles_stereo_to_mono_conversion(self, mock_sf_read, vosk_service, mock_vosk_recognizer):
         """Test that stereo audio is converted to mono."""
         # Arrange
         vosk_service.model = Mock()
@@ -215,9 +208,7 @@ class TestVoskAudioTranscription:
         mock_vosk_recognizer.AcceptWaveform.assert_called_once()
 
     @patch("services.vosk_stt_service.sf.read")
-    def test_transcribe_handles_sample_rate_conversion(
-        self, mock_sf_read, vosk_service, mock_vosk_recognizer
-    ):
+    def test_transcribe_handles_sample_rate_conversion(self, mock_sf_read, vosk_service, mock_vosk_recognizer):
         """Test that audio is resampled to target sample rate."""
         # Arrange
         vosk_service.model = Mock()
@@ -238,9 +229,7 @@ class TestVoskAudioTranscription:
             mock_resample.assert_called_once()
 
     @patch("services.vosk_stt_service.sf.read")
-    def test_transcribe_calculates_word_confidence(
-        self, mock_sf_read, vosk_service, mock_vosk_recognizer
-    ):
+    def test_transcribe_calculates_word_confidence(self, mock_sf_read, vosk_service, mock_vosk_recognizer):
         """Test that average confidence is calculated from word confidences."""
         # Arrange
         vosk_service.model = Mock()

@@ -1,6 +1,4 @@
-"""Configuration settings for the Avatar Service.
-"""
-
+"""Configuration settings for the Avatar Service."""
 
 from dotenv import load_dotenv
 

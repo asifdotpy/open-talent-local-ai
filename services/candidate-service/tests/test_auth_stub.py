@@ -22,9 +22,9 @@ class TestAuthStub:
     def test_no_auth_header_returns_user(self, client):
         """Verify requests without auth header use DEFAULT_USER_ID."""
         response = client.get("/api/v1/candidates")
-        assert (
-            response.status_code == 200
-        ), f"Expected 200, got {response.status_code}: {response.json()}"
+        assert response.status_code == 200, (
+            f"Expected 200, got {response.status_code}: {response.json()}"
+        )
         data = response.json()
         assert "items" in data
         assert "total" in data
@@ -92,9 +92,9 @@ class TestAuthStub:
 
         for endpoint in endpoints:
             response = client.get(endpoint)
-            assert (
-                response.status_code == 200
-            ), f"{endpoint} returned {response.status_code}, expected 200"
+            assert response.status_code == 200, (
+                f"{endpoint} returned {response.status_code}, expected 200"
+            )
 
     def test_auth_header_variations(self, client):
         """Verify different auth header formats are handled gracefully."""
@@ -111,9 +111,9 @@ class TestAuthStub:
                 headers["Authorization"] = auth_value
 
             response = client.get("/api/v1/candidates", headers=headers)
-            assert (
-                response.status_code == expected_status
-            ), f"Auth: '{auth_value}' returned {response.status_code}, expected {expected_status}"
+            assert response.status_code == expected_status, (
+                f"Auth: '{auth_value}' returned {response.status_code}, expected {expected_status}"
+            )
 
 
 class TestAuthStubIntegration:

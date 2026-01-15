@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
-"""
-Test script for RNNoise integration in voice service.
+"""Test script for RNNoise integration in voice service.
 Tests noise suppression functionality.
 """
 
-import numpy as np
-import tempfile
-import soundfile as sf
 from fractions import Fraction
-from services.audio_processing_service import RNNoiseTrack
+
+import numpy as np
 from aiortc import AudioStreamTrack
 from av import AudioFrame
+
+from services.audio_processing_service import RNNoiseTrack
 
 
 class MockAudioTrack(AudioStreamTrack):
@@ -102,12 +101,8 @@ def test_rnnoise():
         def calculate_snr(signal, noise):
             return 10 * np.log10(np.mean(signal**2) / np.mean(noise**2))
 
-        original_snr = calculate_snr(
-            clean_signal[: len(processed_audio)], noise[: len(processed_audio)]
-        )
-        processed_snr = calculate_snr(
-            processed_audio, processed_audio - clean_signal[: len(processed_audio)]
-        )
+        original_snr = calculate_snr(clean_signal[: len(processed_audio)], noise[: len(processed_audio)])
+        processed_snr = calculate_snr(processed_audio, processed_audio - clean_signal[: len(processed_audio)])
 
         print(".2f")
         print(".2f")

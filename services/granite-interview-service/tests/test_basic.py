@@ -2,10 +2,11 @@
 Basic tests for Granite Interview Service components.
 """
 
-import pytest
-from unittest.mock import Mock, patch
 import json
 from pathlib import Path
+from unittest.mock import patch
+
+import pytest
 
 
 # Test configuration loading
@@ -79,7 +80,7 @@ def test_dataset_format():
     """Test that the training dataset has correct format."""
     dataset_path = Path("data/interview_v1.json")
 
-    with open(dataset_path, "r") as f:
+    with open(dataset_path) as f:
         data = json.load(f)
 
     assert isinstance(data, list)

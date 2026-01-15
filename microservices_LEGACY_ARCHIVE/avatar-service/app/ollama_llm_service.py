@@ -1,7 +1,8 @@
-import os
-import httpx
-from typing import Dict, Any, Optional
 import asyncio
+import os
+from typing import Any
+
+import httpx
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -17,8 +18,7 @@ class OllamaLLMService:
     """Service for handling LLM processing using local Ollama."""
 
     def __init__(self, base_url: str = "http://localhost:11434"):
-        """
-        Initialize Ollama LLM service.
+        """Initialize Ollama LLM service.
 
         Args:
             base_url: The base URL for Ollama API (default: http://localhost:11434)
@@ -27,10 +27,9 @@ class OllamaLLMService:
         self.model = os.environ.get("OLLAMA_MODEL", "granite4:350m-h")
 
     async def generate_interview_response(
-        self, candidate_input: str, system_prompt: str, context: Optional[Dict[str, Any]] = None
+        self, candidate_input: str, system_prompt: str, context: dict[str, Any] | None = None
     ) -> str:
-        """
-        Generate interview response using local Ollama LLM.
+        """Generate interview response using local Ollama LLM.
 
         Args:
             candidate_input: The candidate's response or input
@@ -61,19 +60,14 @@ class OllamaLLMService:
                 return result.get("response", "").strip()
 
         except httpx.HTTPStatusError as e:
-            raise OllamaLLMError(
-                f"Ollama API request failed: {e.response.status_code} - {e.response.text}"
-            )
+            raise OllamaLLMError(f"Ollama API request failed: {e.response.status_code} - {e.response.text}")
         except httpx.TimeoutException:
             raise OllamaLLMError("Ollama API request timed out")
         except Exception as e:
             raise OllamaLLMError(f"Unexpected error in Ollama LLM service: {str(e)}")
 
-    async def generate_script_text(
-        self, interview_context: Dict[str, Any], system_prompt: str
-    ) -> str:
-        """
-        Generate script text for avatar video creation.
+    async def generate_script_text(self, interview_context: dict[str, Any], system_prompt: str) -> str:
+        """Generate script text for avatar video creation.
 
         Args:
             interview_context: Context about the interview (stage, questions, responses)
@@ -107,7 +101,7 @@ class OllamaLLMService:
             raise OllamaLLMError(f"Failed to generate script text: {str(e)}")
 
     def _build_interview_prompt(
-        self, candidate_input: str, system_prompt: str, context: Optional[Dict[str, Any]] = None
+        self, candidate_input: str, system_prompt: str, context: dict[str, Any] | None = None
     ) -> str:
         """Build complete prompt for interview response generation."""
         prompt_parts = [
@@ -134,7 +128,7 @@ class OllamaLLMService:
 
         return "\n".join(prompt_parts)
 
-    def _build_script_prompt(self, interview_context: Dict[str, Any], system_prompt: str) -> str:
+    def _build_script_prompt(self, interview_context: dict[str, Any], system_prompt: str) -> str:
         """Build prompt for script generation."""
         return f"""
 Generate a natural, conversational script for an AI interviewer avatar based on this context:
@@ -193,10 +187,10 @@ async def main():
         "previous_questions": ["Tell me about yourself"],
     }
 
-    system_prompt = (
-        "You are Interview, a professional and friendly AI interviewer for technical positions."
+    system_prompt = "You are Interview, a professional and friendly AI interviewer for technical positions."
+    candidate_input = (
+        "I have 5 years of experience in Python dev and have worked on several web applications using FastAPI."
     )
-    candidate_input = "I have 5 years of experience in Python dev and have worked on several web applications using FastAPI."
 
     try:
         response = await ollama.generate_interview_response(
@@ -205,9 +199,7 @@ async def main():
         print(f"🤖 Generated Response: {response}")
 
         # Test script generation
-        script = await ollama.generate_script_text(
-            interview_context=context, system_prompt=system_prompt
-        )
+        script = await ollama.generate_script_text(interview_context=context, system_prompt=system_prompt)
         print(f"📜 Generated Script: {script}")
 
     except OllamaLLMError as e:

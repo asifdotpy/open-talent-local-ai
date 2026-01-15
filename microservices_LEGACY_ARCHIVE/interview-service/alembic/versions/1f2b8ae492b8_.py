@@ -5,17 +5,18 @@ Revises:
 Create Date: 2025-08-31 13:49:44.956919
 
 """
-from typing import Sequence, Union
 
-from alembic import op
+from collections.abc import Sequence
+
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "1f2b8ae492b8"
-down_revision: Union[str, Sequence[str], None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | Sequence[str] | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -43,9 +44,7 @@ def upgrade() -> None:
         sa.Column("questions", sa.Text(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(
-        op.f("ix_demo_interview_sessions_id"), "demo_interview_sessions", ["id"], unique=False
-    )
+    op.create_index(op.f("ix_demo_interview_sessions_id"), "demo_interview_sessions", ["id"], unique=False)
     op.create_index(
         op.f("ix_demo_interview_sessions_session_id"),
         "demo_interview_sessions",
@@ -180,9 +179,7 @@ def downgrade() -> None:
     op.drop_table("skill")
     op.drop_index(op.f("ix_search_criteria_id"), table_name="search_criteria")
     op.drop_table("search_criteria")
-    op.drop_index(
-        op.f("ix_demo_interview_sessions_session_id"), table_name="demo_interview_sessions"
-    )
+    op.drop_index(op.f("ix_demo_interview_sessions_session_id"), table_name="demo_interview_sessions")
     op.drop_index(op.f("ix_demo_interview_sessions_id"), table_name="demo_interview_sessions")
     op.drop_table("demo_interview_sessions")
     op.drop_index(op.f("ix_candidate_profile_id"), table_name="candidate_profile")

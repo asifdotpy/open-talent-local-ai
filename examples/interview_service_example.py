@@ -23,7 +23,6 @@ INTEGRATION STEPS:
 
 # Import Vetta AI
 import sys
-from typing import Optional
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
@@ -62,7 +61,7 @@ class CandidateAssessment(BaseModel):
     job_id: str
     candidate_profile: str
     job_requirements: str
-    interview_responses: Optional[list[str]] = None
+    interview_responses: list[str] | None = None
 
 
 class InterviewResponse(BaseModel):

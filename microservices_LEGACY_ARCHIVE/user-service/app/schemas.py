@@ -1,5 +1,6 @@
 from datetime import datetime
-from typing import Optional, Any
+from typing import Any
+
 from pydantic import BaseModel, EmailStr, Field
 
 from .models import UserRole, UserStatus
@@ -7,15 +8,15 @@ from .models import UserRole, UserStatus
 
 class UserBase(BaseModel):
     email: EmailStr
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    phone: Optional[str] = None
+    first_name: str | None = None
+    last_name: str | None = None
+    phone: str | None = None
     role: UserRole = UserRole.CANDIDATE
     status: UserStatus = UserStatus.ACTIVE
-    bio: Optional[str] = None
-    location: Optional[str] = None
-    avatar_url: Optional[str] = None
-    tenant_id: Optional[str] = Field(default=None, max_length=64)
+    bio: str | None = None
+    location: str | None = None
+    avatar_url: str | None = None
+    tenant_id: str | None = Field(default=None, max_length=64)
 
 
 class UserCreate(UserBase):
@@ -32,13 +33,13 @@ class UserRead(UserBase):
 
 
 class UserProfileBase(BaseModel):
-    bio: Optional[str] = None
-    phone: Optional[str] = None
-    location: Optional[str] = None
-    company: Optional[str] = None
-    job_title: Optional[str] = None
-    avatar_url: Optional[str] = None
-    tenant_id: Optional[str] = Field(default=None, max_length=64)
+    bio: str | None = None
+    phone: str | None = None
+    location: str | None = None
+    company: str | None = None
+    job_title: str | None = None
+    avatar_url: str | None = None
+    tenant_id: str | None = Field(default=None, max_length=64)
 
 
 class UserProfileCreate(UserProfileBase):
@@ -60,12 +61,12 @@ class UserProfileRead(UserProfileBase):
 
 
 class UserPreferencesBase(BaseModel):
-    notification_email: Optional[bool] = True
-    notification_sms: Optional[bool] = False
-    notification_push: Optional[bool] = False
-    theme: Optional[str] = "light"
-    language: Optional[str] = "en"
-    tenant_id: Optional[str] = Field(default=None, max_length=64)
+    notification_email: bool | None = True
+    notification_sms: bool | None = False
+    notification_push: bool | None = False
+    theme: str | None = "light"
+    language: str | None = "en"
+    tenant_id: str | None = Field(default=None, max_length=64)
 
 
 class UserPreferencesCreate(UserPreferencesBase):
@@ -90,10 +91,10 @@ class UserActivityRead(BaseModel):
     id: str
     user_id: str
     action: str
-    resource: Optional[str] = None
-    details: Optional[Any] = None
+    resource: str | None = None
+    details: Any | None = None
     timestamp: datetime
-    tenant_id: Optional[str] = None
+    tenant_id: str | None = None
 
     class Config:
         from_attributes = True
@@ -102,12 +103,12 @@ class UserActivityRead(BaseModel):
 class UserSessionRead(BaseModel):
     id: str
     user_id: str
-    device: Optional[str] = None
-    ip: Optional[str] = None
-    user_agent: Optional[str] = None
+    device: str | None = None
+    ip: str | None = None
+    user_agent: str | None = None
     last_seen: datetime
     revoked: bool
-    tenant_id: Optional[str] = None
+    tenant_id: str | None = None
 
     class Config:
         from_attributes = True

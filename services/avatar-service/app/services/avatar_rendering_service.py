@@ -8,7 +8,7 @@ import logging
 import os
 import tempfile
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urljoin
 
 import aiohttp
@@ -43,8 +43,8 @@ class AvatarRenderingService:
     async def generate_avatar_video(
         self,
         audio_data: bytes,
-        phonemes: Optional[list] = None,
-        duration: Optional[float] = None,
+        phonemes: list | None = None,
+        duration: float | None = None,
         model: str = "face",
     ) -> bytes:
         """Generate avatar video with audio using Node.js renderer.
@@ -76,29 +76,31 @@ class AvatarRenderingService:
             }
 
             # Call Node.js avatar renderer
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
+            async with (
+                aiohttp.ClientSession() as session,
+                session.post(
                     urljoin(self.renderer_url, "/render/lipsync"),
                     json=request_data,
                     timeout=aiohttp.ClientTimeout(total=300),  # 5 minute timeout
-                ) as response:
-                    if response.status != 200:
-                        error_text = await response.text()
-                        logger.error(f"Avatar renderer failed: {response.status} - {error_text}")
-                        return await self._generate_mock_video(audio_data, duration)
+                ) as response,
+            ):
+                if response.status != 200:
+                    error_text = await response.text()
+                    logger.error(f"Avatar renderer failed: {response.status} - {error_text}")
+                    return await self._generate_mock_video(audio_data, duration)
 
-                    # Get video data
-                    video_data = await response.read()
+                # Get video data
+                video_data = await response.read()
 
-                    # Log processing info
-                    processing_time = response.headers.get("X-Processing-Time", "unknown")
-                    video_duration = response.headers.get("X-Video-Duration", "unknown")
-                    logger.info(
-                        f"Avatar video rendered: {len(video_data)} bytes, "
-                        f"duration: {video_duration}, processing: {processing_time}"
-                    )
+                # Log processing info
+                processing_time = response.headers.get("X-Processing-Time", "unknown")
+                video_duration = response.headers.get("X-Video-Duration", "unknown")
+                logger.info(
+                    f"Avatar video rendered: {len(video_data)} bytes, "
+                    f"duration: {video_duration}, processing: {processing_time}"
+                )
 
-                    return video_data
+                return video_data
 
         except Exception as e:
             logger.error(f"Failed to generate avatar video: {e}")
@@ -129,9 +131,7 @@ class AvatarRenderingService:
         except Exception as e:
             logger.warning(f"Failed to cleanup temp file {file_path}: {e}")
 
-    async def _generate_mock_video(
-        self, audio_data: bytes, duration: Optional[float] = None
-    ) -> bytes:
+    async def _generate_mock_video(self, audio_data: bytes, duration: float | None = None) -> bytes:
         """Generate a simple mock video when renderer is unavailable."""
         try:
             import numpy as np
@@ -180,9 +180,7 @@ class AvatarRenderingService:
         renderer_status = "unknown"
         try:
             response = requests.get(urljoin(self.renderer_url, "/health"), timeout=5)
-            renderer_status = (
-                "connected" if response.status_code == 200 else f"error_{response.status_code}"
-            )
+            renderer_status = "connected" if response.status_code == 200 else f"error_{response.status_code}"
         except:
             renderer_status = "disconnected"
 

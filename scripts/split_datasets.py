@@ -71,24 +71,24 @@ def get_dataset_splits() -> dict[str, dict[str, Any]]:
 def create_dataset_readme(config: dict[str, Any], example_count: int) -> str:
     """Create a README for the dataset."""
 
-    return f"""# {config['title']}
+    return f"""# {config["title"]}
 
-{config['description']}
+{config["description"]}
 
 ## Dataset Details
 
 - **Total Examples**: {example_count}
-- **Agent**: {config['agent']}
-- **Categories**: {len(config['categories']) if config['categories'] else 'All'}
+- **Agent**: {config["agent"]}
+- **Categories**: {len(config["categories"]) if config["categories"] else "All"}
 - **Source**: Split from vetta-multi-persona-dataset
 
 ## Usage
 
-This dataset is used to fine-tune language models for {config['agent'].lower()} in the OpenTalent platform.
+This dataset is used to fine-tune language models for {config["agent"].lower()} in the OpenTalent platform.
 
 ## Categories
 
-{chr(10).join(f"- `{cat}`" for cat in config['categories']) if config['categories'] else "- All categories from interview and sourcing domains"}
+{chr(10).join(f"- `{cat}`" for cat in config["categories"]) if config["categories"] else "- All categories from interview and sourcing domains"}
 
 ## Columns
 

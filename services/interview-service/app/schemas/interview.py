@@ -1,6 +1,5 @@
 """Pydantic models for the Interview process, based on the Agent-to-Interview Handoff Contract."""
 
-
 from pydantic import BaseModel, Field
 
 

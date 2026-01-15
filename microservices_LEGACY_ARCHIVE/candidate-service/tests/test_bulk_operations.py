@@ -57,9 +57,7 @@ def test_bulk_import_with_partial_failure():
 
 
 def test_bulk_import_unauthorized():
-    payload = {
-        "candidates": [{"email": "test@example.com", "first_name": "Test", "last_name": "User"}]
-    }
+    payload = {"candidates": [{"email": "test@example.com", "first_name": "Test", "last_name": "User"}]}
     r = client.post("/api/v1/candidates/bulk", json=payload)
     assert r.status_code == 401
 

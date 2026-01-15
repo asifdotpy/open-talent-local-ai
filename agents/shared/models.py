@@ -5,7 +5,7 @@ Pydantic schemas for inter-agent communication and data exchange.
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -52,8 +52,8 @@ class Skill(BaseModel):
     """Skill representation"""
 
     name: str
-    proficiency_level: Optional[SkillProficiency] = None
-    years_experience: Optional[int] = None
+    proficiency_level: SkillProficiency | None = None
+    years_experience: int | None = None
     verified: bool = False
 
 
@@ -62,11 +62,11 @@ class WorkExperience(BaseModel):
 
     company: str
     title: str
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
+    start_date: datetime | None = None
+    end_date: datetime | None = None
     is_current: bool = False
-    description: Optional[str] = None
-    location: Optional[str] = None
+    description: str | None = None
+    location: str | None = None
 
 
 class Education(BaseModel):
@@ -74,10 +74,10 @@ class Education(BaseModel):
 
     institution: str
     degree: str
-    field_of_study: Optional[str] = None
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
-    grade: Optional[str] = None
+    field_of_study: str | None = None
+    start_date: datetime | None = None
+    end_date: datetime | None = None
+    grade: str | None = None
 
 
 class SocialProfile(BaseModel):
@@ -85,7 +85,7 @@ class SocialProfile(BaseModel):
 
     platform: str
     url: str
-    username: Optional[str] = None
+    username: str | None = None
     verified: bool = False
 
 
@@ -93,35 +93,35 @@ class CandidateProfile(BaseModel):
     """Comprehensive candidate profile"""
 
     # Basic Information
-    id: Optional[str] = None
+    id: str | None = None
     name: str
-    email: Optional[EmailStr] = None
-    phone: Optional[str] = None
-    location: Optional[str] = None
+    email: EmailStr | None = None
+    phone: str | None = None
+    location: str | None = None
 
     # Professional Data
-    current_role: Optional[str] = None
-    current_company: Optional[str] = None
-    experience_years: Optional[int] = None
+    current_role: str | None = None
+    current_company: str | None = None
+    experience_years: int | None = None
     experience: list[WorkExperience] = Field(default_factory=list)
     education: list[Education] = Field(default_factory=list)
     skills: list[Skill] = Field(default_factory=list)
 
     # Social & Portfolio
-    linkedin_url: Optional[str] = None
-    github_url: Optional[str] = None
-    portfolio_url: Optional[str] = None
+    linkedin_url: str | None = None
+    github_url: str | None = None
+    portfolio_url: str | None = None
     social_profiles: list[SocialProfile] = Field(default_factory=list)
 
     # AI-Generated Insights
-    ai_summary: Optional[str] = None
-    match_score: Optional[float] = Field(None, ge=0, le=100)
-    quality_score: Optional[float] = Field(None, ge=0, le=100)
+    ai_summary: str | None = None
+    match_score: float | None = Field(None, ge=0, le=100)
+    quality_score: float | None = Field(None, ge=0, le=100)
 
     # Process Tracking
     status: CandidateStatus = CandidateStatus.NEW
-    source: Optional[CandidateSource] = None
-    source_notes: Optional[str] = None
+    source: CandidateSource | None = None
+    source_notes: str | None = None
 
     # Metadata
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -157,15 +157,15 @@ class OutreachStatus(str, Enum):
 class OutreachAttempt(BaseModel):
     """Single outreach attempt"""
 
-    id: Optional[str] = None
+    id: str | None = None
     channel: OutreachChannel
-    subject: Optional[str] = None
+    subject: str | None = None
     message: str
-    sent_at: Optional[datetime] = None
+    sent_at: datetime | None = None
     status: OutreachStatus = OutreachStatus.PENDING
-    opened_at: Optional[datetime] = None
-    replied_at: Optional[datetime] = None
-    response_text: Optional[str] = None
+    opened_at: datetime | None = None
+    replied_at: datetime | None = None
+    response_text: str | None = None
 
 
 class EngagementHistory(BaseModel):
@@ -177,9 +177,9 @@ class EngagementHistory(BaseModel):
     channels_used: list[OutreachChannel] = Field(default_factory=list)
     outreach_attempts: list[OutreachAttempt] = Field(default_factory=list)
     response_rate: float = Field(0.0, ge=0, le=1)
-    engagement_score: Optional[float] = Field(None, ge=0, le=100)
-    last_contact_date: Optional[datetime] = None
-    next_followup_date: Optional[datetime] = None
+    engagement_score: float | None = Field(None, ge=0, le=100)
+    last_contact_date: datetime | None = None
+    next_followup_date: datetime | None = None
 
     class Config:
         use_enum_values = True
@@ -217,9 +217,9 @@ class CompetitorIntel(BaseModel):
     location: str
     open_positions: int = 0
     hiring_rate: str = "unknown"  # "low", "medium", "high"
-    avg_tenure_months: Optional[float] = None
-    benefits_score: Optional[float] = Field(None, ge=0, le=10)
-    culture_rating: Optional[float] = Field(None, ge=0, le=5)
+    avg_tenure_months: float | None = None
+    benefits_score: float | None = Field(None, ge=0, le=10)
+    culture_rating: float | None = Field(None, ge=0, le=5)
     data_source: str = "unknown"
 
 
@@ -227,13 +227,13 @@ class MarketInsight(BaseModel):
     """Market intelligence aggregation"""
 
     job_title: str
-    location: Optional[str] = None
-    industry: Optional[str] = None
+    location: str | None = None
+    industry: str | None = None
     salary_trends: list[SalaryTrend] = Field(default_factory=list)
     competitor_data: list[CompetitorIntel] = Field(default_factory=list)
     in_demand_skills: list[str] = Field(default_factory=list)
-    talent_availability: Optional[str] = None  # "high", "medium", "low"
-    market_saturation: Optional[float] = Field(None, ge=0, le=1)
+    talent_availability: str | None = None  # "high", "medium", "low"
+    market_saturation: float | None = Field(None, ge=0, le=1)
     generated_at: datetime = Field(default_factory=datetime.utcnow)
 
 
@@ -270,12 +270,12 @@ class AgentMessage(BaseModel):
 
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     source_agent: str
-    target_agent: Optional[str] = None  # None = broadcast
+    target_agent: str | None = None  # None = broadcast
     message_type: MessageType
     payload: dict[str, Any]
     priority: MessagePriority = MessagePriority.MEDIUM
-    correlation_id: Optional[str] = None
-    trace_id: Optional[str] = None
+    correlation_id: str | None = None
+    trace_id: str | None = None
 
     class Config:
         use_enum_values = True
@@ -309,7 +309,7 @@ class SourcingPipeline(BaseModel):
     interviews_completed: int = 0
     started_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
-    completed_at: Optional[datetime] = None
+    completed_at: datetime | None = None
 
     class Config:
         use_enum_values = True
@@ -324,9 +324,9 @@ class InterviewResult(BaseModel):
     questions: list[dict[str, Any]]
     responses: list[dict[str, Any]]
     overall_score: float = Field(..., ge=0, le=100)
-    technical_score: Optional[float] = Field(None, ge=0, le=100)
-    communication_score: Optional[float] = Field(None, ge=0, le=100)
-    cultural_fit_score: Optional[float] = Field(None, ge=0, le=100)
+    technical_score: float | None = Field(None, ge=0, le=100)
+    communication_score: float | None = Field(None, ge=0, le=100)
+    cultural_fit_score: float | None = Field(None, ge=0, le=100)
     recommendation: str  # "hire", "maybe", "reject"
     key_insights: list[str] = Field(default_factory=list)
     red_flags: list[str] = Field(default_factory=list)

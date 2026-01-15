@@ -1,30 +1,28 @@
-"""
-Unit Tests for Natural Language Question Builder Service
+"""Unit Tests for Natural Language Question Builder Service
 
 Tests Ollama Granite4 integration, template generation, and question pinning logic
 """
 
-import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
 from datetime import datetime
+from unittest.mock import MagicMock, patch
+
+import pytest
 
 from services.question_builder import (
-    NaturalLanguageQuestionBuilder,
-    NaturalLanguagePrompt,
     InterviewQuestion,
-    QuestionTemplate,
+    NaturalLanguagePrompt,
+    NaturalLanguageQuestionBuilder,
     QuestionDifficulty,
-    QuestionType,
     QuestionPriority,
+    QuestionTemplate,
+    QuestionType,
 )
 
 
 @pytest.fixture
 def question_builder():
     """Create question builder instance for testing"""
-    return NaturalLanguageQuestionBuilder(
-        ollama_base_url="http://localhost:11434", model="smollm:135m"
-    )
+    return NaturalLanguageQuestionBuilder(ollama_base_url="http://localhost:11434", model="smollm:135m")
 
 
 @pytest.fixture
@@ -44,7 +42,6 @@ def sample_prompt():
 @pytest.mark.asyncio
 async def test_generate_questions_with_ollama(question_builder, sample_prompt):
     """Test question generation with Ollama API"""
-
     # Mock Ollama response
     mock_ollama_response = """[
   {
@@ -117,7 +114,6 @@ async def test_generate_questions_with_ollama(question_builder, sample_prompt):
 @pytest.mark.asyncio
 async def test_generate_questions_fallback_to_template(question_builder, sample_prompt):
     """Test fallback to template when Ollama fails"""
-
     # Mock Ollama API failure
     with patch("httpx.AsyncClient.post", side_effect=Exception("API Error")):
         questions = await question_builder.generate_questions(sample_prompt)
@@ -131,7 +127,6 @@ async def test_generate_questions_fallback_to_template(question_builder, sample_
 
 def test_list_templates(question_builder):
     """Test listing available templates"""
-
     templates = question_builder.list_templates()
 
     assert len(templates) >= 3  # We have 3 general templates
@@ -143,7 +138,6 @@ def test_list_templates(question_builder):
 
 def test_list_templates_filtered_by_role(question_builder):
     """Test listing templates filtered by job role"""
-
     # Filter for backend roles
     templates = question_builder.list_templates(job_role="Backend Engineer")
 
@@ -153,7 +147,6 @@ def test_list_templates_filtered_by_role(question_builder):
 
 def test_get_specific_template(question_builder):
     """Test retrieving a specific template"""
-
     template = question_builder.get_template("backend-senior")
 
     assert template is not None
@@ -169,7 +162,6 @@ def test_get_specific_template(question_builder):
 
 def test_get_nonexistent_template(question_builder):
     """Test retrieving a template that doesn't exist"""
-
     template = question_builder.get_template("nonexistent-template")
 
     assert template is None
@@ -177,7 +169,6 @@ def test_get_nonexistent_template(question_builder):
 
 def test_pin_question(question_builder):
     """Test pinning a question (make it must-ask)"""
-
     question = InterviewQuestion(
         question_text="Sample question",
         question_type=QuestionType.TECHNICAL,
@@ -199,7 +190,6 @@ def test_pin_question(question_builder):
 
 def test_unpin_question(question_builder):
     """Test unpinning a question (make it nice-to-ask)"""
-
     question = InterviewQuestion(
         question_text="Sample question",
         question_type=QuestionType.TECHNICAL,
@@ -221,7 +211,6 @@ def test_unpin_question(question_builder):
 
 def test_create_custom_template(question_builder):
     """Test creating a custom template"""
-
     questions = [
         InterviewQuestion(
             question_text="Custom question 1",
@@ -262,15 +251,12 @@ def test_create_custom_template(question_builder):
 
 def test_backend_template_content(question_builder):
     """Test backend template has proper questions"""
-
     template = question_builder.get_template("backend-senior")
 
     assert len(template.questions) >= 2
 
     # Check system design question exists
-    system_design_questions = [
-        q for q in template.questions if q.question_type == QuestionType.SYSTEM_DESIGN
-    ]
+    system_design_questions = [q for q in template.questions if q.question_type == QuestionType.SYSTEM_DESIGN]
     assert len(system_design_questions) > 0
 
     # Check all questions are senior level
@@ -283,27 +269,21 @@ def test_backend_template_content(question_builder):
 
 def test_product_manager_template_content(question_builder):
     """Test product manager template has behavioral questions"""
-
     template = question_builder.get_template("product-manager")
 
     assert len(template.questions) >= 1
 
     # Check behavioral question exists
-    behavioral_questions = [
-        q for q in template.questions if q.question_type == QuestionType.BEHAVIORAL
-    ]
+    behavioral_questions = [q for q in template.questions if q.question_type == QuestionType.BEHAVIORAL]
     assert len(behavioral_questions) > 0
 
     # Check prioritization skill is assessed
-    prioritization_questions = [
-        q for q in template.questions if "Prioritization" in q.skill_assessed
-    ]
+    prioritization_questions = [q for q in template.questions if "Prioritization" in q.skill_assessed]
     assert len(prioritization_questions) > 0
 
 
 def test_data_scientist_template_content(question_builder):
     """Test data scientist template has ML questions"""
-
     template = question_builder.get_template("data-scientist")
 
     assert len(template.questions) >= 1
@@ -320,7 +300,6 @@ def test_data_scientist_template_content(question_builder):
 @pytest.mark.asyncio
 async def test_ollama_response_parsing(question_builder, sample_prompt):
     """Test parsing Ollama response (direct JSON, no markdown wrapping)"""
-
     # Mock Ollama response (direct JSON)
     mock_ollama_response = """[
   {
@@ -348,7 +327,6 @@ async def test_ollama_response_parsing(question_builder, sample_prompt):
 
 def test_prompt_validation():
     """Test that prompts with invalid data are rejected"""
-
     # Test negative num_questions
     with pytest.raises(Exception):
         NaturalLanguagePrompt(
@@ -372,7 +350,6 @@ def test_prompt_validation():
 
 def test_question_metadata():
     """Test that questions have proper metadata"""
-
     question = InterviewQuestion(
         question_text="Test question",
         question_type=QuestionType.TECHNICAL,

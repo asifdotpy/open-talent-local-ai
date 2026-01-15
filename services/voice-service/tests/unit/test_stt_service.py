@@ -93,9 +93,7 @@ class TestModelLoading:
     """Test Whisper model loading functionality."""
 
     @patch("whisper.load_model")
-    def test_load_model_succeeds_with_valid_configuration(
-        self, mock_load, stt_service, mock_whisper_model
-    ):
+    def test_load_model_succeeds_with_valid_configuration(self, mock_load, stt_service, mock_whisper_model):
         """Test that model loads successfully with valid configuration."""
         # Arrange
         mock_load.return_value = mock_whisper_model
@@ -151,9 +149,7 @@ class TestModelLoading:
             mock_load.assert_called_with(size, device=service.device)
 
     @patch("whisper.load_model")
-    def test_load_model_multiple_times_replaces_old_model(
-        self, mock_load, stt_service, mock_whisper_model
-    ):
+    def test_load_model_multiple_times_replaces_old_model(self, mock_load, stt_service, mock_whisper_model):
         """Test that loading model multiple times replaces the old one."""
         # Arrange
         mock_load.return_value = mock_whisper_model
@@ -180,9 +176,7 @@ class TestAudioTranscription:
         assert result is None
 
     @patch("whisper.load_model")
-    def test_transcribe_succeeds_with_valid_audio(
-        self, mock_load, stt_service, test_audio_file, mock_whisper_model
-    ):
+    def test_transcribe_succeeds_with_valid_audio(self, mock_load, stt_service, test_audio_file, mock_whisper_model):
         """Test that transcription succeeds with valid audio file."""
         # Arrange
         mock_whisper_model.transcribe.return_value = {"text": "Hello world"}
@@ -194,9 +188,7 @@ class TestAudioTranscription:
 
         # Assert
         assert result == "Hello world"
-        mock_whisper_model.transcribe.assert_called_once_with(
-            test_audio_file, language="en", fp16=False, verbose=False
-        )
+        mock_whisper_model.transcribe.assert_called_once_with(test_audio_file, language="en", fp16=False, verbose=False)
 
     @patch("whisper.load_model")
     def test_transcribe_strips_whitespace_from_result(
@@ -215,9 +207,7 @@ class TestAudioTranscription:
         assert result == "Hello world"
 
     @patch("whisper.load_model")
-    def test_transcribe_with_different_languages(
-        self, mock_load, stt_service, test_audio_file, mock_whisper_model
-    ):
+    def test_transcribe_with_different_languages(self, mock_load, stt_service, test_audio_file, mock_whisper_model):
         """Test that transcription supports different languages."""
         # Arrange
         mock_whisper_model.transcribe.return_value = {"text": "Hola mundo"}
@@ -229,9 +219,7 @@ class TestAudioTranscription:
 
         # Assert
         assert result == "Hola mundo"
-        mock_whisper_model.transcribe.assert_called_once_with(
-            test_audio_file, language="es", fp16=False, verbose=False
-        )
+        mock_whisper_model.transcribe.assert_called_once_with(test_audio_file, language="es", fp16=False, verbose=False)
 
     @patch("whisper.load_model")
     def test_transcribe_fails_gracefully_on_exception(
@@ -264,9 +252,7 @@ class TestAudioTranscription:
         assert result is None
 
     @patch("whisper.load_model")
-    def test_transcribe_with_empty_result(
-        self, mock_load, stt_service, test_audio_file, mock_whisper_model
-    ):
+    def test_transcribe_with_empty_result(self, mock_load, stt_service, test_audio_file, mock_whisper_model):
         """Test that transcription handles empty transcription results."""
         # Arrange
         mock_whisper_model.transcribe.return_value = {"text": ""}
@@ -306,9 +292,7 @@ class TestEdgeCasesAndErrorHandling:
     """Test edge cases and error handling."""
 
     @patch("whisper.load_model")
-    def test_transcribe_with_corrupted_audio_file(
-        self, mock_load, stt_service, invalid_audio_file, mock_whisper_model
-    ):
+    def test_transcribe_with_corrupted_audio_file(self, mock_load, stt_service, invalid_audio_file, mock_whisper_model):
         """Test that transcription handles corrupted audio files."""
         # Arrange
         mock_whisper_model.transcribe.side_effect = RuntimeError("Invalid audio format")
@@ -322,9 +306,7 @@ class TestEdgeCasesAndErrorHandling:
         assert result is None
 
     @patch("whisper.load_model")
-    def test_transcribe_with_very_long_audio(
-        self, mock_load, stt_service, long_audio_file, mock_whisper_model
-    ):
+    def test_transcribe_with_very_long_audio(self, mock_load, stt_service, long_audio_file, mock_whisper_model):
         """Test that transcription handles long audio files."""
         # Arrange
         long_transcription = "This is a very long transcription " * 50
@@ -339,9 +321,7 @@ class TestEdgeCasesAndErrorHandling:
         assert result == long_transcription.strip()
 
     @patch("whisper.load_model")
-    def test_transcribe_with_silent_audio(
-        self, mock_load, stt_service, silent_audio_file, mock_whisper_model
-    ):
+    def test_transcribe_with_silent_audio(self, mock_load, stt_service, silent_audio_file, mock_whisper_model):
         """Test that transcription handles silent audio."""
         # Arrange
         mock_whisper_model.transcribe.return_value = {"text": ""}
@@ -369,9 +349,7 @@ class TestEdgeCasesAndErrorHandling:
             assert result is None
 
     @patch("whisper.load_model")
-    def test_transcribe_preserves_punctuation(
-        self, mock_load, stt_service, test_audio_file, mock_whisper_model
-    ):
+    def test_transcribe_preserves_punctuation(self, mock_load, stt_service, test_audio_file, mock_whisper_model):
         """Test that transcription preserves punctuation in results."""
         # Arrange
         text_with_punctuation = "Hello! How are you? I'm fine, thank you."
@@ -386,9 +364,7 @@ class TestEdgeCasesAndErrorHandling:
         assert result == text_with_punctuation
 
     @patch("whisper.load_model")
-    def test_transcribe_handles_numbers_in_text(
-        self, mock_load, stt_service, test_audio_file, mock_whisper_model
-    ):
+    def test_transcribe_handles_numbers_in_text(self, mock_load, stt_service, test_audio_file, mock_whisper_model):
         """Test that transcription handles numbers in transcribed text."""
         # Arrange
         text_with_numbers = "The year is 2025 and the time is 3:45 PM"
@@ -408,9 +384,7 @@ class TestDeviceManagement:
 
     @patch("torch.cuda.is_available", return_value=False)
     @patch("whisper.load_model")
-    def test_model_loads_on_cpu_when_cuda_unavailable(
-        self, mock_load, mock_cuda, mock_whisper_model
-    ):
+    def test_model_loads_on_cpu_when_cuda_unavailable(self, mock_load, mock_cuda, mock_whisper_model):
         """Test that model loads on CPU when CUDA is unavailable."""
         # Arrange
         mock_load.return_value = mock_whisper_model

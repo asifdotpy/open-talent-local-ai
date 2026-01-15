@@ -1,12 +1,12 @@
-"""
-Vetta AI v4 Integration for Interview Service
+"""Vetta AI v4 Integration for Interview Service
 Uses fine-tuned Granite 3.0 2B GGUF model via Ollama for comprehensive recruiting AI
 """
 
-import os
 import logging
-from typing import Dict, Any, List, Optional
+import os
 from datetime import datetime
+from typing import Any
+
 import httpx
 
 logger = logging.getLogger(__name__)
@@ -14,14 +14,12 @@ logger = logging.getLogger(__name__)
 # Ollama configuration
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://localhost:11434")
 OLLAMA_MODEL_NAME = os.getenv("OLLAMA_MODEL_NAME", "vetta-granite-2b")
-OLLAMA_TIMEOUT = float(
-    os.getenv("OLLAMA_TIMEOUT", "90.0")
-)  # Increased to 90s for first-time model loading
+OLLAMA_TIMEOUT = float(os.getenv("OLLAMA_TIMEOUT", "90.0"))  # Increased to 90s for first-time model loading
 
 # Legacy Unsloth support (fallback)
 try:
-    from unsloth import FastLanguageModel
     import torch
+    from unsloth import FastLanguageModel
 
     UNSLOTH_AVAILABLE = True
 except ImportError:
@@ -30,8 +28,7 @@ except ImportError:
 
 
 class VettaAI:
-    """
-    Vetta AI v4 - Comprehensive Recruiting AI via Ollama
+    """Vetta AI v4 - Comprehensive Recruiting AI via Ollama
 
     Supports 8 domains:
     1. Interview - Avatar interview orchestration
@@ -45,8 +42,7 @@ class VettaAI:
     """
 
     def __init__(self, model_name: str = OLLAMA_MODEL_NAME, use_ollama: bool = True):
-        """
-        Initialize Vetta AI model.
+        """Initialize Vetta AI model.
 
         Args:
             model_name: Ollama model name or HuggingFace repository
@@ -66,13 +62,12 @@ class VettaAI:
 
         if use_ollama:
             self._check_ollama_connection()
+        # Legacy Unsloth path
+        elif UNSLOTH_AVAILABLE:
+            self._load_model_unsloth()
         else:
-            # Legacy Unsloth path
-            if UNSLOTH_AVAILABLE:
-                self._load_model_unsloth()
-            else:
-                self.fallback_mode = True
-                logger.warning("Neither Ollama nor Unsloth available - using fallback mode")
+            self.fallback_mode = True
+            logger.warning("Neither Ollama nor Unsloth available - using fallback mode")
 
     def _check_ollama_connection(self):
         """Check Ollama service connection synchronously."""
@@ -88,9 +83,7 @@ class VettaAI:
                     self.loaded = True
                     logger.info(f"✅ Vetta AI v4 connected to Ollama: {self.model_name}")
                 else:
-                    logger.warning(
-                        f"Model {self.model_name} not found in Ollama. Available: {model_names}"
-                    )
+                    logger.warning(f"Model {self.model_name} not found in Ollama. Available: {model_names}")
                     self.fallback_mode = True
             else:
                 logger.warning(f"Ollama API returned {response.status_code}")
@@ -104,8 +97,8 @@ class VettaAI:
         try:
             logger.info(f"Loading Vetta AI v4 model via Unsloth: {self.model_name}")
 
-            from unsloth import FastLanguageModel
             import torch
+            from unsloth import FastLanguageModel
 
             # Load model with 4-bit quantization for efficiency
             self.model, self.tokenizer = FastLanguageModel.from_pretrained(
@@ -131,9 +124,8 @@ class VettaAI:
             self.fallback_mode = True
             logger.warning("Switching to fallback mode")
 
-    def _format_prompt(self, instruction: str, context: Optional[str] = None) -> str:
-        """
-        Format prompt in Alpaca instruction-response format.
+    def _format_prompt(self, instruction: str, context: str | None = None) -> str:
+        """Format prompt in Alpaca instruction-response format.
 
         Args:
             instruction: The task instruction
@@ -167,8 +159,7 @@ class VettaAI:
         temperature: float = 0.7,
         top_p: float = 0.9,
     ) -> str:
-        """
-        Generate response using Ollama API.
+        """Generate response using Ollama API.
 
         Args:
             prompt: Formatted prompt
@@ -230,8 +221,6 @@ class VettaAI:
     ) -> str:
         """Generate response using Unsloth (legacy)."""
         try:
-            import torch
-
             # Tokenize
             inputs = self.tokenizer([prompt], return_tensors="pt").to("cuda")
 
@@ -263,13 +252,12 @@ class VettaAI:
     async def generate(
         self,
         instruction: str,
-        context: Optional[str] = None,
+        context: str | None = None,
         max_tokens: int = 256,
         temperature: float = 0.7,
         top_p: float = 0.9,
     ) -> str:
-        """
-        Generate response using Vetta AI.
+        """Generate response using Vetta AI.
 
         Args:
             instruction: Task instruction (e.g., "Assess this candidate's skills")
@@ -299,9 +287,8 @@ class VettaAI:
             return """Skill Score: 7/10. Strengths: Relevant experience demonstrated. Gaps: Limited specific examples provided. Growth potential: 8/10. Recommendation: Proceed with technical assessment."""
         return "Response generated in fallback mode."
 
-    def _fallback_generate(self, instruction: str, context: Optional[str] = None) -> str:
-        """
-        Fallback response when model is unavailable.
+    def _fallback_generate(self, instruction: str, context: str | None = None) -> str:
+        """Fallback response when model is unavailable.
 
         Returns basic structured response based on instruction type.
         """
@@ -321,9 +308,8 @@ class VettaAI:
 
     async def assess_candidate(
         self, candidate_info: str, job_description: str, role: str = "Senior Python Developer"
-    ) -> Dict[str, Any]:
-        """
-        Assess candidate's technical skills for a role.
+    ) -> dict[str, Any]:
+        """Assess candidate's technical skills for a role.
 
         Args:
             candidate_info: Candidate profile/resume text
@@ -348,12 +334,11 @@ class VettaAI:
 
     async def generate_interview_question(
         self,
-        previous_responses: List[str],
+        previous_responses: list[str],
         job_requirements: str,
         expertise_level: str = "intermediate",
     ) -> str:
-        """
-        Generate next interview question based on context.
+        """Generate next interview question based on context.
 
         Args:
             previous_responses: List of previous candidate responses
@@ -365,9 +350,7 @@ class VettaAI:
         """
         context_text = "\n".join([f"- {resp[:100]}..." for resp in previous_responses[-3:]])
 
-        instruction = (
-            f"Generate the next interview question for a {expertise_level} level candidate."
-        )
+        instruction = f"Generate the next interview question for a {expertise_level} level candidate."
         context = f"Job Requirements: {job_requirements}\n\nPrevious Responses:\n{context_text}"
 
         question = await self.generate(instruction, context, max_tokens=150, temperature=0.8)
@@ -381,8 +364,7 @@ class VettaAI:
     async def generate_outreach_message(
         self, candidate_name: str, candidate_skills: str, role: str, company: str
     ) -> str:
-        """
-        Generate personalized outreach message.
+        """Generate personalized outreach message.
 
         Args:
             candidate_name: Candidate's name
@@ -404,10 +386,9 @@ class VettaAI:
         self,
         candidate_profile: str,
         job_requirements: str,
-        scoring_criteria: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
-        """
-        Score candidate quality against job requirements.
+        scoring_criteria: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Score candidate quality against job requirements.
 
         Args:
             candidate_profile: Candidate information
@@ -431,9 +412,8 @@ class VettaAI:
             "timestamp": datetime.now().isoformat(),
         }
 
-    async def analyze_response_sentiment(self, response_text: str) -> Dict[str, Any]:
-        """
-        Analyze sentiment of candidate response.
+    async def analyze_response_sentiment(self, response_text: str) -> dict[str, Any]:
+        """Analyze sentiment of candidate response.
 
         Args:
             response_text: Candidate's response
@@ -448,7 +428,7 @@ class VettaAI:
 
         return {"sentiment_analysis": analysis, "timestamp": datetime.now().isoformat()}
 
-    def get_model_info(self) -> Dict[str, Any]:
+    def get_model_info(self) -> dict[str, Any]:
         """Get model information and status."""
         cuda_available = False
         gpu_memory_gb = 0
@@ -493,7 +473,7 @@ class VettaAI:
 
 
 # Global instance (singleton pattern)
-_vetta_ai_instance: Optional[VettaAI] = None
+_vetta_ai_instance: VettaAI | None = None
 
 
 def get_vetta_ai() -> VettaAI:

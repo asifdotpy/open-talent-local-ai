@@ -55,10 +55,10 @@ def analyze_dataset(dataset):
     response_lengths = [len(item["response"].split()) for item in dataset]
 
     print("\nText Length Statistics:")
-    print(f"  Instructions - Avg: {sum(instruction_lengths)/len(instruction_lengths):.1f} words")
+    print(f"  Instructions - Avg: {sum(instruction_lengths) / len(instruction_lengths):.1f} words")
     print(f"  Instructions - Min: {min(instruction_lengths)} words")
     print(f"  Instructions - Max: {max(instruction_lengths)} words")
-    print(f"  Responses - Avg: {sum(response_lengths)/len(response_lengths):.1f} words")
+    print(f"  Responses - Avg: {sum(response_lengths) / len(response_lengths):.1f} words")
     print(f"  Responses - Min: {min(response_lengths)} words")
     print(f"  Responses - Max: {max(response_lengths)} words")
 
@@ -97,7 +97,7 @@ def compare_datasets(original_path, expanded_path):
         print(f"Original Dataset: {len(original)} examples")
         print(f"Expanded Dataset: {len(expanded)} examples")
         print(
-            f"Growth: +{len(expanded) - len(original)} examples ({((len(expanded) - len(original))/len(original)*100):.1f}%)"
+            f"Growth: +{len(expanded) - len(original)} examples ({((len(expanded) - len(original)) / len(original) * 100):.1f}%)"
         )
 
         # Compare categories

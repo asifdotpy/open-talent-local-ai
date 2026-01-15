@@ -3,8 +3,6 @@ Pydantic schemas for Security Service
 Defines request/response models for authentication, authorization, and encryption
 """
 
-from typing import Optional
-
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -20,7 +18,7 @@ class TokenResponse(BaseModel):
 
     access_token: str
     token: str  # Alias for access_token
-    refresh_token: Optional[str] = None
+    refresh_token: str | None = None
     expires_in: int
     token_type: str = "bearer"
 
@@ -119,8 +117,8 @@ class EncryptResponse(BaseModel):
 class DecryptRequest(BaseModel):
     """Data decryption request"""
 
-    encrypted: Optional[str] = None
-    ciphertext: Optional[str] = None
+    encrypted: str | None = None
+    ciphertext: str | None = None
 
 
 class DecryptResponse(BaseModel):
@@ -134,11 +132,11 @@ class ErrorResponse(BaseModel):
     """Standard error response"""
 
     error: str
-    details: Optional[str] = None
+    details: str | None = None
 
 
 class SuccessResponse(BaseModel):
     """Standard success response"""
 
     message: str
-    data: Optional[dict] = None
+    data: dict | None = None

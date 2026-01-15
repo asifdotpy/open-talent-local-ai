@@ -333,9 +333,7 @@ def create_jwt_token(
         "role": role,
         "tenant_id": tenant_id,
         "exp": int(
-            (
-                datetime.now(UTC).replace(tzinfo=None) + timedelta(minutes=exp_minutes)
-            ).timestamp()
+            (datetime.now(UTC).replace(tzinfo=None) + timedelta(minutes=exp_minutes)).timestamp()
         ),
         "iat": int(datetime.now(UTC).replace(tzinfo=None).timestamp()),
     }

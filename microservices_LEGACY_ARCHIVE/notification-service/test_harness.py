@@ -1,6 +1,6 @@
 import asyncio
 import os
-import json
+
 import httpx
 
 BASE_URL = os.getenv("NOTIFY_BASE_URL", "http://localhost:8011")

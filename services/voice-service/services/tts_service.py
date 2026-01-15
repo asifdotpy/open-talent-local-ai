@@ -5,8 +5,7 @@ from loguru import logger
 
 
 class PiperTTSService:
-    """Piper TTS Service - Local, Fast, High-Quality Text-to-Speech
-    """
+    """Piper TTS Service - Local, Fast, High-Quality Text-to-Speech"""
 
     def __init__(self, piper_path: str, model_path: str):
         """Initialize Piper TTS

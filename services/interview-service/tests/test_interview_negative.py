@@ -1,9 +1,9 @@
 """Negative tests for interview endpoints."""
+
 from unittest.mock import MagicMock, patch
 
 import pytest
 from app.core.config import settings
-from fastapi import HTTPException
 from fastapi.testclient import TestClient
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
@@ -23,9 +23,7 @@ def test_start_interview_missing_fields(test_client: TestClient) -> None:
         # candidateProfile is missing
     }
 
-    response = test_client.post(
-        f"{settings.API_V1_STR}/interview/start", json=incomplete_payload
-    )
+    response = test_client.post(f"{settings.API_V1_STR}/interview/start", json=incomplete_payload)
     assert response.status_code == 422  # Unprocessable Entity
     assert "candidateProfile" in response.text
 
@@ -73,9 +71,7 @@ def test_start_interview_invalid_data_types(test_client: TestClient) -> None:
         },
     }
 
-    response = test_client.post(
-        f"{settings.API_V1_STR}/interview/start", json=invalid_payload
-    )
+    response = test_client.post(f"{settings.API_V1_STR}/interview/start", json=invalid_payload)
     assert response.status_code == 422
 
 
@@ -136,9 +132,10 @@ def test_start_interview_conversation_service_failure(test_client: TestClient) -
 
     try:
         # Mock both audit_service and avatar_service directly
-        with patch("app.api.routes.interview.audit_service", MagicMock()), patch(
-            "app.api.routes.interview.avatar_service", MagicMock()
-        ) as mock_avatar:
+        with (
+            patch("app.api.routes.interview.audit_service", MagicMock()),
+            patch("app.api.routes.interview.avatar_service", MagicMock()) as mock_avatar,
+        ):
             # Configure the avatar service mock to return proper values
             mock_avatar.get_avatar_response.return_value = {
                 "video_url": "https://example.com/fake_video.mp4",
@@ -189,9 +186,12 @@ def test_start_interview_avatar_service_failure(test_client: TestClient) -> None
 
     try:
         # Mock both audit_service and conversation_service directly
-        with patch("app.api.routes.interview.audit_service", MagicMock()), patch(
-            "app.api.routes.interview.conversation_service", MagicMock()
-        ) as mock_conversation:
+        with (
+            patch("app.api.routes.interview.audit_service", MagicMock()),
+            patch(
+                "app.api.routes.interview.conversation_service", MagicMock()
+            ) as mock_conversation,
+        ):
             # Configure the conversation service mock to return proper values
             mock_conversation.initiate_conversation.return_value = "Tell me about yourself."
 

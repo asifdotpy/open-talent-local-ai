@@ -298,15 +298,9 @@ def audio_factory() -> AudioFileFactory:
 # Markers for test categorization
 def pytest_configure(config):
     """Register custom markers."""
-    config.addinivalue_line(
-        "markers", "unit: Unit tests for individual components (fast, isolated, 90%+ coverage)"
-    )
-    config.addinivalue_line(
-        "markers", "integration: Integration tests requiring running services (80%+ coverage)"
-    )
-    config.addinivalue_line(
-        "markers", "business: Business value tests validating user outcomes (100% critical paths)"
-    )
+    config.addinivalue_line("markers", "unit: Unit tests for individual components (fast, isolated, 90%+ coverage)")
+    config.addinivalue_line("markers", "integration: Integration tests requiring running services (80%+ coverage)")
+    config.addinivalue_line("markers", "business: Business value tests validating user outcomes (100% critical paths)")
     config.addinivalue_line("markers", "slow: Tests that take longer to run (>5 seconds)")
     config.addinivalue_line("markers", "requires_models: Tests requiring downloaded models")
     config.addinivalue_line("markers", "webrtc: WebRTC-specific tests")

@@ -211,7 +211,7 @@ The question should:
 4. Allow for deep technical discussion"""
 
         context = f"""Previous responses:
-{chr(10).join(f'- {r}' for r in previous_responses)}
+{chr(10).join(f"- {r}" for r in previous_responses)}
 
 Requirements: {job_requirements}"""
 
@@ -269,7 +269,7 @@ Company: {company}"""
             Scores and overall assessment
         """
         instruction = f"""Score this candidate on the following criteria (1-10 each):
-{chr(10).join(f'- {c}' for c in scoring_criteria)}
+{chr(10).join(f"- {c}" for c in scoring_criteria)}
 
 Provide scores and brief justification for each."""
 

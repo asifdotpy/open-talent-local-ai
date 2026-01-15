@@ -5,7 +5,7 @@ Implements retry logic, circuit breakers, and timeout configuration.
 
 import logging
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 from tenacity import (
@@ -25,7 +25,7 @@ class CircuitBreaker:
         self.failure_threshold = failure_threshold
         self.timeout = timeout
         self.failures = 0
-        self.last_failure_time: Optional[datetime] = None
+        self.last_failure_time: datetime | None = None
         self.is_open = False
 
     def call_succeeded(self):
@@ -135,7 +135,7 @@ class ConversationServiceClient(BaseServiceClient):
     async def generate_questions(
         self,
         job_description: str,
-        job_title: Optional[str] = None,
+        job_title: str | None = None,
         num_questions: int = 10,
         difficulty: str = "medium",
     ) -> dict[str, Any]:
@@ -204,8 +204,8 @@ class AvatarServiceClient(BaseServiceClient):
 
     async def generate_avatar(
         self,
-        session_id: Optional[str] = None,
-        turn_number: Optional[int] = None,
+        session_id: str | None = None,
+        turn_number: int | None = None,
         still_mode: bool = True,
         expression_scale: float = 1.0,
         pose_style: int = 0,

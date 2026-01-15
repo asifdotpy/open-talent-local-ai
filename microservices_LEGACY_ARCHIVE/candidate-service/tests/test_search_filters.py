@@ -1,5 +1,4 @@
 from fastapi.testclient import TestClient
-from urllib.parse import quote
 
 from main import app
 

@@ -15,26 +15,28 @@ Usage:
 
 import json
 import os
-from collections import defaultdict, Counter
-from typing import Dict, List, Any
+from collections import Counter
 from datetime import datetime
+from typing import Any
 
-def load_dataset(file_path: str) -> List[Dict[str, Any]]:
+
+def load_dataset(file_path: str) -> list[dict[str, Any]]:
     """Load the dataset from JSON file."""
     print(f"📥 Loading dataset from {file_path}")
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, encoding="utf-8") as f:
         data = json.load(f)
-    
+
     # Handle both formats (with or without wrapper)
-    if isinstance(data, dict) and 'examples' in data:
-        examples = data['examples']
+    if isinstance(data, dict) and "examples" in data:
+        examples = data["examples"]
     else:
         examples = data
-    
+
     print(f"✅ Loaded {len(examples)} examples")
     return examples
 
-def remove_duplicates(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+
+def remove_duplicates(data: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Remove duplicate instruction-response pairs, keeping the first occurrence."""
     print("🔄 Removing duplicates...")
 
@@ -43,7 +45,7 @@ def remove_duplicates(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
     for item in data:
         # Create a unique key from instruction + response
-        pair_key = (item['instruction'], item['response'])
+        pair_key = (item["instruction"], item["response"])
 
         if pair_key not in seen_pairs:
             seen_pairs.add(pair_key)
@@ -53,45 +55,47 @@ def remove_duplicates(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     print(f"✅ Removed {removed_count} duplicates, kept {len(unique_data)} unique examples")
     return unique_data
 
-def enhance_metadata(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+
+def enhance_metadata(data: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Enhance metadata with proper source tracking and quality indicators."""
     print("🔧 Enhancing metadata...")
 
     for item in data:
         # Ensure _metadata exists and is a dict
-        if not isinstance(item.get('_metadata'), dict):
-            item['_metadata'] = {}
+        if not isinstance(item.get("_metadata"), dict):
+            item["_metadata"] = {}
 
-        metadata = item['_metadata']
+        metadata = item["_metadata"]
 
         # Add source information
-        if 'source' not in metadata:
-            metadata['source'] = 'vetta_comprehensive_v1'
+        if "source" not in metadata:
+            metadata["source"] = "vetta_comprehensive_v1"
 
         # Add quality score based on content
         quality_score = calculate_quality_score(item)
-        metadata['quality_score'] = quality_score
+        metadata["quality_score"] = quality_score
 
         # Add processing timestamp
-        metadata['processed_at'] = datetime.now().isoformat()
+        metadata["processed_at"] = datetime.now().isoformat()
 
         # Add version info
-        metadata['version'] = '1.1.0'
+        metadata["version"] = "1.1.0"
 
     print("✅ Enhanced metadata for all examples")
     return data
 
-def calculate_quality_score(item: Dict[str, Any]) -> float:
+
+def calculate_quality_score(item: dict[str, Any]) -> float:
     """Calculate a quality score for the example (0.0 to 1.0)."""
     score = 0.0
 
     # Base score for having required fields
-    if 'instruction' in item and 'response' in item:
+    if "instruction" in item and "response" in item:
         score += 0.3
 
     # Content quality
-    instruction = item.get('instruction', '')
-    response = item.get('response', '')
+    instruction = item.get("instruction", "")
+    response = item.get("response", "")
 
     # Length checks (reasonable lengths)
     if 20 <= len(instruction) <= 200:
@@ -100,18 +104,19 @@ def calculate_quality_score(item: Dict[str, Any]) -> float:
         score += 0.2
 
     # Metadata completeness
-    metadata_fields = ['category', 'difficulty', 'domain']
+    metadata_fields = ["category", "difficulty", "domain"]
     metadata_score = sum(1 for field in metadata_fields if field in item) / len(metadata_fields)
     score += metadata_score * 0.3
 
     return round(min(score, 1.0), 2)
 
-def balance_categories(data: List[Dict[str, Any]], min_examples: int = 10) -> List[Dict[str, Any]]:
+
+def balance_categories(data: list[dict[str, Any]], min_examples: int = 10) -> list[dict[str, Any]]:
     """Balance category distributions by ensuring minimum examples per category."""
     print("⚖️ Balancing category distributions...")
 
     # Count current distribution
-    categories = Counter(item.get('category', 'unknown') for item in data)
+    categories = Counter(item.get("category", "unknown") for item in data)
     print(f"Current categories: {dict(categories)}")
 
     # Identify underrepresented categories
@@ -129,50 +134,54 @@ def balance_categories(data: List[Dict[str, Any]], min_examples: int = 10) -> Li
 
     return data
 
-def validate_dataset(data: List[Dict[str, Any]]) -> Dict[str, Any]:
+
+def validate_dataset(data: list[dict[str, Any]]) -> dict[str, Any]:
     """Validate the dataset quality and return validation results."""
     print("🔍 Validating dataset quality...")
 
     validation = {
-        'total_examples': len(data),
-        'missing_fields': {},
-        'empty_fields': {},
-        'quality_distribution': Counter(),
-        'category_distribution': Counter(),
-        'domain_distribution': Counter(),
-        'warnings': [],
-        'errors': []
+        "total_examples": len(data),
+        "missing_fields": {},
+        "empty_fields": {},
+        "quality_distribution": Counter(),
+        "category_distribution": Counter(),
+        "domain_distribution": Counter(),
+        "warnings": [],
+        "errors": [],
     }
 
     for item in data:
         # Check required fields
-        required_fields = ['instruction', 'response', 'category', 'difficulty', 'domain']
+        required_fields = ["instruction", "response", "category", "difficulty", "domain"]
         for field in required_fields:
             if field not in item:
-                validation['missing_fields'][field] = validation['missing_fields'].get(field, 0) + 1
-            elif not item[field] or str(item[field]).strip() == '':
-                validation['empty_fields'][field] = validation['empty_fields'].get(field, 0) + 1
+                validation["missing_fields"][field] = validation["missing_fields"].get(field, 0) + 1
+            elif not item[field] or str(item[field]).strip() == "":
+                validation["empty_fields"][field] = validation["empty_fields"].get(field, 0) + 1
 
         # Collect distributions
-        validation['quality_distribution'][item.get('_metadata', {}).get('quality_score', 0)] += 1
-        validation['category_distribution'][item.get('category', 'unknown')] += 1
-        validation['domain_distribution'][item.get('domain', 'unknown')] += 1
+        validation["quality_distribution"][item.get("_metadata", {}).get("quality_score", 0)] += 1
+        validation["category_distribution"][item.get("category", "unknown")] += 1
+        validation["domain_distribution"][item.get("domain", "unknown")] += 1
 
     # Generate warnings and errors
-    if validation['missing_fields']:
-        validation['errors'].append(f"Missing required fields: {validation['missing_fields']}")
+    if validation["missing_fields"]:
+        validation["errors"].append(f"Missing required fields: {validation['missing_fields']}")
 
-    if validation['empty_fields']:
-        validation['warnings'].append(f"Empty fields found: {validation['empty_fields']}")
+    if validation["empty_fields"]:
+        validation["warnings"].append(f"Empty fields found: {validation['empty_fields']}")
 
-    low_quality = sum(count for score, count in validation['quality_distribution'].items() if score < 0.7)
+    low_quality = sum(
+        count for score, count in validation["quality_distribution"].items() if score < 0.7
+    )
     if low_quality > len(data) * 0.1:  # More than 10% low quality
-        validation['warnings'].append(f"{low_quality} examples have quality score < 0.7")
+        validation["warnings"].append(f"{low_quality} examples have quality score < 0.7")
 
     print("✅ Validation complete")
     return validation
 
-def save_dataset(data: List[Dict[str, Any]], output_path: str, validation: Dict[str, Any]):
+
+def save_dataset(data: list[dict[str, Any]], output_path: str, validation: dict[str, Any]):
     """Save the enhanced dataset with validation summary."""
     print(f"💾 Saving enhanced dataset to {output_path}")
 
@@ -181,47 +190,48 @@ def save_dataset(data: List[Dict[str, Any]], output_path: str, validation: Dict[
 
     # Add validation summary as a comment/metadata
     enhanced_data = {
-        '_dataset_metadata': {
-            'created_at': datetime.now().isoformat(),
-            'total_examples': len(data),
-            'validation_summary': validation,
-            'enhancement_version': '1.1.0'
+        "_dataset_metadata": {
+            "created_at": datetime.now().isoformat(),
+            "total_examples": len(data),
+            "validation_summary": validation,
+            "enhancement_version": "1.1.0",
         },
-        'examples': data
+        "examples": data,
     }
 
-    with open(output_path, 'w', encoding='utf-8') as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(enhanced_data, f, indent=2, ensure_ascii=False)
 
     print(f"✅ Saved {len(data)} examples to {output_path}")
 
-def generate_quality_report(validation: Dict[str, Any], output_path: str):
+
+def generate_quality_report(validation: dict[str, Any], output_path: str):
     """Generate a quality report."""
-    report_path = output_path.replace('.json', '_quality_report.md')
+    report_path = output_path.replace(".json", "_quality_report.md")
 
     report = f"""# Dataset Quality Report
 Generated: {datetime.now().isoformat()}
 
 ## Summary
-- **Total Examples**: {validation['total_examples']}
-- **Quality Score Distribution**: {dict(validation['quality_distribution'])}
-- **Category Distribution**: {dict(validation['category_distribution'])}
-- **Domain Distribution**: {dict(validation['domain_distribution'])}
+- **Total Examples**: {validation["total_examples"]}
+- **Quality Score Distribution**: {dict(validation["quality_distribution"])}
+- **Category Distribution**: {dict(validation["category_distribution"])}
+- **Domain Distribution**: {dict(validation["domain_distribution"])}
 
 ## Issues Found
 """
 
-    if validation['errors']:
+    if validation["errors"]:
         report += "\n### Errors\n"
-        for error in validation['errors']:
+        for error in validation["errors"]:
             report += f"- {error}\n"
 
-    if validation['warnings']:
+    if validation["warnings"]:
         report += "\n### Warnings\n"
-        for warning in validation['warnings']:
+        for warning in validation["warnings"]:
             report += f"- {warning}\n"
 
-    if not validation['errors'] and not validation['warnings']:
+    if not validation["errors"] and not validation["warnings"]:
         report += "\n✅ No issues found!\n"
 
     report += "\n## Recommendations\n"
@@ -229,24 +239,31 @@ Generated: {datetime.now().isoformat()}
     report += "- Consider collecting more data for underrepresented categories\n"
     report += "- Validate instruction-response pairs for coherence\n"
 
-    with open(report_path, 'w', encoding='utf-8') as f:
+    with open(report_path, "w", encoding="utf-8") as f:
         f.write(report)
 
     print(f"📊 Quality report saved to {report_path}")
 
+
 def main():
     """Main function to enhance dataset quality."""
     import argparse
-    
-    parser = argparse.ArgumentParser(description='Enhance dataset quality')
-    parser.add_argument('--input', type=str, 
-                        default='notebooks/data/vetta_comprehensive.json',
-                        help='Input dataset file')
-    parser.add_argument('--output', type=str,
-                        default=None,
-                        help='Output dataset file (default: input_enhanced.json)')
+
+    parser = argparse.ArgumentParser(description="Enhance dataset quality")
+    parser.add_argument(
+        "--input",
+        type=str,
+        default="notebooks/data/vetta_comprehensive.json",
+        help="Input dataset file",
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        default=None,
+        help="Output dataset file (default: input_enhanced.json)",
+    )
     args = parser.parse_args()
-    
+
     print("🚀 Starting Vetta Dataset Quality Enhancement")
     print("=" * 50)
 
@@ -255,7 +272,7 @@ def main():
     if args.output:
         output_file = args.output
     else:
-        output_file = input_file.replace('.json', '_enhanced.json')
+        output_file = input_file.replace(".json", "_enhanced.json")
 
     # Load dataset
     data = load_dataset(input_file)
@@ -289,6 +306,7 @@ def main():
     print(f"  • Quality distribution: {dict(validation['quality_distribution'])}")
     print(f"  • Categories: {len(validation['category_distribution'])}")
     print(f"  • Domains: {len(validation['domain_distribution'])}")
+
 
 if __name__ == "__main__":
     main()

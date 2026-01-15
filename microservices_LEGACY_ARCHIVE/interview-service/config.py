@@ -1,5 +1,4 @@
-"""Configuration, constants, and logging setup for Interview service.
-"""
+"""Configuration, constants, and logging setup for Interview service."""
 
 import logging
 import os
@@ -28,9 +27,7 @@ TIMEOUT_CONFIG = {
 }
 
 # Local service configurations (no external APIs required)
-OLLAMA_API_KEY = os.getenv(
-    "OLLAMA_API_KEY", "1b55ff79559b4c218d015c0b7f3ddf8e.3peDt-lWL1ue6evEKFFxjQqk"
-)
+OLLAMA_API_KEY = os.getenv("OLLAMA_API_KEY", "1b55ff79559b4c218d015c0b7f3ddf8e.3peDt-lWL1ue6evEKFFxjQqk")
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 
 # Define the static persona configuration for Interview (Local Implementation)

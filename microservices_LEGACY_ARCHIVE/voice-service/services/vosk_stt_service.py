@@ -1,29 +1,25 @@
-"""
-Vosk Speech-to-Text Service
+"""Vosk Speech-to-Text Service
 Lightweight, local SST with streaming support and word-level timing
 """
 
 import json
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
-import wave
 
 try:
-    from vosk import Model, KaldiRecognizer
+    from vosk import KaldiRecognizer, Model
 
     VOSK_AVAILABLE = True
 except ImportError:
     VOSK_AVAILABLE = False
     logging.warning("Vosk not installed. Install with: pip install vosk")
 
-import soundfile as sf
 import numpy as np
+import soundfile as sf
 
 
 class VoskSTTService:
-    """
-    Local Speech-to-Text service using Vosk (Kaldi-based)
+    """Local Speech-to-Text service using Vosk (Kaldi-based)
 
     Features:
     - 5-8% WER on American English
@@ -33,11 +29,8 @@ class VoskSTTService:
     - Streaming support for real-time transcription
     """
 
-    def __init__(
-        self, model_path: str = "models/vosk-model-small-en-us-0.15", sample_rate: int = 16000
-    ):
-        """
-        Initialize Vosk SST service.
+    def __init__(self, model_path: str = "models/vosk-model-small-en-us-0.15", sample_rate: int = 16000):
+        """Initialize Vosk SST service.
 
         Args:
             model_path: Path to Vosk model directory
@@ -77,9 +70,8 @@ class VoskSTTService:
             self.logger.error(f"Failed to load Vosk model: {e}")
             return False
 
-    def transcribe_audio(self, audio_file_path: str) -> Dict:
-        """
-        Transcribe audio file to text with word-level timing.
+    def transcribe_audio(self, audio_file_path: str) -> dict:
+        """Transcribe audio file to text with word-level timing.
 
         Args:
             audio_file_path: Path to audio file (WAV, MP3, etc.)
@@ -151,9 +143,8 @@ class VoskSTTService:
             self.logger.error(f"Transcription failed: {e}")
             raise
 
-    def transcribe_streaming(self, audio_chunk: bytes) -> Optional[Dict]:
-        """
-        Process streaming audio chunk for real-time transcription.
+    def transcribe_streaming(self, audio_chunk: bytes) -> dict | None:
+        """Process streaming audio chunk for real-time transcription.
 
         Args:
             audio_chunk: Audio data as bytes (int16 format)
@@ -179,7 +170,7 @@ class VoskSTTService:
         if self.recognizer:
             self.recognizer.Reset()
 
-    def _format_result(self, result: Dict) -> Dict:
+    def _format_result(self, result: dict) -> dict:
         """Format Vosk result into standardized output."""
         formatted = {"text": result.get("text", ""), "words": [], "partial": False}
 
@@ -197,8 +188,7 @@ class VoskSTTService:
         return formatted
 
     def _resample_audio(self, audio: np.ndarray, orig_sr: int, target_sr: int) -> np.ndarray:
-        """
-        Resample audio to target sample rate.
+        """Resample audio to target sample rate.
         Simple linear interpolation for basic resampling.
         """
         if orig_sr == target_sr:
@@ -218,7 +208,7 @@ class VoskSTTService:
         """Check if Vosk service is ready."""
         return self.model is not None and self.recognizer is not None
 
-    def get_info(self) -> Dict:
+    def get_info(self) -> dict:
         """Get service information."""
         return {
             "service": "Vosk STT",
@@ -243,7 +233,7 @@ class MockVoskSTTService:
         self.logger = logging.getLogger(__name__)
         self.logger.warning("Using Mock Vosk STT Service")
 
-    def transcribe_audio(self, audio_file_path: str) -> Dict:
+    def transcribe_audio(self, audio_file_path: str) -> dict:
         """Return mock transcription."""
         return {
             "text": "This is a mock transcription for testing purposes",
@@ -261,7 +251,7 @@ class MockVoskSTTService:
     def health_check(self) -> bool:
         return True
 
-    def get_info(self) -> Dict:
+    def get_info(self) -> dict:
         return {
             "service": "Mock Vosk STT",
             "ready": True,

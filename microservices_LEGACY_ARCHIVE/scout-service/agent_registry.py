@@ -1,5 +1,4 @@
-"""
-Agent Registry and Discovery Module
+"""Agent Registry and Discovery Module
 Handles agent discovery, metadata management, and health monitoring
 
 Author: OpenTalent Team
@@ -9,12 +8,11 @@ Updated: December 13, 2025
 import asyncio
 import logging
 from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
-import re
-from pydantic import BaseModel, Field
-import aiohttp
 from enum import Enum
+from pathlib import Path
+
+import aiohttp
+from pydantic import BaseModel, Field
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -40,12 +38,12 @@ class AgentMetadata(BaseModel):
     port: int = Field(..., description="Port the agent runs on")
     url: str = Field(..., description="Full URL for agent API")
     purpose: str = Field(..., description="Agent's primary purpose")
-    capabilities: List[str] = Field(default_factory=list, description="List of capabilities")
+    capabilities: list[str] = Field(default_factory=list, description="List of capabilities")
     status: AgentStatus = Field(default=AgentStatus.UNKNOWN, description="Current health status")
-    last_health_check: Optional[datetime] = Field(None, description="Last health check timestamp")
-    endpoints: List[str] = Field(default_factory=list, description="Available endpoints")
-    venv_path: Optional[str] = Field(None, description="Path to virtual environment")
-    requires_python_version: Optional[str] = Field(None, description="Required Python version")
+    last_health_check: datetime | None = Field(None, description="Last health check timestamp")
+    endpoints: list[str] = Field(default_factory=list, description="Available endpoints")
+    venv_path: str | None = Field(None, description="Path to virtual environment")
+    requires_python_version: str | None = Field(None, description="Required Python version")
 
     class Config:
         use_enum_values = True
@@ -57,9 +55,7 @@ class AgentMetadata(BaseModel):
 
 
 class AgentRegistry:
-    """
-    Manages agent discovery, metadata, and health monitoring
-    """
+    """Manages agent discovery, metadata, and health monitoring"""
 
     # Agent configuration: name -> (port, purpose, capabilities)
     AGENT_CONFIG = {
@@ -110,23 +106,20 @@ class AgentRegistry:
         },
     }
 
-    def __init__(self, host: str = "localhost", agents_path: Optional[str] = None):
-        """
-        Initialize agent registry
+    def __init__(self, host: str = "localhost", agents_path: str | None = None):
+        """Initialize agent registry
 
         Args:
             host: Host where agents are running (default: localhost)
             agents_path: Path to agents directory for venv discovery
         """
         self.host = host
-        self.agents_path = (
-            Path(agents_path) if agents_path else Path("/home/asif1/open-talent/agents")
-        )
-        self.agents: Dict[str, AgentMetadata] = {}
+        self.agents_path = Path(agents_path) if agents_path else Path("/home/asif1/open-talent/agents")
+        self.agents: dict[str, AgentMetadata] = {}
         self.health_check_interval = 30  # seconds
         self.health_check_timeout = 5  # seconds
-        self._session: Optional[aiohttp.ClientSession] = None
-        self._health_check_task: Optional[asyncio.Task] = None
+        self._session: aiohttp.ClientSession | None = None
+        self._health_check_task: asyncio.Task | None = None
 
     async def init_session(self):
         """Initialize aiohttp session"""
@@ -141,9 +134,8 @@ class AgentRegistry:
             self._session = None
         logger.info("Agent registry session closed")
 
-    async def discover_agents(self) -> Dict[str, AgentMetadata]:
-        """
-        Discover and initialize all agents from configuration
+    async def discover_agents(self) -> dict[str, AgentMetadata]:
+        """Discover and initialize all agents from configuration
 
         Returns:
             Dict of agent names to metadata
@@ -177,7 +169,7 @@ class AgentRegistry:
         logger.info(f"Agent discovery complete: {len(self.agents)} agents found")
         return self.agents
 
-    def _get_venv_path(self, agent_name: str) -> Optional[str]:
+    def _get_venv_path(self, agent_name: str) -> str | None:
         """Get venv path for agent if it exists"""
         venv_path = self.agents_path / agent_name / ".venv"
         if venv_path.exists():
@@ -190,7 +182,7 @@ class AgentRegistry:
 
         return None
 
-    def _get_agent_python_version(self, agent_name: str) -> Optional[str]:
+    def _get_agent_python_version(self, agent_name: str) -> str | None:
         """Detect required Python version for agent"""
         agent_path = self.agents_path / agent_name / "main.py"
 
@@ -198,7 +190,7 @@ class AgentRegistry:
             return None
 
         try:
-            with open(agent_path, "r") as f:
+            with open(agent_path) as f:
                 content = f.read()
 
             # Check for Python version comments
@@ -213,8 +205,7 @@ class AgentRegistry:
         return None
 
     async def check_agent_health(self, agent_name: str) -> AgentStatus:
-        """
-        Check health of a single agent
+        """Check health of a single agent
 
         Args:
             agent_name: Name of the agent to check
@@ -245,7 +236,7 @@ class AgentRegistry:
                     logger.warning(f"✗ {agent_name} returned status {response.status}")
                     return AgentStatus.UNHEALTHY
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             agent.status = AgentStatus.UNREACHABLE
             agent.last_health_check = datetime.now()
             logger.warning(f"✗ {agent_name} health check timed out")
@@ -256,9 +247,8 @@ class AgentRegistry:
             logger.warning(f"✗ {agent_name} health check failed: {e}")
             return AgentStatus.UNREACHABLE
 
-    async def check_all_agents_health(self) -> Dict[str, AgentStatus]:
-        """
-        Check health of all agents in parallel
+    async def check_all_agents_health(self) -> dict[str, AgentStatus]:
+        """Check health of all agents in parallel
 
         Returns:
             Dict of agent names to health status
@@ -311,23 +301,23 @@ class AgentRegistry:
             except Exception as e:
                 logger.error(f"Error in health monitoring loop: {e}")
 
-    def get_agent(self, agent_name: str) -> Optional[AgentMetadata]:
+    def get_agent(self, agent_name: str) -> AgentMetadata | None:
         """Get agent metadata by name"""
         return self.agents.get(agent_name)
 
-    def get_agents_by_capability(self, capability: str) -> List[AgentMetadata]:
+    def get_agents_by_capability(self, capability: str) -> list[AgentMetadata]:
         """Get all agents with a specific capability"""
         return [agent for agent in self.agents.values() if capability in agent.capabilities]
 
-    def get_healthy_agents(self) -> List[AgentMetadata]:
+    def get_healthy_agents(self) -> list[AgentMetadata]:
         """Get all healthy agents"""
         return [agent for agent in self.agents.values() if agent.status == AgentStatus.HEALTHY]
 
-    def get_all_agents(self) -> List[AgentMetadata]:
+    def get_all_agents(self) -> list[AgentMetadata]:
         """Get all registered agents"""
         return list(self.agents.values())
 
-    def get_agents_by_status(self, status: AgentStatus) -> List[AgentMetadata]:
+    def get_agents_by_status(self, status: AgentStatus) -> list[AgentMetadata]:
         """Get agents by specific status"""
         return [agent for agent in self.agents.values() if agent.status == status]
 
@@ -336,11 +326,10 @@ class AgentRegistry:
         agent_name: str,
         endpoint: str,
         method: str = "GET",
-        data: Optional[Dict] = None,
-        params: Optional[Dict] = None,
-    ) -> Tuple[int, Optional[Dict]]:
-        """
-        Call an agent endpoint
+        data: dict | None = None,
+        params: dict | None = None,
+    ) -> tuple[int, dict | None]:
+        """Call an agent endpoint
 
         Args:
             agent_name: Name of the agent
@@ -367,16 +356,14 @@ class AgentRegistry:
 
             url = f"{agent.url}{endpoint}"
 
-            async with self._session.request(
-                method=method, url=url, json=data, params=params, timeout=30
-            ) as response:
+            async with self._session.request(method=method, url=url, json=data, params=params, timeout=30) as response:
                 response_data = None
                 if response.status in [200, 201]:
                     response_data = await response.json()
 
                 return response.status, response_data
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.error(f"Call to {agent_name}{endpoint} timed out")
             return 504, None
         except Exception as e:
@@ -388,10 +375,10 @@ class AgentRegistry:
 # Singleton Instance
 # ============================
 
-_registry_instance: Optional[AgentRegistry] = None
+_registry_instance: AgentRegistry | None = None
 
 
-def get_agent_registry(host: str = "localhost", agents_path: Optional[str] = None) -> AgentRegistry:
+def get_agent_registry(host: str = "localhost", agents_path: str | None = None) -> AgentRegistry:
     """Get or create agent registry instance"""
     global _registry_instance
 

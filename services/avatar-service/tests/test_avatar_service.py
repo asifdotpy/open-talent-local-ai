@@ -62,23 +62,17 @@ class TestAvatarCreation:
 
     @pytest.mark.asyncio
     async def test_get_avatar(self, avatar_service_url, async_client, auth_headers):
-        response = await async_client.get(
-            f"{avatar_service_url}/api/v1/avatars/avatar123", headers=auth_headers
-        )
+        response = await async_client.get(f"{avatar_service_url}/api/v1/avatars/avatar123", headers=auth_headers)
         assert response.status_code in [200, 404]
 
     @pytest.mark.asyncio
     async def test_list_avatars(self, avatar_service_url, async_client, auth_headers):
-        response = await async_client.get(
-            f"{avatar_service_url}/api/v1/avatars", headers=auth_headers
-        )
+        response = await async_client.get(f"{avatar_service_url}/api/v1/avatars", headers=auth_headers)
         assert response.status_code in [200, 403]
 
     @pytest.mark.asyncio
     async def test_delete_avatar(self, avatar_service_url, async_client, auth_headers):
-        response = await async_client.delete(
-            f"{avatar_service_url}/api/v1/avatars/avatar123", headers=auth_headers
-        )
+        response = await async_client.delete(f"{avatar_service_url}/api/v1/avatars/avatar123", headers=auth_headers)
         assert response.status_code in [200, 201, 204, 404]
 
 
@@ -133,9 +127,7 @@ class TestAvatarAnimation:
 
     @pytest.mark.asyncio
     async def test_get_available_animations(self, avatar_service_url, async_client, auth_headers):
-        response = await async_client.get(
-            f"{avatar_service_url}/api/v1/avatars/animations", headers=auth_headers
-        )
+        response = await async_client.get(f"{avatar_service_url}/api/v1/avatars/animations", headers=auth_headers)
         assert response.status_code in [200, 403]
 
 

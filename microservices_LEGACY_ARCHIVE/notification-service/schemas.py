@@ -5,7 +5,7 @@ Defines request/response models for email, SMS, and push notifications
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -33,17 +33,15 @@ class EmailPayload(BaseModel):
     to: EmailStr = Field(..., description="Recipient email address")
     subject: str = Field(..., min_length=1, max_length=200)
     body: str = Field(..., min_length=1)
-    from_email: Optional[EmailStr] = Field(None, description="Sender email address (optional)")
-    from_name: Optional[str] = Field(None, description="Sender display name")
-    cc: Optional[list[EmailStr]] = Field(None, description="CC recipients")
-    bcc: Optional[list[EmailStr]] = Field(None, description="BCC recipients")
-    reply_to: Optional[EmailStr] = Field(None, description="Reply-to address")
-    html_body: Optional[str] = Field(None, description="HTML version of the email body")
-    attachments: Optional[list[dict[str, str]]] = Field(None, description="Email attachments")
-    template_id: Optional[str] = Field(
-        None, description="Template identifier for pre-defined emails"
-    )
-    template_data: Optional[dict[str, Any]] = Field(None, description="Data to populate template")
+    from_email: EmailStr | None = Field(None, description="Sender email address (optional)")
+    from_name: str | None = Field(None, description="Sender display name")
+    cc: list[EmailStr] | None = Field(None, description="CC recipients")
+    bcc: list[EmailStr] | None = Field(None, description="BCC recipients")
+    reply_to: EmailStr | None = Field(None, description="Reply-to address")
+    html_body: str | None = Field(None, description="HTML version of the email body")
+    attachments: list[dict[str, str]] | None = Field(None, description="Email attachments")
+    template_id: str | None = Field(None, description="Template identifier for pre-defined emails")
+    template_data: dict[str, Any] | None = Field(None, description="Data to populate template")
     priority: NotificationPriority = NotificationPriority.NORMAL
 
 
@@ -54,9 +52,9 @@ class SMSPayload(BaseModel):
         ..., pattern=r"^\+?[1-9]\d{1,14}$", description="Recipient phone number in E.164 format"
     )
     message: str = Field(..., min_length=1, max_length=1600, description="SMS message content")
-    from_number: Optional[str] = Field(None, description="Sender phone number")
+    from_number: str | None = Field(None, description="Sender phone number")
     priority: NotificationPriority = NotificationPriority.NORMAL
-    scheduled_time: Optional[datetime] = Field(None, description="Schedule SMS for future delivery")
+    scheduled_time: datetime | None = Field(None, description="Schedule SMS for future delivery")
 
 
 class PushPayload(BaseModel):
@@ -65,15 +63,15 @@ class PushPayload(BaseModel):
     user_id: str = Field(..., description="Target user identifier")
     title: str = Field(..., min_length=1, max_length=100)
     body: str = Field(..., min_length=1, max_length=500)
-    icon: Optional[str] = Field(None, description="Notification icon URL")
-    image: Optional[str] = Field(None, description="Notification image URL")
-    click_action: Optional[str] = Field(None, description="URL to navigate on click")
-    data: Optional[dict[str, Any]] = Field(None, description="Additional custom data payload")
+    icon: str | None = Field(None, description="Notification icon URL")
+    image: str | None = Field(None, description="Notification image URL")
+    click_action: str | None = Field(None, description="URL to navigate on click")
+    data: dict[str, Any] | None = Field(None, description="Additional custom data payload")
     priority: NotificationPriority = NotificationPriority.NORMAL
-    badge: Optional[int] = Field(None, ge=0, description="Badge count for app icon")
-    sound: Optional[str] = Field("default", description="Notification sound")
-    tag: Optional[str] = Field(None, description="Notification tag for grouping")
-    device_tokens: Optional[list[str]] = Field(None, description="Specific device tokens to target")
+    badge: int | None = Field(None, ge=0, description="Badge count for app icon")
+    sound: str | None = Field("default", description="Notification sound")
+    tag: str | None = Field(None, description="Notification tag for grouping")
+    device_tokens: list[str] | None = Field(None, description="Specific device tokens to target")
 
 
 class NotificationRequest(BaseModel):
@@ -81,9 +79,9 @@ class NotificationRequest(BaseModel):
 
     channel: NotificationChannel
     recipient: str = Field(..., description="Recipient identifier (email, phone, user_id)")
-    subject: Optional[str] = None
+    subject: str | None = None
     message: str = Field(..., min_length=1)
-    data: Optional[dict[str, Any]] = None
+    data: dict[str, Any] | None = None
     priority: NotificationPriority = NotificationPriority.NORMAL
 
 
@@ -94,8 +92,8 @@ class NotificationResponse(BaseModel):
     status: str = Field(..., description="Status: 'sent', 'queued', 'failed'")
     channel: NotificationChannel
     recipient: str
-    sent_at: Optional[datetime] = None
-    message: Optional[str] = None
+    sent_at: datetime | None = None
+    message: str | None = None
 
 
 class BulkNotificationRequest(BaseModel):
@@ -103,9 +101,9 @@ class BulkNotificationRequest(BaseModel):
 
     channel: NotificationChannel
     recipients: list[str] = Field(..., min_items=1, max_items=1000)
-    subject: Optional[str] = None
+    subject: str | None = None
     message: str = Field(..., min_length=1)
-    data: Optional[dict[str, Any]] = None
+    data: dict[str, Any] | None = None
     priority: NotificationPriority = NotificationPriority.NORMAL
 
 
@@ -127,10 +125,10 @@ class NotificationStatus(BaseModel):
     channel: NotificationChannel
     recipient: str
     created_at: datetime
-    sent_at: Optional[datetime] = None
-    delivered_at: Optional[datetime] = None
-    read_at: Optional[datetime] = None
-    error_message: Optional[str] = None
+    sent_at: datetime | None = None
+    delivered_at: datetime | None = None
+    read_at: datetime | None = None
+    error_message: str | None = None
 
 
 class NotificationPreference(BaseModel):
@@ -140,10 +138,10 @@ class NotificationPreference(BaseModel):
     email_enabled: bool = True
     sms_enabled: bool = True
     push_enabled: bool = True
-    quiet_hours_start: Optional[str] = Field(
+    quiet_hours_start: str | None = Field(
         None, pattern=r"^([01]\d|2[0-3]):[0-5]\d$", description="Quiet hours start time (HH:MM)"
     )
-    quiet_hours_end: Optional[str] = Field(
+    quiet_hours_end: str | None = Field(
         None, pattern=r"^([01]\d|2[0-3]):[0-5]\d$", description="Quiet hours end time (HH:MM)"
     )
     timezone: str = "UTC"
@@ -153,11 +151,11 @@ class ErrorResponse(BaseModel):
     """Standard error response"""
 
     error: str
-    details: Optional[str] = None
+    details: str | None = None
 
 
 class SuccessResponse(BaseModel):
     """Standard success response"""
 
     message: str
-    data: Optional[dict[str, Any]] = None
+    data: dict[str, Any] | None = None

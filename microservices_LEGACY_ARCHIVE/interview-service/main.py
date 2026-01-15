@@ -63,9 +63,7 @@ async def log_requests(request: Request, call_next):
     response = await call_next(request)
 
     process_time = time.time() - start_time
-    logger.info(
-        f"[{request_id}] {request.method} {request.url.path} - {response.status_code} - {process_time:.3f}s"
-    )
+    logger.info(f"[{request_id}] {request.method} {request.url.path} - {response.status_code} - {process_time:.3f}s")
 
     return response
 
@@ -191,7 +189,7 @@ class Participant(BaseModel):
     user_id: str
     role: ParticipantRole
     display_name: str
-    joined_at: Optional[datetime] = None
+    joined_at: datetime | None = None
     connection_status: ConnectionStatus = ConnectionStatus.CONNECTING
 
 
@@ -209,7 +207,7 @@ class InterviewQuestion(BaseModel):
     text: str
     order: int
     generated_at: datetime
-    ai_metadata: Optional[dict[str, Any]] = {}
+    ai_metadata: dict[str, Any] | None = {}
 
 
 class InterviewAnswer(BaseModel):
@@ -243,7 +241,7 @@ class InterviewRoom(BaseModel):
     participants: list[Participant] = Field(default_factory=list)
     security_settings: RoomSecurity = Field(default_factory=RoomSecurity)
     max_duration_minutes: int = 45
-    current_question_index: Optional[int] = None
+    current_question_index: int | None = None
     questions: list[InterviewQuestion] = Field(default_factory=list)
     responses: list["InterviewAnswer"] = Field(default_factory=list)
     response_analyses: list["ResponseAnalysis"] = Field(default_factory=list)
@@ -254,10 +252,10 @@ class CreateRoomRequest(BaseModel):
     interview_session_id: str
     participants: list[Participant]
     duration_minutes: int = 45
-    security_settings: Optional[RoomSecurity] = None
-    job_id: Optional[str] = None  # NEW: Job/project ID for dynamic loading
-    project_id: Optional[str] = None  # NEW: Alternative to job_id
-    job_description: Optional[str] = None  # NEW: Direct job description (fallback)
+    security_settings: RoomSecurity | None = None
+    job_id: str | None = None  # NEW: Job/project ID for dynamic loading
+    project_id: str | None = None  # NEW: Alternative to job_id
+    job_description: str | None = None  # NEW: Direct job description (fallback)
 
 
 class JoinRoomRequest(BaseModel):
@@ -280,8 +278,8 @@ class WebRTCSignal(BaseModel):
     session_id: str
     room_id: str
     participant_id: str
-    data: Optional[dict] = None
-    timestamp: Optional[datetime] = None
+    data: dict | None = None
+    timestamp: datetime | None = None
 
 
 class WebRTCConnection(BaseModel):
@@ -313,7 +311,7 @@ class TranscriptionSegment(BaseModel):
     start_time: float
     end_time: float
     confidence: float
-    speaker_id: Optional[str] = None
+    speaker_id: str | None = None
     is_final: bool = False
     words: list[dict] = []  # Word-level timing and confidence
 
@@ -334,7 +332,7 @@ class WebSocketConnection(BaseModel):
     connection_id: str
     room_id: str
     participant_id: str
-    websocket: Optional[object] = None  # FastAPI WebSocket object
+    websocket: object | None = None  # FastAPI WebSocket object
     connected_at: datetime = Field(default_factory=datetime.now)
     last_activity: datetime = Field(default_factory=datetime.now)
 
@@ -346,9 +344,7 @@ class SentimentAnalysis(BaseModel):
     """Sentiment analysis results for candidate responses."""
 
     polarity: float = Field(..., description="Sentiment polarity (-1 to 1, negative to positive)")
-    subjectivity: float = Field(
-        ..., description="Subjectivity score (0 to 1, objective to subjective)"
-    )
+    subjectivity: float = Field(..., description="Subjectivity score (0 to 1, objective to subjective)")
     confidence: float = Field(..., description="Analysis confidence score")
     emotion: str = Field(..., description="Primary emotion detected")
     intensity: float = Field(..., description="Emotional intensity score")
@@ -374,23 +370,17 @@ class BiasDetection(BaseModel):
     flags: list[str] = Field(default_factory=list, description="Specific bias indicators detected")
     severity: str = Field(..., description="Bias severity level")
     categories: list[str] = Field(default_factory=list, description="Bias categories identified")
-    recommendations: list[str] = Field(
-        default_factory=list, description="Bias mitigation recommendations"
-    )
+    recommendations: list[str] = Field(default_factory=list, description="Bias mitigation recommendations")
 
 
 class ExpertiseAssessment(BaseModel):
     """Assessment of candidate's expertise level."""
 
-    level: str = Field(
-        ..., description="Expertise level (beginner, intermediate, advanced, expert)"
-    )
+    level: str = Field(..., description="Expertise level (beginner, intermediate, advanced, expert)")
     confidence: float = Field(..., description="Assessment confidence score")
-    technical_skills: list[str] = Field(
-        default_factory=list, description="Identified technical skills"
-    )
+    technical_skills: list[str] = Field(default_factory=list, description="Identified technical skills")
     knowledge_gaps: list[str] = Field(default_factory=list, description="Knowledge gaps identified")
-    experience_years: Optional[int] = Field(None, description="Estimated years of experience")
+    experience_years: int | None = Field(None, description="Estimated years of experience")
 
 
 class FollowupQuestion(BaseModel):
@@ -414,17 +404,15 @@ class ResponseAnalysis(BaseModel):
     followup_suggestions: list[FollowupQuestion] = Field(
         default_factory=list, description="Suggested follow-up questions"
     )
-    analyzed_at: datetime = Field(
-        default_factory=datetime.now, description="When the analysis was performed"
-    )
+    analyzed_at: datetime = Field(default_factory=datetime.now, description="When the analysis was performed")
 
 
 class NextQuestionRequest(BaseModel):
     """Request for next AI-generated question."""
 
     current_responses: list[InterviewAnswer] = Field(default_factory=list)
-    job_requirements: Optional[str] = None
-    interview_phase: Optional[str] = None
+    job_requirements: str | None = None
+    interview_phase: str | None = None
 
 
 class ResponseAnalysisRequest(BaseModel):
@@ -513,9 +501,7 @@ async def health_check():
         total_rooms = len(rooms_store)
         expired_rooms = len([r for r in rooms_store.values() if r.status == RoomStatus.EXPIRED])
 
-        logger.debug(
-            f"Room stats: {active_rooms} active, {total_rooms} total, {expired_rooms} expired"
-        )
+        logger.debug(f"Room stats: {active_rooms} active, {total_rooms} total, {expired_rooms} expired")
 
         status = {
             "status": "healthy",
@@ -578,17 +564,14 @@ async def create_interview_room(request: CreateRoomRequest):
 
         if request.duration_minutes <= 0 or request.duration_minutes > 480:  # Max 8 hours
             logger.error(f"Invalid duration: {request.duration_minutes} minutes")
-            raise HTTPException(
-                status_code=400, detail="Duration must be between 1 and 480 minutes"
-            )
+            raise HTTPException(status_code=400, detail="Duration must be between 1 and 480 minutes")
 
         # Check for duplicate session
         existing_room = next(
             (
                 r
                 for r in rooms_store.values()
-                if r.interview_session_id == request.interview_session_id
-                and r.status != RoomStatus.ENDED
+                if r.interview_session_id == request.interview_session_id and r.status != RoomStatus.ENDED
             ),
             None,
         )
@@ -612,8 +595,7 @@ async def create_interview_room(request: CreateRoomRequest):
             jitsi_url=f"https://meet.jit.si/{room_name}",
             interview_session_id=request.interview_session_id,
             created_at=datetime.now(),
-            expires_at=datetime.now()
-            + timedelta(minutes=request.duration_minutes + 15),  # 15min buffer
+            expires_at=datetime.now() + timedelta(minutes=request.duration_minutes + 15),  # 15min buffer
             status=RoomStatus.CREATED,
             participants=request.participants,
             security_settings=request.security_settings or RoomSecurity(),
@@ -623,9 +605,7 @@ async def create_interview_room(request: CreateRoomRequest):
         # Store room
         rooms_store[room_id] = room
 
-        logger.info(
-            f"Interview room created successfully: {room_id} for {len(request.participants)} participants"
-        )
+        logger.info(f"Interview room created successfully: {room_id} for {len(request.participants)} participants")
         return room
 
     except HTTPException:
@@ -691,9 +671,7 @@ async def start_interview(request: CreateRoomRequest):
             logger.error(f"Failed to connect to voice service: {e}")
             # Continue - interview can still work without voice processing
 
-        logger.info(
-            f"Interview started: room={room.room_id}, session={request.interview_session_id}"
-        )
+        logger.info(f"Interview started: room={room.room_id}, session={request.interview_session_id}")
         return room
 
     except Exception as e:
@@ -721,9 +699,7 @@ async def join_room(room_id: str, request: JoinRoomRequest):
     participant.connection_status = ConnectionStatus.CONNECTED
 
     # Add or update participant
-    existing_participant = next(
-        (p for p in room.participants if p.user_id == participant.user_id), None
-    )
+    existing_participant = next((p for p in room.participants if p.user_id == participant.user_id), None)
     if existing_participant:
         existing_participant.connection_status = ConnectionStatus.CONNECTED
         existing_participant.joined_at = datetime.now()
@@ -731,9 +707,7 @@ async def join_room(room_id: str, request: JoinRoomRequest):
         room.participants.append(participant)
 
     # Update room status to active if first real participant joins
-    if room.status == RoomStatus.CREATED and any(
-        p.role != ParticipantRole.AI_AVATAR for p in room.participants
-    ):
+    if room.status == RoomStatus.CREATED and any(p.role != ParticipantRole.AI_AVATAR for p in room.participants):
         room.status = RoomStatus.ACTIVE
 
     rooms_store[room_id] = room
@@ -794,7 +768,7 @@ async def get_room_status(room_id: str):
 
 
 @app.get("/api/v1/rooms")
-async def list_rooms(status: Optional[RoomStatus] = None):
+async def list_rooms(status: RoomStatus | None = None):
     """List all rooms, optionally filtered by status."""
     rooms = list(rooms_store.values())
 
@@ -820,9 +794,7 @@ async def get_room_participants(room_id: str):
         "room_id": room_id,
         "participants": room.participants,
         "participant_count": len(room.participants),
-        "connected_count": len(
-            [p for p in room.participants if p.connection_status == ConnectionStatus.CONNECTED]
-        ),
+        "connected_count": len([p for p in room.participants if p.connection_status == ConnectionStatus.CONNECTED]),
     }
 
 
@@ -830,9 +802,7 @@ async def get_room_participants(room_id: str):
 
 
 @app.post("/api/v1/rooms/{room_id}/webrtc/start", tags=["webrtc"])
-async def start_webrtc_audio_stream(
-    room_id: str, participant_id: str, config: Optional[AudioStreamConfig] = None
-):
+async def start_webrtc_audio_stream(room_id: str, participant_id: str, config: AudioStreamConfig | None = None):
     """Start WebRTC audio streaming for a participant in an interview room.
 
     This initializes the voice service WebRTC worker and establishes
@@ -892,9 +862,7 @@ async def start_webrtc_audio_stream(
                 raise HTTPException(status_code=500, detail="Failed to initialize voice service")
 
             connection.status = "ready"
-            logger.info(
-                f"WebRTC audio streaming started for participant {participant_id} in room {room_id}"
-            )
+            logger.info(f"WebRTC audio streaming started for participant {participant_id} in room {room_id}")
 
             return {
                 "connection_id": connection_id,
@@ -926,11 +894,7 @@ async def webrtc_signaling(room_id: str, signal: WebRTCSignal):
 
     # Find the WebRTC connection
     connection = next(
-        (
-            c
-            for c in webrtc_connections.values()
-            if c.room_id == room_id and c.participant_id == signal.participant_id
-        ),
+        (c for c in webrtc_connections.values() if c.room_id == room_id and c.participant_id == signal.participant_id),
         None,
     )
     if not connection:
@@ -958,9 +922,7 @@ async def webrtc_signaling(room_id: str, signal: WebRTCSignal):
                 logger.error(f"Voice service signaling failed: {voice_response.text}")
                 raise HTTPException(status_code=500, detail="Signaling failed")
 
-            logger.debug(
-                f"WebRTC signal forwarded: {signal.type.value} for participant {signal.participant_id}"
-            )
+            logger.debug(f"WebRTC signal forwarded: {signal.type.value} for participant {signal.participant_id}")
 
             return {
                 "status": "forwarded",
@@ -1000,7 +962,7 @@ async def get_webrtc_status(room_id: str):
 
 
 @app.delete("/api/v1/rooms/{room_id}/webrtc/stop", tags=["webrtc"])
-async def stop_webrtc_audio_stream(room_id: str, participant_id: Optional[str] = None):
+async def stop_webrtc_audio_stream(room_id: str, participant_id: str | None = None):
     """Stop WebRTC audio streaming for a room or specific participant.
 
     If participant_id is not provided, stops all connections in the room.
@@ -1011,9 +973,7 @@ async def stop_webrtc_audio_stream(room_id: str, participant_id: Optional[str] =
     # Find connections to stop
     if participant_id:
         connections_to_stop = [
-            c
-            for c in webrtc_connections.values()
-            if c.room_id == room_id and c.participant_id == participant_id
+            c for c in webrtc_connections.values() if c.room_id == room_id and c.participant_id == participant_id
         ]
     else:
         connections_to_stop = [c for c in webrtc_connections.values() if c.room_id == room_id]
@@ -1059,9 +1019,7 @@ async def cleanup_closed_connections():
     """Clean up closed WebRTC connections after a delay."""
     await asyncio.sleep(30)  # Wait 30 seconds
 
-    closed_connections = [
-        cid for cid, conn in webrtc_connections.items() if conn.status == "closed"
-    ]
+    closed_connections = [cid for cid, conn in webrtc_connections.items() if conn.status == "closed"]
 
     for connection_id in closed_connections:
         del webrtc_connections[connection_id]
@@ -1123,9 +1081,7 @@ async def websocket_live_transcription(websocket: WebSocket, room_id: str):
 
                 # Handle client messages
                 if data.get("type") == "ping":
-                    await websocket.send_json(
-                        {"type": "pong", "timestamp": datetime.now().isoformat()}
-                    )
+                    await websocket.send_json({"type": "pong", "timestamp": datetime.now().isoformat()})
                 elif data.get("type") == "request_history":
                     # Send transcription history
                     segments = transcription_history.get(room_id, [])
@@ -1139,7 +1095,7 @@ async def websocket_live_transcription(websocket: WebSocket, room_id: str):
                 else:
                     logger.debug(f"Unknown WebSocket message type: {data.get('type')}")
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # Send keepalive ping
                 await websocket.send_json({"type": "ping", "timestamp": datetime.now().isoformat()})
 
@@ -1188,9 +1144,7 @@ async def submit_transcription_segment(
     return {
         "status": "stored",
         "segment_id": len(transcription_history[room_id]) - 1,
-        "clients_notified": len(
-            [c for c in websocket_connections.values() if c.room_id == room_id]
-        ),
+        "clients_notified": len([c for c in websocket_connections.values() if c.room_id == room_id]),
     }
 
 
@@ -1198,9 +1152,7 @@ async def broadcast_transcription_update(room_id: str, update: LiveTranscription
     """Broadcast transcription update to all WebSocket clients in the room."""
     room_connections = [c for c in websocket_connections.values() if c.room_id == room_id]
 
-    logger.info(
-        f"Broadcasting transcription update for room {room_id} to {len(room_connections)} clients"
-    )
+    logger.info(f"Broadcasting transcription update for room {room_id} to {len(room_connections)} clients")
 
     disconnected_clients = []
 
@@ -1213,9 +1165,7 @@ async def broadcast_transcription_update(room_id: str, update: LiveTranscription
                     "start_time": float(update.segment.start_time),
                     "end_time": float(update.segment.end_time),
                     "confidence": float(update.segment.confidence),
-                    "speaker_id": str(update.segment.speaker_id)
-                    if update.segment.speaker_id
-                    else None,
+                    "speaker_id": str(update.segment.speaker_id) if update.segment.speaker_id else None,
                     "is_final": bool(update.segment.is_final),
                     "words": list(update.segment.words) if update.segment.words else [],
                 }
@@ -1236,18 +1186,12 @@ async def broadcast_transcription_update(room_id: str, update: LiveTranscription
                     "timestamp": datetime.now().isoformat(),
                 }
 
-                logger.debug(
-                    f"Sending message to client {connection.connection_id}: type={message['type']}"
-                )
+                logger.debug(f"Sending message to client {connection.connection_id}: type={message['type']}")
                 await connection.websocket.send_json(message)
                 connection.last_activity = datetime.now()
-                logger.info(
-                    f"Successfully sent transcription update to client {connection.connection_id}"
-                )
+                logger.info(f"Successfully sent transcription update to client {connection.connection_id}")
         except Exception as e:
-            logger.error(
-                f"Failed to send transcription update to client {connection.connection_id}: {e}"
-            )
+            logger.error(f"Failed to send transcription update to client {connection.connection_id}: {e}")
             logger.error(
                 f"Message data types: segment.text={type(update.segment.text)}, timestamp={type(update.timestamp)}"
             )
@@ -1260,9 +1204,7 @@ async def broadcast_transcription_update(room_id: str, update: LiveTranscription
 
 
 @app.get("/api/v1/rooms/{room_id}/transcription", tags=["transcription"])
-async def get_transcription_history(
-    room_id: str, limit: Optional[int] = None, offset: Optional[int] = 0
-):
+async def get_transcription_history(room_id: str, limit: int | None = None, offset: int | None = 0):
     """Get transcription history for a room.
 
     Returns stored transcription segments with optional pagination.
@@ -1312,7 +1254,7 @@ async def get_transcription_status():
     Returns statistics about active WebSocket connections and transcription data.
     """
     total_segments = sum(len(segments) for segments in transcription_history.values())
-    active_rooms = len([r for r in transcription_history.keys() if r in rooms_store])
+    active_rooms = len([r for r in transcription_history if r in rooms_store])
 
     return {
         "active_websocket_connections": len(websocket_connections),
@@ -1321,7 +1263,7 @@ async def get_transcription_status():
         "total_transcription_segments": total_segments,
         "connections_by_room": {
             room_id: len([c for c in websocket_connections.values() if c.room_id == room_id])
-            for room_id in transcription_history.keys()
+            for room_id in transcription_history
         },
         "timestamp": datetime.now().isoformat(),
     }
@@ -1350,9 +1292,7 @@ async def analyze_candidate_expertise(responses: list[InterviewAnswer]) -> str:
         "architecture",
         "scalability",
     ]
-    technical_count = sum(
-        1 for r in responses for term in technical_indicators if term.lower() in r.answer.lower()
-    )
+    technical_count = sum(1 for r in responses for term in technical_indicators if term.lower() in r.answer.lower())
 
     if avg_length > 500 and technical_count >= 3:
         return "expert"
@@ -1421,18 +1361,12 @@ async def analyze_response_quality(response_text: str, question_context: str) ->
     # Relevance check (simple keyword matching)
     question_keywords = set(question_context.lower().split())
     response_keywords = set(response_text.lower().split())
-    relevance_score = (
-        len(question_keywords.intersection(response_keywords))
-        / max(len(question_keywords), 1)
-        * 2.5
-    )
+    relevance_score = len(question_keywords.intersection(response_keywords)) / max(len(question_keywords), 1) * 2.5
 
     # Clarity assessment (sentence structure)
     sentences = response_text.split(".")
     avg_sentence_length = sum(len(s.split()) for s in sentences) / max(len(sentences), 1)
-    clarity_score = max(
-        0, 2.5 - abs(avg_sentence_length - 15) / 10
-    )  # Optimal ~15 words per sentence
+    clarity_score = max(0, 2.5 - abs(avg_sentence_length - 15) / 10)  # Optimal ~15 words per sentence
 
     # Technical accuracy (placeholder - would need domain-specific analysis)
     technical_score = 2.5  # Default medium score
@@ -1456,9 +1390,7 @@ async def analyze_response_quality(response_text: str, question_context: str) ->
     )
 
 
-async def detect_response_bias(
-    response_text: str, participants: list[Participant]
-) -> BiasDetection:
+async def detect_response_bias(response_text: str, participants: list[Participant]) -> BiasDetection:
     """Detect potential bias indicators in responses."""
     bias_flags = []
     categories = []
@@ -1511,9 +1443,7 @@ async def detect_response_bias(
     )
 
 
-async def assess_response_expertise(
-    response_text: str, question_context: str
-) -> ExpertiseAssessment:
+async def assess_response_expertise(response_text: str, question_context: str) -> ExpertiseAssessment:
     """Assess candidate's expertise level from response."""
     # Technical skill detection
     technical_skills = []
@@ -1537,7 +1467,7 @@ async def assess_response_expertise(
         "expert": ["designed systems", "mentored", "innovated", "pioneered"],
     }
 
-    expertise_scores = {level: 0 for level in experience_indicators.keys()}
+    expertise_scores = dict.fromkeys(experience_indicators.keys(), 0)
 
     for level, indicators in experience_indicators.items():
         for indicator in indicators:
@@ -1708,9 +1638,7 @@ async def analyze_interview_performance(room: InterviewRoom) -> InterviewPerform
     total_bias = sum(len(a.bias_detection.flags) for a in analyses)
 
     # Determine trends
-    sentiment_trend = (
-        "positive" if avg_sentiment > 0.2 else "negative" if avg_sentiment < -0.2 else "neutral"
-    )
+    sentiment_trend = "positive" if avg_sentiment > 0.2 else "negative" if avg_sentiment < -0.2 else "neutral"
     quality_trend = "improving" if avg_quality > 7 else "declining" if avg_quality < 5 else "stable"
 
     # Expertise level (use latest assessment)
@@ -1754,9 +1682,7 @@ async def generate_interview_adaptations(
     # Time adjustments
     if time_remaining < 15 and performance.overall_score > 7:
         adaptations["time_adjustments"]["early_termination"] = True
-        adaptations["immediate_actions"].append(
-            "Consider concluding interview early - strong candidate"
-        )
+        adaptations["immediate_actions"].append("Consider concluding interview early - strong candidate")
     elif time_remaining < 10:
         adaptations["immediate_actions"].append("Focus on key remaining questions")
 
@@ -1804,9 +1730,7 @@ async def generate_intelligence_report(
 
     # Expertise evaluation
     expertise_levels = [a.expertise_assessment.level for a in analyses]
-    most_common_expertise = (
-        max(set(expertise_levels), key=expertise_levels.count) if expertise_levels else "unknown"
-    )
+    most_common_expertise = max(set(expertise_levels), key=expertise_levels.count) if expertise_levels else "unknown"
 
     # Quality metrics
     quality_trends = {
@@ -1861,9 +1785,7 @@ async def generate_intelligence_report(
             "technical_skills_identified": list(
                 set(skill for a in analyses for skill in a.expertise_assessment.technical_skills)
             ),
-            "average_experience_years": sum(
-                a.expertise_assessment.experience_years or 0 for a in analyses
-            )
+            "average_experience_years": sum(a.expertise_assessment.experience_years or 0 for a in analyses)
             / len(analyses),
         },
         quality_metrics={
@@ -1918,9 +1840,7 @@ async def get_next_ai_question(room_id: str, request: NextQuestionRequest):
                 json={
                     "room_id": room_id,
                     "session_id": room.interview_session_id,
-                    "previous_responses": [
-                        r.dict() if hasattr(r, "dict") else r for r in previous_responses
-                    ],
+                    "previous_responses": [r.dict() if hasattr(r, "dict") else r for r in previous_responses],
                     "expertise_level": expertise_level,
                     "job_requirements": job_requirements,
                     "question_number": len(previous_responses) + 1,
@@ -1991,17 +1911,13 @@ async def analyze_candidate_response(room_id: str, request: ResponseAnalysisRequ
         sentiment_result = await analyze_response_sentiment(request.response_text)
 
         # Analyze content quality
-        quality_result = await analyze_response_quality(
-            request.response_text, request.question_context
-        )
+        quality_result = await analyze_response_quality(request.response_text, request.question_context)
 
         # Detect potential bias indicators
         bias_result = await detect_response_bias(request.response_text, room.participants)
 
         # Assess expertise level
-        expertise_result = await assess_response_expertise(
-            request.response_text, request.question_context
-        )
+        expertise_result = await assess_response_expertise(request.response_text, request.question_context)
 
         # Generate follow-up suggestions
         followup_suggestions = await generate_followup_questions(

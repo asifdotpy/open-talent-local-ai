@@ -1,12 +1,11 @@
-"""
-Vetta AI API Routes for Interview Service
+"""Vetta AI API Routes for Interview Service
 Provides REST endpoints for all Vetta AI v4 capabilities
 """
 
+from datetime import datetime
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
-from datetime import datetime
 
 from services.vetta_ai import get_vetta_ai
 
@@ -27,9 +26,7 @@ class CandidateAssessmentRequest(BaseModel):
 class InterviewQuestionRequest(BaseModel):
     """Request for AI-generated interview question."""
 
-    previous_responses: List[str] = Field(
-        default_factory=list, description="Previous candidate responses"
-    )
+    previous_responses: list[str] = Field(default_factory=list, description="Previous candidate responses")
     job_requirements: str = Field(..., description="Job requirements")
     expertise_level: str = Field(default="intermediate", description="Candidate expertise level")
 
@@ -48,7 +45,7 @@ class QualityScoringRequest(BaseModel):
 
     candidate_profile: str = Field(..., description="Candidate information")
     job_requirements: str = Field(..., description="Job requirements")
-    scoring_criteria: Optional[List[str]] = Field(None, description="Custom scoring criteria")
+    scoring_criteria: list[str] | None = Field(None, description="Custom scoring criteria")
 
 
 class SentimentAnalysisRequest(BaseModel):
@@ -61,7 +58,7 @@ class GenerateRequest(BaseModel):
     """Generic generation request."""
 
     instruction: str = Field(..., description="Task instruction")
-    context: Optional[str] = Field(None, description="Optional context")
+    context: str | None = Field(None, description="Optional context")
     max_tokens: int = Field(default=256, description="Maximum tokens to generate")
     temperature: float = Field(default=0.7, ge=0.0, le=1.0, description="Sampling temperature")
     top_p: float = Field(default=0.9, ge=0.0, le=1.0, description="Nucleus sampling threshold")
@@ -72,8 +69,7 @@ class GenerateRequest(BaseModel):
 
 @router.get("/info")
 async def get_model_info():
-    """
-    Get Vetta AI model information and status.
+    """Get Vetta AI model information and status.
 
     Returns model details, capabilities, and resource usage.
     """
@@ -83,8 +79,7 @@ async def get_model_info():
 
 @router.post("/generate")
 async def generate_response(request: GenerateRequest):
-    """
-    Generate response using Vetta AI with custom instruction.
+    """Generate response using Vetta AI with custom instruction.
 
     Generic endpoint for any Vetta AI generation task.
     """
@@ -112,8 +107,7 @@ async def generate_response(request: GenerateRequest):
 
 @router.post("/assess-candidate")
 async def assess_candidate(request: CandidateAssessmentRequest):
-    """
-    Assess candidate's technical skills for a role.
+    """Assess candidate's technical skills for a role.
 
     Returns comprehensive assessment with scores, strengths, gaps, and recommendations.
     """
@@ -134,8 +128,7 @@ async def assess_candidate(request: CandidateAssessmentRequest):
 
 @router.post("/generate-question")
 async def generate_interview_question(request: InterviewQuestionRequest):
-    """
-    Generate next interview question based on context.
+    """Generate next interview question based on context.
 
     Adapts questions based on previous responses and expertise level.
     """
@@ -161,8 +154,7 @@ async def generate_interview_question(request: InterviewQuestionRequest):
 
 @router.post("/generate-outreach")
 async def generate_outreach_message(request: OutreachMessageRequest):
-    """
-    Generate personalized outreach message for candidate.
+    """Generate personalized outreach message for candidate.
 
     Creates engaging, professional outreach tailored to candidate's skills.
     """
@@ -190,8 +182,7 @@ async def generate_outreach_message(request: OutreachMessageRequest):
 
 @router.post("/score-quality")
 async def score_candidate_quality(request: QualityScoringRequest):
-    """
-    Score candidate quality against job requirements.
+    """Score candidate quality against job requirements.
 
     Provides detailed scoring breakdown across multiple criteria.
     """
@@ -212,8 +203,7 @@ async def score_candidate_quality(request: QualityScoringRequest):
 
 @router.post("/analyze-sentiment")
 async def analyze_response_sentiment(request: SentimentAnalysisRequest):
-    """
-    Analyze sentiment and tone of candidate response.
+    """Analyze sentiment and tone of candidate response.
 
     Helps assess candidate's emotional state and communication style.
     """
@@ -230,8 +220,7 @@ async def analyze_response_sentiment(request: SentimentAnalysisRequest):
 
 @router.get("/health")
 async def vetta_health_check():
-    """
-    Health check for Vetta AI service.
+    """Health check for Vetta AI service.
 
     Returns model status and readiness.
     """

@@ -370,7 +370,8 @@ class TestCandidateServiceIntegration:
         candidate_data = {"full_name": "Test User"}
 
         response = self.client.post(
-            "/api/v1/candidate-profiles", content=str(candidate_data)  # Not JSON
+            "/api/v1/candidate-profiles",
+            content=str(candidate_data),  # Not JSON
         )
 
         # Should handle gracefully or return error

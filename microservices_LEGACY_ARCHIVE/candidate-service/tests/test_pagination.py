@@ -1,6 +1,8 @@
 """Test pagination for list endpoints"""
+
 import pytest
 from fastapi.testclient import TestClient
+
 from main import app
 
 client = TestClient(app)
@@ -160,9 +162,7 @@ def test_list_interviews_pagination():
             "location": "Remote",
             "status": "scheduled",
         }
-        client.post(
-            f"/api/v1/candidates/{candidate_id}/interviews", json=interview_payload, headers=AUTH
-        )
+        client.post(f"/api/v1/candidates/{candidate_id}/interviews", json=interview_payload, headers=AUTH)
 
     # Test pagination
     r = client.get(f"/api/v1/candidates/{candidate_id}/interviews?offset=0&limit=2", headers=AUTH)
@@ -194,9 +194,7 @@ def test_list_assessments_pagination():
             "assessment_type": "coding",
             "status": "pending",
         }
-        client.post(
-            f"/api/v1/candidates/{candidate_id}/assessments", json=assess_payload, headers=AUTH
-        )
+        client.post(f"/api/v1/candidates/{candidate_id}/assessments", json=assess_payload, headers=AUTH)
 
     # Test pagination
     r = client.get(f"/api/v1/candidates/{candidate_id}/assessments?offset=0&limit=2", headers=AUTH)
@@ -230,9 +228,7 @@ def test_list_availability_pagination():
             "timezone": "UTC",
             "is_available": True,
         }
-        client.post(
-            f"/api/v1/candidates/{candidate_id}/availability", json=avail_payload, headers=AUTH
-        )
+        client.post(f"/api/v1/candidates/{candidate_id}/availability", json=avail_payload, headers=AUTH)
 
     # Test pagination
     r = client.get(f"/api/v1/candidates/{candidate_id}/availability?offset=0&limit=2", headers=AUTH)
@@ -304,5 +300,5 @@ def test_pagination_metadata_consistency():
     expected_has_previous = 10 > 0  # = True
     assert data["has_previous"] == expected_has_previous
 
-    expected_has_next = (10 + 5) < data["total"]
+    expected_has_next = data["total"] > (10 + 5)
     assert data["has_next"] == expected_has_next

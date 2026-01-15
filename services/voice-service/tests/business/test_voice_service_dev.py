@@ -1,5 +1,3 @@
-
-
 def test_basic_functionality(client):
     """Test just the core functionality."""
     # Health check

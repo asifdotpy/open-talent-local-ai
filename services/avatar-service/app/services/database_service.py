@@ -151,12 +151,7 @@ class DatabaseService:
     def list_sessions(self, avatar_id: str, limit: int = 100) -> list[DBSession]:
         """List sessions for avatar (excluding deleted)."""
         with self.get_db() as db:
-            return (
-                db.query(DBSession)
-                .filter_by(avatar_id=avatar_id, deleted_at=None)
-                .limit(limit)
-                .all()
-            )
+            return db.query(DBSession).filter_by(avatar_id=avatar_id, deleted_at=None).limit(limit).all()
 
     # ============= PRESET OPERATIONS =============
 
@@ -205,9 +200,7 @@ class DatabaseService:
 
     # ============= RENDER OPERATIONS =============
 
-    def create_render(
-        self, frame_id: str, avatar_id: str, width: int, height: int, file_path: str, **kwargs
-    ) -> Render:
+    def create_render(self, frame_id: str, avatar_id: str, width: int, height: int, file_path: str, **kwargs) -> Render:
         """Create render record."""
         with self.get_db() as db:
             render = Render(
@@ -230,13 +223,7 @@ class DatabaseService:
     def list_renders(self, avatar_id: str, limit: int = 50) -> list[Render]:
         """List renders for avatar (most recent first)."""
         with self.get_db() as db:
-            return (
-                db.query(Render)
-                .filter_by(avatar_id=avatar_id)
-                .order_by(Render.created_at.desc())
-                .limit(limit)
-                .all()
-            )
+            return db.query(Render).filter_by(avatar_id=avatar_id).order_by(Render.created_at.desc()).limit(limit).all()
 
     # ============= AUDIO OPERATIONS =============
 
@@ -271,24 +258,14 @@ class DatabaseService:
     def list_audios(self, avatar_id: str, limit: int = 50) -> list[Audio]:
         """List audios for avatar (most recent first)."""
         with self.get_db() as db:
-            return (
-                db.query(Audio)
-                .filter_by(avatar_id=avatar_id)
-                .order_by(Audio.created_at.desc())
-                .limit(limit)
-                .all()
-            )
+            return db.query(Audio).filter_by(avatar_id=avatar_id).order_by(Audio.created_at.desc()).limit(limit).all()
 
     # ============= PHONEME OPERATIONS =============
 
-    def create_phoneme(
-        self, audio_id: str, phoneme: str, start_ms: int, end_ms: int, **kwargs
-    ) -> Phoneme:
+    def create_phoneme(self, audio_id: str, phoneme: str, start_ms: int, end_ms: int, **kwargs) -> Phoneme:
         """Create phoneme record."""
         with self.get_db() as db:
-            ph = Phoneme(
-                audio_id=audio_id, phoneme=phoneme, start_ms=start_ms, end_ms=end_ms, **kwargs
-            )
+            ph = Phoneme(audio_id=audio_id, phoneme=phoneme, start_ms=start_ms, end_ms=end_ms, **kwargs)
             db.add(ph)
             db.commit()
             return ph
@@ -311,14 +288,10 @@ class DatabaseService:
 
     # ============= ASSET OPERATIONS =============
 
-    def create_asset(
-        self, asset_id: str, name: str, asset_type: str, file_path: str, **kwargs
-    ) -> Asset:
+    def create_asset(self, asset_id: str, name: str, asset_type: str, file_path: str, **kwargs) -> Asset:
         """Create asset record."""
         with self.get_db() as db:
-            asset = Asset(
-                asset_id=asset_id, name=name, asset_type=asset_type, file_path=file_path, **kwargs
-            )
+            asset = Asset(asset_id=asset_id, name=name, asset_type=asset_type, file_path=file_path, **kwargs)
             db.add(asset)
             db.commit()
             return asset
@@ -378,8 +351,7 @@ class DatabaseService:
         with self.get_db() as db:
             return {
                 "avatars": db.query(func.count(Avatar.id)).scalar() or 0,
-                "sessions": db.query(func.count(DBSession.id)).filter_by(deleted_at=None).scalar()
-                or 0,
+                "sessions": db.query(func.count(DBSession.id)).filter_by(deleted_at=None).scalar() or 0,
                 "presets": db.query(func.count(Preset.id)).scalar() or 0,
                 "renders": db.query(func.count(Render.id)).scalar() or 0,
                 "audios": db.query(func.count(Audio.id)).scalar() or 0,

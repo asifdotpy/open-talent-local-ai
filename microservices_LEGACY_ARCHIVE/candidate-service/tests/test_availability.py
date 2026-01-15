@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
+
 from fastapi.testclient import TestClient
 
 from main import app
@@ -49,9 +50,7 @@ def test_availability_crud_happy_path():
 
     # Update availability
     upd = {"is_available": False, "notes": "Rescheduled"}
-    r5 = client.put(
-        f"/api/v1/candidates/{candidate_id}/availability/{avail_id}", json=upd, headers=AUTH
-    )
+    r5 = client.put(f"/api/v1/candidates/{candidate_id}/availability/{avail_id}", json=upd, headers=AUTH)
     assert r5.status_code == 200
     assert r5.json()["is_available"] is False
     assert r5.json()["notes"] == "Rescheduled"

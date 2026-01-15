@@ -115,9 +115,7 @@ class PhonemeExtractor:
                     phoneme_start = word_start + (i * phoneme_duration)
                     phoneme_end = phoneme_start + phoneme_duration
 
-                    phoneme_symbol = (
-                        phoneme_parts[phoneme_idx] if phoneme_idx < len(phoneme_parts) else "AH"
-                    )
+                    phoneme_symbol = phoneme_parts[phoneme_idx] if phoneme_idx < len(phoneme_parts) else "AH"
 
                     phonemes.append(
                         {

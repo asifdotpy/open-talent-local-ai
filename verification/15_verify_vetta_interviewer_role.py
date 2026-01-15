@@ -5,11 +5,11 @@
 # Install required packages (run this first if not installed)
 # !pip install torch transformers unsloth huggingface_hub
 
-import torch
-from unsloth import FastLanguageModel
-from transformers import AutoTokenizer
-from huggingface_hub import login
 import time
+
+import torch
+from huggingface_hub import login
+from unsloth import FastLanguageModel
 
 # 1. CONFIGURATION
 LORA_REPO = "asifdotpy/vetta-granite-2b-lora-v3"
@@ -24,12 +24,14 @@ print()
 # 2. AUTHENTICATE
 try:
     # Use HF_TOKEN from environment
-    hf_token = os.environ.get('HF_TOKEN')
+    hf_token = os.environ.get("HF_TOKEN")
     if hf_token:
         login(token=hf_token)
         print("✅ Authenticated with Hugging Face")
     else:
-        print("⚠️  HF_TOKEN not set. Please set HF_TOKEN environment variable or run huggingface-cli login")
+        print(
+            "⚠️  HF_TOKEN not set. Please set HF_TOKEN environment variable or run huggingface-cli login"
+        )
         login()  # Will prompt for token
 except Exception as e:
     print(f"❌ HF Authentication failed: {e}")
@@ -53,7 +55,15 @@ try:
         lora_path=LORA_REPO,
         r=16,
         lora_alpha=16,
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+        target_modules=[
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "o_proj",
+            "gate_proj",
+            "up_proj",
+            "down_proj",
+        ],
     )
 
     load_time = time.time() - start_time
@@ -73,45 +83,46 @@ test_scenarios = [
         "role": "Interviewer Introduction",
         "context": "Candidate has just joined the video call",
         "candidate_input": "Hi, I'm John. I'm here for the software engineering interview.",
-        "expected": "Professional greeting, introduction as interviewer, explain process, ask icebreaker question"
+        "expected": "Professional greeting, introduction as interviewer, explain process, ask icebreaker question",
     },
     {
         "role": "Technical Follow-up",
         "context": "Candidate just explained they worked with React",
         "candidate_input": "I've been working with React for about 2 years now, building user interfaces and managing state.",
-        "expected": "Ask specific technical questions about React experience, probe for depth, ask about challenges"
+        "expected": "Ask specific technical questions about React experience, probe for depth, ask about challenges",
     },
     {
         "role": "Behavioral Probing",
         "context": "Candidate mentioned they solved a performance issue",
         "candidate_input": "I once had to optimize a slow database query that was causing page load times of 5+ seconds.",
-        "expected": "Ask follow-up questions about the problem-solving process, technical details, outcomes"
+        "expected": "Ask follow-up questions about the problem-solving process, technical details, outcomes",
     },
     {
         "role": "Experience Assessment",
         "context": "Candidate is explaining their background",
         "candidate_input": "I have experience with Python, JavaScript, and some cloud technologies like AWS.",
-        "expected": "Ask about specific projects, depth of experience, ask to elaborate on technologies mentioned"
+        "expected": "Ask about specific projects, depth of experience, ask to elaborate on technologies mentioned",
     },
     {
         "role": "Problem-Solving Evaluation",
         "context": "Candidate is walking through a coding problem",
         "candidate_input": "For this algorithm, I think we should use a hash table to store the frequencies.",
-        "expected": "Ask why they chose that approach, probe about trade-offs, ask about edge cases"
+        "expected": "Ask why they chose that approach, probe about trade-offs, ask about edge cases",
     },
     {
         "role": "Culture Fit Assessment",
         "context": "Candidate is asked about team collaboration",
         "candidate_input": "I prefer working independently because I can focus better that way.",
-        "expected": "Gently probe about teamwork preferences, ask about past collaborative experiences, explore flexibility"
+        "expected": "Gently probe about teamwork preferences, ask about past collaborative experiences, explore flexibility",
     },
     {
         "role": "Closing Questions",
         "context": "Interview is wrapping up",
         "candidate_input": "I think that covers most of my experience. Do you have any other questions?",
-        "expected": "Ask candidate if they have questions about the role/company, provide next steps, thank them"
-    }
+        "expected": "Ask candidate if they have questions about the role/company, provide next steps, thank them",
+    },
 ]
+
 
 def analyze_interviewer_response(response, expected_behavior):
     """Analyze if response shows interviewer behavior"""
@@ -119,10 +130,34 @@ def analyze_interviewer_response(response, expected_behavior):
         "word_count": len(response.split()),
         "asks_questions": "?" in response,
         "follow_up_questions": response.count("?") >= 2,
-        "probing_depth": any(word in response.lower() for word in ["why", "how", "what", "tell me more", "can you elaborate", "walk me through"]),
-        "shows_engagement": any(word in response.lower() for word in ["interesting", "great", "excellent", "impressive", "fascinating"]),
-        "professional_tone": not any(word in response.lower() for word in ["i think", "i believe", "in my experience", "i remember"]),
-        "interviewer_indicators": any(word in response.lower() for word in ["let's talk about", "can you tell me", "i'd like to know", "help me understand"])
+        "probing_depth": any(
+            word in response.lower()
+            for word in [
+                "why",
+                "how",
+                "what",
+                "tell me more",
+                "can you elaborate",
+                "walk me through",
+            ]
+        ),
+        "shows_engagement": any(
+            word in response.lower()
+            for word in ["interesting", "great", "excellent", "impressive", "fascinating"]
+        ),
+        "professional_tone": not any(
+            word in response.lower()
+            for word in ["i think", "i believe", "in my experience", "i remember"]
+        ),
+        "interviewer_indicators": any(
+            word in response.lower()
+            for word in [
+                "let's talk about",
+                "can you tell me",
+                "i'd like to know",
+                "help me understand",
+            ]
+        ),
     }
 
     # Calculate quality score
@@ -138,6 +173,7 @@ def analyze_interviewer_response(response, expected_behavior):
     analysis["max_score"] = 9
 
     return analysis
+
 
 print("\n🧪 TESTING VETTA AS INTERVIEWER (Enhanced Scenarios)")
 print("=" * 70)
@@ -166,9 +202,9 @@ NEVER respond as if you are the candidate being interviewed. Always respond as t
 
     prompt = f"""{system_prompt}
 
-Interview Context: {scenario['context']}
+Interview Context: {scenario["context"]}
 
-Candidate's Response: {scenario['candidate_input']}
+Candidate's Response: {scenario["candidate_input"]}
 
 As the interviewer, how would you respond? Ask follow-up questions and show engagement:
 
@@ -187,7 +223,7 @@ Vetta:"""
                 top_p=0.9,
                 do_sample=True,
                 pad_token_id=tokenizer.eos_token_id,
-                repetition_penalty=1.1
+                repetition_penalty=1.1,
             )
 
         # Decode response
@@ -207,7 +243,7 @@ Vetta:"""
         print(f"🤖 Vetta: {vetta_response}")
 
         # Analyze response quality
-        analysis = analyze_interviewer_response(vetta_response, scenario['expected'])
+        analysis = analyze_interviewer_response(vetta_response, scenario["expected"])
 
         print("📊 Interviewer Quality Analysis:")
         print(f"   • Words: {analysis['word_count']}")
@@ -216,11 +252,13 @@ Vetta:"""
         print(f"   • Probing depth: {'✅' if analysis['probing_depth'] else '❌'}")
         print(f"   • Shows engagement: {'✅' if analysis['shows_engagement'] else '❌'}")
         print(f"   • Professional tone: {'✅' if analysis['professional_tone'] else '❌'}")
-        print(f"   • Interviewer indicators: {'✅' if analysis['interviewer_indicators'] else '❌'}")
+        print(
+            f"   • Interviewer indicators: {'✅' if analysis['interviewer_indicators'] else '❌'}"
+        )
         print(f"   • Quality Score: {analysis['quality_score']}/{analysis['max_score']}")
 
-        total_score += analysis['quality_score']
-        max_possible_score += analysis['max_score']
+        total_score += analysis["quality_score"]
+        max_possible_score += analysis["max_score"]
 
     except Exception as e:
         print(f"❌ Generation failed: {e}")

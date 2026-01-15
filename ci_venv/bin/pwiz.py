@@ -185,8 +185,7 @@ def get_option_parser():
         dest="engine",
         choices=engines,
         help=(
-            "Database type, e.g. sqlite, mysql, postgresql or cockroachdb. "
-            'Default is "postgresql".'
+            'Database type, e.g. sqlite, mysql, postgresql or cockroachdb. Default is "postgresql".'
         ),
     )
     ao("-s", "--schema", dest="schema")
@@ -211,7 +210,7 @@ def get_option_parser():
         "--info",
         dest="info",
         action="store_true",
-        help=("Add database information and other metadata to top of the " "generated file."),
+        help=("Add database information and other metadata to top of the generated file."),
     )
     ao(
         "-o",

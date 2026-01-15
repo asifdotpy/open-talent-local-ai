@@ -25,9 +25,7 @@ from services.stream_service import UnifiedStreamService
 from services.vosk_stt_service import MockVoskSTTService, VoskSTTService
 
 # Configure logging BEFORE importing WebRTC (which uses logger)
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # --- Service Initialization ---
@@ -160,9 +158,7 @@ else:
         tts_service = ModularTTSService(
             provider="local",
             piper_model_path=os.getenv("PIPER_MODEL_PATH", "models/en_US-lessac-medium.onnx"),
-            piper_config_path=os.getenv(
-                "PIPER_CONFIG_PATH", "models/en_US-lessac-medium.onnx.json"
-            ),
+            piper_config_path=os.getenv("PIPER_CONFIG_PATH", "models/en_US-lessac-medium.onnx.json"),
             piper_binary=os.getenv(
                 "PIPER_BINARY",
                 "/home/asif1/open-talent-platform/microservices/voice-service/piper/piper",
@@ -176,9 +172,7 @@ else:
     )
 
 # Initialize unified streaming service
-stream_service = UnifiedStreamService(
-    stt_service=stt_service, tts_service=tts_service, vad_service=vad_service
-)
+stream_service = UnifiedStreamService(stt_service=stt_service, tts_service=tts_service, vad_service=vad_service)
 
 # Initialize WebRTC worker if available and enabled
 webrtc_task = None
@@ -208,13 +202,9 @@ async def startup_event():
     logger.info("Streaming Service: ✓ (initialized)")
 
     if not USE_MOCK and not all([stt_health, tts_health]):
-        logger.warning(
-            "Core services (STT/TTS) not ready. Run download_models.py to fetch required models."
-        )
+        logger.warning("Core services (STT/TTS) not ready. Run download_models.py to fetch required models.")
         if not vad_health:
-            logger.warning(
-                "VAD service degraded - this is non-critical and won't prevent service startup"
-            )
+            logger.warning("VAD service degraded - this is non-critical and won't prevent service startup")
 
     # Start WebRTC worker if enabled
     global webrtc_task
@@ -371,9 +361,7 @@ async def health_check():
         },
         "active_connections": stream_service.get_connection_count(),
         "mode": "mock" if USE_MOCK else "local",
-        "note": "VAD degradation doesn't affect core functionality"
-        if core_healthy and not vad_health
-        else None,
+        "note": "VAD degradation doesn't affect core functionality" if core_healthy and not vad_health else None,
     }
 
 

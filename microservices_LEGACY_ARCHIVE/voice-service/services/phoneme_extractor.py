@@ -1,5 +1,4 @@
-"""
-Phoneme Extractor Service for Voice Service
+"""Phoneme Extractor Service for Voice Service
 
 Provides phoneme timing extraction for lip-sync animation.
 Uses phonemizer for phoneme identification and estimated timing.
@@ -7,9 +6,6 @@ Uses phonemizer for phoneme identification and estimated timing.
 
 import logging
 import re
-from typing import Dict, List, Optional
-from pathlib import Path
-import json
 
 try:
     from phonemizer import phonemize
@@ -20,14 +16,13 @@ except ImportError:
 
 
 class PhonemeExtractor:
-    """
-    Extracts phonemes and timing information for lip-sync animation.
+    """Extracts phonemes and timing information for lip-sync animation.
 
     Uses phonemizer for accurate phoneme identification and provides
     estimated timing based on phoneme count and syllable structure.
     """
 
-    def __init__(self, logger: Optional[logging.Logger] = None):
+    def __init__(self, logger: logging.Logger | None = None):
         self.logger = logger or logging.getLogger(__name__)
 
         if not PHONEMIZER_AVAILABLE:
@@ -60,9 +55,8 @@ class PhonemeExtractor:
             "sious": ["ZH", "AH", "S"],
         }
 
-    def extract_phonemes(self, text: str, duration: float = 0.0) -> Dict:
-        """
-        Extract phonemes and timing from text.
+    def extract_phonemes(self, text: str, duration: float = 0.0) -> dict:
+        """Extract phonemes and timing from text.
 
         Args:
             text: Input text
@@ -81,7 +75,7 @@ class PhonemeExtractor:
             self.logger.error(f"Phoneme extraction failed: {e}")
             return self._extract_basic(text, duration)
 
-    def _extract_with_phonemizer(self, text: str, duration: float = 0.0) -> Dict:
+    def _extract_with_phonemizer(self, text: str, duration: float = 0.0) -> dict:
         """Extract phonemes using phonemizer library."""
         # Get phoneme string from phonemizer
         phoneme_text = phonemize(text, language="en-us", backend="espeak", strip=True)
@@ -121,9 +115,7 @@ class PhonemeExtractor:
                     phoneme_start = word_start + (i * phoneme_duration)
                     phoneme_end = phoneme_start + phoneme_duration
 
-                    phoneme_symbol = (
-                        phoneme_parts[phoneme_idx] if phoneme_idx < len(phoneme_parts) else "AH"
-                    )
+                    phoneme_symbol = phoneme_parts[phoneme_idx] if phoneme_idx < len(phoneme_parts) else "AH"
 
                     phonemes.append(
                         {
@@ -149,7 +141,7 @@ class PhonemeExtractor:
 
         return {"phonemes": phonemes, "words": words, "text": text, "duration": duration}
 
-    def _segment_phonemes(self, phoneme_text: str, num_words: int) -> List[str]:
+    def _segment_phonemes(self, phoneme_text: str, num_words: int) -> list[str]:
         """Segment phoneme text into individual phoneme symbols."""
         # Split on spaces and common phoneme boundaries
         parts = re.split(r"[ː\s]+", phoneme_text)
@@ -174,7 +166,7 @@ class PhonemeExtractor:
 
         return phonemes[: num_words * 3]  # Limit to reasonable number
 
-    def _extract_basic(self, text: str, duration: float = 0.0) -> Dict:
+    def _extract_basic(self, text: str, duration: float = 0.0) -> dict:
         """Basic phoneme extraction without phonemizer."""
         # Estimate duration if not provided
         if duration <= 0:
@@ -277,7 +269,7 @@ class PhonemeExtractor:
 
         return max(1, count)
 
-    def _get_basic_phonemes(self, word: str) -> List[str]:
+    def _get_basic_phonemes(self, word: str) -> list[str]:
         """Get basic phoneme list for a word."""
         word = word.lower()
         phonemes = []

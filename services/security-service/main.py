@@ -242,7 +242,7 @@ async def health():
 
 
 @app.post("/api/v1/auth/register")
-@ limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
+@limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
 async def register(request: Request, payload: RegisterRequest = Body(...)):
     """Register a new user"""
     email = payload.email.strip()
@@ -289,7 +289,7 @@ async def register(request: Request, payload: RegisterRequest = Body(...)):
 
 
 @app.post("/api/v1/auth/login")
-@ limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
+@limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
 async def login(request: Request, payload: LoginRequest = Body(...)):
     """Login and get access token"""
     email = payload.email.strip()
@@ -589,7 +589,7 @@ async def decrypt_data(payload: DecryptRequest = Body(...)):
 
 
 @app.post("/api/v1/auth/password/change")
-@ limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
+@limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
 async def change_password(
     request: Request,
     payload: ChangePasswordRequest = Body(...),
@@ -627,7 +627,7 @@ async def change_password(
 
 
 @app.post("/api/v1/auth/password/reset-request")
-@ limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
+@limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
 async def request_password_reset(request: Request, payload: PasswordResetRequest = Body(...)):
     """Request password reset"""
     email = payload.email.strip()
@@ -642,7 +642,7 @@ async def request_password_reset(request: Request, payload: PasswordResetRequest
 
 
 @app.post("/api/v1/auth/password/reset")
-@ limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
+@limiter.limit(RATE_LIMIT_RULE) if limiter else (lambda f: f)
 async def reset_password(request: Request, payload: PasswordResetWithTokenRequest = Body(...)):
     """Reset password with token"""
     token = payload.token

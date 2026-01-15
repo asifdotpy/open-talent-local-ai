@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+
 from app.main import app
 from app.models import JobDetails
 
@@ -6,9 +7,7 @@ client = TestClient(app)
 
 
 def test_get_job_details():
-    """
-    Tests the GET /jobs/{project_id} endpoint.
-    """
+    """Tests the GET /jobs/{project_id} endpoint."""
     project_id = "test-project-123"
     response = client.get(f"/jobs/{project_id}")
 

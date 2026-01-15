@@ -6,7 +6,6 @@ Endpoints for avatar video generation and management.
 import io
 import logging
 from pathlib import Path
-from typing import Optional
 
 import httpx
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
@@ -26,8 +25,8 @@ class AvatarRequest(BaseModel):
     """Request model for avatar generation."""
 
     text: str
-    voice: Optional[str] = "en_US-lessac-medium"
-    avatar_id: Optional[str] = "default"
+    voice: str | None = "en_US-lessac-medium"
+    avatar_id: str | None = "default"
 
 
 class PhonemeData(BaseModel):
@@ -47,11 +46,7 @@ async def get_avatar_page():
     """Serve the avatar HTML page from shared ai-orchestra-simulation library."""
     try:
         # Use shared avatar.html from ai-orchestra-simulation
-        html_path = (
-            Path(__file__).parent.parent.parent.parent.parent
-            / "ai-orchestra-simulation"
-            / "avatar.html"
-        )
+        html_path = Path(__file__).parent.parent.parent.parent.parent / "ai-orchestra-simulation" / "avatar.html"
         with open(html_path) as f:
             html_content = f.read()
         return HTMLResponse(content=html_content, status_code=200)
@@ -65,12 +60,7 @@ async def serve_src_files(path: str):
     """Serve JavaScript source files from shared ai-orchestra-simulation library."""
     try:
         # Use shared library from ai-orchestra-simulation
-        orchestra_path = (
-            Path(__file__).parent.parent.parent.parent.parent
-            / "ai-orchestra-simulation"
-            / "src"
-            / path
-        )
+        orchestra_path = Path(__file__).parent.parent.parent.parent.parent / "ai-orchestra-simulation" / "src" / path
         if orchestra_path.exists() and orchestra_path.is_file():
             return FileResponse(orchestra_path)
         else:
@@ -86,10 +76,7 @@ async def serve_asset_files(path: str):
     try:
         # Use shared assets from ai-orchestra-simulation
         orchestra_assets = (
-            Path(__file__).parent.parent.parent.parent.parent
-            / "ai-orchestra-simulation"
-            / "assets"
-            / path
+            Path(__file__).parent.parent.parent.parent.parent / "ai-orchestra-simulation" / "assets" / path
         )
         if orchestra_assets.exists() and orchestra_assets.is_file():
             return FileResponse(orchestra_assets)
@@ -130,9 +117,7 @@ async def generate_avatar_video(request: AvatarRequest):
         if not audio_data:
             raise HTTPException(status_code=500, detail="No audio data from voice service")
 
-        logger.info(
-            f"Received audio: {len(audio_data)} bytes, duration: {duration:.2f}s, phonemes: {len(phonemes)}"
-        )
+        logger.info(f"Received audio: {len(audio_data)} bytes, duration: {duration:.2f}s, phonemes: {len(phonemes)}")
 
         # Convert audio_data from base64
         if isinstance(audio_data, str):
@@ -202,7 +187,7 @@ async def get_phonemes():
 @router.post("/generate-from-audio")
 async def generate_avatar_from_audio(
     audio_file: UploadFile = File(...),
-    phonemes: Optional[str] = Form(None),  # JSON string of phonemes
+    phonemes: str | None = Form(None),  # JSON string of phonemes
 ):
     """Generate avatar video from uploaded audio file.
 
@@ -224,9 +209,7 @@ async def generate_avatar_from_audio(
             phoneme_data = json.loads(phonemes)
 
         # Generate video
-        video_bytes = await avatar_service.generate_avatar_video(
-            audio_data=audio_data, phonemes=phoneme_data
-        )
+        video_bytes = await avatar_service.generate_avatar_video(audio_data=audio_data, phonemes=phoneme_data)
 
         return StreamingResponse(
             io.BytesIO(video_bytes),

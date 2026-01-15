@@ -2,8 +2,8 @@
 
 import asyncio
 import logging
-from typing import Dict, Optional
-from datetime import datetime, timedelta
+from datetime import datetime
+
 import httpx
 
 from app.config.settings import settings
@@ -19,7 +19,7 @@ class ServiceHealthCache:
         self.cached_result = None
         self.cache_time = None
 
-    def get(self) -> Optional[Dict]:
+    def get(self) -> dict | None:
         """Get cached health result if not expired."""
         if self.cached_result and self.cache_time:
             elapsed = (datetime.now() - self.cache_time).total_seconds()
@@ -27,7 +27,7 @@ class ServiceHealthCache:
                 return self.cached_result
         return None
 
-    def set(self, result: Dict):
+    def set(self, result: dict):
         """Cache health result."""
         self.cached_result = result
         self.cache_time = datetime.now()
@@ -73,7 +73,7 @@ class ServiceDiscovery:
             f"{', '.join([s for s in self.services.keys() if not s.startswith('_')])}"
         )
 
-    async def check_all_services(self) -> Dict:
+    async def check_all_services(self) -> dict:
         """Check health of all services. Returns cached result if not expired."""
         # Try cache first
         cached = self.health_cache.get()
@@ -85,7 +85,7 @@ class ServiceDiscovery:
         self.health_cache.set(result)
         return result
 
-    async def _perform_health_checks(self) -> Dict:
+    async def _perform_health_checks(self) -> dict:
         """Actually perform health checks on all services."""
         tasks = [self._check_service(name, url) for name, url in self.services.items()]
         service_statuses = await asyncio.gather(*tasks, return_exceptions=False)
@@ -119,7 +119,7 @@ class ServiceDiscovery:
             },
         }
 
-    async def _check_service(self, name: str, url: str) -> Dict:
+    async def _check_service(self, name: str, url: str) -> dict:
         """Check health of a single service."""
         start_time = datetime.now()
 
@@ -149,7 +149,7 @@ class ServiceDiscovery:
                 "lastChecked": datetime.now().isoformat(),
             }
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return {
                 "name": name,
                 "url": url,
@@ -167,7 +167,7 @@ class ServiceDiscovery:
                 "lastChecked": datetime.now().isoformat(),
             }
 
-    async def get_service_url(self, service_name: str) -> Optional[str]:
+    async def get_service_url(self, service_name: str) -> str | None:
         """Get URL for a service if it's healthy."""
         health = await self.check_all_services()
         service_status = health["services"].get(service_name)

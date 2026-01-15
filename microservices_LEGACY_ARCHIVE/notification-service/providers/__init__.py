@@ -1,8 +1,9 @@
-import os
 import asyncio
-from .novu import NovuProvider
+import os
+
 from .apprise import AppriseProvider
 from .base import NotificationProvider
+from .novu import NovuProvider
 
 RETRY_ATTEMPTS = int(os.getenv("NOTIFY_RETRY_ATTEMPTS", "2"))
 RETRY_BACKOFF_SEC = float(os.getenv("NOTIFY_RETRY_BACKOFF_SEC", "0.3"))

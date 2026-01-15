@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
+
 from fastapi.testclient import TestClient
 
 from main import app
@@ -43,9 +44,7 @@ def test_interview_crud_happy_path():
 
     # Update interview
     upd = {"status": "completed", "notes": "Strong performance"}
-    r5 = client.put(
-        f"/api/v1/candidates/{candidate_id}/interviews/{interview_id}", json=upd, headers=AUTH
-    )
+    r5 = client.put(f"/api/v1/candidates/{candidate_id}/interviews/{interview_id}", json=upd, headers=AUTH)
     assert r5.status_code == 200
     assert r5.json()["status"] == "completed"
 
@@ -72,9 +71,7 @@ def test_interview_unauthorized_and_not_found():
 
     # Get interview with unknown ID
     unknown_interview = str(uuid.uuid4())
-    r3 = client.get(
-        f"/api/v1/candidates/{candidate_id}/interviews/{unknown_interview}", headers=AUTH
-    )
+    r3 = client.get(f"/api/v1/candidates/{candidate_id}/interviews/{unknown_interview}", headers=AUTH)
     assert r3.status_code == 404
 
     # List for unknown candidate

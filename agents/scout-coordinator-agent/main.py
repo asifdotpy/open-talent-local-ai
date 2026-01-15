@@ -9,7 +9,6 @@ import os
 import sys
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Optional
 
 from fastapi import (
     BackgroundTasks,
@@ -42,7 +41,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Global instances
-message_bus: Optional[MessageBus] = None
+message_bus: MessageBus | None = None
 active_pipelines: dict[str, SourcingPipeline] = {}
 active_connections: list[WebSocket] = []
 
@@ -108,7 +107,7 @@ class StartPipelineRequest(BaseModel):
 
     project_id: str
     job_description: str
-    job_title: Optional[str] = None
+    job_title: str | None = None
     target_platforms: list[str] = ["linkedin", "github"]
     num_candidates_target: int = 50
     priority: str = "medium"
@@ -128,7 +127,7 @@ class PipelineStatusResponse(BaseModel):
     progress_percentage: float
     started_at: datetime
     updated_at: datetime
-    estimated_completion: Optional[datetime] = None
+    estimated_completion: datetime | None = None
 
 
 class PipelineListResponse(BaseModel):
@@ -546,9 +545,7 @@ async def get_pipeline_status(pipeline_id: str):
 
 
 @app.get("/pipelines", response_model=PipelineListResponse)
-async def list_pipelines(
-    project_id: Optional[str] = None, state: Optional[str] = None, limit: int = 50
-):
+async def list_pipelines(project_id: str | None = None, state: str | None = None, limit: int = 50):
     """
     List all pipelines
 

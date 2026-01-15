@@ -8,7 +8,6 @@ Lightweight, demo-focused implementation (Phase 0).
 import logging
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Optional, Union
 
 import httpx
 from fastapi import FastAPI, HTTPException
@@ -19,7 +18,7 @@ from app.config.settings import settings
 from app.core.service_discovery import ServiceDiscovery
 
 
-def format_bytes(size: Union[int, str, None]) -> str:
+def format_bytes(size: int | str | None) -> str:
     """Convert bytes (int) to human-readable format (string)."""
     if size is None or size == "unknown":
         return "unknown"
@@ -64,8 +63,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Global service discovery
-service_discovery: Optional[ServiceDiscovery] = None
-http_client: Optional[httpx.AsyncClient] = None
+service_discovery: ServiceDiscovery | None = None
+http_client: httpx.AsyncClient | None = None
 
 
 @asynccontextmanager
@@ -985,7 +984,7 @@ Responses Provided: {response_count}
 
 Performance Metrics:
 • Average Response Quality: {round(avg_quality, 1)}/10
-• Sentiment Trend: {'Positive and improving' if avg_sentiment > 0.1 else 'Neutral to positive' if avg_sentiment > -0.1 else 'Areas for confidence building'}
+• Sentiment Trend: {"Positive and improving" if avg_sentiment > 0.1 else "Neutral to positive" if avg_sentiment > -0.1 else "Areas for confidence building"}
 
 Thank you for participating in this OpenTalent interview.""",
         "timestamp": datetime.now().isoformat(),

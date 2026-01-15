@@ -1,5 +1,4 @@
-"""
-Integration Tests for Voice Service API
+"""Integration Tests for Voice Service API
 
 Following TDD principles:
 - Test real API interactions
@@ -18,14 +17,13 @@ Created: November 18, 2025
 Updated: November 18, 2025 - Code quality cleanup, removed duplicates
 """
 
-import pytest
-import httpx
 import asyncio
 import base64
 import json
-from pathlib import Path
-from typing import Dict, Any
+from typing import Any
 
+import httpx
+import pytest
 
 # Mark all tests in this module as integration tests
 pytestmark = pytest.mark.integration
@@ -38,9 +36,8 @@ async def async_client():
         yield client
 
 
-def validate_json_response(response: httpx.Response, expected_fields: list) -> Dict[str, Any]:
-    """
-    Validate JSON response has expected fields.
+def validate_json_response(response: httpx.Response, expected_fields: list) -> dict[str, Any]:
+    """Validate JSON response has expected fields.
 
     Args:
         response: HTTP response object
@@ -66,8 +63,7 @@ def validate_json_response(response: httpx.Response, expected_fields: list) -> D
 
 
 def validate_audio_data(audio_base64: str) -> bytes:
-    """
-    Validate base64-encoded audio data.
+    """Validate base64-encoded audio data.
 
     Args:
         audio_base64: Base64-encoded audio string
@@ -91,8 +87,7 @@ def validate_audio_data(audio_base64: str) -> bytes:
 
 
 def validate_phoneme_data(phonemes: list) -> None:
-    """
-    Validate phoneme data structure.
+    """Validate phoneme data structure.
 
     Args:
         phonemes: List of phoneme dictionaries
@@ -115,9 +110,7 @@ def validate_phoneme_data(phonemes: list) -> None:
         assert isinstance(phoneme["phoneme"], str), f"Phoneme {i}: 'phoneme' must be string"
         assert isinstance(phoneme["start"], (int, float)), f"Phoneme {i}: 'start' must be number"
         assert isinstance(phoneme["end"], (int, float)), f"Phoneme {i}: 'end' must be number"
-        assert isinstance(
-            phoneme["duration"], (int, float)
-        ), f"Phoneme {i}: 'duration' must be number"
+        assert isinstance(phoneme["duration"], (int, float)), f"Phoneme {i}: 'duration' must be number"
 
         # Validate timing logic
         assert phoneme["end"] > phoneme["start"], f"Phoneme {i}: end must be greater than start"
@@ -125,14 +118,13 @@ def validate_phoneme_data(phonemes: list) -> None:
 
         # Validate duration calculation (allow small floating point errors)
         calculated_duration = phoneme["end"] - phoneme["start"]
-        assert (
-            abs(phoneme["duration"] - calculated_duration) < 0.01
-        ), f"Phoneme {i}: duration mismatch (expected {calculated_duration}, got {phoneme['duration']})"
+        assert abs(phoneme["duration"] - calculated_duration) < 0.01, (
+            f"Phoneme {i}: duration mismatch (expected {calculated_duration}, got {phoneme['duration']})"
+        )
 
 
 def validate_phoneme_sequence(phonemes: list) -> None:
-    """
-    Validate that phonemes are in sequential order.
+    """Validate that phonemes are in sequential order.
 
     Args:
         phonemes: List of phoneme dictionaries
@@ -144,9 +136,7 @@ def validate_phoneme_sequence(phonemes: list) -> None:
         current = phonemes[i]
         next_phoneme = phonemes[i + 1]
 
-        assert (
-            current["end"] <= next_phoneme["start"]
-        ), f"Phonemes {i} and {i+1} overlap or are out of order"
+        assert current["end"] <= next_phoneme["start"], f"Phonemes {i} and {i + 1} overlap or are out of order"
 
 
 class TestHealthAndInfo:
@@ -223,9 +213,7 @@ class TestHealthAndInfo:
         assert "ready" in tts_info, "TTS missing ready field"
         assert "voices" in tts_info, "TTS missing voices field"
         assert "features" in tts_info, "TTS missing features field"
-        assert (
-            "phoneme_extraction" in tts_info["features"]
-        ), "TTS missing phoneme_extraction feature"
+        assert "phoneme_extraction" in tts_info["features"], "TTS missing phoneme_extraction feature"
 
         # Validate STT info structure
         stt_info = data["stt"]
@@ -302,9 +290,7 @@ class TestTTSEndpoint:
         response = await async_client.post(f"{service_url}/voice/tts", json=request_data)
 
         # Assert
-        data = validate_json_response(
-            response, ["audio_data", "duration", "sample_rate", "phonemes"]
-        )
+        data = validate_json_response(response, ["audio_data", "duration", "sample_rate", "phonemes"])
 
         # Validate phoneme data
         validate_phoneme_data(data["phonemes"])
@@ -316,14 +302,12 @@ class TestTTSEndpoint:
         max_expected = word_count * 10
         phoneme_count = len(data["phonemes"])
 
-        assert (
-            min_expected <= phoneme_count <= max_expected
-        ), f"Unexpected phoneme count {phoneme_count} for {word_count} words"
+        assert min_expected <= phoneme_count <= max_expected, (
+            f"Unexpected phoneme count {phoneme_count} for {word_count} words"
+        )
 
     @pytest.mark.asyncio
-    async def test_tts_with_different_voices(
-        self, async_client, service_url, short_text, available_voices
-    ):
+    async def test_tts_with_different_voices(self, async_client, service_url, short_text, available_voices):
         """Test TTS with different voice models."""
         for voice in available_voices:
             # Arrange
@@ -379,9 +363,7 @@ class TestTTSEndpoint:
         ], f"Unexpected status code: {response.status_code}"
 
     @pytest.mark.asyncio
-    async def test_tts_graceful_degradation_invalid_voice(
-        self, async_client, service_url, short_text
-    ):
+    async def test_tts_graceful_degradation_invalid_voice(self, async_client, service_url, short_text):
         """Test TTS graceful degradation with invalid voice."""
         # Arrange
         request_data = {"text": short_text, "voice": "invalid-voice-model"}
@@ -397,9 +379,7 @@ class TestTTSEndpoint:
         ], f"Unexpected status code: {response.status_code}"
 
     @pytest.mark.asyncio
-    async def test_tts_handles_special_characters(
-        self, async_client, service_url, special_characters_text
-    ):
+    async def test_tts_handles_special_characters(self, async_client, service_url, special_characters_text):
         """Test TTS with special characters and punctuation."""
         # Arrange
         request_data = {
@@ -487,9 +467,7 @@ class TestPhonemeExtraction:
             next_phoneme = phonemes[i + 1]
 
             # Current phoneme should end before or at next start
-            assert (
-                current["end"] <= next_phoneme["start"]
-            ), f"Phoneme overlap at index {i}: {current} -> {next_phoneme}"
+            assert current["end"] <= next_phoneme["start"], f"Phoneme overlap at index {i}: {current} -> {next_phoneme}"
 
     @pytest.mark.asyncio
     async def test_phoneme_duration_positive(self, async_client, service_url, short_text):
@@ -534,9 +512,9 @@ class TestPhonemeExtraction:
         min_expected = word_count * 2
         max_expected = word_count * 10
 
-        assert (
-            min_expected <= phoneme_count <= max_expected
-        ), f"Phoneme count {phoneme_count} outside expected range [{min_expected}, {max_expected}] for {word_count} words"
+        assert min_expected <= phoneme_count <= max_expected, (
+            f"Phoneme count {phoneme_count} outside expected range [{min_expected}, {max_expected}] for {word_count} words"
+        )
 
     @pytest.mark.asyncio
     async def test_word_grouping_when_enabled(self, async_client, service_url, sample_text):
@@ -559,9 +537,9 @@ class TestPhonemeExtraction:
         word_count = len(sample_text.split())
 
         # Should have reasonable word count (allowing for contractions/splits)
-        assert (
-            0.8 * word_count <= len(words) <= 1.5 * word_count
-        ), f"Word count mismatch: got {len(words)}, expected ~{word_count}"
+        assert 0.8 * word_count <= len(words) <= 1.5 * word_count, (
+            f"Word count mismatch: got {len(words)}, expected ~{word_count}"
+        )
 
 
 @pytest.mark.integration
@@ -711,9 +689,7 @@ class TestPerformanceAndConcurrency:
         # Arrange
         texts = [f"Test text number {i}" for i in range(5)]
         requests = [
-            async_client.post(
-                f"{service_url}/voice/tts", json={"text": text, "voice": "en_US-lessac-medium"}
-            )
+            async_client.post(f"{service_url}/voice/tts", json={"text": text, "voice": "en_US-lessac-medium"})
             for text in texts
         ]
 
@@ -721,9 +697,7 @@ class TestPerformanceAndConcurrency:
         responses = await asyncio.gather(*requests, return_exceptions=True)
 
         # Assert
-        success_count = sum(
-            1 for r in responses if not isinstance(r, Exception) and r.status_code == 200
-        )
+        success_count = sum(1 for r in responses if not isinstance(r, Exception) and r.status_code == 200)
 
         assert success_count >= 3, f"Only {success_count}/5 concurrent requests succeeded"
 
@@ -734,9 +708,7 @@ class TestPerformanceAndConcurrency:
                 validate_audio_data(data["audio_data"])
 
     @pytest.mark.asyncio
-    async def test_mixed_endpoint_concurrency(
-        self, async_client, service_url, short_text, test_audio_file
-    ):
+    async def test_mixed_endpoint_concurrency(self, async_client, service_url, short_text, test_audio_file):
         """Test concurrent requests to different endpoints."""
         # Arrange
         with open(test_audio_file, "rb") as f:
@@ -749,9 +721,7 @@ class TestPerformanceAndConcurrency:
                 f"{service_url}/voice/tts",
                 json={"text": short_text, "voice": "en_US-lessac-medium"},
             ),
-            async_client.post(
-                f"{service_url}/voice/stt", json={"audio_data": audio_b64, "language": "en"}
-            ),
+            async_client.post(f"{service_url}/voice/stt", json={"audio_data": audio_b64, "language": "en"}),
             async_client.get(f"{service_url}/health"),
         ]
 
@@ -759,9 +729,7 @@ class TestPerformanceAndConcurrency:
         responses = await asyncio.gather(*requests, return_exceptions=True)
 
         # Assert - at least some should succeed
-        success_count = sum(
-            1 for r in responses if not isinstance(r, Exception) and r.status_code == 200
-        )
+        success_count = sum(1 for r in responses if not isinstance(r, Exception) and r.status_code == 200)
 
         assert success_count >= 2, f"Only {success_count}/3 mixed requests succeeded"
 

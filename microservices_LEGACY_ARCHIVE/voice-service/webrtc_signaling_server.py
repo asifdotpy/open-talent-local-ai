@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-"""
-Simple WebRTC Signaling Server for Voice Service Testing
+"""Simple WebRTC Signaling Server for Voice Service Testing
 Provides WebSocket signaling for WebRTC connections during testing
 """
 
-import asyncio
-import json
 import logging
 import os
-from typing import Dict, Set
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -27,7 +24,7 @@ app.add_middleware(
 )
 
 # Connected clients by session_id and peer_type
-connected_clients: Dict[str, Dict[str, WebSocket]] = {}
+connected_clients: dict[str, dict[str, WebSocket]] = {}
 
 
 @app.websocket("/webrtc/signal")
@@ -49,9 +46,7 @@ async def signaling_endpoint(websocket: WebSocket):
         peer_type = registration_msg.get("peer_type")
 
         if not session_id or not peer_type:
-            await websocket.send_json(
-                {"type": "error", "message": "Missing session_id or peer_type"}
-            )
+            await websocket.send_json({"type": "error", "message": "Missing session_id or peer_type"})
             return
 
         # Register client
@@ -61,9 +56,7 @@ async def signaling_endpoint(websocket: WebSocket):
         connected_clients[session_id][peer_type] = websocket
 
         # Send registration acknowledgment
-        await websocket.send_json(
-            {"type": "registered", "session_id": session_id, "peer_type": peer_type}
-        )
+        await websocket.send_json({"type": "registered", "session_id": session_id, "peer_type": peer_type})
 
         logger.info(f"Client registered: session={session_id}, type={peer_type}")
 
@@ -106,10 +99,7 @@ async def handle_signaling_message(session_id: str, sender_type: str, message: d
             return
 
         # Check if recipient exists
-        if (
-            session_id not in connected_clients
-            or recipient_type not in connected_clients[session_id]
-        ):
+        if session_id not in connected_clients or recipient_type not in connected_clients[session_id]:
             logger.warning(f"No recipient found for session {session_id}, type {recipient_type}")
             return
 
@@ -118,9 +108,7 @@ async def handle_signaling_message(session_id: str, sender_type: str, message: d
         # Forward the message
         await recipient_ws.send_json(message)
 
-        logger.debug(
-            f"Forwarded {msg_type} from {sender_type} to {recipient_type} for session {session_id}"
-        )
+        logger.debug(f"Forwarded {msg_type} from {sender_type} to {recipient_type} for session {session_id}")
 
     except Exception as e:
         logger.error(f"Error handling signaling message: {e}")

@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""
-Test script for the avatar service with local implementation.
+"""Test script for the avatar service with local implementation.
 This tests the service endpoints and mock implementations.
 """
 
 import asyncio
+
 import httpx
-import os
 
 
 async def test_service_endpoints():

@@ -1,6 +1,6 @@
-import os
 import importlib
 import importlib.util
+import os
 
 import httpx
 from httpx import ASGITransport
@@ -44,14 +44,14 @@ def test_bcrypt_with_pepper_changes_hash_and_verification():
     h2 = mod_peppered.hash_password(pw)
     assert h1 != h2, "Pepper should change resulting hash"
     assert mod_peppered.verify_password(pw, h2) is True
-    assert (
-        mod_peppered.verify_password(pw, h1) is False
-    ), "Hash generated without pepper should not verify with pepper"
+    assert mod_peppered.verify_password(pw, h1) is False, (
+        "Hash generated without pepper should not verify with pepper"
+    )
 
 
 def test_legacy_sha256_verification_still_supported():
     mod = reload_security_module({"PEPPER": ""})
-    legacy_hash = mod.sha256("LegacyPass123!".encode()).hexdigest()
+    legacy_hash = mod.sha256(b"LegacyPass123!").hexdigest()
     assert mod.verify_password("LegacyPass123!", legacy_hash) is True
     assert mod.verify_password("wrong", legacy_hash) is False
 

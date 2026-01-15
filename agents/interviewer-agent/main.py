@@ -15,7 +15,7 @@ import sys
 from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 import structlog
@@ -28,6 +28,13 @@ shared_path = Path(__file__).parent.parent / "shared"
 sys.path.insert(0, str(shared_path))
 
 from message_bus import MessageBus, Topics
+from models import (
+    AgentMessage,
+    CandidateProfile,
+    InterviewResult,
+    InterviewSession,
+    MessageType,
+)
 from service_clients import (
     AvatarServiceClient,
     CandidateServiceClient,
@@ -36,13 +43,6 @@ from service_clients import (
 )
 
 from config import Config
-from models import (
-    AgentMessage,
-    CandidateProfile,
-    InterviewResult,
-    InterviewSession,
-    MessageType,
-)
 
 # Configure structured logging
 structlog.configure(
@@ -66,9 +66,9 @@ structlog.configure(
 logger = structlog.get_logger()
 
 # Global variables for lifespan
-message_bus: Optional[MessageBus] = None
-config: Optional[Config] = None
-genkit_client: Optional[httpx.AsyncClient] = None
+message_bus: MessageBus | None = None
+config: Config | None = None
+genkit_client: httpx.AsyncClient | None = None
 
 
 @asynccontextmanager
@@ -576,10 +576,10 @@ async def generate_final_assessment(session: InterviewSession, candidate: Candid
 
         return f"""
 Final Assessment:
-Score: {assessment_data['overallScore']}/10
-Summary: {assessment_data['summary']}
-Feedback: {assessment_data['detailedFeedback']}
-Recommendation: {assessment_data['hireRecommendation']}
+Score: {assessment_data["overallScore"]}/10
+Summary: {assessment_data["summary"]}
+Feedback: {assessment_data["detailedFeedback"]}
+Recommendation: {assessment_data["hireRecommendation"]}
 """
 
     except Exception as e:

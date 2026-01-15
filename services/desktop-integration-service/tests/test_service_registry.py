@@ -117,9 +117,9 @@ class TestServiceRegistry:
 
         for service_name, expected_port in expected_ports.items():
             assert service_name in all_services, f"Service {service_name} not found"
-            assert (
-                all_services[service_name]["port"] == expected_port
-            ), f"Service {service_name} has port {all_services[service_name]['port']}, expected {expected_port}"
+            assert all_services[service_name]["port"] == expected_port, (
+                f"Service {service_name} has port {all_services[service_name]['port']}, expected {expected_port}"
+            )
 
     def test_service_descriptions_present(self, client):
         """Test all services have descriptions."""
@@ -134,9 +134,9 @@ class TestServiceRegistry:
 
         for service_name, service_info in all_services.items():
             assert "description" in service_info, f"Service {service_name} missing description"
-            assert (
-                len(service_info["description"]) > 0
-            ), f"Service {service_name} has empty description"
+            assert len(service_info["description"]) > 0, (
+                f"Service {service_name} has empty description"
+            )
 
     def test_service_discovery_initialization(self):
         """Test ServiceDiscovery initializes with all services."""
@@ -163,9 +163,9 @@ class TestServiceRegistry:
             "ollama",
         }
 
-        assert (
-            set(discovery.services.keys()) == expected_services
-        ), f"Service names mismatch. Missing: {expected_services - set(discovery.services.keys())}, Extra: {set(discovery.services.keys()) - expected_services}"
+        assert set(discovery.services.keys()) == expected_services, (
+            f"Service names mismatch. Missing: {expected_services - set(discovery.services.keys())}, Extra: {set(discovery.services.keys()) - expected_services}"
+        )
 
     def test_health_check_covers_all_services(self, client):
         """Test health check includes all 14 services."""
@@ -176,9 +176,9 @@ class TestServiceRegistry:
         assert "services" in health
 
         # Should have all 14 services in health check
-        assert (
-            len(health["services"]) == 14
-        ), f"Health check shows {len(health['services'])} services, expected 14"
+        assert len(health["services"]) == 14, (
+            f"Health check shows {len(health['services'])} services, expected 14"
+        )
 
     def test_system_status_shows_visible_services(self, client):
         """Test /api/v1/system/status only shows visible services."""
@@ -188,15 +188,15 @@ class TestServiceRegistry:
         data = response.json()
 
         # Should show 13 services (14 - 1 hidden _granite-interview-service)
-        assert (
-            data["services_total"] == 13
-        ), f"System status shows {data['services_total']} visible services, expected 13"
+        assert data["services_total"] == 13, (
+            f"System status shows {data['services_total']} visible services, expected 13"
+        )
 
         # Verify no hidden services in details
         for service_name in data["service_details"]:
-            assert not service_name.startswith(
-                "_"
-            ), f"Hidden service {service_name} exposed in system status"
+            assert not service_name.startswith("_"), (
+                f"Hidden service {service_name} exposed in system status"
+            )
 
 
 class TestServiceCallability:
