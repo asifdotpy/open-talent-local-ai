@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 import httpx
@@ -97,18 +97,29 @@ async def get_jwt_claims(authorization: str | None = Header(None)) -> JWTClaims:
                     "email": "test@example.com",
                     "role": "admin",
                     "tenant_id": "test-tenant",
-                    "iat": int(datetime.utcnow().timestamp()),
+                    "iat": int(datetime.now(UTC).replace(tzinfo=None).timestamp()),
                 }
             else:
                 raise
     else:
         # If explicitly allowed for black-box external tests, accept any token
         if settings.allow_unsafe_test_tokens:
+            # For testing, we can try to decode without verification to get the email
+            try:
+                unverified_payload = jwt.decode(token, options={"verify_signature": False})
+                email = unverified_payload.get("email", "test@example.com")
+                role = unverified_payload.get("role", "admin")
+                tenant_id = unverified_payload.get("tenant_id", "test-tenant")
+            except:
+                email = "test@example.com"
+                role = "admin"
+                tenant_id = "test-tenant"
+
             payload = {
-                "email": "test@example.com",
-                "role": "admin",
-                "tenant_id": "test-tenant",
-                "iat": int(datetime.utcnow().timestamp()),
+                "email": email,
+                "role": role,
+                "tenant_id": tenant_id,
+                "iat": int(datetime.now(UTC).replace(tzinfo=None).timestamp()),
             }
         else:
             raise HTTPException(

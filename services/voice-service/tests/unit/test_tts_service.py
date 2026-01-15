@@ -1,5 +1,4 @@
-"""
-Unit Tests for Piper TTS Service
+"""Unit Tests for Piper TTS Service
 
 Following TDD principles:
 - Test behavior, not implementation
@@ -11,11 +10,11 @@ Following TDD principles:
 Created: November 13, 2025
 """
 
-import pytest
-import os
 import subprocess
-from unittest.mock import Mock, patch, MagicMock, call
-from pathlib import Path
+from unittest.mock import Mock, patch
+
+import pytest
+
 from services.tts_service import PiperTTSService
 
 

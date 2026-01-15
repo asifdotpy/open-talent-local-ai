@@ -3,7 +3,6 @@ Supports both local Piper TTS and OpenAI API TTS with unified interface
 """
 
 import logging
-from typing import Optional
 
 from .piper_tts_service import MockPiperTTSService, PiperTTSService
 
@@ -33,14 +32,14 @@ class ModularTTSService:
         self,
         provider: str = "local",  # "local" or "openai"
         # Piper (local) parameters
-        piper_model_path: Optional[str] = None,
-        piper_config_path: Optional[str] = None,
-        piper_binary: Optional[str] = None,
+        piper_model_path: str | None = None,
+        piper_config_path: str | None = None,
+        piper_binary: str | None = None,
         # OpenAI API parameters
-        openai_api_key: Optional[str] = None,
-        openai_model: Optional[str] = None,
-        openai_voice: Optional[str] = None,
-        openai_base_url: Optional[str] = None,
+        openai_api_key: str | None = None,
+        openai_model: str | None = None,
+        openai_voice: str | None = None,
+        openai_base_url: str | None = None,
     ):
         """Initialize modular TTS service.
 

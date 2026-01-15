@@ -3,9 +3,10 @@ User Service - Pydantic Schemas
 Comprehensive schema definitions for user management, profiles, and activity tracking
 """
 
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, HttpUrl, field_validator
 
@@ -108,6 +109,11 @@ class UserCreate(UserBase):
 
     password: str = Field(..., min_length=8, max_length=100)
     role: UserRole = UserRole.CANDIDATE
+    tenant_id: str | None = None
+    status: UserStatus = UserStatus.ACTIVE
+    bio: str | None = None
+    location: str | None = None
+    avatar_url: HttpUrl | None = None
 
     @field_validator("password")
     @classmethod
@@ -135,15 +141,16 @@ class UserUpdate(BaseModel):
 class UserResponse(UserBase):
     """User response model"""
 
-    user_id: str
+    id: UUID = Field(..., alias="id")
     status: UserStatus
     role: UserRole
+    tenant_id: str | None = None
     created_at: datetime
     updated_at: datetime
     last_login: datetime | None = None
     is_verified: bool = False
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class UserListResponse(BaseModel):
@@ -167,6 +174,10 @@ class ProfileBase(BaseModel):
     bio: str | None = Field(None, max_length=500)
     avatar_url: HttpUrl | None = None
     location: str | None = Field(None, max_length=100)
+    phone: str | None = Field(None, max_length=30)
+    company: str | None = Field(None, max_length=100)
+    job_title: str | None = Field(None, max_length=100)
+    tenant_id: str | None = Field(None, max_length=64)
     timezone: str | None = Field(None, max_length=50)
     date_of_birth: datetime | None = None
     gender: Gender | None = None
@@ -191,10 +202,10 @@ class ProfileUpdate(ProfileBase):
 class ProfileResponse(ProfileBase):
     """Profile response"""
 
-    user_id: str
-    profile_id: str
+    user_id: UUID
+    id: UUID = Field(..., alias="id")
     privacy_level: PrivacyLevel = PrivacyLevel.PRIVATE
-    profile_completion: int = Field(..., ge=0, le=100, description="Profile completion percentage")
+    profile_completion: int = Field(0, ge=0, le=100, description="Profile completion percentage")
     created_at: datetime
     updated_at: datetime
 
@@ -232,6 +243,7 @@ class UserPreferences(BaseModel):
     time_format: str = Field("HH:mm", pattern=r"^(12h|24h|HH:mm|hh:mm A)$")
 
     model_config = ConfigDict(
+        from_attributes=True,
         json_schema_extra={
             "example": {
                 "language": "en",
@@ -242,7 +254,7 @@ class UserPreferences(BaseModel):
                 "reminder_minutes_before": 30,
                 "timezone": "America/New_York",
             }
-        }
+        },
     )
 
 
@@ -455,7 +467,7 @@ class UserExportRequest(BaseModel):
 class UserImportRequest(BaseModel):
     """Import users"""
 
-    users: list[UserCreate] = Field(..., min_items=1, max_items=1000)
+    users: list[UserCreate] = Field(..., min_length=1, max_length=1000)
     skip_duplicates: bool = True
     send_invites: bool = False
 
@@ -495,7 +507,7 @@ class ErrorResponse(BaseModel):
     error: str
     detail: str | None = None
     code: str | None = None
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class ValidationErrorDetail(BaseModel):

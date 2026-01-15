@@ -6,7 +6,6 @@ import asyncio
 import logging
 import os
 import tempfile
-from typing import Optional
 
 from fastapi import (
     Body,
@@ -186,13 +185,12 @@ webrtc_task = None
 
 if WEBRTC_AVAILABLE and ENABLE_WEBRTC and not USE_MOCK:
     logger.info("WebRTC support enabled - will start worker on app startup")
+elif not WEBRTC_AVAILABLE:
+    logger.warning("WebRTC support disabled - aiortc not installed")
+elif USE_MOCK:
+    logger.info("WebRTC support disabled in mock mode")
 else:
-    if not WEBRTC_AVAILABLE:
-        logger.warning("WebRTC support disabled - aiortc not installed")
-    elif USE_MOCK:
-        logger.info("WebRTC support disabled in mock mode")
-    else:
-        logger.info("WebRTC support disabled via ENABLE_WEBRTC=false")
+    logger.info("WebRTC support disabled via ENABLE_WEBRTC=false")
 
 
 @app.on_event("startup")
@@ -233,9 +231,9 @@ async def startup_event():
 # --- Request and Response Models ---
 class TTSRequest(BaseModel):
     text: str
-    voice: Optional[str] = None  # Will default to provider-specific voice
-    speed: Optional[float] = 1.0
-    extract_phonemes: Optional[bool] = True
+    voice: str | None = None  # Will default to provider-specific voice
+    speed: float | None = 1.0
+    extract_phonemes: bool | None = True
 
 
 class STTResponse(BaseModel):
@@ -254,7 +252,7 @@ class TTSResponse(BaseModel):
 
 
 class VADRequest(BaseModel):
-    remove_silence: Optional[bool] = False
+    remove_silence: bool | None = False
 
 
 # --- API Endpoints ---

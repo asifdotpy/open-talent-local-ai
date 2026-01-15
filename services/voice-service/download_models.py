@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
-"""
-Model Download Script for Voice Service
+"""Model Download Script for Voice Service
 Downloads Vosk, Piper, and Silero models with progress tracking
 """
 
-import os
-import sys
 import hashlib
-import zipfile
+import sys
 import tarfile
-from pathlib import Path
-from typing import Optional
 import urllib.request
-import shutil
+import zipfile
+from pathlib import Path
 
 # Progress bar support
 try:
@@ -67,8 +63,7 @@ class ModelDownloader:
         self.models_dir.mkdir(parents=True, exist_ok=True)
 
     def download_file(self, url: str, output_path: Path, desc: str = "Downloading") -> bool:
-        """
-        Download file with progress bar.
+        """Download file with progress bar.
 
         Args:
             url: Download URL
@@ -119,10 +114,10 @@ class ModelDownloader:
         actual_checksum = md5_hash.hexdigest()
 
         if actual_checksum == expected_checksum:
-            print(f"✓ Checksum verified")
+            print("✓ Checksum verified")
             return True
         else:
-            print(f"✗ Checksum mismatch!")
+            print("✗ Checksum mismatch!")
             print(f"  Expected: {expected_checksum}")
             print(f"  Actual:   {actual_checksum}")
             return False
@@ -202,19 +197,17 @@ class ModelDownloader:
         model_path = self.models_dir / f"{model_name}.onnx"
         if model_path.exists():
             print(f"✓ Model already exists: {model_path}")
-        else:
-            if not self.download_file(
-                model_info["url"], model_path, f"Piper Voice ({model_info['size']})"
-            ):
-                return False
+        elif not self.download_file(
+            model_info["url"], model_path, f"Piper Voice ({model_info['size']})"
+        ):
+            return False
 
         # Download config JSON
         config_path = self.models_dir / f"{model_name}.onnx.json"
         if config_path.exists():
             print(f"✓ Config already exists: {config_path}")
-        else:
-            if not self.download_file(model_info["config_url"], config_path, "Piper Config"):
-                return False
+        elif not self.download_file(model_info["config_url"], config_path, "Piper Config"):
+            return False
 
         print(f"✓ Piper voice ready: {model_name}")
         return True
@@ -224,7 +217,7 @@ class ModelDownloader:
         model_info = self.MODELS["silero_vad"]
 
         print(f"\n{'='*60}")
-        print(f"Downloading Silero VAD Model")
+        print("Downloading Silero VAD Model")
         print(f"Size: {model_info['size']}")
         print(f"{'='*60}")
 
@@ -252,7 +245,7 @@ class ModelDownloader:
         print("  1. Vosk STT model (40 MB - small model)")
         print("  2. Piper TTS voices (45 MB each)")
         print("  3. Silero VAD model (2 MB)")
-        print(f"\nTotal download: ~135 MB")
+        print("\nTotal download: ~135 MB")
         print("=" * 60)
 
         # Confirm download

@@ -7,16 +7,12 @@ and callable through the gateway.
 
 import pytest
 from app.core.service_discovery import ServiceDiscovery
-from app.main import app
-from fastapi.testclient import TestClient
-
-client = TestClient(app)
 
 
 class TestServiceRegistry:
     """Test suite for all registered services."""
 
-    def test_service_registry_endpoint(self):
+    def test_service_registry_endpoint(self, client):
         """Test /api/v1/services endpoint lists all services."""
         response = client.get("/api/v1/services")
         assert response.status_code == 200
@@ -34,7 +30,7 @@ class TestServiceRegistry:
         assert "infrastructure_services" in registry
         assert "ai_engine" in registry
 
-    def test_all_core_services_registered(self):
+    def test_all_core_services_registered(self, client):
         """Test all 3 core services are in registry."""
         response = client.get("/api/v1/services")
         assert response.status_code == 200
@@ -44,7 +40,7 @@ class TestServiceRegistry:
         assert "user-service" in registry
         assert "candidate-service" in registry
 
-    def test_all_ai_services_registered(self):
+    def test_all_ai_services_registered(self, client):
         """Test all 3 AI services are in registry."""
         response = client.get("/api/v1/services")
         assert response.status_code == 200
@@ -54,7 +50,7 @@ class TestServiceRegistry:
         assert "interview-service" in registry
         assert "_granite-interview-service" in registry
 
-    def test_all_media_services_registered(self):
+    def test_all_media_services_registered(self, client):
         """Test all 2 media services are in registry."""
         response = client.get("/api/v1/services")
         assert response.status_code == 200
@@ -63,7 +59,7 @@ class TestServiceRegistry:
         assert "voice-service" in registry
         assert "avatar-service" in registry
 
-    def test_all_analytics_services_registered(self):
+    def test_all_analytics_services_registered(self, client):
         """Test all 3 analytics services are in registry."""
         response = client.get("/api/v1/services")
         assert response.status_code == 200
@@ -73,7 +69,7 @@ class TestServiceRegistry:
         assert "ai-auditing-service" in registry
         assert "explainability-service" in registry
 
-    def test_all_infrastructure_services_registered(self):
+    def test_all_infrastructure_services_registered(self, client):
         """Test all 2 infrastructure services are in registry."""
         response = client.get("/api/v1/services")
         assert response.status_code == 200
@@ -82,7 +78,7 @@ class TestServiceRegistry:
         assert "security-service" in registry
         assert "notification-service" in registry
 
-    def test_ai_engine_registered(self):
+    def test_ai_engine_registered(self, client):
         """Test Ollama AI engine is registered."""
         response = client.get("/api/v1/services")
         assert response.status_code == 200
@@ -91,7 +87,7 @@ class TestServiceRegistry:
         assert "ollama" in registry
         assert registry["ollama"]["port"] == 11434
 
-    def test_service_ports_correct(self):
+    def test_service_ports_correct(self, client):
         """Test all services have correct port mappings."""
         response = client.get("/api/v1/services")
         assert response.status_code == 200
@@ -125,7 +121,7 @@ class TestServiceRegistry:
                 all_services[service_name]["port"] == expected_port
             ), f"Service {service_name} has port {all_services[service_name]['port']}, expected {expected_port}"
 
-    def test_service_descriptions_present(self):
+    def test_service_descriptions_present(self, client):
         """Test all services have descriptions."""
         response = client.get("/api/v1/services")
         assert response.status_code == 200
@@ -171,7 +167,7 @@ class TestServiceRegistry:
             set(discovery.services.keys()) == expected_services
         ), f"Service names mismatch. Missing: {expected_services - set(discovery.services.keys())}, Extra: {set(discovery.services.keys()) - expected_services}"
 
-    def test_health_check_covers_all_services(self):
+    def test_health_check_covers_all_services(self, client):
         """Test health check includes all 14 services."""
         response = client.get("/health")
         assert response.status_code == 200
@@ -184,7 +180,7 @@ class TestServiceRegistry:
             len(health["services"]) == 14
         ), f"Health check shows {len(health['services'])} services, expected 14"
 
-    def test_system_status_shows_visible_services(self):
+    def test_system_status_shows_visible_services(self, client):
         """Test /api/v1/system/status only shows visible services."""
         response = client.get("/api/v1/system/status")
         assert response.status_code == 200
@@ -206,20 +202,20 @@ class TestServiceRegistry:
 class TestServiceCallability:
     """Test that all services are callable through gateway."""
 
-    def test_models_endpoint_accessible(self):
+    def test_models_endpoint_accessible(self, client):
         """Test /api/v1/models endpoint is accessible."""
         response = client.get("/api/v1/models")
         assert response.status_code == 200
         assert "models" in response.json()
 
-    def test_interviews_endpoint_callable(self):
+    def test_interviews_endpoint_callable(self, client):
         """Test /api/v1/interviews/start endpoint is callable."""
         payload = {"role": "Software Engineer", "model": "granite4:350m", "totalQuestions": 3}
         response = client.post("/api/v1/interviews/start", json=payload)
         # Should return 200 or graceful fallback
         assert response.status_code in [200, 502]
 
-    def test_dashboard_endpoint_accessible(self):
+    def test_dashboard_endpoint_accessible(self, client):
         """Test /api/v1/dashboard endpoint aggregates all services."""
         response = client.get("/api/v1/dashboard")
         assert response.status_code == 200

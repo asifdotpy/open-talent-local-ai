@@ -18,6 +18,11 @@ from cryptography.fernet import Fernet
 from fastapi import Body, Depends, FastAPI, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+
+_this_dir = os.path.dirname(__file__)
+if _this_dir not in _sys.path:
+    _sys.path.append(_this_dir)
+
 from schemas import (
     AssignRoleRequest,
     ChangePasswordRequest,
@@ -37,11 +42,6 @@ from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
-
-_this_dir = os.path.dirname(__file__)
-if _this_dir not in _sys.path:
-    _sys.path.append(_this_dir)
-
 
 app = FastAPI(title="Security Service", version="1.0.0")
 

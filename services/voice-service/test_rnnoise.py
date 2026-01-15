@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
-"""
-Test script for RNNoise integration in voice service.
+"""Test script for RNNoise integration in voice service.
 Tests noise suppression functionality.
 """
 
-import numpy as np
-import tempfile
-import soundfile as sf
 from fractions import Fraction
-from services.audio_processing_service import RNNoiseTrack
+
+import numpy as np
 from aiortc import AudioStreamTrack
 from av import AudioFrame
+
+from services.audio_processing_service import RNNoiseTrack
 
 
 class MockAudioTrack(AudioStreamTrack):

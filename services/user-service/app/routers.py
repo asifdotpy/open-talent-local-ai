@@ -4,7 +4,7 @@ import os
 
 # Import comprehensive schemas from root schemas.py
 import sys
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
@@ -315,7 +315,7 @@ async def update_user(
         if value is not None:
             setattr(user, field, value)
 
-    user.updated_at = datetime.utcnow()
+    user.updated_at = datetime.now(UTC).replace(tzinfo=None)
     await session.commit()
     await session.refresh(user)
     return UserRead.model_validate(user)
@@ -351,7 +351,7 @@ async def delete_user(
 
     # Soft delete
     user.status = UserStatus.INACTIVE
-    user.updated_at = datetime.utcnow()
+    user.updated_at = datetime.now(UTC).replace(tzinfo=None)
     await session.commit()
 
 
@@ -443,7 +443,7 @@ async def update_user_profile(
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(profile, field, value)
 
-    profile.updated_at = datetime.utcnow()
+    profile.updated_at = datetime.now(UTC).replace(tzinfo=None)
     await session.commit()
     await session.refresh(profile)
     return UserProfileRead.model_validate(profile)
@@ -508,7 +508,7 @@ async def update_current_user_profile(
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(profile, field, value)
 
-    profile.updated_at = datetime.utcnow()
+    profile.updated_at = datetime.now(UTC).replace(tzinfo=None)
     await session.commit()
     await session.refresh(profile)
     return UserProfileRead.model_validate(profile)
@@ -609,7 +609,7 @@ async def update_user_preferences(
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(preferences, field, value)
 
-    preferences.updated_at = datetime.utcnow()
+    preferences.updated_at = datetime.now(UTC).replace(tzinfo=None)
     await session.commit()
     await session.refresh(preferences)
     return UserPreferencesRead.model_validate(preferences)
@@ -675,7 +675,7 @@ async def update_current_user_preferences(
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(preferences, field, value)
 
-    preferences.updated_at = datetime.utcnow()
+    preferences.updated_at = datetime.now(UTC).replace(tzinfo=None)
     await session.commit()
     await session.refresh(preferences)
     return UserPreferencesRead.model_validate(preferences)

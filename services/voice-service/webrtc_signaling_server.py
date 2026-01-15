@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-"""
-Simple WebRTC Signaling Server for Voice Service Testing
+"""Simple WebRTC Signaling Server for Voice Service Testing
 Provides WebSocket signaling for WebRTC connections during testing
 """
 
-import asyncio
-import json
 import logging
 import os
-from typing import Dict, Set
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -27,7 +24,7 @@ app.add_middleware(
 )
 
 # Connected clients by session_id and peer_type
-connected_clients: Dict[str, Dict[str, WebSocket]] = {}
+connected_clients: dict[str, dict[str, WebSocket]] = {}
 
 
 @app.websocket("/webrtc/signal")

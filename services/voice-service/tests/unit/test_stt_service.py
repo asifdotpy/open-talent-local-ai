@@ -1,5 +1,4 @@
-"""
-Unit Tests for Whisper STT Service
+"""Unit Tests for Whisper STT Service
 
 Following TDD principles:
 - Red-Green-Refactor cycle
@@ -11,11 +10,10 @@ Following TDD principles:
 Created: November 13, 2025
 """
 
-import pytest
-import os
 import sys
-from unittest.mock import Mock, patch, MagicMock, call
-from pathlib import Path
+from unittest.mock import Mock, patch
+
+import pytest
 
 # Mock torch and whisper before importing the service
 sys.modules["torch"] = Mock()

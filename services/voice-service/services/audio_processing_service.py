@@ -1,16 +1,15 @@
-import asyncio
 import logging
+
+import numpy as np
 from aiortc import AudioStreamTrack
 from av import AudioFrame
-import numpy as np
 from pyrnnoise import RNNoise
 
 logger = logging.getLogger(__name__)
 
 
 class RNNoiseTrack(AudioStreamTrack):
-    """
-    AudioStreamTrack that applies RNNoise noise suppression to incoming audio frames.
+    """AudioStreamTrack that applies RNNoise noise suppression to incoming audio frames.
     Buffers audio to ensure 10ms (480 sample) frames for RNNoise processing.
     """
 

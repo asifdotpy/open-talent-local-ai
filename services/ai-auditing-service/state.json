@@ -558,6 +558,54 @@
       "progress": 100.0,
       "_elapsed": 0.5,
       "finished_at": "2026-01-01T16:05:37Z"
+    },
+    "job_1768457562574": {
+      "status": "completed",
+      "target": "services/security-service",
+      "started_at": "2026-01-15T06:12:42Z",
+      "ruleset": [
+        "enum_validation",
+        "secret_detection"
+      ],
+      "progress": 100.0,
+      "_elapsed": 0.5,
+      "finished_at": "2026-01-15T06:12:42Z"
+    },
+    "job_1768457562892": {
+      "status": "completed",
+      "target": "services/security-service",
+      "started_at": "2026-01-15T06:12:42Z",
+      "ruleset": [
+        "enum_validation",
+        "secret_detection"
+      ],
+      "progress": 100.0,
+      "_elapsed": 0.5,
+      "finished_at": "2026-01-15T06:12:42Z"
+    },
+    "job_1768457563013": {
+      "status": "completed",
+      "target": "services/security-service",
+      "started_at": "2026-01-15T06:12:43Z",
+      "ruleset": [
+        "enum_validation",
+        "secret_detection"
+      ],
+      "progress": 100.0,
+      "_elapsed": 0.5,
+      "finished_at": "2026-01-15T06:12:43Z"
+    },
+    "job_1768457564245": {
+      "status": "completed",
+      "target": "services/security-service",
+      "started_at": "2026-01-15T06:12:44Z",
+      "ruleset": [
+        "enum_validation",
+        "secret_detection"
+      ],
+      "progress": 100.0,
+      "_elapsed": 0.5,
+      "finished_at": "2026-01-15T06:12:44Z"
     }
   },
   "history": {
@@ -935,6 +983,38 @@
       "status": "completed",
       "created_at": "2026-01-01T16:05:37Z",
       "finished_at": "2026-01-01T16:05:37Z",
+      "summary": null
+    },
+    "job_1768457562574": {
+      "job_id": "job_1768457562574",
+      "target": "services/security-service",
+      "status": "completed",
+      "created_at": "2026-01-15T06:12:42Z",
+      "finished_at": "2026-01-15T06:12:42Z",
+      "summary": null
+    },
+    "job_1768457562892": {
+      "job_id": "job_1768457562892",
+      "target": "services/security-service",
+      "status": "completed",
+      "created_at": "2026-01-15T06:12:42Z",
+      "finished_at": "2026-01-15T06:12:42Z",
+      "summary": null
+    },
+    "job_1768457563013": {
+      "job_id": "job_1768457563013",
+      "target": "services/security-service",
+      "status": "completed",
+      "created_at": "2026-01-15T06:12:43Z",
+      "finished_at": "2026-01-15T06:12:43Z",
+      "summary": null
+    },
+    "job_1768457564245": {
+      "job_id": "job_1768457564245",
+      "target": "services/security-service",
+      "status": "completed",
+      "created_at": "2026-01-15T06:12:44Z",
+      "finished_at": "2026-01-15T06:12:44Z",
       "summary": null
     }
   }
