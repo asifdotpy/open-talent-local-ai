@@ -1181,10 +1181,10 @@ async def route_by_capability(
 # ============================
 
 
-@app.post("/search/multi-agent")
+@app.post("/search/multi-agent", response_model=SearchResponse)
 async def search_multi_agent(
     request: SearchRequest, finder: GitHubTalentScout = Depends(get_finder)
-) -> dict[str, Any]:
+) -> SearchResponse:
     """Enhanced search using multiple agents.
 
     This endpoint:

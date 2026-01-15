@@ -1,27 +1,36 @@
-"""
-Shared pytest fixtures for voice service tests.
+"""Shared pytest fixtures for voice service tests.
 
 This module provides reusable test fixtures for all voice service tests,
 following TDD best practices and DRY principles.
 """
 
-import asyncio
 import base64
 import os
 import struct
 import tempfile
 import wave
+from collections.abc import AsyncGenerator, Generator
 from pathlib import Path
-from typing import AsyncGenerator, Generator
 
 import httpx
 import pytest
 import pytest_asyncio
 
-
 # ============================================================================
 # Service Configuration Fixtures
 # ============================================================================
+
+
+@pytest.fixture
+def client():
+    """Provide a TestClient for voice service."""
+    os.environ["USE_MOCK_SERVICES"] = "true"
+    from fastapi.testclient import TestClient
+
+    from main import app
+
+    with TestClient(app) as c:
+        yield c
 
 
 @pytest.fixture(scope="session")
@@ -93,8 +102,7 @@ def create_test_wav_file(
     sample_rate: int = 16000,
     channels: int = 1,
 ) -> str:
-    """
-    Create a test WAV file with sine wave audio.
+    """Create a test WAV file with sine wave audio.
 
     Args:
         filepath: Path to output WAV file

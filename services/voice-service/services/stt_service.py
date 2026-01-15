@@ -1,5 +1,4 @@
-"""
-Legacy Whisper STT Service - DEPRECATED
+"""Legacy Whisper STT Service - DEPRECATED
 
 This module is deprecated and should not be used in production.
 Use services.vosk_stt_service.VoskSTTService instead.
@@ -25,9 +24,9 @@ Migration Path:
     words = result["words"]  # Bonus: word-level timing!
 """
 
-from loguru import logger
-from typing import Optional
 import warnings
+
+from loguru import logger
 
 warnings.warn(
     "WhisperSTTService is deprecated. Use VoskSTTService for production deployments.",
@@ -37,8 +36,7 @@ warnings.warn(
 
 
 class WhisperSTTService:
-    """
-    DEPRECATED: Whisper Speech-to-Text Service
+    """DEPRECATED: Whisper Speech-to-Text Service
 
     This service requires PyTorch and CUDA, which are not suitable for production.
     Use VoskSTTService instead for lightweight, CPU-only inference.
@@ -65,7 +63,7 @@ class WhisperSTTService:
         )
         return False
 
-    def transcribe_audio(self, audio_file_path: str, language="en") -> Optional[str]:
+    def transcribe_audio(self, audio_file_path: str, language="en") -> str | None:
         """Transcribe audio file to text - DEPRECATED"""
         logger.error(
             "WhisperSTTService.transcribe_audio() is deprecated. "

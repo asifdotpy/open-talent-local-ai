@@ -1,11 +1,9 @@
-"""
-Silero Voice Activity Detection Service
+"""Silero Voice Activity Detection Service
 Efficient voice detection for audio preprocessing
 """
 
 import logging
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
 
 import numpy as np
 import soundfile as sf
@@ -20,8 +18,7 @@ except ImportError:
 
 
 class SileroVADService:
-    """
-    Voice Activity Detection using Silero VAD
+    """Voice Activity Detection using Silero VAD
 
     Features:
     - 60-70% computational savings by filtering silence
@@ -36,8 +33,7 @@ class SileroVADService:
         sample_rate: int = 16000,
         threshold: float = 0.5,
     ):
-        """
-        Initialize Silero VAD service.
+        """Initialize Silero VAD service.
 
         Args:
             model_path: Path to Silero VAD ONNX model
@@ -87,9 +83,8 @@ class SileroVADService:
             self.logger.error(f"Failed to load Silero VAD model: {e}")
             self.model = None
 
-    def detect_voice_activity(self, audio_file_path: str) -> Dict:
-        """
-        Detect voice activity in audio file.
+    def detect_voice_activity(self, audio_file_path: str) -> dict:
+        """Detect voice activity in audio file.
 
         Args:
             audio_file_path: Path to audio file
@@ -146,9 +141,8 @@ class SileroVADService:
             self.logger.error(f"Voice activity detection failed: {e}")
             raise
 
-    def filter_silence(self, audio_file_path: str, output_path: str) -> Dict:
-        """
-        Remove silence from audio file.
+    def filter_silence(self, audio_file_path: str, output_path: str) -> dict:
+        """Remove silence from audio file.
 
         Args:
             audio_file_path: Input audio file path
@@ -208,9 +202,8 @@ class SileroVADService:
             self.logger.error(f"Silence filtering failed: {e}")
             raise
 
-    def _get_speech_timestamps(self, audio: np.ndarray) -> List[Tuple[int, int]]:
-        """
-        Get speech timestamps from audio data.
+    def _get_speech_timestamps(self, audio: np.ndarray) -> list[tuple[int, int]]:
+        """Get speech timestamps from audio data.
 
         Returns:
             List of (start_sample, end_sample) tuples
@@ -280,8 +273,8 @@ class SileroVADService:
             return 0.5  # Default to uncertain
 
     def _merge_segments(
-        self, segments: List[Tuple[int, int]], max_gap_samples: Optional[int] = None
-    ) -> List[Tuple[int, int]]:
+        self, segments: list[tuple[int, int]], max_gap_samples: int | None = None
+    ) -> list[tuple[int, int]]:
         """Merge speech segments that are close together."""
         if not segments:
             return []
@@ -320,7 +313,7 @@ class SileroVADService:
         """Check if VAD service is ready."""
         return self.model is not None
 
-    def get_info(self) -> Dict:
+    def get_info(self) -> dict:
         """Get service information."""
         return {
             "service": "Silero VAD",
@@ -345,7 +338,7 @@ class MockSileroVADService:
         self.logger = logging.getLogger(__name__)
         self.logger.warning("Using Mock Silero VAD Service")
 
-    def detect_voice_activity(self, audio_file_path: str) -> Dict:
+    def detect_voice_activity(self, audio_file_path: str) -> dict:
         """Return mock VAD results."""
         return {
             "voice_segments": [(0.0, 2.0), (2.5, 5.0)],
@@ -355,7 +348,7 @@ class MockSileroVADService:
             "num_segments": 2,
         }
 
-    def filter_silence(self, audio_file_path: str, output_path: str) -> Dict:
+    def filter_silence(self, audio_file_path: str, output_path: str) -> dict:
         """Copy input to output (no filtering)."""
         import shutil
 
@@ -372,7 +365,7 @@ class MockSileroVADService:
     def health_check(self) -> bool:
         return True
 
-    def get_info(self) -> Dict:
+    def get_info(self) -> dict:
         return {
             "service": "Mock Silero VAD",
             "ready": True,

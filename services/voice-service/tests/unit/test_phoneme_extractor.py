@@ -1,12 +1,12 @@
-"""
-Unit Tests for PhonemeExtractor
+"""Unit Tests for PhonemeExtractor
 
 Tests phoneme extraction, timing accuracy, syllable counting, and basic phoneme mapping.
 """
 
-import pytest
 import sys
 from pathlib import Path
+
+import pytest
 
 # Add services directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "services"))

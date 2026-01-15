@@ -8,7 +8,7 @@ Tests:
 - RBAC role enforcement
 """
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import jwt
@@ -111,8 +111,8 @@ class TestLocalJWTVerification:
             "email": "user@example.com",
             "role": "admin",
             "tenant_id": "tenant1",
-            "exp": datetime.utcnow() + timedelta(minutes=30),
-            "iat": datetime.utcnow(),
+            "exp": datetime.now(UTC).replace(tzinfo=None) + timedelta(minutes=30),
+            "iat": datetime.now(UTC).replace(tzinfo=None),
         }
         token = jwt.encode(payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
 
@@ -126,7 +126,8 @@ class TestLocalJWTVerification:
         """Test expired JWT token rejection."""
         payload = {
             "email": "user@example.com",
-            "exp": datetime.utcnow() - timedelta(minutes=1),  # Expired
+            "exp": datetime.now(UTC).replace(tzinfo=None)
+            - timedelta(minutes=1),  # Expired
         }
         token = jwt.encode(payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
 
@@ -166,7 +167,7 @@ class TestGetJWTClaims:
             "user_id": "123",
             "role": "recruiter",
             "tenant_id": "tenant1",
-            "exp": datetime.utcnow() + timedelta(minutes=30),
+            "exp": datetime.now(UTC).replace(tzinfo=None) + timedelta(minutes=30),
         }
         token = jwt.encode(payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
 
@@ -205,7 +206,7 @@ class TestGetJWTClaims:
         """Test token without email claim."""
         payload = {
             "user_id": "123",
-            "exp": datetime.utcnow() + timedelta(minutes=30),
+            "exp": datetime.now(UTC).replace(tzinfo=None) + timedelta(minutes=30),
         }
         token = jwt.encode(payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
 

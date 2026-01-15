@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 
 from sqlalchemy import JSON, Boolean, Column, DateTime, String, Text
@@ -13,12 +13,17 @@ class UserStatus(str, Enum):
     ACTIVE = "active"
     INACTIVE = "inactive"
     SUSPENDED = "suspended"
+    PENDING = "pending"
+    DELETED = "deleted"
 
 
 class UserRole(str, Enum):
     ADMIN = "admin"
     RECRUITER = "recruiter"
+    INTERVIEWER = "interviewer"
     CANDIDATE = "candidate"
+    GUEST = "guest"
+    SYSTEM = "system"
 
 
 class User(Base):
@@ -32,8 +37,15 @@ class User(Base):
     status = Column(
         SAEnum(UserStatus, name="userstatus"), nullable=False, default=UserStatus.ACTIVE
     )
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(
+        DateTime, nullable=False, default=lambda: datetime.now(UTC).replace(tzinfo=None)
+    )
+    updated_at = Column(
+        DateTime,
+        nullable=False,
+        default=lambda: datetime.now(UTC).replace(tzinfo=None),
+        onupdate=lambda: datetime.now(UTC).replace(tzinfo=None),
+    )
     last_login = Column(DateTime, nullable=True)
     bio = Column(String(500), nullable=True)
     location = Column(String(255), nullable=True)
@@ -54,8 +66,15 @@ class UserProfile(Base):
     job_title = Column(String(255), nullable=True)
     avatar_url = Column(String(500), nullable=True)
     avatar_uploaded_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(
+        DateTime, nullable=False, default=lambda: datetime.now(UTC).replace(tzinfo=None)
+    )
+    updated_at = Column(
+        DateTime,
+        nullable=False,
+        default=lambda: datetime.now(UTC).replace(tzinfo=None),
+        onupdate=lambda: datetime.now(UTC).replace(tzinfo=None),
+    )
     tenant_id = Column(String(64), nullable=True, index=True)
 
 
@@ -69,8 +88,15 @@ class UserPreferences(Base):
     notification_push = Column(Boolean, nullable=False, default=False)
     theme = Column(String(20), nullable=True, default="light")
     language = Column(String(10), nullable=True, default="en")
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(
+        DateTime, nullable=False, default=lambda: datetime.now(UTC).replace(tzinfo=None)
+    )
+    updated_at = Column(
+        DateTime,
+        nullable=False,
+        default=lambda: datetime.now(UTC).replace(tzinfo=None),
+        onupdate=lambda: datetime.now(UTC).replace(tzinfo=None),
+    )
     tenant_id = Column(String(64), nullable=True, index=True)
 
 
@@ -82,7 +108,9 @@ class UserActivity(Base):
     action = Column(String(100), nullable=False)
     resource = Column(String(100), nullable=True)
     details = Column(JSON, nullable=True)
-    timestamp = Column(DateTime, nullable=False, default=datetime.utcnow)
+    timestamp = Column(
+        DateTime, nullable=False, default=lambda: datetime.now(UTC).replace(tzinfo=None)
+    )
     tenant_id = Column(String(64), nullable=True, index=True)
 
 
@@ -94,6 +122,8 @@ class UserSession(Base):
     device = Column(String(100), nullable=True)
     ip = Column(String(64), nullable=True)
     user_agent = Column(Text, nullable=True)
-    last_seen = Column(DateTime, nullable=False, default=datetime.utcnow)
+    last_seen = Column(
+        DateTime, nullable=False, default=lambda: datetime.now(UTC).replace(tzinfo=None)
+    )
     revoked = Column(Boolean, nullable=False, default=False)
     tenant_id = Column(String(64), nullable=True, index=True)

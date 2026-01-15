@@ -1,85 +1,53 @@
-"""
-Tests for Desktop Integration Service
-Following TDD principles - tests written before implementation
-Port: 8009
-Purpose: Desktop app integration, local services coordination
-"""
-
-
-import httpx
 import pytest
 
 
-@pytest.fixture
-def desktop_service_url():
-    return "http://localhost:8009"
-
-
-@pytest.fixture
-def async_client():
-    return httpx.AsyncClient(timeout=5.0)
-
-
-@pytest.fixture
-def auth_headers():
-    return {"Authorization": "Bearer test_token"}
-
-
 class TestDesktopIntegrationServiceBasics:
-    @pytest.mark.asyncio
-    async def test_service_health(self, desktop_service_url, async_client):
-        response = await async_client.get(f"{desktop_service_url}/health")
+    def test_service_health(self, client):
+        response = client.get("/health")
         assert response.status_code == 200
 
-    @pytest.mark.asyncio
-    async def test_root_endpoint(self, desktop_service_url, async_client):
-        response = await async_client.get(f"{desktop_service_url}/")
+    def test_root_endpoint(self, client):
+        response = client.get("/")
+        assert response.status_code == 200
+        assert "service" in response.json()
+
+
+class TestSystemEndpoints:
+    def test_get_system_status(self, client):
+        response = client.get("/api/v1/system/status")
+        assert response.status_code == 200
+        assert "services_online" in response.json()
+
+    def test_list_services(self, client):
+        response = client.get("/api/v1/services")
+        assert response.status_code == 200
+        assert "service_registry" in response.json()
+
+
+class TestModelEndpoints:
+    def test_list_models(self, client):
+        response = client.get("/api/v1/models")
+        assert response.status_code == 200
+        assert "models" in response.json()
+
+    def test_select_model(self, client):
+        # We need an available model ID, fallback has vetta-granite-2b-gguf-v4
+        response = client.post(
+            "/api/v1/models/select", params={"model_id": "vetta-granite-2b-gguf-v4"}
+        )
         assert response.status_code == 200
 
 
-class TestServiceCoordination:
-    @pytest.mark.asyncio
-    async def test_get_service_status(self, desktop_service_url, async_client, auth_headers):
-        response = await async_client.get(
-            f"{desktop_service_url}/api/v1/services/status", headers=auth_headers
-        )
-        assert response.status_code in [200, 403]
-
-    @pytest.mark.asyncio
-    async def test_start_service(self, desktop_service_url, async_client, auth_headers):
-        response = await async_client.post(
-            f"{desktop_service_url}/api/v1/services/start",
-            json={"service_name": "notification"},
-            headers=auth_headers,
-        )
-        assert response.status_code in [200, 201]
-
-    @pytest.mark.asyncio
-    async def test_stop_service(self, desktop_service_url, async_client, auth_headers):
-        response = await async_client.post(
-            f"{desktop_service_url}/api/v1/services/stop",
-            json={"service_name": "notification"},
-            headers=auth_headers,
-        )
-        assert response.status_code in [200, 201]
-
-
-class TestLocalConfiguration:
-    @pytest.mark.asyncio
-    async def test_get_config(self, desktop_service_url, async_client, auth_headers):
-        response = await async_client.get(
-            f"{desktop_service_url}/api/v1/config", headers=auth_headers
-        )
-        assert response.status_code in [200, 403]
-
-    @pytest.mark.asyncio
-    async def test_update_config(self, desktop_service_url, async_client, auth_headers):
-        response = await async_client.put(
-            f"{desktop_service_url}/api/v1/config",
-            json={"language": "en", "theme": "dark"},
-            headers=auth_headers,
-        )
-        assert response.status_code in [200, 201]
+class TestInterviewEndpoints:
+    def test_start_interview(self, client):
+        payload = {
+            "role": "Software Engineer",
+            "model": "vetta-granite-2b-gguf-v4",
+            "totalQuestions": 3,
+        }
+        response = client.post("/api/v1/interviews/start", json=payload)
+        assert response.status_code == 200
+        assert "messages" in response.json()
 
 
 if __name__ == "__main__":

@@ -36,87 +36,40 @@ def synthesis_data() -> dict[str, Any]:
     }
 
 
-class TestVoiceServiceBasics:
-    @pytest.mark.asyncio
-    async def test_service_health(self, voice_service_url, async_client):
-        response = await async_client.get(f"{voice_service_url}/health")
-        assert response.status_code == 200
+import pytest
 
-    @pytest.mark.asyncio
-    async def test_root_endpoint(self, voice_service_url, async_client):
-        response = await async_client.get(f"{voice_service_url}/")
+
+class TestVoiceServiceBasics:
+    def test_service_health(self, client):
+        response = client.get("/health")
         assert response.status_code == 200
+        assert response.json()["status"] == "healthy"
+
+    def test_root_endpoint(self, client):
+        response = client.get("/")
+        assert response.status_code == 200
+        assert response.json()["service"] == "Voice Service"
 
 
 class TestTextToSpeech:
-    @pytest.mark.asyncio
-    async def test_synthesize_speech(
-        self, voice_service_url, async_client, synthesis_data, auth_headers
-    ):
-        response = await async_client.post(
-            f"{voice_service_url}/voice/tts", json=synthesis_data, headers=auth_headers
-        )
-        assert response.status_code in [200, 201]
-        if response.status_code == 200:
-            # Should return audio content
-            assert response.content is not None
+    def test_synthesize_speech(self, client):
+        payload = {"text": "Hello, this is a test message", "voice": "en_US-lessac-medium"}
+        response = client.post("/voice/tts", json=payload)
+        assert response.status_code == 200
+        assert "audio_data" in response.json()
 
-    @pytest.mark.asyncio
-    async def test_get_available_voices(self, voice_service_url, async_client, auth_headers):
-        response = await async_client.get(f"{voice_service_url}/voices", headers=auth_headers)
-        assert response.status_code in [200, 403]
-
-    @pytest.mark.asyncio
-    async def test_get_voice_details(self, voice_service_url, async_client, auth_headers):
-        response = await async_client.get(
-            f"{voice_service_url}/voices/default", headers=auth_headers
-        )
-        assert response.status_code in [200, 404]
+    def test_get_available_voices(self, client):
+        response = client.get("/voices")
+        assert response.status_code == 200
+        assert "voices" in response.json()
 
 
 class TestAudioProcessing:
-    @pytest.mark.asyncio
-    async def test_get_synthesis_status(self, voice_service_url, async_client, auth_headers):
-        response = await async_client.get(
-            f"{voice_service_url}/voice/synthesis/syn123/status", headers=auth_headers
-        )
-        assert response.status_code in [200, 404]
-
-    @pytest.mark.asyncio
-    async def test_download_audio(self, voice_service_url, async_client, auth_headers):
-        response = await async_client.get(
-            f"{voice_service_url}/voice/synthesis/syn123/audio", headers=auth_headers
-        )
-        assert response.status_code in [200, 404]
-
-
-class TestVoiceModulation:
-    @pytest.mark.asyncio
-    async def test_adjust_speed(self, voice_service_url, async_client, auth_headers):
-        response = await async_client.post(
-            f"{voice_service_url}/voice/synthesis/syn123/speed",
-            json={"speed": 1.5},
-            headers=auth_headers,
-        )
-        assert response.status_code in [200, 201, 404]
-
-    @pytest.mark.asyncio
-    async def test_adjust_pitch(self, voice_service_url, async_client, auth_headers):
-        response = await async_client.post(
-            f"{voice_service_url}/voice/synthesis/syn123/pitch",
-            json={"pitch": 1.2},
-            headers=auth_headers,
-        )
-        assert response.status_code in [200, 201, 404]
-
-    @pytest.mark.asyncio
-    async def test_adjust_volume(self, voice_service_url, async_client, auth_headers):
-        response = await async_client.post(
-            f"{voice_service_url}/voice/synthesis/syn123/volume",
-            json={"volume": 0.9},
-            headers=auth_headers,
-        )
-        assert response.status_code in [200, 201, 404]
+    def test_vad_functionality(self, client, test_audio_file):
+        with open(test_audio_file, "rb") as f:
+            response = client.post("/voice/vad", files={"audio_file": ("test.wav", f, "audio/wav")})
+        assert response.status_code == 200
+        assert "num_segments" in response.json()
 
 
 if __name__ == "__main__":

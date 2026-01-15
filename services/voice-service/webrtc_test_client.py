@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-WebRTC Test Client for Voice Service
+"""WebRTC Test Client for Voice Service
 Tests real-time audio processing with RNNoise integration
 Enhanced with proper error handling, logging, and comprehensive validation
 """
@@ -8,15 +7,16 @@ Enhanced with proper error handling, logging, and comprehensive validation
 import asyncio
 import json
 import logging
+import os
 import sys
+import tempfile
+import time
+
+import aiohttp
 import numpy as np
 import soundfile as sf
-from aiortc import RTCPeerConnection, RTCIceCandidate, RTCSessionDescription, RTCConfiguration, RTCIceServer
-import aiohttp
-import tempfile
-import os
-import time
-from typing import Dict, List, Optional, Tuple
+from aiortc import RTCConfiguration, RTCIceCandidate, RTCPeerConnection, RTCSessionDescription
+
 from audio_processing_validator import AudioProcessingValidator, ValidationResult
 
 # Configure logging
@@ -97,7 +97,7 @@ class WebRTCTestClient:
                 timeout=self.session_timeout
             )
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.error(f"Operation timed out after {self.session_timeout}s")
             await self._handle_timeout()
         except aiohttp.ClientError as e:
@@ -203,7 +203,7 @@ class WebRTCTestClient:
                 timeout=self.session_timeout
             )
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.error(f"Operation timed out after {self.session_timeout}s")
             await self._handle_timeout()
         except aiohttp.ClientError as e:
@@ -379,7 +379,7 @@ class WebRTCTestClient:
                     if frame_count % 20 == 0:
                         logger.debug(f"Collected {frame_count} audio frames")
 
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     logger.debug("Timeout waiting for audio frame")
                     self.audio_dropouts += 1
                     break
@@ -482,7 +482,7 @@ class WebRTCTestClient:
                         logger.info("WebSocket connection closed")
                         break
 
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     # Check if we should continue waiting
                     elapsed = time.time() - self.start_time
                     if elapsed > self.session_timeout:

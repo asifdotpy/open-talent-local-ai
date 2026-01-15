@@ -1,19 +1,17 @@
 #!/usr/bin/env python3
-"""
-Audio Processing Validators for Voice Service
+"""Audio Processing Validators for Voice Service
 Comprehensive validation suite for audio quality, latency, and processing metrics
 """
 
 import asyncio
 import logging
+import os
+import tempfile
+from dataclasses import dataclass
+
 import numpy as np
 import soundfile as sf
-import time
-from typing import Dict, List, Optional, Tuple, Any
-from dataclasses import dataclass
 from scipy import signal
-import tempfile
-import os
 
 logger = logging.getLogger(__name__)
 
@@ -39,14 +37,13 @@ class ValidationResult:
 
     passed: bool
     metrics: AudioMetrics
-    errors: List[str]
-    warnings: List[str]
-    recommendations: List[str]
+    errors: list[str]
+    warnings: list[str]
+    recommendations: list[str]
 
 
 class AudioProcessingValidator:
-    """
-    Comprehensive validator for audio processing pipeline
+    """Comprehensive validator for audio processing pipeline
     Tests SNR, latency, compression, and quality metrics
     """
 
@@ -68,12 +65,11 @@ class AudioProcessingValidator:
         self,
         input_audio: np.ndarray,
         processed_audio: np.ndarray,
-        original_bitrate: Optional[int] = None,
-        compressed_bitrate: Optional[int] = None,
-        processing_latency_ms: Optional[float] = None,
+        original_bitrate: int | None = None,
+        compressed_bitrate: int | None = None,
+        processing_latency_ms: float | None = None,
     ) -> ValidationResult:
-        """
-        Comprehensive validation of audio processing pipeline
+        """Comprehensive validation of audio processing pipeline
 
         Args:
             input_audio: Original audio samples
@@ -194,7 +190,7 @@ class AudioProcessingValidator:
             return 0.0
 
     def _calculate_compression_ratio(
-        self, original_bitrate: Optional[int], compressed_bitrate: Optional[int]
+        self, original_bitrate: int | None, compressed_bitrate: int | None
     ) -> float:
         """Calculate compression ratio"""
         if original_bitrate and compressed_bitrate and compressed_bitrate > 0:
@@ -243,9 +239,9 @@ class AudioProcessingValidator:
     def _validate_metrics(
         self,
         metrics: AudioMetrics,
-        errors: List[str],
-        warnings: List[str],
-        recommendations: List[str],
+        errors: list[str],
+        warnings: list[str],
+        recommendations: list[str],
     ) -> bool:
         """Validate metrics against acceptable thresholds for voice processing"""
         passed = True
@@ -291,9 +287,9 @@ class AudioProcessingValidator:
         self,
         input_file: str,
         processed_file: str,
-        original_bitrate: Optional[int] = None,
-        compressed_bitrate: Optional[int] = None,
-        processing_latency_ms: Optional[float] = None,
+        original_bitrate: int | None = None,
+        compressed_bitrate: int | None = None,
+        processing_latency_ms: float | None = None,
     ) -> ValidationResult:
         """Validate audio files directly"""
         try:
@@ -355,7 +351,7 @@ class AudioProcessingValidator:
         include_noise: bool = True,
         include_speech_like: bool = True,
         frequency: int = 1000,
-    ) -> Tuple[np.ndarray, str]:
+    ) -> tuple[np.ndarray, str]:
         """Generate test audio for validation testing"""
         try:
             # Generate base sine wave
@@ -431,7 +427,7 @@ class AudioProcessingValidator:
 
 
 async def validate_rnnoise_processing(
-    input_audio: np.ndarray, output_audio: np.ndarray, latency_ms: Optional[float] = None
+    input_audio: np.ndarray, output_audio: np.ndarray, latency_ms: float | None = None
 ) -> ValidationResult:
     """Validate RNNoise processing specifically"""
     validator = AudioProcessingValidator()

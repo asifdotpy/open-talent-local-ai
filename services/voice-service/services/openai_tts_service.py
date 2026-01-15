@@ -1,13 +1,9 @@
-"""
-OpenAI Text-to-Speech Service
+"""OpenAI Text-to-Speech Service
 Production TTS using OpenAI's gpt-4o-mini-tts model
 """
 
 import logging
 import time
-from pathlib import Path
-from typing import Dict, List, Optional
-import io
 
 import numpy as np
 import soundfile as sf
@@ -17,8 +13,7 @@ from .phoneme_extractor import PhonemeExtractor
 
 
 class OpenAITTSService:
-    """
-    OpenAI Text-to-Speech service using gpt-4o-mini-tts model
+    """OpenAI Text-to-Speech service using gpt-4o-mini-tts model
 
     Features:
     - Cost-effective: $0.015 per minute
@@ -33,10 +28,9 @@ class OpenAITTSService:
         api_key: str,
         model: str = "gpt-4o-mini-tts",
         voice: str = "alloy",
-        base_url: Optional[str] = None,
+        base_url: str | None = None,
     ):
-        """
-        Initialize OpenAI TTS service.
+        """Initialize OpenAI TTS service.
 
         Args:
             api_key: OpenAI API key
@@ -85,9 +79,8 @@ class OpenAITTSService:
         voice: str = "alloy",
         speed: float = 1.0,
         extract_phonemes: bool = True,
-    ) -> Dict:
-        """
-        Synthesize speech from text using OpenAI TTS API.
+    ) -> dict:
+        """Synthesize speech from text using OpenAI TTS API.
 
         Args:
             text: Text to synthesize
@@ -185,9 +178,8 @@ class OpenAITTSService:
 
     def synthesize_streaming(
         self, text: str, chunk_size: int = 4096, voice: str = "alloy"
-    ) -> List[bytes]:
-        """
-        Synthesize speech in chunks for streaming.
+    ) -> list[bytes]:
+        """Synthesize speech in chunks for streaming.
 
         Args:
             text: Text to synthesize
@@ -221,7 +213,7 @@ class OpenAITTSService:
             self.logger.error(f"Streaming synthesis failed: {e}")
             raise
 
-    def get_available_voices(self) -> List[Dict]:
+    def get_available_voices(self) -> list[dict]:
         """Get list of available OpenAI TTS voices."""
         return [
             {
@@ -243,7 +235,7 @@ class OpenAITTSService:
             self.logger.error(f"OpenAI TTS health check failed: {e}")
             return False
 
-    def get_info(self) -> Dict:
+    def get_info(self) -> dict:
         """Get service information."""
         return {
             "service": "OpenAI TTS",
@@ -278,7 +270,7 @@ class MockOpenAITTSService:
         voice: str = "alloy",
         speed: float = 1.0,
         extract_phonemes: bool = True,
-    ) -> Dict:
+    ) -> dict:
         """Return mock synthesis result and create WAV file with audio content."""
         # Create WAV file with actual audio content (20-30 seconds)
         sample_rate = 24000  # OpenAI uses 24kHz
@@ -316,7 +308,7 @@ class MockOpenAITTSService:
             "model": "gpt-4o-mini-tts",
         }
 
-    def get_available_voices(self) -> List[Dict]:
+    def get_available_voices(self) -> list[dict]:
         """Return mock voices."""
         return [
             {
@@ -330,7 +322,7 @@ class MockOpenAITTSService:
     def health_check(self) -> bool:
         return True
 
-    def get_info(self) -> Dict:
+    def get_info(self) -> dict:
         return {
             "service": "Mock OpenAI TTS",
             "ready": True,

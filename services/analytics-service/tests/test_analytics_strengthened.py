@@ -1,118 +1,83 @@
-import httpx
 import pytest
 
 
-@pytest.fixture
-def analytics_service_url():
-    return "http://localhost:8007"
-
-
-@pytest.fixture
-def async_client():
-    return httpx.AsyncClient(timeout=10.0)
-
-
-@pytest.fixture
-def auth_headers():
-    return {"Authorization": "Bearer test_token"}
-
-
 class TestAnalyticsStrengthened:
-    @pytest.mark.asyncio
-    async def test_analyze_sentiment(self, analytics_service_url, async_client, auth_headers):
-        response = await async_client.post(
-            f"{analytics_service_url}/api/v1/analyze/sentiment",
-            json={"text": "This is a great experience, I love the platform!"},
-            headers=auth_headers,
-        )
+    def test_analyze_sentiment(self, client):
+        payload = {"text": "I really love working with agentic AI systems!"}
+        response = client.post("/api/v1/analyze/sentiment", json=payload)
         assert response.status_code == 200
         data = response.json()
+        assert "polarity" in data
         assert data["emotion"] == "positive"
-        assert "great" in data["keywords"]
 
-    @pytest.mark.asyncio
-    async def test_analyze_quality(self, analytics_service_url, async_client, auth_headers):
-        response = await async_client.post(
-            f"{analytics_service_url}/api/v1/analyze/quality",
-            json={
-                "response_text": "I have used Python for 5 years in backend development.",
-                "question_context": "Tell me about your experience with Python.",
-            },
-            headers=auth_headers,
-        )
+    def test_analyze_quality(self, client):
+        payload = {
+            "response_text": "I have extensive experience building scalable microservices with Python and FastAPI.",
+            "question_context": "Tell me about your experience with Python backend development.",
+        }
+        response = client.post("/api/v1/analyze/quality", json=payload)
         assert response.status_code == 200
         data = response.json()
+        assert data["overall_score"] > 0
         assert "clarity" in data
-        assert "technical_accuracy" in data
 
-    @pytest.mark.asyncio
-    async def test_analyze_bias(self, analytics_service_url, async_client, auth_headers):
-        response = await async_client.post(
-            f"{analytics_service_url}/api/v1/analyze/bias",
-            json={"text": "Candidate was very expressive."},
-            headers=auth_headers,
-        )
+    def test_analyze_bias(self, client):
+        payload = {"text": "We need a young and energetic person for this junior role."}
+        response = client.post("/api/v1/analyze/bias", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert "bias_score" in data
+        assert data["bias_score"] > 0
+        assert "age_bias" in data["flags"]
 
-    @pytest.mark.asyncio
-    async def test_analyze_expertise(self, analytics_service_url, async_client, auth_headers):
-        response = await async_client.post(
-            f"{analytics_service_url}/api/v1/analyze/expertise",
-            json={
-                "response_text": "I implemented a microservices architecture using Docker and Kubernetes.",
-                "question_context": "Explain your experience with container orchestration.",
-            },
-            headers=auth_headers,
-        )
+    def test_analyze_expertise(self, client):
+        payload = {
+            "response_text": "I have architected and led several projects using Kubernetes and AWS.",
+            "question_context": "Explain your experience with cloud architecture.",
+        }
+        response = client.post("/api/v1/analyze/expertise", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert "level" in data
-        assert "confidence" in data
+        assert data["level"] in ["advanced", "expert"]
+        assert "cloud" in data["technical_skills"]
 
-    @pytest.mark.asyncio
-    async def test_analyze_performance(self, analytics_service_url, async_client, auth_headers):
-        response = await async_client.post(
-            f"{analytics_service_url}/api/v1/analyze/performance",
-            json={
-                "room_id": "room_123",
-                "response_analyses": [
-                    {
-                        "quality": {"overall_score": 8.5},
-                        "sentiment": {"polarity": 0.5},
-                        "bias_detection": {"flags": []},
-                        "expertise_assessment": {"level": "advanced"},
-                    }
-                ],
-            },
-            headers=auth_headers,
-        )
+    def test_analyze_performance(self, client):
+        payload = {
+            "room_id": "int_123",
+            "response_analyses": [
+                {
+                    "sentiment": {"polarity": 0.5},
+                    "quality": {"overall_score": 8.0},
+                    "bias_detection": {"flags": []},
+                    "expertise_assessment": {"level": "advanced"},
+                }
+            ],
+        }
+        response = client.post("/api/v1/analyze/performance", json=payload)
         assert response.status_code == 200
         data = response.json()
-        assert "overall_score" in data
-        assert data["expertise_level"] == "advanced"
+        assert data["overall_score"] > 5
+        assert data["sentiment_trend"] == "positive"
 
-    @pytest.mark.asyncio
-    async def test_generate_report(self, analytics_service_url, async_client, auth_headers):
-        response = await async_client.post(
-            f"{analytics_service_url}/api/v1/analyze/report",
-            json={
-                "room_id": "room_123",
-                "room_created_at": "2026-01-01T22:00:00",
-                "analyses": [
-                    {
-                        "quality": {"overall_score": 8.5},
-                        "sentiment": {"polarity": 0.5},
-                        "bias_detection": {"flags": []},
-                        "expertise_assessment": {"level": "advanced"},
-                    }
-                ],
-                "responses": [{"text": "Hello world"}],
-            },
-            headers=auth_headers,
-        )
+    def test_generate_report(self, client):
+        payload = {
+            "room_id": "room_456",
+            "room_created_at": "2024-01-01T10:00:00",
+            "responses": [{"text": "sample response"}],
+            "analyses": [
+                {
+                    "sentiment": {"polarity": 0.1},
+                    "quality": {"overall_score": 7.0},
+                    "bias_detection": {"flags": [], "categories": []},
+                    "expertise_assessment": {"level": "intermediate"},
+                }
+            ],
+        }
+        response = client.post("/api/v1/analyze/report", json=payload)
         assert response.status_code == 200
         data = response.json()
         assert "summary" in data
         assert "interview_effectiveness" in data
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

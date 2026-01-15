@@ -1,5 +1,4 @@
-"""
-Unit Tests for Vosk STT Service
+"""Unit Tests for Vosk STT Service
 
 Following TDD principles with comprehensive test coverage for production-ready
 speech-to-text service using Vosk (Kaldi-based, CPU-only inference).
@@ -7,12 +6,13 @@ speech-to-text service using Vosk (Kaldi-based, CPU-only inference).
 Created: November 13, 2025
 """
 
-import pytest
 import json
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
-import numpy as np
 import sys
+from pathlib import Path
+from unittest.mock import Mock, patch
+
+import numpy as np
+import pytest
 
 # Mock vosk before importing the service
 sys.modules["vosk"] = Mock()
@@ -23,12 +23,11 @@ from services.vosk_stt_service import VoskSTTService
 @pytest.fixture
 def vosk_service():
     """Create VoskSTTService instance for testing."""
-    with patch("services.vosk_stt_service.VOSK_AVAILABLE", True):
-        with patch.object(VoskSTTService, "load_model"):
-            service = VoskSTTService(
-                model_path="models/vosk-model-small-en-us-0.15", sample_rate=16000
-            )
-            return service
+    with patch("services.vosk_stt_service.VOSK_AVAILABLE", True), patch.object(VoskSTTService, "load_model"):
+        service = VoskSTTService(
+            model_path="models/vosk-model-small-en-us-0.15", sample_rate=16000
+        )
+        return service
 
 
 @pytest.fixture

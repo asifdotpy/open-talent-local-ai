@@ -1,7 +1,8 @@
-import pytest
+from unittest.mock import AsyncMock, Mock, patch
+
 import numpy as np
-from unittest.mock import Mock, patch, AsyncMock
-import asyncio
+import pytest
+
 from services.audio_processing_service import RNNoiseTrack
 
 
