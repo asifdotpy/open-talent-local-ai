@@ -63,7 +63,6 @@ declare -A SERVICES=(
     ["conversation-service"]="$CONVERSATION_SERVICE_PORT"
     ["voice-service"]="$VOICE_SERVICE_PORT"
     ["avatar-service"]="$AVATAR_SERVICE_PORT"
-    ["granite-interview-service"]="$GRANITE_SERVICE_PORT"
     ["candidate-service"]="$CANDIDATE_SERVICE_PORT"
     ["analytics-service"]="$ANALYTICS_SERVICE_PORT"
     ["desktop-integration-service"]="$GATEWAY_PORT"
@@ -196,15 +195,7 @@ start_microservice() {
     # Service-Specific Overrides
     local timeout=10 # Default timeout
 
-    if [ "$service_name" == "granite-interview-service" ]; then
-        # Override Docker paths with local directory structure
-        export MODEL_CACHE_DIR="$SCRIPT_DIR/models/cache"
-        export TRAINING_DATA_DIR="$SCRIPT_DIR/data/training"
-        export OUTPUT_DIR="$SCRIPT_DIR/models/output"
-        mkdir -p "$MODEL_CACHE_DIR" "$TRAINING_DATA_DIR" "$OUTPUT_DIR"
-
-        timeout=120 # Heavy load time for Granite
-    elif [ "$service_name" == "candidate-service" ]; then
+    if [ "$service_name" == "candidate-service" ]; then
         timeout=120 # Heavy load time for embeddings
     fi
 
