@@ -8,7 +8,7 @@
   "scripts": {
     "build-ts": "tsc",
     "start": "cross-env FORCE_PROD=1 npm run build-ts && npx react-scripts build && electron dist/main/main.js",
-    "dev": "concurrently \"npm run dev-react\" \"npm run dev-electron\"",
+    "dev": "concurrently --names REACT,ELECTRON --prefix-colors cyan,magenta --kill-others-on-fail \"npm run dev-react\" \"npm run dev-electron\"",
     "dev-react": "react-scripts start",
     "dev-electron": "npm run build-ts && wait-on http://localhost:3000 && electron dist/main/main.js --dev",
     "build": "npm run build-ts && npx react-scripts build",

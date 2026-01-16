@@ -237,20 +237,56 @@ start_microservice() {
 start_desktop() {
     log_progress "Starting Desktop Application..."
 
+    # Verify npm dependencies first
+    if [ ! -d "desktop-app/node_modules/concurrently" ]; then
+        log_error "Desktop dependencies not installed. Run: cd desktop-app && npm install"
+        return 1
+    fi
+
+    # Ensure we use WSL npm, not Windows npm
+    local WSL_NPM
+    if [ -d "$HOME/.nvm/versions/node" ]; then
+        # Use nvm's npm
+        local NODE_VERSION
+        NODE_VERSION=$(ls -1 "$HOME/.nvm/versions/node" | tail -1)
+        WSL_NPM="$HOME/.nvm/versions/node/$NODE_VERSION/bin/npm"
+    elif command -v npm &> /dev/null; then
+        WSL_NPM=$(command -v npm)
+    else
+        log_error "npm not found. Please install Node.js in WSL"
+        return 1
+    fi
+
+    log_info "Using npm at: $WSL_NPM"
+
     (
         cd desktop-app
-        npm run dev >> "$LOG_DIR/desktop-app.log" 2>&1
+        # Set environment to prevent Windows interference
+        export BROWSER=none
+        export PATH="$HOME/.nvm/versions/node/$NODE_VERSION/bin:$PATH"
+
+        # Use absolute path to ensure WSL npm
+        "$WSL_NPM" run dev >> "$LOG_DIR/desktop-app.log" 2>&1
     ) &
 
     local pid=$!
     echo "desktop-app:$pid:$DESKTOP_PORT" >> "$PID_FILE"
 
-    sleep 3
+    # Increase wait time for TypeScript compilation
+    sleep 8
+
+    # Check if process is still alive
     if kill -0 $pid 2>/dev/null; then
-        log_success "Desktop App started (PID: $pid, Port: $DESKTOP_PORT)"
-        return 0
+        # Additional check: verify React dev server is up
+        if check_service_health "desktop-app" "$DESKTOP_PORT" 5; then
+            log_success "Desktop App started (PID: $pid, Port: $DESKTOP_PORT)"
+            return 0
+        else
+            log_warning "Desktop App started but React dev server not responding yet (PID: $pid)"
+            return 0  # Don't fail, it might still be compiling
+        fi
     else
-        log_error "Desktop App failed to start"
+        log_error "Desktop App failed to start (check logs/desktop-app.log)"
         return 1
     fi
 }
