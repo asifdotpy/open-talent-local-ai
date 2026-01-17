@@ -141,7 +141,7 @@ def create_access_token(email: str, expires_delta: timedelta | None = None) -> s
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
     # Standard claims
-    payload = {"exp": expire, "iat": datetime.utcnow(), "sub": email}
+    payload = {"exp": expire, "iat": datetime.utcnow(), "sub": email, "email": email}
 
     # Add non-sensitive user data to the token payload
     user = users_db.get(email)

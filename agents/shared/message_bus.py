@@ -9,7 +9,6 @@ from collections.abc import Callable
 from typing import Any
 
 import redis.asyncio as redis
-
 from models import AgentMessage, MessagePriority, MessageType
 
 logger = logging.getLogger(__name__)

@@ -6,11 +6,14 @@ import json
 import logging
 import os
 import tempfile
+import time
 from fractions import Fraction
+from typing import Annotated
 
 import aiohttp
 import httpx
 import numpy as np
+import soundfile as sf
 from aiortc import (
     MediaStreamTrack,
     RTCConfiguration,
@@ -21,7 +24,20 @@ from aiortc import (
 from aiortc.codecs.opus import OpusEncoder
 from aiortc.contrib.media import MediaBlackhole, MediaStreamError
 from av import AudioFrame
-from fastapi import Body, FastAPI
+from fastapi import Body, FastAPI, status
+
+# --- Constants ---
+HTTP_OK = status.HTTP_200_OK
+HTTP_BAD_REQUEST = status.HTTP_400_BAD_REQUEST
+HTTP_NOT_FOUND = status.HTTP_404_NOT_FOUND
+HTTP_INTERNAL_SERVER_ERROR = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+DEFAULT_SAMPLE_RATE = 16000
+VOSK_MODEL_SAMPLE_RATE = 16000
+SILERO_MODEL_SAMPLE_RATE = 16000
+WEBRTC_AUDIO_SAMPLE_RATE = 48000
+OPUS_PREFERRED_SAMPLE_RATE = 48000
+AUDIO_CHUNK_DURATION_MS = 200
 
 # Import voice services
 try:
@@ -52,7 +68,7 @@ USE_MOCK = os.getenv("USE_MOCK", "false").lower() == "true"
 OPUS_BITRATE = int(os.getenv("OPUS_BITRATE", "64000"))  # 64kbps default (32-128kbps range)
 OPUS_COMPLEXITY = int(os.getenv("OPUS_COMPLEXITY", "8"))  # 0-10, higher = better quality
 ENABLE_AEC = os.getenv("ENABLE_AEC", "false").lower() == "true"
-AUDIO_SAMPLE_RATE = 48000  # Opus optimal sample rate
+AUDIO_SAMPLE_RATE = WEBRTC_AUDIO_SAMPLE_RATE  # Opus optimal sample rate
 AUDIO_CHANNELS = 1  # Mono for voice processing
 
 # Performance monitoring
@@ -67,14 +83,17 @@ audio_pipeline_stats = {
 # Initialize STT/TTS services
 if STT_TTS_AVAILABLE and not USE_MOCK:
     stt_service = VoskSTTService(
-        model_path=os.getenv("VOSK_MODEL_PATH", "models/vosk-model-small-en-us-0.15"), sample_rate=16000
+        model_path=os.getenv("VOSK_MODEL_PATH", "models/vosk-model-small-en-us-0.15"),
+        sample_rate=VOSK_MODEL_SAMPLE_RATE,
     )
     tts_service = PiperTTSService(
         model_path=os.getenv("PIPER_MODEL_PATH", "models/en_US-lessac-medium.onnx"),
         config_path=os.getenv("PIPER_CONFIG_PATH", "models/en_US-lessac-medium.onnx.json"),
     )
     vad_service = SileroVADService(
-        model_path=os.getenv("SILERO_MODEL_PATH", "models/silero_vad.onnx"), sample_rate=16000, threshold=0.5
+        model_path=os.getenv("SILERO_MODEL_PATH", "models/silero_vad.onnx"),
+        sample_rate=SILERO_MODEL_SAMPLE_RATE,
+        threshold=0.5,
     )
 else:
     stt_service = None
@@ -91,6 +110,7 @@ class ConversationClient:
     """Client for communicating with the conversation service."""
 
     def __init__(self, base_url: str = CONVERSATION_SERVICE_URL):
+        """Initialize the ConversationClient."""
         self.base_url = base_url
         self.client = httpx.AsyncClient(timeout=10.0)
 
@@ -107,7 +127,7 @@ class ConversationClient:
                 },
             )
 
-            if response.status_code == 200:
+            if response.status_code == HTTP_OK:
                 return response.json()
             else:
                 logger.error(f"Conversation service error: {response.status_code} - {response.text}")
@@ -130,7 +150,7 @@ class ConversationClient:
                 },
             )
 
-            return response.status_code == 200
+            return response.status_code == HTTP_OK
 
         except Exception as e:
             logger.error(f"Failed to start conversation: {e}")
@@ -145,6 +165,7 @@ class InterviewServiceClient:
     """Client for communicating with the interview service for live transcription."""
 
     def __init__(self, base_url: str = INTERVIEW_SERVICE_URL):
+        """Initialize the InterviewServiceClient."""
         self.base_url = base_url
         self.client = httpx.AsyncClient(timeout=5.0)
 
@@ -176,7 +197,7 @@ class InterviewServiceClient:
                 json={"segment": segment_data, "session_id": session_id, "participant_id": participant_id},
             )
 
-            if response.status_code == 200:
+            if response.status_code == HTTP_OK:
                 logger.debug(f"Sent transcription segment to interview service: '{text[:30]}...'")
                 return True
             else:
@@ -200,13 +221,15 @@ interview_client = InterviewServiceClient()
 
 
 class EnhancedAudioPipeline(MediaStreamTrack):
-    """Enhanced audio processing pipeline: RNNoise → Opus Encoder → AEC (future)
+    """Enhanced audio processing pipeline: RNNoise → Opus Encoder → AEC (future).
+
     Provides optimized audio quality for WebRTC voice processing.
     """
 
     kind = "audio"
 
     def __init__(self, track: MediaStreamTrack):
+        """Initialize the EnhancedAudioPipeline."""
         super().__init__()
         self.track = track
         self.opus_encoder = None
@@ -236,8 +259,6 @@ class EnhancedAudioPipeline(MediaStreamTrack):
 
     async def recv(self):
         """Process audio through enhanced pipeline: RNNoise → Opus → AEC."""
-        import time
-
         start_time = time.time()
 
         try:
@@ -324,8 +345,8 @@ class AudioStreamTrack(MediaStreamTrack):
         self.conversation_client = conversation_client
         self.interview_client = interview_client
         self.buffer = bytearray()
-        self.sample_rate = 16000
-        self.chunk_duration_ms = 200  # Process every 200ms
+        self.sample_rate = DEFAULT_SAMPLE_RATE
+        self.chunk_duration_ms = AUDIO_CHUNK_DURATION_MS  # Process every 200ms
         self.bytes_per_chunk = int(self.sample_rate * 2 * self.chunk_duration_ms / 1000)
 
         # Note: Echo Cancellation (AEC) is handled client-side in the browser WebRTC implementation
@@ -488,7 +509,7 @@ class TTSAudioTrack(MediaStreamTrack):
         self.session_id = session_id
         self.audio_frames = []
         self.frame_index = 0
-        self.sample_rate = 16000  # Mock TTS default
+        self.sample_rate = DEFAULT_SAMPLE_RATE  # Mock TTS default
         self.generating = False
 
         # Generate TTS audio in background
@@ -515,8 +536,6 @@ class TTSAudioTrack(MediaStreamTrack):
             )
 
             # Read generated audio and convert to frames
-            import soundfile as sf
-
             audio_data, sr = sf.read(output_path)
 
             # Convert to frames (20ms each)
@@ -544,8 +563,6 @@ class TTSAudioTrack(MediaStreamTrack):
 
         # Return frames
         if self.frame_index < len(self.audio_frames):
-            from av import AudioFrame
-
             frame_data = self.audio_frames[self.frame_index]
             self.frame_index += 1
 
@@ -722,7 +739,7 @@ class VoiceServiceWorker:
 
 
 @app.post("/webrtc/start")
-async def start_session(payload: dict = Body(...)):
+async def start_session(payload: Annotated[dict, Body(...)]):
     """Start a new WebRTC session for voice processing.
     Called by interview-service when a new interview begins.
     """
@@ -753,7 +770,7 @@ async def start_session(payload: dict = Body(...)):
 
 
 @app.post("/webrtc/stop")
-async def stop_session(payload: dict = Body(...)):
+async def stop_session(payload: Annotated[dict, Body(...)]):
     """Stop an active WebRTC session."""
     session_id = payload.get("session_id")
 
@@ -767,10 +784,11 @@ async def stop_session(payload: dict = Body(...)):
 
 
 @app.post("/webrtc/tts")
-async def send_tts_audio(payload: dict = Body(...)):
+async def send_tts_audio(payload: Annotated[dict, Body(...)]):
     """Generate and send TTS audio to active session.
 
     Args:
+        payload (dict): The request payload containing the session_id and text.
         session_id: Active session ID
         text: Text to synthesize
     """
@@ -808,10 +826,11 @@ async def get_audio_pipeline_stats():
 
 
 @app.post("/webrtc/audio/benchmark")
-async def run_audio_benchmark(payload: dict = Body(...)):
+async def run_audio_benchmark(payload: Annotated[dict, Body(...)]):
     """Run audio pipeline benchmark test.
 
     Args:
+        payload (dict): The request payload containing the duration_seconds and sample_rate.
         duration_seconds: Test duration (default: 5)
         sample_rate: Audio sample rate (default: 48000)
     """
@@ -820,8 +839,6 @@ async def run_audio_benchmark(payload: dict = Body(...)):
 
     try:
         # Generate test audio (sine wave with noise)
-        import time
-
         start_time = time.time()
 
         # Create test audio: 1kHz sine wave + white noise
@@ -858,8 +875,6 @@ async def run_audio_benchmark(payload: dict = Body(...)):
                     self.index = end_idx
 
                     # Create AudioFrame
-                    from av import AudioFrame
-
                     frame = AudioFrame.from_ndarray(chunk.reshape(1, -1), format="flt", layout="mono")
                     frame.sample_rate = sample_rate
                     frame.pts = start_idx
