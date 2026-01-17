@@ -126,7 +126,7 @@ def verify_password(password: str, hash_value: str) -> bool:
 
 
 def create_access_token(email: str, expires_delta: timedelta | None = None) -> str:
-    """Generate a signed JWT access token for a user.
+    """Generate a signed JWT access token for a user, including user data.
 
     Args:
         email: User email to include in the JWT payload.
@@ -140,7 +140,20 @@ def create_access_token(email: str, expires_delta: timedelta | None = None) -> s
     else:
         expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    payload = {"email": email, "exp": expire, "iat": datetime.utcnow()}
+    # Standard claims
+    payload = {"exp": expire, "iat": datetime.utcnow(), "sub": email}
+
+    # Add non-sensitive user data to the token payload
+    user = users_db.get(email)
+    if user:
+        user_claims = {
+            "email": user.get("email"),
+            "first_name": user.get("first_name"),
+            "last_name": user.get("last_name"),
+            "roles": user.get("roles", []),
+            "permissions": user.get("permissions", []),
+        }
+        payload.update(user_claims)
 
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
     return token
