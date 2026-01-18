@@ -6,6 +6,7 @@ import asyncio
 import logging
 import os
 import tempfile
+from typing import Annotated
 
 from fastapi import (
     Body,
@@ -14,10 +15,16 @@ from fastapi import (
     HTTPException,
     UploadFile,
     WebSocket,
+    status,
 )
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+
+# --- Constants ---
+DEFAULT_SAMPLE_RATE = 16000
+VOSK_MODEL_SAMPLE_RATE = 16000
+SILERO_MODEL_SAMPLE_RATE = 16000
 
 from services.modular_tts_service import MockModularTTSService, ModularTTSService
 from services.silero_vad_service import MockSileroVADService, SileroVADService
@@ -140,7 +147,7 @@ else:
     logger.info("Initializing PRODUCTION speech processing services")
     stt_service = VoskSTTService(
         model_path=os.getenv("VOSK_MODEL_PATH", "models/vosk-model-small-en-us-0.15"),
-        sample_rate=16000,
+        sample_rate=VOSK_MODEL_SAMPLE_RATE,
     )
 
     # Initialize modular TTS service (can use local Piper or OpenAI API)
@@ -167,7 +174,7 @@ else:
 
     vad_service = SileroVADService(
         model_path=os.getenv("SILERO_MODEL_PATH", "models/silero_vad.onnx"),
-        sample_rate=16000,
+        sample_rate=SILERO_MODEL_SAMPLE_RATE,
         threshold=0.5,
     )
 
@@ -220,6 +227,8 @@ async def startup_event():
 
 # --- Request and Response Models ---
 class TTSRequest(BaseModel):
+    """Request model for Text-to-Speech synthesis."""
+
     text: str
     voice: str | None = None  # Will default to provider-specific voice
     speed: float | None = 1.0
@@ -227,6 +236,8 @@ class TTSRequest(BaseModel):
 
 
 class STTResponse(BaseModel):
+    """Response model for Speech-to-Text transcription."""
+
     text: str
     words: list[dict]
     duration: float
@@ -234,6 +245,8 @@ class STTResponse(BaseModel):
 
 
 class TTSResponse(BaseModel):
+    """Response model for Text-to-Speech synthesis."""
+
     audio_file: str
     duration: float
     sample_rate: int
@@ -242,6 +255,8 @@ class TTSResponse(BaseModel):
 
 
 class VADRequest(BaseModel):
+    """Request model for Voice Activity Detection."""
+
     remove_silence: bool | None = False
 
 
@@ -414,7 +429,7 @@ async def health_options():
     summary="Speech-to-Text transcription",
 )
 async def speech_to_text(
-    audio_file: UploadFile = File(..., description="Audio file to transcribe (WAV, MP3, etc.)"),
+    audio_file: Annotated[UploadFile, File(..., description="Audio file to transcribe (WAV, MP3, etc.)")],
     use_vad: bool = False,
 ):
     """Convert speech to text using Vosk.
@@ -430,7 +445,7 @@ async def speech_to_text(
 
     # Validate file type
     if not audio_file.content_type or not audio_file.content_type.startswith("audio/"):
-        raise HTTPException(status_code=400, detail="Invalid audio file type")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid audio file type")
 
     # Save uploaded file temporarily
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_audio_file:
@@ -452,7 +467,7 @@ async def speech_to_text(
         transcription = stt_service.transcribe_audio(tmp_audio_file_path)
 
         if not transcription or not transcription.get("text"):
-            raise HTTPException(status_code=500, detail="Transcription failed")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Transcription failed")
 
         logger.info(f"Transcription successful: '{transcription['text'][:50]}...'")
 
@@ -460,7 +475,9 @@ async def speech_to_text(
 
     except Exception as e:
         logger.error(f"STT failed: {e}")
-        raise HTTPException(status_code=500, detail=f"Speech-to-text failed: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Speech-to-text failed: {str(e)}"
+        )
     finally:
         # Cleanup temporary file
         if os.path.exists(tmp_audio_file_path):
@@ -480,7 +497,7 @@ async def text_to_speech(request: TTSRequest):
     logger.info(f"TTS request: '{request.text[:50]}...' (voice: {request.voice})")
 
     if not request.text or len(request.text.strip()) == 0:
-        raise HTTPException(status_code=400, detail="Text cannot be empty")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Text cannot be empty")
 
     # Create temporary output file
     with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_audio_file:
@@ -497,7 +514,7 @@ async def text_to_speech(request: TTSRequest):
         )
 
         if not os.path.exists(output_path):
-            raise HTTPException(status_code=500, detail="TTS synthesis failed")
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="TTS synthesis failed")
 
         logger.info(f"TTS successful: {synthesis_result['duration']:.2f}s audio generated")
 
@@ -523,7 +540,9 @@ async def text_to_speech(request: TTSRequest):
         # Cleanup on error
         if os.path.exists(output_path):
             os.unlink(output_path)
-        raise HTTPException(status_code=500, detail=f"Text-to-speech failed: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Text-to-speech failed: {str(e)}"
+        )
     finally:
         # Cleanup temp file
         if os.path.exists(output_path):
@@ -532,7 +551,7 @@ async def text_to_speech(request: TTSRequest):
 
 @app.post("/voice/vad", tags=["voice-processing"], summary="Voice Activity Detection")
 async def voice_activity_detection(
-    audio_file: UploadFile = File(..., description="Audio file to analyze"),
+    audio_file: Annotated[UploadFile, File(..., description="Audio file to analyze")],
     remove_silence: bool = False,
 ):
     """Detect voice activity in audio file.
@@ -579,7 +598,9 @@ async def voice_activity_detection(
 
     except Exception as e:
         logger.error(f"VAD failed: {e}")
-        raise HTTPException(status_code=500, detail=f"Voice activity detection failed: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Voice activity detection failed: {str(e)}"
+        )
     finally:
         # Cleanup temporary file
         if os.path.exists(tmp_audio_file_path):
@@ -608,7 +629,7 @@ async def websocket_tts_stream(websocket: WebSocket):
 if WEBRTC_AVAILABLE:
 
     @app.post("/webrtc/start", tags=["webrtc"], summary="Start WebRTC session")
-    async def start_webrtc_session(payload: dict = Body(...)):
+    async def start_webrtc_session(payload: Annotated[dict, Body(...)]):
         """Start a new WebRTC session for voice processing.
         Called by interview-service when a new interview begins.
         """
@@ -616,7 +637,7 @@ if WEBRTC_AVAILABLE:
         payload.get("job_description", "General software engineering position")
 
         if not session_id:
-            return {"error": "Missing session_id"}, 400
+            return {"error": "Missing session_id"}, status.HTTP_400_BAD_REQUEST
 
         # Start conversation session (placeholder - integrate with conversation service)
         logger.info(f"Starting WebRTC session {session_id}")
@@ -628,22 +649,22 @@ if WEBRTC_AVAILABLE:
             return {"status": "started", "session_id": session_id}
         except Exception as e:
             logger.error(f"Failed to start WebRTC session: {e}")
-            return {"error": str(e)}, 500
+            return {"error": str(e)}, status.HTTP_500_INTERNAL_SERVER_ERROR
 
     @app.post("/webrtc/stop", tags=["webrtc"], summary="Stop WebRTC session")
-    async def stop_webrtc_session(payload: dict = Body(...)):
+    async def stop_webrtc_session(payload: Annotated[dict, Body(...)]):
         """Stop an active WebRTC session."""
         session_id = payload.get("session_id")
 
         if not session_id:
-            return {"error": "Missing session_id"}, 400
+            return {"error": "Missing session_id"}, status.HTTP_400_BAD_REQUEST
 
         # Stop WebRTC worker for this session (placeholder)
         logger.info(f"Stopping WebRTC session {session_id}")
         return {"status": "stopped", "session_id": session_id}
 
     @app.post("/webrtc/tts", tags=["webrtc"], summary="Send TTS to WebRTC session")
-    async def send_webrtc_tts(payload: dict = Body(...)):
+    async def send_webrtc_tts(payload: Annotated[dict, Body(...)]):
         """Generate and send TTS audio to active WebRTC session.
 
         Args:
@@ -654,7 +675,7 @@ if WEBRTC_AVAILABLE:
         text = payload.get("text")
 
         if not session_id or not text:
-            return {"error": "Missing session_id or text"}, 400
+            return {"error": "Missing session_id or text"}, status.HTTP_400_BAD_REQUEST
 
         # Send TTS to WebRTC session (placeholder)
         logger.info(f"Sending TTS to WebRTC session {session_id}: {text[:50]}...")

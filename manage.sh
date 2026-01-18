@@ -234,30 +234,22 @@ start_desktop() {
         return 1
     fi
 
-    # Ensure we use WSL npm, not Windows npm
-    local WSL_NPM
-    if [ -d "$HOME/.nvm/versions/node" ]; then
-        # Use nvm's npm
-        local NODE_VERSION
-        NODE_VERSION=$(ls -1 "$HOME/.nvm/versions/node" | tail -1)
-        WSL_NPM="$HOME/.nvm/versions/node/$NODE_VERSION/bin/npm"
-    elif command -v npm &> /dev/null; then
-        WSL_NPM=$(command -v npm)
-    else
-        log_error "npm not found. Please install Node.js in WSL"
+    # Find npm in the path
+    NPM_CMD=$(command -v npm)
+    if [ -z "$NPM_CMD" ]; then
+        log_error "npm not found. Please ensure Node.js is installed and npm is in your PATH."
         return 1
     fi
 
-    log_info "Using npm at: $WSL_NPM"
+    log_info "Using npm at: $NPM_CMD"
 
     (
         cd desktop-app
         # Set environment to prevent Windows interference
         export BROWSER=none
-        export PATH="$HOME/.nvm/versions/node/$NODE_VERSION/bin:$PATH"
 
-        # Use absolute path to ensure WSL npm
-        "$WSL_NPM" run dev >> "$LOG_DIR/desktop-app.log" 2>&1
+        # Use the found npm command
+        "$NPM_CMD" run dev >> "$LOG_DIR/desktop-app.log" 2>&1
     ) &
 
     local pid=$!

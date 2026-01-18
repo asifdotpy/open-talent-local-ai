@@ -345,5 +345,4 @@ if not merged_available or not gguf_available:
     if not gguf_available:
         print("3. Convert GGUF: python convert_to_gguf.py")
         print("4. Upload GGUF to: asifdotpy/vetta-granite-2b-gguf-v3")
-print("\nYou can now integrate Vetta into your interview service using LoRA format!")</content>
-<parameter name="filePath">/home/asif1/open-talent-platform/notebook_chunks/11_upload_huggingface.py
+print("\nYou can now integrate Vetta into your interview service using LoRA format!")

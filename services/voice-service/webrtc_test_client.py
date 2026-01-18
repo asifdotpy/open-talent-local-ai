@@ -28,13 +28,26 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# --- Constants ---
+DEFAULT_SIGNALING_URL = "ws://localhost:8005/webrtc/signal"
+DEFAULT_SESSION_TIMEOUT = 30
+TEST_SESSION_ID = "test-session-fixed"
+AUDIO_SAMPLE_RATE = 48000
+AUDIO_CHANNELS = 1
+DUMMY_AUDIO_FRAME_SIZE = 480
+LATENCY_THRESHOLD_MS = 5000
+HIGH_LATENCY_WARNING_MS = 2000
+STRESS_TEST_CONNECTIONS = 3
+TEST_AUDIO_DURATION_S = 5.0
+TEST_AUDIO_FREQUENCY_HZ = 1000
+
 
 class WebRTCTestClient:
     """Test client for WebRTC voice service testing with robust error handling and validation."""
 
-    def __init__(self, signaling_url="ws://localhost:8005/webrtc/signal", session_timeout=30):
+    def __init__(self, signaling_url=DEFAULT_SIGNALING_URL, session_timeout=DEFAULT_SESSION_TIMEOUT):
         self.signaling_url = signaling_url
-        self.session_id = "test-session-fixed"  # Use fixed session ID for testing
+        self.session_id = TEST_SESSION_ID  # Use fixed session ID for testing
         self.session_timeout = session_timeout
         self.pc = None
         self.ws = None
@@ -120,7 +133,7 @@ class WebRTCTestClient:
         try:
             # Generate test audio
             self.test_audio, self.test_audio_file = await self.validator.generate_test_audio(
-                duration_seconds=5.0, include_noise=True, frequency=1000
+                duration_seconds=TEST_AUDIO_DURATION_S, include_noise=True, frequency=TEST_AUDIO_FREQUENCY_HZ
             )
 
             if len(self.test_audio) > 0:
@@ -137,7 +150,7 @@ class WebRTCTestClient:
         # Test Scenario 3: Stress Test (Multiple Connections)
         logger.info("🧪 Test Scenario 3: Connection Stress Test")
         try:
-            stress_results = await self._run_stress_test(num_connections=3)
+            stress_results = await self._run_stress_test(num_connections=STRESS_TEST_CONNECTIONS)
             results["stress_test"] = stress_results
         except Exception as e:
             logger.error(f"Stress test failed: {e}")
@@ -232,9 +245,11 @@ class WebRTCTestClient:
                     # Generate silent audio frames
                     await asyncio.sleep(0.1)  # 100ms delay
                     # Create a silent 10ms audio frame (480 samples at 48kHz)
-                    silent_frame = np.zeros(480, dtype=np.int16)
+                    silent_frame = np.zeros(DUMMY_AUDIO_FRAME_SIZE, dtype=np.int16)
                     return type(
-                        "Frame", (), {"to_ndarray": lambda: silent_frame, "sample_rate": 48000, "channels": 1}
+                        "Frame",
+                        (),
+                        {"to_ndarray": lambda: silent_frame, "sample_rate": AUDIO_SAMPLE_RATE, "channels": AUDIO_CHANNELS},
                     )()
 
             dummy_track = DummyAudioTrack()
@@ -388,7 +403,7 @@ class WebRTCTestClient:
 
             # Save to temporary file
             with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
-                sf.write(tmp.name, audio_array, 48000)
+                sf.write(tmp.name, audio_array, AUDIO_SAMPLE_RATE)
                 logger.info(f"Saved processed audio to {tmp.name}")
 
                 # Analyze SNR
@@ -549,7 +564,7 @@ class WebRTCTestClient:
 
         return ValidationResult(
             passed=passed,
-            metrics=AudioMetrics(0, 0, 0, 0, 0, 0, 48000, 1, 0),
+            metrics=AudioMetrics(0, 0, 0, 0, 0, 0, AUDIO_SAMPLE_RATE, AUDIO_CHANNELS, 0),
             errors=errors,
             warnings=warnings,
             recommendations=recommendations,
@@ -561,7 +576,7 @@ class WebRTCTestClient:
 
         return ValidationResult(
             passed=False,
-            metrics=AudioMetrics(0, 0, 0, 0, 0, 0, 48000, 1, 0),
+            metrics=AudioMetrics(0, 0, 0, 0, 0, 0, AUDIO_SAMPLE_RATE, AUDIO_CHANNELS, 0),
             errors=[error_msg],
             warnings=[],
             recommendations=["Check voice service logs for detailed error information"],
@@ -635,7 +650,7 @@ class WebRTCTestClient:
 
         return ValidationResult(
             passed=passed,
-            metrics=AudioMetrics(0, 0, 0, 0, 0, 0, 48000, 1, 0),
+            metrics=AudioMetrics(0, 0, 0, 0, 0, 0, AUDIO_SAMPLE_RATE, AUDIO_CHANNELS, 0),
             errors=errors,
             warnings=warnings,
             recommendations=recommendations,
@@ -653,12 +668,12 @@ class WebRTCTestClient:
             latency_ms = connection_time * 1000
 
             # Validate latency
-            passed = latency_ms < 5000  # 5 second threshold
+            passed = latency_ms < LATENCY_THRESHOLD_MS  # 5 second threshold
             errors = [] if passed else [f"High latency: {latency_ms:.1f}ms"]
             warnings = []
             recommendations = []
 
-            if latency_ms > 2000:
+            if latency_ms > HIGH_LATENCY_WARNING_MS:
                 warnings.append(f"High connection latency: {latency_ms:.1f}ms")
                 recommendations.append("Check network conditions and server response times")
 
@@ -668,7 +683,7 @@ class WebRTCTestClient:
 
             return ValidationResult(
                 passed=passed,
-                metrics=AudioMetrics(0, 0, latency_ms, 0, 0, 0, 48000, 1, 0),
+                metrics=AudioMetrics(0, 0, latency_ms, 0, 0, 0, AUDIO_SAMPLE_RATE, AUDIO_CHANNELS, 0),
                 errors=errors,
                 warnings=warnings,
                 recommendations=recommendations,

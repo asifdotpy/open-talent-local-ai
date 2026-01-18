@@ -13,9 +13,9 @@ from typing import Any
 
 import uvicorn
 from app.config.settings import Settings
+from app.models import ModelRegistry
 from app.services.inference_engine import InferenceEngine
 from app.services.model_loader import ModelLoader
-from app.models import ModelRegistry
 from app.services.training_service import TrainingService
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware

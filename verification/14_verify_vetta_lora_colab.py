@@ -5,12 +5,12 @@
 # Install required packages (run this first if not installed)
 # !pip install torch transformers unsloth huggingface_hub
 
-import torch
-from unsloth import FastLanguageModel
-from transformers import AutoTokenizer
-from huggingface_hub import login
-from google.colab import userdata
 import time
+
+import torch
+from google.colab import userdata
+from huggingface_hub import login
+from unsloth import FastLanguageModel
 
 # 1. CONFIGURATION
 LORA_REPO = "asifdotpy/vetta-granite-2b-lora-v3"
@@ -158,7 +158,8 @@ Vetta:"""
         has_questions = "?" in vetta_response
         has_technical_terms = any(term in vetta_response.lower() for term in ["api", "database", "framework", "algorithm", "performance"])
 
-        print("📊 Quality Metrics:"        print(f"   • Words: {word_count}")
+        print("📊 Quality Metrics:")
+        print(f"   • Words: {word_count}")
         print(f"   • Asks questions: {'✅' if has_questions else '❌'}")
         print(f"   • Technical content: {'✅' if has_technical_terms else '❌'}")
         print(f"   • Response length: {'Good' if 50 <= word_count <= 300 else 'Check length'}")

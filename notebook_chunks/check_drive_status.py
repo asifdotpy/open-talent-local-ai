@@ -73,5 +73,4 @@ def check_drive_status():
     print("   Run this script anytime to check status.")
 
 if __name__ == "__main__":
-    check_drive_status()</content>
-<parameter name="filePath">/home/asif1/open-talent-platform/notebook_chunks/check_drive_status.py
+    check_drive_status()

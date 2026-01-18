@@ -5,11 +5,11 @@
 # Install required packages (run this first if not installed)
 # !pip install torch transformers unsloth huggingface_hub
 
-import torch
-from unsloth import FastLanguageModel
-from transformers import AutoTokenizer
-from huggingface_hub import login, HfApi
 import time
+
+import torch
+from huggingface_hub import login
+from unsloth import FastLanguageModel
 
 print("🔍 Starting Vetta LoRA Model Verification...")
 print("=" * 60)
@@ -25,7 +25,7 @@ try:
     hf_token = userdata.get('HF_TOKEN')
     login(token=hf_token)
     print("✅ Authenticated with Hugging Face")
-except:
+except Exception:
     print("⚠️  Running locally - ensure HF_TOKEN is set")
     import os
     hf_token = os.getenv('HF_TOKEN')
@@ -53,7 +53,9 @@ try:
     )
 
     load_time = time.time() - start_time
-    print(".1f"except Exception as e:
+    print(f"✅ Model loaded in {load_time:.1f} seconds")
+
+except Exception as e:
     print(f"❌ Failed to load model: {e}")
     raise
 
@@ -120,7 +122,7 @@ print("✅ LoRA Model: Successfully loaded and integrated")
 print("✅ Inference: Working with optimized generation")
 print("✅ Responses: Professional interview-focused content")
 print(f"✅ Load Time: {load_time:.1f}s")
-print(f"✅ Model Size: ~113MB (LoRA adapters only)")
+print("✅ Model Size: ~113MB (LoRA adapters only)")
 print("\n🚀 Vetta AI Interviewer is ready for integration!")
 print(f"📚 Model Repository: https://huggingface.co/{LORA_REPO}")
 print("\n💡 Next Steps:")
