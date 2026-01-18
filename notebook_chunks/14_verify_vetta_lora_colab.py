@@ -158,7 +158,8 @@ Vetta:"""
         has_questions = "?" in vetta_response
         has_technical_terms = any(term in vetta_response.lower() for term in ["api", "database", "framework", "algorithm", "performance"])
 
-        print("📊 Quality Metrics:"        print(f"   • Words: {word_count}")
+        print("📊 Quality Metrics:")
+        print(f"   • Words: {word_count}")
         print(f"   • Asks questions: {'✅' if has_questions else '❌'}")
         print(f"   • Technical content: {'✅' if has_technical_terms else '❌'}")
         print(f"   • Response length: {'Good' if 50 <= word_count <= 300 else 'Check length'}")
